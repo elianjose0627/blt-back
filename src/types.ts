@@ -41,6 +41,14 @@ export interface IUser {
   logoutTime?: Nullable<Date>
 }
 
+export interface ICustomer {
+  id: string
+  internalCustomerId: number
+  createdAt: Date
+  updatedAt: Date
+  customer: IUser
+}
+
 export interface CustomRequest extends Request {
   user?: any
   record?: any
