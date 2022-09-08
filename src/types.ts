@@ -49,6 +49,14 @@ export interface ICustomer {
   customer: IUser
 }
 
+export interface IToken {
+  id: string
+  accessToken: string
+  refreshToken: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface CustomRequest extends Request {
   user?: any
   record?: any
