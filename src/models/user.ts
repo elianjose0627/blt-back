@@ -42,7 +42,10 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
     private readonly updatedAt: Date
 
     static associate (models: any): any {
-
+      User.hasOne(models.Customer, {
+        foreignKey: 'userId',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): IUser {
@@ -159,7 +162,7 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
   })
 
   User.beforeSave(async (user: any) => {
-    if (user.changed('password')) {
+    if (user.changed('password') === true) {
       user.password = await bcrypt.hash(user.password, 10)
     }
     user.firstName = capitalize(user.firstName)

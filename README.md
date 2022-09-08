@@ -8,7 +8,7 @@ Service account credentials from Google Cloud for file storage on Firebase
 
 **Setting up the database with a user who has all privileges**
 ```
-psql postgres 
+psql postgres or sudo -u postgres psql postgres
 postgres=# create database your_database;
 postgres=# create user your-username with encrypted password 'your-password';
 postgres=# grant all privileges on database your_database to username;
