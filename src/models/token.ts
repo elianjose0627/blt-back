@@ -37,11 +37,11 @@ const TokenModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false
     },
     accessToken: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false
     },
     refreshToken: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false
     }
   }, {
