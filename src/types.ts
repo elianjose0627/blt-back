@@ -24,6 +24,7 @@ export interface LoginTime {
 
 export interface IUser {
   id: string
+  customerId: string | null
   location?: any
   firstName: string
   lastName: string
@@ -69,6 +70,7 @@ export interface CustomRequest extends Request {
 
 export interface TokenUser {
   id: string
+  customerId: string
   email: string
   role: string
   logoutTime: any
