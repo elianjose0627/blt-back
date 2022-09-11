@@ -6,6 +6,7 @@ import { LoginTime, MediaData, INotifications, Nullable, Role, IUser } from '../
 const UserModel = (sequelize: any, DataTypes: any): any => {
   interface UserAttributes {
     id: string
+    customerId: string | null
     firstName: string
     lastName: string
     username: string
@@ -40,17 +41,20 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
     private readonly password: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
+    private readonly customerId: string | null
 
     static associate (models: any): any {
       User.hasOne(models.Customer, {
         foreignKey: 'userId',
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
+        as: 'customer'
       })
     }
 
     toJSONFor (): IUser {
       return {
         id: this.id,
+        customerId: this.customerId,
         firstName: this.firstName,
         lastName: this.lastName,
         username: this.username,
@@ -83,6 +87,10 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
       type: DataTypes.UUID,
       primaryKey: true,
       allowNull: false
+    },
+    customerId: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     firstName: {
       type: DataTypes.STRING,
