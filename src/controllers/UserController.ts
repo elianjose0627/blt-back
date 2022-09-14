@@ -11,7 +11,7 @@ class UserController extends BaseController {
     const response = await userService.login(email, password)
     const statusCode = response.message === 'User not found' ? statusCodes.NOT_FOUND : statusCodes.UNAUTHORIZED
 
-    if (response.message) {
+    if (response.message !== undefined) {
       return res.status(statusCode).send({
         statusCode,
         success: false,
@@ -59,7 +59,7 @@ class UserController extends BaseController {
 
     const response = await userService.updatePassword(record, { password, currentPassword, logoutTime: Date() })
 
-    if (response.message) {
+    if (response.message !== undefined) {
       return res.status(statusCodes.FORBIDDEN).send({
         statusCode: statusCodes.FORBIDDEN,
         success: false,
@@ -93,7 +93,7 @@ class UserController extends BaseController {
 
     const response = await userService.forgotPassword(email)
 
-    if (response.message) {
+    if (response.message !== undefined) {
       return res.status(response.status).send({
         statusCode: response.status,
         success: false,
@@ -130,7 +130,7 @@ class UserController extends BaseController {
     const { user } = req
     const response = await userService.sendVerifyEmail(user)
 
-    if (response.message) {
+    if (response.message !== undefined) {
       return res.status(response.status).send({
         statusCode: response.status,
         success: false,
@@ -179,7 +179,7 @@ class UserController extends BaseController {
     const { limit, page, offset, email } = req.query
     let records: any
 
-    if (email) {
+    if (email !== undefined) {
       records = await userService.searchUsers(limit, offset, email)
     } else {
       records = await userService.getAll(limit, offset)

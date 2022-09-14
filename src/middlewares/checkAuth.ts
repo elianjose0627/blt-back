@@ -4,7 +4,7 @@ import { CustomNext, CustomRequest, CustomResponse } from '../types'
 
 const checkAuth = (req: CustomRequest, res: CustomResponse, next: CustomNext): any => {
   passport.authenticate('jwt', { session: false }, function (err, user, info) {
-    if (err) {
+    if (err !== null) {
       return res.status(statusCodes.NOT_FOUND).send({
         statusCode: statusCodes.NOT_FOUND,
         success: false,
@@ -14,7 +14,7 @@ const checkAuth = (req: CustomRequest, res: CustomResponse, next: CustomNext): a
       })
     }
 
-    if (user) {
+    if (user !== false) {
       req.user = user
       return next()
     }

@@ -97,6 +97,21 @@ const validateUUID = Joi.object().keys({
   id: Joi.string().uuid()
 })
 
+const validateUsersQueryParams = Joi.object({
+  limit: Joi.number().optional(),
+  page: Joi.number().optional(),
+  offset: Joi.number().optional(),
+  email: Joi.string().optional().email().lowercase().max(128)
+})
+
+const validateNotifications = Joi.object({
+  user: Joi.object({
+    notifications: Joi.object({
+      isEnabled: Joi.boolean().optional()
+    })
+  })
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -107,5 +122,7 @@ export default {
   validateEmail,
   validateOtp,
   validateUserPhoto,
-  validatePasswordReset
+  validatePasswordReset,
+  validateUsersQueryParams,
+  validateNotifications
 }
