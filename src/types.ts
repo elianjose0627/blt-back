@@ -58,6 +58,15 @@ export interface IToken {
   updatedAt: Date
 }
 
+export interface ICompany {
+  id: string
+  company: string
+  customerId: number
+  email: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface CustomRequest extends Request {
   user?: any
   record?: any
