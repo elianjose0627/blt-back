@@ -21,11 +21,11 @@ class BaseService {
   }
 
   singleRecord (): string {
-    return `${this.model.charAt(0).toLowerCase()}${this.model.slice(1)}`
+    return `${String(this.model.charAt(0).toLowerCase())}${String(this.model.slice(1))}`
   }
 
   manyRecords (): string {
-    return `${this.model.charAt(0).toLowerCase()}${this.model.slice(1)}s`
+    return `${String(this.model.charAt(0).toLowerCase())}${String(this.model.slice(1))}s`
   }
 
   async findById (id: string, paranoid = true): Promise<any> {
