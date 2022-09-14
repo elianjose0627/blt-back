@@ -40,10 +40,6 @@ const validateUpdatedUser = Joi.object({
       }),
     location: Joi.object({
       country: Joi.string().required().valid(...countryList.countries).allow('').allow(null)
-    }).optional(),
-    goals: Joi.object({
-      daily: Joi.number().min(10).max(100).required(),
-      weekly: Joi.number().min(50).max(500).required()
     }).optional()
   }).required()
 })
