@@ -18,3 +18,8 @@ steps:
   args: ['run', 'migrate']
 - name: 'gcr.io/cloud-builders/npm'
   args: ['test']
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['run', 'codecov-coverage']
+  env:
+    - 'CODECOV_TOKEN=${_CODECOV_TOKEN}'
+  timeout: '600s'
