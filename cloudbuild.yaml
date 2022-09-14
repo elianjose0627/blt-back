@@ -17,6 +17,12 @@ steps:
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'migrate']
 - name: 'gcr.io/cloud-builders/npm'
+  args: ['test']
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['run', 'codecov-coverage']
+  env:
+    - 'CODECOV_TOKEN=${_CODECOV_TOKEN}'
+- name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'build']
 - name: 'gcr.io/cloud-builders/docker'
   args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/endeavour-api', '.' ]

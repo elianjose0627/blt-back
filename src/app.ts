@@ -14,6 +14,7 @@ import passportAuth from './config/passport'
 dotenv.config()
 passportAuth(passport)
 
+const apiPrefix = '/api'
 const authPrefix = '/auth'
 
 // Set up the express app
@@ -30,8 +31,9 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 // Add routes to the app
-// app.use(apiPrefix, routers.userRouter())
+app.use(apiPrefix, routers.userRouter())
 app.use(authPrefix, routers.authRouter())
+app.use(apiPrefix, routers.profileRouter())
 
 // Add validation middleware
 app.use(joiErrors)

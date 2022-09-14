@@ -11,16 +11,17 @@ dayjs.extend(utc)
 
 const expiresIn = process.env.TOKEN_EXPIRATION
 
-const appName = process.env.APP_NAME
-const adminEmail = process.env.ADMIN_EMAIL
+const appName = String(process.env.APP_NAME)
+const adminEmail = String(process.env.ADMIN_EMAIL)
 
 class UserService extends BaseService {
   async findByEmail (email: string): Promise<any> {
-    return await db[this.model].findOne({
+    const user = await db[this.model].findOne({
       where: {
         email
       }
     })
+    return user
   }
 
   async login (email: string, password: string): Promise<any> {
@@ -29,7 +30,8 @@ class UserService extends BaseService {
         email
       }
     })
-    if (!user) {
+
+    if (user === null) {
       return { message: 'User not found' }
     }
 
@@ -50,7 +52,7 @@ class UserService extends BaseService {
       }
     }
 
-    return user.comparePassword(password, async (match: any) => {
+    return user.comparePassword(password, async (match: boolean) => {
       if (match) {
         const token = generateToken(user, 'login', expiresIn)
         const loginTime = {
@@ -74,7 +76,7 @@ class UserService extends BaseService {
         const loginTime = {
           ...user.loginTime,
           lastFailed: dayjs.utc(),
-          failed: user.loginTime.failed + 1
+          failed: Number(user.loginTime.failed) + 1
         }
         await db[this.model].update({
           loginTime
@@ -102,12 +104,12 @@ class UserService extends BaseService {
   async updatePassword (record: any, data: any): Promise<any> {
     const { currentPassword, password, logoutTime } = data
 
-    return record.comparePassword(currentPassword, async (match: any) => {
+    return record.comparePassword(currentPassword, async (match: boolean) => {
       if (match) {
         const updatedRecord = await record.update({ password, logoutTime })
 
         const bccStatus = false
-        const message = `Hello ${updatedRecord.firstName}, your password for ${appName} App has been updated. \nIf you didn't ask to change your password, contact us immediately through ${adminEmail}. \n\nThanks,\n\n${appName} Application team`
+        const message = `Hello ${String(updatedRecord.firstName)}, your password for ${appName} App has been updated. \nIf you didn't ask to change your password, contact us immediately through ${adminEmail}. \n\nThanks,\n\n${appName} Application team`
         try {
           await sendNotifierEmail(updatedRecord.email, 'Password Change', message, bccStatus)
         } catch (error) {}
@@ -126,10 +128,10 @@ class UserService extends BaseService {
       }
     })
 
-    if (user) {
+    if (user !== null) {
       const otp = generateOtp()
       const subject = `Reset your password for ${appName}`
-      const message = `Hello ${user.firstName},\n\nYour OTP is ${otp}.\nOpen the app and go to Sign In Page.\nClick the Forgot your password link.\nOn the Restore Password Page, click the Enter OTP link and enter the code you received on your email.\n\nIf you didn’t ask to reset your password, you can ignore this email.\n\nThanks,\n\n${appName} team`
+      const message = `Hello ${String(user.firstName)},\n\nYour OTP is ${otp}.\nOpen the app and go to Sign In Page.\nClick the Forgot your password link.\nOn the Restore Password Page, click the Enter OTP link and enter the code you received on your email.\n\nIf you didn’t ask to reset your password, you can ignore this email.\n\nThanks,\n\n${appName} team`
 
       await user.update({ otp: { createdAt: dayjs.utc(), value: otp } })
 
@@ -155,7 +157,7 @@ class UserService extends BaseService {
     const { email, firstName } = user
     const otp = generateOtp()
     const subject = `Verify your email for ${appName}`
-    const message = `Hello ${firstName},\n\nYour OTP is ${otp}.\nOpen the app and make sure you are logged in.\nClick on the profile picture at the top of the screen.\nSelect Verify, and enter the code you received on your email.\n\nIf you didn’t ask to reset your password, you can ignore this email.\n\nThanks,\n\n${appName} team`
+    const message = `Hello ${String(firstName)},\n\nYour OTP is ${otp}.\nOpen the app and make sure you are logged in.\nClick on the profile picture at the top of the screen.\nSelect Verify, and enter the code you received on your email.\n\nIf you didn’t ask to reset your password, you can ignore this email.\n\nThanks,\n\n${appName} team`
 
     await user.update({ otp: { createdAt: dayjs.utc(), value: otp } })
 

@@ -1,3 +1,4 @@
+[![codecov](https://codecov.io/gh/big-little-things/endeavour-backend/branch/main/graph/badge.svg?token=WLP34K1QSX)](https://codecov.io/gh/big-little-things/endeavour-backend)
 # endeavour-backend
 A REST API for the big little things backend.
 ## Prerequisites

@@ -40,10 +40,6 @@ const validateUpdatedUser = Joi.object({
       }),
     location: Joi.object({
       country: Joi.string().required().valid(...countryList.countries).allow('').allow(null)
-    }).optional(),
-    goals: Joi.object({
-      daily: Joi.number().min(10).max(100).required(),
-      weekly: Joi.number().min(50).max(500).required()
     }).optional()
   }).required()
 })
@@ -97,6 +93,21 @@ const validateUUID = Joi.object().keys({
   id: Joi.string().uuid()
 })
 
+const validateUsersQueryParams = Joi.object({
+  limit: Joi.number().optional(),
+  page: Joi.number().optional(),
+  offset: Joi.number().optional(),
+  email: Joi.string().optional().email().lowercase().max(128)
+})
+
+const validateNotifications = Joi.object({
+  user: Joi.object({
+    notifications: Joi.object({
+      isEnabled: Joi.boolean().optional()
+    })
+  })
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -107,5 +118,7 @@ export default {
   validateEmail,
   validateOtp,
   validateUserPhoto,
-  validatePasswordReset
+  validatePasswordReset,
+  validateUsersQueryParams,
+  validateNotifications
 }
