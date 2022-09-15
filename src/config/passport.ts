@@ -13,6 +13,13 @@ const jwtOptions = {
 const passportAuth = (passport: PassportStatic): any => {
   const getUser = async (email: string): Promise<any> => db.User.findOne({
     attributes: { exclude: ['password'] },
+    include: [
+      {
+        model: db.Company,
+        attributes: ['id', 'name', 'email', 'customerId'],
+        as: 'company'
+      }
+    ],
     where: {
       email
     }

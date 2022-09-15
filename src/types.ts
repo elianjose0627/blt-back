@@ -24,7 +24,7 @@ export interface LoginTime {
 
 export interface IUser {
   id: string
-  customerId: string | null
+  salutation?: string
   location?: any
   firstName: string
   lastName: string
@@ -40,6 +40,7 @@ export interface IUser {
   notifications: INotifications
   loginTime: LoginTime
   logoutTime?: Nullable<Date>
+  company: ICompany | null
 }
 
 export interface ICustomer {
@@ -60,11 +61,13 @@ export interface IToken {
 
 export interface ICompany {
   id: string
-  company: string
+  name: string
   customerId: number
   email: string
-  createdAt: Date
-  updatedAt: Date
+  phone?: string
+  vat?: string
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export interface CustomRequest extends Request {
@@ -79,7 +82,7 @@ export interface CustomRequest extends Request {
 
 export interface TokenUser {
   id: string
-  customerId: string
+  company: ICompany | null
   email: string
   role: string
   logoutTime: any

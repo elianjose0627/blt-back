@@ -6,7 +6,7 @@ import { LoginTime, MediaData, INotifications, Nullable, Role, IUser } from '../
 const UserModel = (sequelize: any, DataTypes: any): any => {
   interface UserAttributes {
     id: string
-    customerId: string | null
+    salutation: string
     firstName: string
     lastName: string
     username: string
@@ -25,6 +25,7 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
   }
   class User extends Model<UserAttributes> {
     private readonly id: string
+    private readonly salutation: string
     private readonly firstName: string
     private readonly lastName: string
     private readonly username: string
@@ -41,20 +42,20 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
     private readonly password: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
-    private readonly customerId: string | null
+    private readonly company: any
 
     static associate (models: any): any {
-      User.hasOne(models.Customer, {
-        foreignKey: 'userId',
-        onDelete: 'CASCADE',
-        as: 'customer'
+      User.belongsTo(models.Company, {
+        foreignKey: 'companyId',
+        as: 'company',
+        onDelete: 'CASCADE'
       })
     }
 
     toJSONFor (): IUser {
       return {
         id: this.id,
-        customerId: this.customerId,
+        salutation: this.salutation,
         firstName: this.firstName,
         lastName: this.lastName,
         username: this.username,
@@ -69,7 +70,8 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
         updatedAt: this.updatedAt,
         logoutTime: this.logoutTime,
         notifications: this.notifications,
-        loginTime: this.loginTime
+        loginTime: this.loginTime,
+        company: this.company
       }
     }
 
@@ -88,7 +90,7 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
       primaryKey: true,
       allowNull: false
     },
-    customerId: {
+    salutation: {
       type: DataTypes.STRING,
       allowNull: true
     },

@@ -6,6 +6,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.UUID
       },
+      salutation: {
+        type: Sequelize.STRING
+      },
       firstName: {
         type: Sequelize.STRING
       },
@@ -85,6 +88,16 @@ module.exports = {
       deletedAt: {
         allowNull: true,
         type: Sequelize.DATE
+      },
+      companyId: {
+        allowNull: true,
+        type: Sequelize.UUID,
+        onDelete: 'CASCADE',
+        references: {
+          model: 'Companies',
+          key: 'id',
+          as: 'companyId'
+        }
       }
     })
   },

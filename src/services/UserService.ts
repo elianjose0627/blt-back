@@ -14,9 +14,18 @@ const expiresIn = process.env.TOKEN_EXPIRATION
 const appName = String(process.env.APP_NAME)
 const adminEmail = String(process.env.ADMIN_EMAIL)
 
+const include = [
+  {
+    model: db.Company,
+    attributes: ['id', 'name', 'email', 'customerId'],
+    as: 'company'
+  }
+]
+
 class UserService extends BaseService {
   async findByEmail (email: string): Promise<any> {
     const user = await db[this.model].findOne({
+      include,
       where: {
         email
       }
@@ -26,6 +35,7 @@ class UserService extends BaseService {
 
   async login (email: string, password: string): Promise<any> {
     const user = await db[this.model].findOne({
+      include,
       where: {
         email
       }
