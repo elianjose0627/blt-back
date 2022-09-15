@@ -1,39 +1,49 @@
 import { Model } from 'sequelize'
 import { ICompany } from '../types'
 
-const ShippingAddressModel = (sequelize: any, DataTypes: any): any => {
-  interface ShippingAddressAttributes {
+const CompanyModel = (sequelize: any, DataTypes: any): any => {
+  interface CompanyAttributes {
     id: string
     customerId: number
-    company: string
+    name: string
     email: string
+    phone: string
+    vat: string
   }
 
-  class ShippingAddress extends Model<ShippingAddressAttributes> {
+  class Company extends Model<CompanyAttributes> {
     private readonly id: string
     private readonly customerId: number
-    private readonly company: string
+    private readonly name: string
     private readonly email: string
+    private readonly phone: string
+    private readonly vat: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
 
     static associate (models: any): any {
-
+      Company.hasMany(models.User, {
+        foreignKey: 'companyId',
+        as: 'employees',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): ICompany {
       return {
         id: this.id,
         customerId: this.customerId,
-        company: this.company,
+        name: this.name,
         email: this.email,
+        phone: this.phone,
+        vat: this.vat,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       }
     }
   };
 
-  ShippingAddress.init({
+  Company.init({
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
@@ -43,21 +53,29 @@ const ShippingAddressModel = (sequelize: any, DataTypes: any): any => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    company: {
+    name: {
       type: DataTypes.STRING,
       allowNull: true
     },
     email: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    vat: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     sequelize,
     paranoid: true,
-    modelName: 'ShippingAddress'
+    modelName: 'Company'
   })
 
-  return ShippingAddress
+  return Company
 }
 
-module.exports = ShippingAddressModel
+module.exports = CompanyModel
