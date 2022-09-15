@@ -24,7 +24,7 @@ class BaseController {
     const { id } = req.params
     const record = await this.service.findById(id)
 
-    if (!(record)) {
+    if (record === null) {
       return res.status(statusCodes.NOT_FOUND).send({
         statusCode: statusCodes.NOT_FOUND,
         success: false,
