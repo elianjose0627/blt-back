@@ -28,6 +28,7 @@ const validateLogin = Joi.object({
 
 const validateUpdatedUser = Joi.object({
   user: Joi.object({
+    salutation: Joi.string().optional().max(8),
     firstName: Joi.string().optional().max(64),
     lastName: Joi.string().optional().max(64),
     username: Joi.string().lowercase().optional().allow(null).max(64).regex(/^\S+$/)
