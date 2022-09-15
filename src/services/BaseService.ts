@@ -30,7 +30,15 @@ class BaseService {
 
   async findById (id: string, paranoid = true): Promise<any> {
     const excluded = this.model === 'User' ? [] : ['userId']
-    const included = this.model === 'User' ? [] : generateInclude()
+    const included = this.model === 'User'
+      ? [
+          {
+            model: db.Company,
+            attributes: ['id', 'name', 'email', 'customerId'],
+            as: 'company'
+          }
+        ]
+      : generateInclude()
 
     const record = await db[this.model].findOne({
       attributes: { exclude: [...excluded] },
