@@ -13,6 +13,7 @@ describe('generateToken', () => {
       company: null,
       email: 'simiyuwire@gmail.com',
       role: 'administrator',
+      isVerified: true,
       logoutTime: '2020-08-28T12:19:25.850Z'
     }
     const type = 'login'
@@ -29,6 +30,7 @@ describe('generateToken', () => {
       company: null,
       email: 'simiyuwire@gmail.com',
       role: 'administrator',
+      isVerified: true,
       logoutTime: '2020-08-28T12:19:25.850Z'
     }
     const type = 'login'
