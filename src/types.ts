@@ -43,14 +43,6 @@ export interface IUser {
   company: ICompany | null
 }
 
-export interface ICustomer {
-  id: string
-  internalCustomerId: number
-  createdAt: Date
-  updatedAt: Date
-  customer: IUser
-}
-
 export interface IToken {
   id: string
   accessToken: string
@@ -82,7 +74,6 @@ export interface CustomRequest extends Request {
 
 export interface TokenUser {
   id: string
-  company: ICompany | null
   email: string
   role: string
   logoutTime: any

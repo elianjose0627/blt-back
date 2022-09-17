@@ -6,7 +6,7 @@ import checkAuth from '../middlewares/checkAuth'
 const profileRoutes = (): any => {
   const profileRouter = express.Router()
 
-  profileRouter.use('/profiles', asyncHandler(checkAuth))
+  profileRouter.use('/profiles', checkAuth)
   profileRouter.route('/profiles/me')
     .get(asyncHandler(UserController.getMyProfile))
   profileRouter.route('/profiles/:id')

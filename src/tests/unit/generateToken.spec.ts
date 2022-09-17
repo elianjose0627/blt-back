@@ -10,7 +10,6 @@ describe('generateToken', () => {
   it('should return a token', () => {
     const user = {
       id: 'b686e980-e928-11ea-9732-ebb399168cb4',
-      company: null,
       email: 'simiyuwire@gmail.com',
       role: 'administrator',
       isVerified: true,
@@ -27,7 +26,6 @@ describe('generateToken', () => {
   it('should return a token when expiresIn is not set', () => {
     const user = {
       id: 'b686e980-e928-11ea-9732-ebb399168cb4',
-      company: null,
       email: 'simiyuwire@gmail.com',
       role: 'administrator',
       isVerified: true,
