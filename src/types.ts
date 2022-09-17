@@ -86,6 +86,7 @@ export interface TokenUser {
   email: string
   role: string
   logoutTime: any
+  isVerified: boolean
 }
 
 export interface CustomResponse extends Response {}
