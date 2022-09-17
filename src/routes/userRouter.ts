@@ -12,7 +12,7 @@ import checkOtp from '../middlewares/checkOtp'
 const userRoutes = (): any => {
   const userRouter = express.Router()
 
-  userRouter.use('/users', asyncHandler(checkAuth))
+  userRouter.use('/users', checkAuth)
   userRouter.route('/users')
     .get(asyncHandler(checkAdmin), celebrate({
       query: validator.validateUsersQueryParams
