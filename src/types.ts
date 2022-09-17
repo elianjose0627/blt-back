@@ -74,7 +74,6 @@ export interface CustomRequest extends Request {
 
 export interface TokenUser {
   id: string
-  company: ICompany | null
   email: string
   role: string
   logoutTime: any
