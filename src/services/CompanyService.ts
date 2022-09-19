@@ -3,6 +3,10 @@ import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 
 class CompanyService extends BaseService {
+  manyRecords (): string {
+    return 'companies'
+  }
+
   async insert (data: any): Promise<any> {
     const { user, company } = data
     let response: any
