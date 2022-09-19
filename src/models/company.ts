@@ -1,10 +1,9 @@
 import { Model } from 'sequelize'
-import { ICompany } from '../types'
+import { ICompany, IUser } from '../types'
 
 const CompanyModel = (sequelize: any, DataTypes: any): any => {
   interface CompanyAttributes {
     id: string
-    customerId: number
     name: string
     email: string
     phone: string
@@ -13,15 +12,20 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
 
   class Company extends Model<CompanyAttributes> {
     private readonly id: string
-    private readonly customerId: number
     private readonly name: string
     private readonly email: string
     private readonly phone: string
     private readonly vat: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
+    private readonly owner: IUser
 
     static associate (models: any): any {
+      Company.belongsTo(models.User, {
+        foreignKey: 'userId',
+        as: 'owner',
+        onDelete: 'CASCADE'
+      })
       Company.hasMany(models.User, {
         foreignKey: 'companyId',
         as: 'employees',
@@ -32,13 +36,13 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     toJSONFor (): ICompany {
       return {
         id: this.id,
-        customerId: this.customerId,
         name: this.name,
         email: this.email,
         phone: this.phone,
         vat: this.vat,
         createdAt: this.createdAt,
-        updatedAt: this.updatedAt
+        updatedAt: this.updatedAt,
+        owner: this.owner
       }
     }
   };
@@ -47,10 +51,6 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
-      allowNull: false
-    },
-    customerId: {
-      type: DataTypes.INTEGER,
       allowNull: false
     },
     name: {

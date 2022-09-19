@@ -4,7 +4,7 @@ import { LoggingWinston } from '@google-cloud/logging-winston'
 const loggingWinston = new LoggingWinston({
   defaultCallback: err => {
     // eslint-disable-next-line no-console
-    console.log(`LoggingWinston Callback: ${err}`)
+    console.log(`LoggingWinston Callback: ${String(err)}`)
   }
 })
 

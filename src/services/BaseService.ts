@@ -1,12 +1,12 @@
 import { v1 as uuidv1 } from 'uuid'
 import db from '../models'
 
-const generateInclude = (): any => {
+export const generateInclude = (): any => {
   return (
     [
       {
         model: db.User,
-        attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role', 'updatedAt'],
+        attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role', 'updatedAt', 'createdAt'],
         as: 'owner'
       }
     ]
@@ -30,11 +30,11 @@ class BaseService {
 
   async findById (id: string, paranoid = true): Promise<any> {
     const excluded = this.model === 'User' ? [] : ['userId']
-    const included = this.model === 'User'
+    const included = (this.model === 'User')
       ? [
           {
             model: db.Company,
-            attributes: ['id', 'name', 'email', 'customerId'],
+            attributes: ['id', 'name', 'email'],
             as: 'company'
           }
         ]

@@ -14,6 +14,7 @@ steps:
     - 'TOKEN_AUDIENCE=${_TOKEN_AUDIENCE}'
     - 'MAILER_EMAIL=${_MAILER_EMAIL}'
     - 'SENDGRID_API_KEY=${_SENDGRID_API_KEY}'
+    - 'APP_NAME=${_APP_NAME}'
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'migrate']
 - name: 'gcr.io/cloud-builders/npm'

@@ -50,6 +50,10 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
         as: 'company',
         onDelete: 'CASCADE'
       })
+      User.hasOne(models.Company, {
+        foreignKey: 'userId',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): IUser {
