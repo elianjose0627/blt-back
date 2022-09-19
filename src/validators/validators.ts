@@ -48,7 +48,7 @@ const validateUpdatedUser = Joi.object({
 const validateRole = Joi.object({
   user: Joi.object({
     role: Joi.string().lowercase()
-      .valid(...['user', 'administrator', 'customer', 'company'])
+      .valid(...['user', 'administrator', 'customer', 'company', 'manager'])
       .required()
   }).required()
 })
@@ -101,12 +101,42 @@ const validateUsersQueryParams = Joi.object({
   email: Joi.string().optional().email().lowercase().max(128)
 })
 
+const validateQueryParams = Joi.object({
+  limit: Joi.number().optional(),
+  page: Joi.number().optional(),
+  offset: Joi.number().optional()
+})
+
 const validateNotifications = Joi.object({
   user: Joi.object({
     notifications: Joi.object({
       isEnabled: Joi.boolean().optional()
     })
   })
+})
+
+const validateCreatedCompany = Joi.object({
+  company: Joi.object({
+    name: Joi.string().required().max(64),
+    email: Joi.string().email().lowercase().required().max(128),
+    phone: Joi.string().optional().allow('').allow(null).min(9).max(15).regex(/^[0-9]+$/)
+      .messages({
+        'string.pattern.base': '{#label} must be numeric'
+      }),
+    vat: Joi.string().optional().max(24)
+  }).required()
+})
+
+const validateUpdatedCompany = Joi.object({
+  company: Joi.object({
+    name: Joi.string().optional().max(64),
+    email: Joi.string().email().lowercase().optional().max(128),
+    phone: Joi.string().optional().allow('').allow(null).min(9).max(15).regex(/^[0-9]+$/)
+      .messages({
+        'string.pattern.base': '{#label} must be numeric'
+      }),
+    vat: Joi.string().optional().max(24)
+  }).required()
 })
 
 export default {
@@ -121,5 +151,8 @@ export default {
   validateUserPhoto,
   validatePasswordReset,
   validateUsersQueryParams,
-  validateNotifications
+  validateNotifications,
+  validateCreatedCompany,
+  validateQueryParams,
+  validateUpdatedCompany
 }

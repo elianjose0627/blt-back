@@ -2,10 +2,10 @@ import * as statusCodes from '../constants/statusCodes'
 import { CustomNext, CustomRequest, CustomResponse } from '../types'
 
 const checkOwner = (req: CustomRequest, res: CustomResponse, next: CustomNext): any => {
-  const { user: currentUser, record: { owner, trainer } } = req
+  const { user: currentUser, record: { owner, email } } = req
   const { id } = req.params
 
-  if (currentUser.id === id || currentUser.id === owner?.id || currentUser.id === trainer?.id) {
+  if (currentUser.id === id || currentUser.id === owner?.id || currentUser.email === email) {
     return next()
   } else {
     return res.status(statusCodes.FORBIDDEN).send({

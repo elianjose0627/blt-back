@@ -17,7 +17,7 @@ const adminEmail = String(process.env.ADMIN_EMAIL)
 const include = [
   {
     model: db.Company,
-    attributes: ['id', 'name', 'email', 'customerId'],
+    attributes: ['id', 'name', 'email'],
     as: 'company'
   }
 ]

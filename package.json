@@ -12,6 +12,7 @@
     "lint": "eslint './src/**/*.ts' --quiet",
     "create-env": "printenv > .env",
     "migrate": "sequelize db:migrate",
+    "migrate:undo": "sequelize db:migrate:undo",
     "reset:db": "sequelize db:migrate:undo:all && npm run migrate",
     "test": "NODE_ENV=test npm run reset:db && NODE_ENV=test nyc mocha --require ts-node/register --timeout 10000 src/tests/**/*.spec.ts --exit",
     "coveralls-coverage": "nyc report --reporter=text-lcov | coveralls",

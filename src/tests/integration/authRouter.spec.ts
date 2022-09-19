@@ -172,7 +172,7 @@ describe('Auth Actions', () => {
     expect(res.body.errors.details[0].username).to.equal('user.username cannot contain spaces')
   })
 
-  xit('should return 200 when a reset code is requested', async () => {
+  it('should return 200 when a reset code is requested', async () => {
     await chai
       .request(app)
       .post('/auth/signup')
