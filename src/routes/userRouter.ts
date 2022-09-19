@@ -1,5 +1,5 @@
 import express from 'express'
-import { celebrate } from 'celebrate'
+import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import UserController from '../controllers/UserController'
 import asyncHandler from '../middlewares/asyncHandler'
@@ -15,40 +15,40 @@ const userRoutes = (): any => {
   userRouter.use('/users', checkAuth)
   userRouter.route('/users')
     .get(asyncHandler(checkAdmin), celebrate({
-      query: validator.validateUsersQueryParams
+      [Segments.QUERY]: validator.validateUsersQueryParams
     }), asyncHandler(paginate), asyncHandler(UserController.getAll))
   userRouter.use('/users/:id', celebrate({
-    params: validator.validateUUID
+    [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(UserController.checkRecord))
   userRouter.route('/users/:id')
     .get(asyncHandler(checkOwner), asyncHandler(UserController.get))
     .put(asyncHandler(checkOwner), celebrate({
-      body: validator.validateUpdatedUser
+      [Segments.BODY]: validator.validateUpdatedUser
     }), asyncHandler(UserController.update))
     .delete(asyncHandler(checkAdmin), asyncHandler(UserController.delete))
   userRouter.route('/users/:id/purge')
     .delete(asyncHandler(checkOwner), asyncHandler(UserController.purge))
   userRouter.route('/users/:id/role')
     .patch(asyncHandler(checkAdmin), celebrate({
-      body: validator.validateRole
+      [Segments.BODY]: validator.validateRole
     }), asyncHandler(UserController.updateRole))
   userRouter.route('/users/:id/photo')
     .patch(asyncHandler(checkOwner), celebrate({
-      body: validator.validateUserPhoto
+      [Segments.BODY]: validator.validateUserPhoto
     }), asyncHandler(UserController.update))
   userRouter.route('/users/:id/password')
     .patch(asyncHandler(checkOwner), celebrate({
-      body: validator.validatePassword
+      [Segments.BODY]: validator.validatePassword
     }), asyncHandler(UserController.updatePassword))
   userRouter.route('/users/:id/verify')
     .post(asyncHandler(checkOwner), asyncHandler(UserController.sendVerifyEmail))
   userRouter.route('/users/:id/verify')
     .patch(asyncHandler(checkOwner), celebrate({
-      body: validator.validateOtp
+      [Segments.BODY]: validator.validateOtp
     }), asyncHandler(checkOtp), asyncHandler(UserController.verifyEmail))
   userRouter.route('/users/:id/notifications')
     .patch(asyncHandler(checkOwner), celebrate({
-      body: validator.validateNotifications
+      [Segments.BODY]: validator.validateNotifications
     }), asyncHandler(UserController.updateNotifications))
 
   return userRouter

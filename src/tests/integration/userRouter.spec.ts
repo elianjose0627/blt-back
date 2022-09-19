@@ -306,7 +306,7 @@ describe('A user', () => {
     })
   })
 
-  xit('should return 200 when a verification code is requested', async () => {
+  it('should return 200 when a verification code is requested', async () => {
     await chai
       .request(app)
       .post('/auth/signup')

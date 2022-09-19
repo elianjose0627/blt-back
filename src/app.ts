@@ -34,6 +34,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use(apiPrefix, routers.userRouter())
 app.use(authPrefix, routers.authRouter())
 app.use(apiPrefix, routers.profileRouter())
+app.use(apiPrefix, routers.companyRouter())
 
 // Add validation middleware
 app.use(joiErrors)

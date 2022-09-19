@@ -54,12 +54,12 @@ export interface IToken {
 export interface ICompany {
   id: string
   name: string
-  customerId: number
   email: string
   phone?: string
   vat?: string
   createdAt?: Date
   updatedAt?: Date
+  owner?: IUser
 }
 
 export interface CustomRequest extends Request {
