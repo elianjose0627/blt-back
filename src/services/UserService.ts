@@ -19,7 +19,7 @@ const adminEmail = String(process.env.ADMIN_EMAIL)
 const include = [
   {
     model: db.Company,
-    attributes: ['id', 'name', 'email'],
+    attributes: ['id', 'name', 'email', 'phone', 'vat'],
     as: 'company'
   }
 ]
@@ -169,7 +169,7 @@ class UserService extends BaseService {
     const { email, firstName } = user
     const otp = generateOtp()
     const subject = `Verify your email for ${appName}`
-    const message = `Hello ${String(firstName)},\n\nYour OTP is ${otp}.\nOpen the app and make sure you are logged in.\nClick on the profile picture at the top of the screen.\nSelect Verify, and enter the code you received on your email.\n\nIf you didn’t ask to reset your password, you can ignore this email.\n\nThanks,\n\n${appName} team`
+    const message = `Hello ${String(firstName)},\n\nYour OTP is ${otp}.\nOpen the app and make sure you are logged in.\nClick on the profile picture at the top of the screen.\nSelect Profile, and enter the code you received on your email.\n\nIf you didn’t ask to reset your password, you can ignore this email.\n\nThanks,\n\n${appName} team`
 
     await user.update({ otp: { createdAt: dayjs.utc(), value: otp } })
 
