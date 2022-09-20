@@ -7,6 +7,8 @@ import { sendNotifierEmail } from '../utils/sendMail'
 import generateToken from '../utils/generateToken'
 import generateOtp from '../utils/generateOtp'
 
+// TODO email instructions when user registers for email verification
+
 dayjs.extend(utc)
 
 const expiresIn = process.env.TOKEN_EXPIRATION
@@ -145,7 +147,7 @@ class UserService extends BaseService {
 
       await user.update({ otp: { createdAt: dayjs.utc(), value: otp } })
 
-      const info = await sendNotifierEmail(email, subject, message)
+      const info = await sendNotifierEmail(email, subject, message, false)
 
       if (info[0].statusCode === 202) {
         return info
@@ -171,7 +173,7 @@ class UserService extends BaseService {
 
     await user.update({ otp: { createdAt: dayjs.utc(), value: otp } })
 
-    const info = await sendNotifierEmail(email, subject, message)
+    const info = await sendNotifierEmail(email, subject, message, false)
 
     if (info[0].statusCode === 202) {
       return info
