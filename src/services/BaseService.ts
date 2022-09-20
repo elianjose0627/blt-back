@@ -34,7 +34,7 @@ class BaseService {
       ? [
           {
             model: db.Company,
-            attributes: ['id', 'name', 'email'],
+            attributes: ['id', 'name', 'email', 'phone', 'vat'],
             as: 'company'
           }
         ]
