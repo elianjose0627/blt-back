@@ -15,6 +15,7 @@ interface Database {
   Sequelize?: any
   User?: any
   Company?: any
+  Address?: any
 }
 
 const db: Database = {}

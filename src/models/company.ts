@@ -31,6 +31,11 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         as: 'employees',
         onDelete: 'CASCADE'
       })
+      Company.hasOne(models.Address, {
+        foreignKey: 'companyId',
+        as: 'address',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): ICompany {

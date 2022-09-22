@@ -20,7 +20,14 @@ const include = [
   {
     model: db.Company,
     attributes: ['id', 'name', 'email', 'phone', 'vat'],
-    as: 'company'
+    as: 'company',
+    include: [
+      {
+        model: db.Address,
+        attributes: ['id', 'country', 'city', 'street', 'zip'],
+        as: 'address'
+      }
+    ]
   }
 ]
 
