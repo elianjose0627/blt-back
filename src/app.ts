@@ -35,6 +35,7 @@ app.use(apiPrefix, routers.userRouter())
 app.use(authPrefix, routers.authRouter())
 app.use(apiPrefix, routers.profileRouter())
 app.use(apiPrefix, routers.companyRouter())
+app.use(apiPrefix, routers.addressRouter())
 
 // Add validation middleware
 app.use(joiErrors)

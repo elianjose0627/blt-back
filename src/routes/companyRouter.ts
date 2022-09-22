@@ -2,6 +2,7 @@ import express from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import CompanyController from '../controllers/CompanyController'
+import AddressController from '../controllers/AddressController'
 import asyncHandler from '../middlewares/asyncHandler'
 import checkOwner from '../middlewares/checkOwner'
 import checkAdmin from '../middlewares/checkAdmin'
@@ -28,6 +29,10 @@ const companyRoutes = (): any => {
       [Segments.BODY]: validator.validateUpdatedCompany
     }), asyncHandler(CompanyController.update))
     .delete(asyncHandler(checkAdmin), asyncHandler(CompanyController.delete))
+  companyRouter.route('/companies/:id/address')
+    .post(celebrate({
+      [Segments.BODY]: validator.validateCreatedAddress
+    }, { abortEarly: false }), asyncHandler(AddressController.insert))
   return companyRouter
 }
 

@@ -139,6 +139,24 @@ const validateUpdatedCompany = Joi.object({
   }).required()
 })
 
+const validateCreatedAddress = Joi.object({
+  address: Joi.object({
+    country: Joi.string().required().valid(...countryList.countries).max(64),
+    city: Joi.string().required().max(64),
+    street: Joi.string().optional().allow('').allow(null).min(9).max(64),
+    zip: Joi.string().optional().max(24)
+  }).required()
+})
+
+const validateUpdatedAddress = Joi.object({
+  address: Joi.object({
+    country: Joi.string().optional().valid(...countryList.countries).max(64),
+    city: Joi.string().optional().max(64),
+    street: Joi.string().optional().allow('').allow(null).min(9).max(64),
+    zip: Joi.string().optional().max(24)
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -154,5 +172,7 @@ export default {
   validateNotifications,
   validateCreatedCompany,
   validateQueryParams,
-  validateUpdatedCompany
+  validateUpdatedCompany,
+  validateCreatedAddress,
+  validateUpdatedAddress
 }

@@ -62,13 +62,22 @@ export interface ICompany {
   owner?: IUser
 }
 
+export interface IAddress {
+  id: string
+  country: string
+  city: string
+  street?: string
+  zip?: string
+  createdAt?: Date
+  updatedAt?: Date
+  owner?: IUser
+}
+
 export interface CustomRequest extends Request {
   user?: any
   record?: any
   query: any
-  team?: any
-  workout?: any
-  member?: any
+  company?: any
   joiError?: boolean
 }
 
