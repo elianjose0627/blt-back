@@ -60,6 +60,7 @@ export interface ICompany {
   createdAt?: Date
   updatedAt?: Date
   owner?: IUser
+  address?: IAddress
 }
 
 export interface IAddress {
