@@ -60,15 +60,40 @@ export interface ICompany {
   createdAt?: Date
   updatedAt?: Date
   owner?: IUser
+  address?: IAddress
+}
+
+export interface IAddress {
+  id: string
+  country: string
+  city: string
+  street?: string
+  zip?: string
+  createdAt?: Date
+  updatedAt?: Date
+  owner?: IUser
+}
+
+export interface IRecipient {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone?: Nullable<string>
+  country: string
+  city: string
+  street?: string
+  zip?: string
+  createdAt?: Date
+  updatedAt?: Date
+  company?: ICompany
 }
 
 export interface CustomRequest extends Request {
   user?: any
   record?: any
   query: any
-  team?: any
-  workout?: any
-  member?: any
+  company?: any
   joiError?: boolean
 }
 

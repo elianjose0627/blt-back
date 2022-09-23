@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { ICompany, IUser } from '../types'
+import { IAddress, ICompany, IUser } from '../types'
 
 const CompanyModel = (sequelize: any, DataTypes: any): any => {
   interface CompanyAttributes {
@@ -19,6 +19,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly owner: IUser
+    private readonly address: IAddress
 
     static associate (models: any): any {
       Company.belongsTo(models.User, {
@@ -29,6 +30,16 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
       Company.hasMany(models.User, {
         foreignKey: 'companyId',
         as: 'employees',
+        onDelete: 'CASCADE'
+      })
+      Company.hasOne(models.Address, {
+        foreignKey: 'companyId',
+        as: 'address',
+        onDelete: 'CASCADE'
+      })
+      Company.hasMany(models.Recipient, {
+        foreignKey: 'companyId',
+        as: 'recipients',
         onDelete: 'CASCADE'
       })
     }
@@ -42,7 +53,8 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         vat: this.vat,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
-        owner: this.owner
+        owner: this.owner,
+        address: this.address
       }
     }
   };

@@ -1,7 +1,26 @@
 import { v1 as uuidv1 } from 'uuid'
 import db from '../models'
 
-export const generateInclude = (): any => {
+export const generateInclude = (model: string): any => {
+  if (model === 'Company') {
+    return (
+      [
+        {
+          model: db.User,
+          attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'updatedAt', 'createdAt'],
+          as: 'owner'
+        },
+        {
+          model: db.Address,
+          attributes: ['id', 'country', 'city', 'street', 'zip', 'updatedAt', 'createdAt'],
+          as: 'address'
+        }
+      ]
+    )
+  }
+  if (model === 'Recipient') {
+    return ([])
+  }
   return (
     [
       {
@@ -38,7 +57,7 @@ class BaseService {
             as: 'company'
           }
         ]
-      : generateInclude()
+      : generateInclude(this.model)
 
     const record = await db[this.model].findOne({
       attributes: { exclude: [...excluded] },

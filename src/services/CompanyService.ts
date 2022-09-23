@@ -12,7 +12,7 @@ class CompanyService extends BaseService {
     let response: any
 
     response = await db[this.model].findOne({
-      include: generateInclude(),
+      include: generateInclude(this.model),
       where: {
         name: company.name,
         email: company.email,

@@ -1,29 +1,39 @@
 'use strict'
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Companies', {
+    await queryInterface.createTable('Recipients', {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID
       },
-      customerId: {
-        allowNull: true,
-        type: Sequelize.INTEGER
+      firstName: {
+        type: Sequelize.STRING
       },
-      name: {
-        allowNull: true,
+      lastName: {
         type: Sequelize.STRING
       },
       email: {
-        allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true
       },
       phone: {
         allowNull: true,
         type: Sequelize.STRING
       },
-      vat: {
+      country: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+      city: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+      street: {
+        allowNull: true,
+        type: Sequelize.STRING
+      },
+      zip: {
         allowNull: true,
         type: Sequelize.STRING
       },
@@ -38,10 +48,20 @@ module.exports = {
       deletedAt: {
         allowNull: true,
         type: Sequelize.DATE
+      },
+      companyId: {
+        allowNull: true,
+        type: Sequelize.UUID,
+        onDelete: 'CASCADE',
+        references: {
+          model: 'Companies',
+          key: 'id',
+          as: 'companyId'
+        }
       }
     })
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Companies')
+    await queryInterface.dropTable('Recipients')
   }
 }
