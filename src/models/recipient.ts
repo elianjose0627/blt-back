@@ -4,6 +4,7 @@ import { IRecipient } from '../types'
 const RecipientModel = (sequelize: any, DataTypes: any): any => {
   interface RecipientAttributes {
     id: string
+    companyName: string
     firstName: string
     lastName: string
     email: string
@@ -16,6 +17,7 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
 
   class Recipient extends Model<RecipientAttributes> {
     private readonly id: string
+    private readonly companyName: string
     private readonly firstName: string
     private readonly lastName: string
     private readonly email: string
@@ -38,6 +40,7 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
     toJSONFor (): IRecipient {
       return {
         id: this.id,
+        companyName: this.companyName,
         firstName: this.firstName,
         lastName: this.lastName,
         email: this.email,
@@ -58,13 +61,17 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
       primaryKey: true,
       allowNull: false
     },
+    companyName: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     firstName: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     lastName: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     email: {
       type: DataTypes.STRING,

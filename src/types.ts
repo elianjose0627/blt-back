@@ -76,8 +76,9 @@ export interface IAddress {
 
 export interface IRecipient {
   id: string
-  firstName: string
-  lastName: string
+  companyName: Nullable<string>
+  firstName: Nullable<string>
+  lastName: Nullable<string>
   email: string
   phone?: Nullable<string>
   country: string
