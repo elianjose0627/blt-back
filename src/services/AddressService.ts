@@ -19,7 +19,7 @@ class AddressService extends BaseService {
           { userId: user?.id }
         ]
       },
-      paranoid: false // To get soft deleted team
+      paranoid: false
     })
 
     if (response !== null) {
