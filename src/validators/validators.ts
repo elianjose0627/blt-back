@@ -159,8 +159,9 @@ const validateUpdatedAddress = Joi.object({
 
 const validateCreatedRecipient = Joi.object({
   recipient: Joi.object({
-    firstName: Joi.string().required().max(64),
-    lastName: Joi.string().required().max(64),
+    companyName: Joi.string().optional().allow('').allow(null).max(64),
+    firstName: Joi.string().optional().allow('').allow(null).max(64),
+    lastName: Joi.string().optional().allow('').allow(null).max(64),
     email: Joi.string().email().lowercase().required().max(128),
     phone: Joi.string().optional().allow('').allow(null).min(9).max(15).regex(/^[0-9]+$/)
       .messages({
@@ -175,8 +176,9 @@ const validateCreatedRecipient = Joi.object({
 
 const validateUpdatedRecipient = Joi.object({
   recipient: Joi.object({
-    firstName: Joi.string().optional().max(64),
-    lastName: Joi.string().optional().max(64),
+    companyName: Joi.string().optional().allow('').allow(null).max(64),
+    firstName: Joi.string().optional().allow('').allow(null).max(64),
+    lastName: Joi.string().optional().allow('').allow(null).max(64),
     email: Joi.string().email().lowercase().optional().max(128),
     phone: Joi.string().optional().allow('').allow(null).min(9).max(15).regex(/^[0-9]+$/)
       .messages({

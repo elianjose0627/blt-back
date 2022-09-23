@@ -7,10 +7,16 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.UUID
       },
+      companyName: {
+        allowNull: true,
+        type: Sequelize.STRING
+      },
       firstName: {
+        allowNull: true,
         type: Sequelize.STRING
       },
       lastName: {
+        allowNull: true,
         type: Sequelize.STRING
       },
       email: {
