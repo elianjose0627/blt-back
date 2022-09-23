@@ -1,17 +1,25 @@
 import { Model } from 'sequelize'
-import { IAddress } from '../types'
+import { IRecipient } from '../types'
 
-const AddressModel = (sequelize: any, DataTypes: any): any => {
-  interface AddressAttributes {
+const RecipientModel = (sequelize: any, DataTypes: any): any => {
+  interface RecipientAttributes {
     id: string
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
     country: string
     city: string
     street: string
     zip: string
   }
 
-  class Address extends Model<AddressAttributes> {
+  class Recipient extends Model<RecipientAttributes> {
     private readonly id: string
+    private readonly firstName: string
+    private readonly lastName: string
+    private readonly email: string
+    private readonly phone: string
     private readonly country: string
     private readonly city: string
     private readonly street: string
@@ -20,21 +28,20 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
     private readonly updatedAt: Date
 
     static associate (models: any): any {
-      Address.belongsTo(models.User, {
-        foreignKey: 'userId',
-        as: 'owner',
-        onDelete: 'CASCADE'
-      })
-      Address.belongsTo(models.Company, {
+      Recipient.belongsTo(models.Company, {
         foreignKey: 'companyId',
-        as: 'companyAddress',
+        as: 'recipient',
         onDelete: 'CASCADE'
       })
     }
 
-    toJSONFor (): IAddress {
+    toJSONFor (): IRecipient {
       return {
         id: this.id,
+        firstName: this.firstName,
+        lastName: this.lastName,
+        email: this.email,
+        phone: this.phone,
         country: this.country,
         city: this.city,
         street: this.street,
@@ -45,11 +52,28 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
     }
   };
 
-  Address.init({
+  Recipient.init({
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
       allowNull: false
+    },
+    firstName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    lastName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     country: {
       type: DataTypes.STRING,
@@ -70,10 +94,10 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
   }, {
     sequelize,
     paranoid: true,
-    modelName: 'Address'
+    modelName: 'Recipient'
   })
 
-  return Address
+  return Recipient
 }
 
-module.exports = AddressModel
+module.exports = RecipientModel

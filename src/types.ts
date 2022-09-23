@@ -74,6 +74,21 @@ export interface IAddress {
   owner?: IUser
 }
 
+export interface IRecipient {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone?: Nullable<string>
+  country: string
+  city: string
+  street?: string
+  zip?: string
+  createdAt?: Date
+  updatedAt?: Date
+  company?: ICompany
+}
+
 export interface CustomRequest extends Request {
   user?: any
   record?: any

@@ -18,6 +18,9 @@ export const generateInclude = (model: string): any => {
       ]
     )
   }
+  if (model === 'Recipient') {
+    return ([])
+  }
   return (
     [
       {
