@@ -162,8 +162,8 @@ describe('Company actions', () => {
     })
   })
 
-  describe('Create a recipient', () => {
-    it('Should return 201 Created when a company owner successfully creates a recipient.', async () => {
+  describe('Create a campaign', () => {
+    it('Should return 201 Created when a company owner successfully creates a campaign.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -177,25 +177,23 @@ describe('Company actions', () => {
 
       const res = await chai
         .request(app)
-        .post(`/api/companies/${String(resCompany.body.company.id)}/recipients`)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          recipient: {
-            firstName: 'John',
-            lastName: 'Doe',
-            email: 'johndoe@doe.com',
-            country: 'Kenya',
-            city: 'Nairobi'
+          campaign: {
+            name: 'Onboarding',
+            type: 'onboarding',
+            status: 'draft'
           }
         })
 
       expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('statusCode', 'success', 'recipient')
-      expect(res.body.recipient).to.be.an('object')
-      expect(res.body.recipient).to.include.keys('id', 'firstName', 'lastName', 'email', 'phone', 'country', 'city', 'street', 'zip', 'createdAt', 'updatedAt')
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaign')
+      expect(res.body.campaign).to.be.an('object')
+      expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'type', 'createdAt', 'updatedAt')
     })
 
-    it('Should return 200 Success when a company owner tries to create a recipient that exists.', async () => {
+    it('Should return 200 Success when a company owner tries to create a campaign that exists.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -209,25 +207,23 @@ describe('Company actions', () => {
 
       const res = await chai
         .request(app)
-        .post(`/api/companies/${String(resCompany.body.company.id)}/recipients`)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          recipient: {
-            firstName: 'John',
-            lastName: 'Doe',
-            email: 'johndoe@doe.com',
-            country: 'Kenya',
-            city: 'Nairobi'
+          campaign: {
+            name: 'Onboarding',
+            type: 'onboarding',
+            status: 'draft'
           }
         })
 
       expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'recipient')
-      expect(res.body.recipient).to.be.an('object')
-      expect(res.body.recipient).to.include.keys('id', 'firstName', 'lastName', 'email', 'phone', 'country', 'city', 'street', 'zip', 'createdAt', 'updatedAt')
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaign')
+      expect(res.body.campaign).to.be.an('object')
+      expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'type', 'createdAt', 'updatedAt')
     })
 
-    it('Should return 403 Forbidden when a non owner tries to create a recipient.', async () => {
+    it('Should return 403 Forbidden when a non owner tries to create a campaign.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -241,17 +237,90 @@ describe('Company actions', () => {
 
       const res = await chai
         .request(app)
-        .post(`/api/companies/${String(resCompany.body.company.id)}/recipients`)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          recipient: {
-            firstName: 'John',
-            lastName: 'Doe',
-            email: 'johndoe@doe.com',
-            country: 'Kenya',
-            city: 'Nairobi'
+          campaign: {
+            name: 'Onboarding',
+            type: 'onboarding',
+            status: 'draft'
           }
         })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner can perform this action')
+    })
+  })
+
+  describe('Get all campaigns', () => {
+    it('Should return 200 Success when an owner successfully retrieves all campaigns.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaigns')
+      expect(res.body.campaigns).to.be.an('array')
+    })
+
+    it('Should return 200 Success when an owner successfully retrieves all campaigns with negative pagination params.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .query({
+          limit: -10,
+          page: -1
+        })
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaigns')
+      expect(res.body.campaigns).to.be.an('array')
+    })
+
+    it('Should return 403 when a non owner tries to retrieve all company campaigns.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')

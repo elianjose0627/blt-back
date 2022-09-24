@@ -90,6 +90,19 @@ export interface IRecipient {
   company?: ICompany
 }
 
+export type CampaignStatus = 'draft' | 'submitted'
+export type CampaignType = 'onboarding' | 'birthday' | 'christmas'
+
+export interface ICampaign {
+  id: string
+  name: string
+  status: CampaignStatus
+  type: CampaignType
+  createdAt?: Date
+  updatedAt?: Date
+  company?: ICompany
+}
+
 export interface CustomRequest extends Request {
   user?: any
   record?: any

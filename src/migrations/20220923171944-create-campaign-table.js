@@ -1,46 +1,22 @@
 'use strict'
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Recipients', {
+    await queryInterface.createTable('Campaigns', {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID
       },
-      companyName: {
-        allowNull: true,
-        type: Sequelize.STRING
-      },
-      firstName: {
-        allowNull: true,
-        type: Sequelize.STRING
-      },
-      lastName: {
-        allowNull: true,
-        type: Sequelize.STRING
-      },
-      email: {
-        type: Sequelize.STRING,
-        unique: true
-      },
-      phone: {
-        allowNull: true,
-        type: Sequelize.STRING
-      },
-      country: {
+      name: {
         allowNull: false,
         type: Sequelize.STRING
       },
-      city: {
+      status: {
         allowNull: false,
         type: Sequelize.STRING
       },
-      street: {
-        allowNull: true,
-        type: Sequelize.STRING
-      },
-      zip: {
-        allowNull: true,
+      type: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       createdAt: {
@@ -68,6 +44,6 @@ module.exports = {
     })
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Recipients')
+    await queryInterface.dropTable('Campaigns')
   }
 }

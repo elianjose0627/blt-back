@@ -17,6 +17,7 @@ interface Database {
   Company?: any
   Address?: any
   Recipient?: any
+  Campaign?: any
 }
 
 const db: Database = {}

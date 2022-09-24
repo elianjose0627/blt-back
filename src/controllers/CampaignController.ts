@@ -1,14 +1,14 @@
 import BaseController from './BaseController'
-import RecipientService from '../services/RecipientService'
+import CampaignService from '../services/CampaignService'
 import { CustomNext, CustomRequest, CustomResponse } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 
-const recipientService = new RecipientService('Recipient')
+const campaignService = new CampaignService('Campaign')
 
-class RecipientController extends BaseController {
+class CampaignController extends BaseController {
   checkOwner (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
-    const { user: currentUser, record: { campaign: { companyId, company: { owner } } } } = req
+    const { user: currentUser, record: { companyId, company: { owner } } } = req
 
     if (currentUser?.companyId === companyId || currentUser.id === owner.id) {
       return next()
@@ -24,11 +24,11 @@ class RecipientController extends BaseController {
   }
 
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { record: campaign, body: { recipient } } = req
+    const { record: company, body: { campaign } } = req
 
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 
-    const { response, status } = await recipientService.insert({ campaign, recipient })
+    const { response, status } = await campaignService.insert({ company, campaign })
 
     const statusCode = {
       200: statusCodes.OK,
@@ -38,7 +38,7 @@ class RecipientController extends BaseController {
     return res.status(statusCode[status]).send({
       statusCode: statusCode[status],
       success: true,
-      recipient: response
+      [this.service.singleRecord()]: response
     })
   }
 
@@ -62,4 +62,4 @@ class RecipientController extends BaseController {
   }
 }
 
-export default new RecipientController(recipientService)
+export default new CampaignController(campaignService)
