@@ -44,7 +44,7 @@ app.use(joiErrors)
 
 app.get('/', (req: Request, res: Response) => res.status(200).send({
   message: 'Welcome to the beginning of insanity',
-  documentation: 'https://documenter.getpostman.com/view/5905120/VVBZQjLf'
+  documentation: String(process.env.API_DOCUMENTATION_URL)
 }))
 
 app.get('/favicon.ico', (req: Request, res: Response) => {

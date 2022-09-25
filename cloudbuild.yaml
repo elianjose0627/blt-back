@@ -15,6 +15,7 @@ steps:
     - 'MAILER_EMAIL=${_MAILER_EMAIL}'
     - 'SENDGRID_API_KEY=${_SENDGRID_API_KEY}'
     - 'APP_NAME=${_APP_NAME}'
+    - 'API_DOCUMENTATION_URL=${_API_DOCUMENTATION_URL}'
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'migrate']
 - name: 'gcr.io/cloud-builders/npm'

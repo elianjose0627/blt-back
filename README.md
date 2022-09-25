@@ -31,3 +31,6 @@ yarn install
 ```bash
 cp .env.example .env
 ```
+
+## API Documentation
+Navigate to the root domain to get the API url under documentation
