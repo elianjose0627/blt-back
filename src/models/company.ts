@@ -37,9 +37,9 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         as: 'address',
         onDelete: 'CASCADE'
       })
-      Company.hasMany(models.Recipient, {
+      Company.hasMany(models.Campaign, {
         foreignKey: 'companyId',
-        as: 'recipients',
+        as: 'campaigns',
         onDelete: 'CASCADE'
       })
     }

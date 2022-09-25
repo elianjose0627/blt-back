@@ -3,7 +3,7 @@ import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import CompanyController from '../controllers/CompanyController'
 import AddressController from '../controllers/AddressController'
-import RecipientController from '../controllers/RecipientController'
+import CampaignController from '../controllers/CampaignController'
 import asyncHandler from '../middlewares/asyncHandler'
 import checkOwner from '../middlewares/checkOwner'
 import checkAdmin from '../middlewares/checkAdmin'
@@ -34,13 +34,13 @@ const companyRoutes = (): any => {
     .post(asyncHandler(checkOwner), celebrate({
       [Segments.BODY]: validator.validateCreatedAddress
     }, { abortEarly: false }), asyncHandler(AddressController.insert))
-  companyRouter.route('/companies/:id/recipients')
+  companyRouter.route('/companies/:id/campaigns')
     .post(asyncHandler(checkOwner), celebrate({
-      [Segments.BODY]: validator.validateCreatedRecipient
-    }, { abortEarly: false }), asyncHandler(RecipientController.insert))
+      [Segments.BODY]: validator.validateCampaign
+    }, { abortEarly: false }), asyncHandler(CampaignController.insert))
     .get(asyncHandler(checkOwner), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
-    }), asyncHandler(paginate), asyncHandler(RecipientController.getAll))
+    }), asyncHandler(paginate), asyncHandler(CampaignController.getAll))
   return companyRouter
 }
 

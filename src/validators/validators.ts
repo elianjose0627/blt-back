@@ -191,6 +191,14 @@ const validateUpdatedRecipient = Joi.object({
   }).required()
 })
 
+const validateCampaign = Joi.object({
+  campaign: Joi.object({
+    name: Joi.string().required().allow('').allow(null).max(64),
+    status: Joi.string().required().valid(...['draft', 'submitted']),
+    type: Joi.string().required().valid(...['onboarding', 'birthday', 'christmas'])
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -210,5 +218,6 @@ export default {
   validateCreatedAddress,
   validateUpdatedAddress,
   validateCreatedRecipient,
-  validateUpdatedRecipient
+  validateUpdatedRecipient,
+  validateCampaign
 }

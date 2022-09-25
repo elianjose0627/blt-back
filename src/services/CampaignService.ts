@@ -2,39 +2,40 @@ import { v1 as uuidv1 } from 'uuid'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 
-class RecipientService extends BaseService {
+class CampaignService extends BaseService {
   async insert (data: any): Promise<any> {
-    const { campaign, recipient } = data
+    const { company, campaign } = data
     let response: any
 
     response = await db[this.model].findOne({
       include: generateInclude(this.model),
       where: {
-        campaignId: campaign?.id,
-        email: recipient?.email
+        name: campaign.name,
+        type: campaign.type,
+        companyId: company.id
       },
-      paranoid: false
+      paranoid: false // To get soft deleted team
     })
 
     if (response !== null) {
       await response.restore()
-      const updatedResponse = await response.update({ ...recipient })
-      return { response: updatedResponse.toJSONFor(campaign), status: 200 }
+      const updatedResponse = await response.update({ ...campaign })
+      return { response: updatedResponse.toJSONFor(company), status: 200 }
     }
 
-    response = await db[this.model].create({ ...recipient, id: uuidv1(), campaignId: campaign?.id })
+    response = await db[this.model].create({ ...campaign, id: uuidv1(), companyId: company?.id })
 
-    return { response: response.toJSONFor(campaign), status: 201 }
+    return { response: response.toJSONFor(company), status: 201 }
   }
 
-  async getAll (limit: number, offset: number, campaignId?: string): Promise<any> {
+  async getAll (limit: number, offset: number, companyId?: string): Promise<any> {
     const records = await db[this.model].findAndCountAll({
       limit,
       offset,
       order: [['createdAt', 'DESC']],
       attributes: { exclude: [] },
       where: {
-        campaignId
+        companyId
       }
     })
 
@@ -45,4 +46,4 @@ class RecipientService extends BaseService {
   }
 }
 
-export default RecipientService
+export default CampaignService
