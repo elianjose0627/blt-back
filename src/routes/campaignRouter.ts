@@ -17,7 +17,7 @@ const CampaignRoutes = (): any => {
   campaignRouter.route('/campaigns/:id')
     .get(asyncHandler(CampaignController.checkOwner), asyncHandler(CampaignController.get))
     .put(asyncHandler(CampaignController.checkOwner), celebrate({
-      [Segments.BODY]: validator.validateUpdatedRecipient
+      [Segments.BODY]: validator.validateCampaign
     }), asyncHandler(CampaignController.update))
     .delete(asyncHandler(CampaignController.checkOwner), asyncHandler(CampaignController.delete))
   campaignRouter.route('/campaigns/:id/recipients')
