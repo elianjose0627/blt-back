@@ -18,8 +18,45 @@ export const generateInclude = (model: string): any => {
       ]
     )
   }
+  if (model === 'Campaign') {
+    return (
+      [
+        {
+          model: db.Company,
+          attributes: ['id', 'name', 'email', 'phone', 'vat'],
+          as: 'company',
+          include: [
+            {
+              model: db.User,
+              attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'updatedAt', 'createdAt'],
+              as: 'owner'
+            }
+          ]
+        }
+      ]
+    )
+  }
   if (model === 'Recipient') {
-    return ([])
+    return ([
+      {
+        model: db.Campaign,
+        as: 'campaign',
+        include: [
+          {
+            model: db.Company,
+            attributes: ['id', 'name', 'email', 'phone', 'vat'],
+            as: 'company',
+            include: [
+              {
+                model: db.User,
+                attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'updatedAt', 'createdAt'],
+                as: 'owner'
+              }
+            ]
+          }
+        ]
+      }
+    ])
   }
   return (
     [

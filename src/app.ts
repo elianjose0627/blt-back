@@ -37,6 +37,7 @@ app.use(apiPrefix, routers.profileRouter())
 app.use(apiPrefix, routers.companyRouter())
 app.use(apiPrefix, routers.addressRouter())
 app.use(apiPrefix, routers.recipientRouter())
+app.use(apiPrefix, routers.campaignRouter())
 
 // Add validation middleware
 app.use(joiErrors)

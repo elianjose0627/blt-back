@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { IRecipient } from '../types'
+import { ICompany, IRecipient } from '../types'
 
 const RecipientModel = (sequelize: any, DataTypes: any): any => {
   interface RecipientAttributes {
@@ -28,11 +28,12 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
     private readonly zip: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
+    private readonly company: ICompany
 
     static associate (models: any): any {
-      Recipient.belongsTo(models.Company, {
-        foreignKey: 'companyId',
-        as: 'recipient',
+      Recipient.belongsTo(models.Campaign, {
+        foreignKey: 'campaignId',
+        as: 'campaign',
         onDelete: 'CASCADE'
       })
     }
@@ -50,7 +51,8 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
         street: this.street,
         zip: this.zip,
         createdAt: this.createdAt,
-        updatedAt: this.updatedAt
+        updatedAt: this.updatedAt,
+        company: this.company
       }
     }
   };
@@ -75,8 +77,7 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false,
-      unique: true
+      allowNull: false
     },
     phone: {
       type: DataTypes.STRING,
