@@ -1,4 +1,5 @@
 import { Op } from 'sequelize'
+import { v1 as uuidv1 } from 'uuid'
 import db from '../models'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -7,13 +8,14 @@ import { sendNotifierEmail } from '../utils/sendMail'
 import generateToken from '../utils/generateToken'
 import generateOtp from '../utils/generateOtp'
 
-// TODO email instructions when user registers for email verification
-
 dayjs.extend(utc)
 
 const expiresIn = process.env.TOKEN_EXPIRATION
 
 const appName = String(process.env.APP_NAME)
+const appUrl = String(process.env.APP_URL)
+const mailer = String(process.env.MAILER_EMAIL)
+const salesMailer = String(process.env.SALES_MAILER_EMAIL)
 const adminEmail = String(process.env.ADMIN_EMAIL)
 
 const include = [
@@ -40,6 +42,47 @@ class UserService extends BaseService {
       }
     })
     return user
+  }
+
+  async insert (data: any): Promise<any> {
+    const record = await db[this.model].create({ ...data, id: uuidv1() })
+
+    if (record !== null) {
+      const { email, firstName } = record
+      const subject = `Verify your email for ${appName}`
+
+      const steps = `
+      <p>Steps to verify:</p>
+      <ol>
+        <li>Login to your account at ${appUrl}.</li>
+        <li>Click on the profile picture at the top right corner of the screen and select the profile.</li>
+        <li>Under the Pending Actions Section, click "Request Verification OTP" to receive your code via email.</li>
+        <li>Enter your OTP and press Verify Email.</li>
+      </ol>
+      `
+
+      const footer = `
+      <p>For questions regarding your order please reach out to:
+      <br>
+        Support: ${mailer}
+      <br>
+        Sales: ${salesMailer}
+      </p>
+      `
+
+      const message = `<p>Dear ${String(firstName)},</p>
+      <p>Thank you very much for registering an account at big little things.<br>
+      To activate your account please verify the ownership of the associated email address.</p>
+      ${steps}
+      <p>Best Regards,<br>
+      ${appName} team</p>
+      <p>${footer}</p>
+      `
+
+      await sendNotifierEmail(email, subject, message, false, message)
+    }
+
+    return record.toJSONFor()
   }
 
   async login (email: string, password: string): Promise<any> {

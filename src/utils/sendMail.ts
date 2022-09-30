@@ -1,4 +1,5 @@
 import sgMail from '@sendgrid/mail'
+import { EmailMessage } from '../types'
 
 sgMail.setApiKey(String(process.env.SENDGRID_API_KEY))
 
@@ -22,13 +23,17 @@ const sendMail = async (firstName: string, email: string, token: string, url: st
   }
 }
 
-export const sendNotifierEmail = async (email: string, subject: string, message: string, bccStatus = true): Promise<any> => {
-  const msg = {
+export const sendNotifierEmail = async (email: string, subject: string, message: string, bccStatus = true, html = ''): Promise<any> => {
+  const msg: EmailMessage = {
     to: email,
     from: `${appName} <${mailer}>`,
     bcc: bccStatus ? mailer : '',
     subject: `${subject}`,
     text: `${message}`
+  }
+
+  if (html !== '') {
+    msg.html = html ?? '<p></p>'
   }
 
   try {
