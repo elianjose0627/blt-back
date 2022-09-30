@@ -55,13 +55,13 @@ class UserService extends BaseService {
       <p>Steps to verify:</p>
       <ol>
         <li>Login to your account at ${appUrl}.</li>
-        <li>Click on the profile picture at the top right corner of the screen and select the "Profile".</li>
+        <li>Click on the profile picture at the top right corner of the screen and select "Profile".</li>
         <li>Under the Pending Actions Section, click "Request Verification OTP" to receive your code via email.</li>
       </ol>
       `
 
       const footer = `
-      <p>For questions regarding your order please reach out to:
+      <p>For questions regarding your order, please reach out to:
       <br>
         Support: ${mailer}
       <br>
@@ -71,7 +71,7 @@ class UserService extends BaseService {
 
       const message = `<p>Dear ${String(firstName)},</p>
       <p>Thank you very much for registering an account at ${appName}.<br>
-      To activate your account please verify the ownership of the associated email address.</p>
+      To activate your account, please verify the ownership of the associated email address.</p>
       ${steps}
       <p>Best Regards,<br>
       ${appName} team</p>
@@ -223,13 +223,13 @@ class UserService extends BaseService {
     <p>Steps to verify:</p>
     <ol>
       <li>Login to your account at ${appUrl}.</li>
-      <li>Click on the profile picture at the top right corner of the screen and select the "Profile".</li>
+      <li>Click on the profile picture at the top right corner of the screen and select "Profile".</li>
       <li>Under the Pending Actions Section, Enter your verification OTP <strong>${otp}</strong> and click "Verify Email".</li>
     </ol>
     `
 
     const footer = `
-    <p>For questions regarding your order please reach out to:
+    <p>For questions regarding your order, please reach out to:
     <br>
       Support: ${mailer}
     <br>
@@ -242,7 +242,7 @@ class UserService extends BaseService {
     Your OTP is: <span style="font-size:1.5em;"><strong>${otp}</strong></span>
     </p>
     ${steps}
-    <p>If you haven't requested a verification code or created an account at ${appName} notify us: ${mailer}</p>
+    <p>If you haven't requested a verification code or created an account at ${appName}, notify us: ${mailer}.</p>
     <p>Best Regards,<br>
     ${appName} team</p>
     <p>${footer}</p>
