@@ -119,6 +119,15 @@ export interface TokenUser {
   isVerified: boolean
 }
 
+export interface EmailMessage {
+  to: string
+  from: string
+  bcc: string
+  subject: string
+  text: string
+  html?: string
+}
+
 export interface CustomResponse extends Response {}
 
 export interface CustomNext extends NextFunction {}
