@@ -55,9 +55,8 @@ class UserService extends BaseService {
       <p>Steps to verify:</p>
       <ol>
         <li>Login to your account at ${appUrl}.</li>
-        <li>Click on the profile picture at the top right corner of the screen and select the profile.</li>
+        <li>Click on the profile picture at the top right corner of the screen and select the "Profile".</li>
         <li>Under the Pending Actions Section, click "Request Verification OTP" to receive your code via email.</li>
-        <li>Enter your OTP and press Verify Email.</li>
       </ol>
       `
 
@@ -71,7 +70,7 @@ class UserService extends BaseService {
       `
 
       const message = `<p>Dear ${String(firstName)},</p>
-      <p>Thank you very much for registering an account at big little things.<br>
+      <p>Thank you very much for registering an account at ${appName}.<br>
       To activate your account please verify the ownership of the associated email address.</p>
       ${steps}
       <p>Best Regards,<br>
@@ -171,7 +170,7 @@ class UserService extends BaseService {
         const updatedRecord = await record.update({ password, logoutTime })
 
         const bccStatus = false
-        const message = `Hello ${String(updatedRecord.firstName)}, your password for ${appName} App has been updated. \nIf you didn't ask to change your password, contact us immediately through ${adminEmail}. \n\nThanks,\n\n${appName} Application team`
+        const message = `Dear ${String(updatedRecord.firstName)}, your password for ${appName} App has been updated. \nIf you didn't ask to change your password, contact us immediately through ${adminEmail}. \n\nThanks,\n\n${appName} Application team`
         try {
           await sendNotifierEmail(updatedRecord.email, 'Password Change', message, bccStatus)
         } catch (error) {}
@@ -193,7 +192,7 @@ class UserService extends BaseService {
     if (user !== null) {
       const otp = generateOtp()
       const subject = `Reset your password for ${appName}`
-      const message = `Hello ${String(user.firstName)},\n\nYour OTP is ${otp}.\nOpen the app and go to Sign In Page.\nClick the Forgot your password link.\nOn the Restore Password Page, click the Enter OTP link and enter the code you received on your email.\n\nIf you didn’t ask to reset your password, you can ignore this email.\n\nThanks,\n\n${appName} team`
+      const message = `Dear ${String(user.firstName)},\n\nYour OTP is ${otp}.\nOpen the app and go to Sign In Page.\nClick the Forgot your password link.\nOn the Restore Password Page, click the Enter OTP link and enter the code you received on your email.\n\nIf you didn’t ask to reset your password, you can ignore this email.\n\nThanks,\n\n${appName} team`
 
       await user.update({ otp: { createdAt: dayjs.utc(), value: otp } })
 
@@ -218,12 +217,40 @@ class UserService extends BaseService {
   async sendVerifyEmail (user: any): Promise<any> {
     const { email, firstName } = user
     const otp = generateOtp()
+
     const subject = `Verify your email for ${appName}`
-    const message = `Hello ${String(firstName)},\n\nYour OTP is ${otp}.\nOpen the app and make sure you are logged in.\nClick on the profile picture at the top of the screen.\nSelect Profile, and enter the code you received on your email.\n\nIf you didn’t ask to reset your password, you can ignore this email.\n\nThanks,\n\n${appName} team`
+    const steps = `
+    <p>Steps to verify:</p>
+    <ol>
+      <li>Login to your account at ${appUrl}.</li>
+      <li>Click on the profile picture at the top right corner of the screen and select the "Profile".</li>
+      <li>Under the Pending Actions Section, Enter your verification OTP <strong>${otp}</strong> and click "Verify Email".</li>
+    </ol>
+    `
+
+    const footer = `
+    <p>For questions regarding your order please reach out to:
+    <br>
+      Support: ${mailer}
+    <br>
+      Sales: ${salesMailer}
+    </p>
+    `
+
+    const message = `<p>Dear ${String(firstName)},</p>
+    <p>You have requested a verification OTP to activate your account at ${appName}.<br>
+    Your OTP is: <span style="font-size:1.5em;"><strong>${otp}</strong></span>
+    </p>
+    ${steps}
+    <p>If you haven't requested a verification code or created an account at ${appName} notify us: ${mailer}</p>
+    <p>Best Regards,<br>
+    ${appName} team</p>
+    <p>${footer}</p>
+    `
 
     await user.update({ otp: { createdAt: dayjs.utc(), value: otp } })
 
-    const info = await sendNotifierEmail(email, subject, message, false)
+    const info = await sendNotifierEmail(email, subject, message, false, message)
 
     if (info[0].statusCode === 202) {
       return info
