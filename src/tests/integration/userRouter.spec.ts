@@ -359,7 +359,7 @@ describe('A user', () => {
     expect(res.body.errors.message).to.equal('email was not sent')
   })
 
-  it('should return 401 when a otp is invalid', async () => {
+  it('should return 401 when the otp is invalid', async () => {
     await chai
       .request(app)
       .post('/auth/signup')
