@@ -17,6 +17,7 @@ const appUrl = String(process.env.APP_URL)
 const mailer = String(process.env.MAILER_EMAIL)
 const salesMailer = String(process.env.SALES_MAILER_EMAIL)
 const adminEmail = String(process.env.ADMIN_EMAIL)
+const resetPasswordExpiration = '10 minutes'
 
 const include = [
   {
@@ -190,13 +191,34 @@ class UserService extends BaseService {
     })
 
     if (user !== null) {
-      const otp = generateOtp()
-      const subject = `Reset your password for ${appName}`
-      const message = `Dear ${String(user.firstName)},\n\nYour OTP is ${otp}.\nOpen the app and go to Sign In Page.\nClick the Forgot your password link.\nOn the Restore Password Page, click the Enter OTP link and enter the code you received on your email.\n\nIf you didn’t ask to reset your password, you can ignore this email.\n\nThanks,\n\n${appName} team`
+      const { firstName } = user
+      const token = generateToken(user, 'reset', resetPasswordExpiration)
+      const subject = `Reset password request for ${appName}`
+      const steps = `
+      <p>In order to reset your password please follow these steps:</p>
+      <ol>
+        <li>Go to <a href="${appUrl}/reset-password?token=${token}">link</a>. This link is going to be valid for ${resetPasswordExpiration}.</li>
+        <li>Enter a new password for your account.</li>
+      </ol>
+      `
 
-      await user.update({ otp: { createdAt: dayjs.utc(), value: otp } })
+      const footer = `
+      <p>For questions regarding your order, please reach out to:
+      <br>
+        Support: ${mailer}
+      <br>
+        Sales: ${salesMailer}
+      </p>
+      `
 
-      const info = await sendNotifierEmail(email, subject, message, false)
+      const message = `<p>Dear ${String(firstName)},</p>
+      ${steps}
+      <p>Best Regards,<br>
+      ${appName} team</p>
+      <p>${footer}</p>
+      `
+
+      const info = await sendNotifierEmail(email, subject, message, false, message)
 
       if (info[0].statusCode === 202) {
         return info

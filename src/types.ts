@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 
 export type Nullable<T> = T | null
 
-export type TokenType = 'login'
+export type TokenType = 'login' | 'reset'
 
 export interface MediaData {
   filename: Nullable<string>

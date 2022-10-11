@@ -4,7 +4,7 @@ import validator from '../validators/validators'
 import UserController from '../controllers/UserController'
 import asyncHandler from '../middlewares/asyncHandler'
 import checkAuth from '../middlewares/checkAuth'
-import checkOtp from '../middlewares/checkOtp'
+import checkResetToken from '../middlewares/checkResetToken'
 
 const authRoutes = (): any => {
   const authRouter = express.Router()
@@ -30,7 +30,7 @@ const authRoutes = (): any => {
   authRouter.route('/reset-password')
     .patch(celebrate({
       [Segments.BODY]: validator.validatePasswordReset
-    }), asyncHandler(checkOtp), asyncHandler(UserController.resetPassword))
+    }), asyncHandler(checkResetToken), asyncHandler(UserController.resetPassword))
 
   return authRouter
 }
