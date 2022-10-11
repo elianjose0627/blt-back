@@ -3,6 +3,7 @@ import chai from 'chai'
 import chaiHttp from 'chai-http'
 
 import app from '../../app'
+import generateToken from '../../utils/generateToken'
 import {
   deleteTestUser, createBlockedUser,
   createLockedOutUser30mins, createUserWithOtp,
@@ -218,21 +219,40 @@ describe('Auth Actions', () => {
     expect(res.body.errors.message).to.equal('user not found')
   })
 
-  it('should return 422 when a otp is missing', async () => {
+  it('should return 401 when a reset token is missing', async () => {
     const res = await chai
       .request(app)
       .patch('/auth/reset-password')
       .send({ user: { password: '123456' } })
+
+    expect(res).to.have.status(401)
+    expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+    expect(res.body.errors.message).to.equal('No auth token')
+  })
+
+  it('should return 422 when a password key is missing', async () => {
+    const res = await chai
+      .request(app)
+      .patch('/auth/reset-password')
+      .send({ user: { } })
 
     expect(res).to.have.status(422)
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')
   })
 
   it('should return 200 when the password of a user is successfully reset', async () => {
+    const resUser = await chai
+      .request(app)
+      .post('/auth/signup')
+      .send({ user: { firstName: 'Queen', lastName: 'Hippolyta', email: 'qh@themyscira.com', phone: '254724374281', password: 'iamthegreatest' } })
+
+    const token = generateToken(resUser.body.user, 'reset', '1 minute')
+
     const res = await chai
       .request(app)
       .patch('/auth/reset-password')
-      .send({ user: { email: 'thenaeternal@celestial.com', password: '123456', otp: 123456 } })
+      .set('Authorization', `Bearer ${String(token)}`)
+      .send({ user: { password: '123456' } })
 
     expect(res).to.have.status(200)
     expect(res.body).to.include.keys('statusCode', 'success', 'user')
@@ -240,32 +260,27 @@ describe('Auth Actions', () => {
     expect(res.body.user).to.not.have.any.keys('password', 'otp', 'isDeleted')
   })
 
-  it('should return 200 when the password of a user is successfully reset and otp expiration in not set in env variable', async () => {
-    process.env.OTP_EXPIRATION = ''
-    const res = await chai
-      .request(app)
-      .patch('/auth/reset-password')
-      .send({ user: { email: 'thenaeternal@celestial.com', password: '123456', otp: 123456 } })
-
-    expect(res).to.have.status(200)
-    expect(res.body).to.include.keys('statusCode', 'success', 'user')
-    expect(res.body.user).to.be.an('object')
-    expect(res.body.user).to.not.have.any.keys('password', 'otp', 'isDeleted')
-  })
-
-  it('should return 401 when a user uses an invalid OTP to reset password', async () => {
+  it('should return 401 when a user uses an invalid token to reset password', async () => {
     await chai
       .request(app)
       .post('/auth/signup')
       .send({ user: { firstName: 'Gwen', lastName: 'Stacy', email: 'gs@spiderteam.com', phone: '254724374281', password: 'petertingle' } })
 
+    const resLogin = await chai
+      .request(app)
+      .post('/auth/login')
+      .send({ user: { email: 'gs@spiderteam.com', password: 'petertingle' } })
+
+    const token = resLogin.body.token
+
     const res = await chai
       .request(app)
       .patch('/auth/reset-password')
-      .send({ user: { password: '123456', email: 'gs@spiderteam.com', otp: 12345 } })
+      .set('Authorization', `Bearer ${String(token)}`)
+      .send({ user: { password: '123456' } })
 
     expect(res).to.have.status(401)
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-    expect(res.body.errors.message).to.equal('OTP is invalid')
+    expect(res.body.errors.message).to.equal('Invalid token')
   })
 })

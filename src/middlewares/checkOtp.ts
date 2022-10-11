@@ -15,7 +15,7 @@ const checkOtp = async (req: CustomRequest, res: CustomResponse, next: CustomNex
     }
   })
 
-  if (!record) {
+  if (record === null) {
     return res.status(statusCodes.NOT_FOUND).send({
       statusCode: statusCodes.NOT_FOUND,
       success: false,
@@ -40,7 +40,7 @@ const checkOtp = async (req: CustomRequest, res: CustomResponse, next: CustomNex
     })
   }
 
-  if (record && record.otp.value === otp) {
+  if ((record !== null) && record.otp.value === otp) {
     req.user = record
     return next()
   }

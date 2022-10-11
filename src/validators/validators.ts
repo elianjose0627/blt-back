@@ -62,8 +62,6 @@ const validatePassword = Joi.object({
 
 const validatePasswordReset = Joi.object({
   user: Joi.object({
-    email: Joi.string().email().lowercase().max(128).required(),
-    otp: Joi.number().required(),
     password: Joi.string().min(6).max(64).required()
   }).required()
 })
