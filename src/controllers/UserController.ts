@@ -108,7 +108,7 @@ class UserController extends BaseController {
       success: true,
       user: {
         email,
-        message: 'A password reset code has been sent to your email'
+        message: 'A password reset link has been sent to your email'
       }
     })
   }

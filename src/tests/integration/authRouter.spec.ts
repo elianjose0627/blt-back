@@ -173,7 +173,7 @@ describe('Auth Actions', () => {
     expect(res.body.errors.details[0].username).to.equal('user.username cannot contain spaces')
   })
 
-  it('should return 200 when a reset code is requested', async () => {
+  it('should return 200 when a reset link is requested', async () => {
     await chai
       .request(app)
       .post('/auth/signup')
@@ -187,10 +187,10 @@ describe('Auth Actions', () => {
     expect(res).to.have.status(200)
     expect(res.body).to.include.keys('statusCode', 'success', 'user')
     expect(res.body.user.email).to.equal('raywiretest@gmail.com')
-    expect(res.body.user.message).to.equal('A password reset code has been sent to your email')
+    expect(res.body.user.message).to.equal('A password reset link has been sent to your email')
   })
 
-  it('should return 400 when a reset code email request fails', async () => {
+  it('should return 400 when a reset link email request fails', async () => {
     await chai
       .request(app)
       .post('/auth/signup')
@@ -208,7 +208,7 @@ describe('Auth Actions', () => {
     expect(res.body.errors.message).to.equal('email was not sent')
   })
 
-  it('should return 404 when a reset code is requested for a user that does not exist', async () => {
+  it('should return 404 when a reset link is requested for a user that does not exist', async () => {
     const res = await chai
       .request(app)
       .post('/auth/forgot-password')
