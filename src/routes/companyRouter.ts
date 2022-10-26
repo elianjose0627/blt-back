@@ -9,6 +9,7 @@ import checkOwner from '../middlewares/checkOwner'
 import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
+import UserController from '../controllers/UserController'
 
 const companyRoutes = (): any => {
   const companyRouter = express.Router()
@@ -41,6 +42,10 @@ const companyRoutes = (): any => {
     .get(asyncHandler(checkOwner), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CampaignController.getAll))
+  companyRouter.route('/companies/:id/user')
+    .patch(asyncHandler(checkOwner), celebrate({
+      [Segments.BODY]: validator.validateJoinCompany
+    }, { abortEarly: false }), asyncHandler(UserController.updateCompanyId))
   return companyRouter
 }
 

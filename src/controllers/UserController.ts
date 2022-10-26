@@ -175,6 +175,41 @@ class UserController extends BaseController {
     })
   }
 
+  async updateCompanyId (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { body: { user: { email } }, user: currentUser, record: { id: companyId, owner: { id: ownerId } } } = req
+    const { id: userId } = currentUser
+
+    if (userId !== ownerId) {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'Only the company owner can perform this action'
+        }
+      })
+    }
+
+    const employee = await userService.findByEmail(email)
+
+    if (employee === null) {
+      return res.status(statusCodes.NOT_FOUND).send({
+        statusCode: statusCodes.NOT_FOUND,
+        success: false,
+        errors: {
+          message: 'User not found'
+        }
+      })
+    }
+
+    const response = await userService.update(employee, { companyId })
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      user: response
+    })
+  }
+
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { limit, page, offset, email } = req.query
     let records: any
