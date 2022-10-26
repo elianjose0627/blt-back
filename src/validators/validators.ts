@@ -197,6 +197,12 @@ const validateCampaign = Joi.object({
   }).required()
 })
 
+const validateJoinCompany = Joi.object({
+  user: Joi.object({
+    email: Joi.string().email().lowercase().required().max(128)
+  })
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -217,5 +223,6 @@ export default {
   validateUpdatedAddress,
   validateCreatedRecipient,
   validateUpdatedRecipient,
-  validateCampaign
+  validateCampaign,
+  validateJoinCompany
 }
