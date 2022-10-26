@@ -395,17 +395,19 @@ describe('Company actions', () => {
 
       const res = await chai
         .request(app)
-        .delete(`/api/companies/${companyId}/users`)
+        .patch(`/api/companies/${companyId}/users`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: userEmail
+            email: userEmail,
+            actionType: 'remove'
           }
         })
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'user')
       expect(res.body.user).to.be.an('object')
+      expect(res.body.user.company).to.equal(null)
     })
 
     it('Should return 200 Success when an owner successfully retrieves all users with negative pagination params.', async () => {

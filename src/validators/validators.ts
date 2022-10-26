@@ -199,8 +199,9 @@ const validateCampaign = Joi.object({
 
 const validateJoinCompany = Joi.object({
   user: Joi.object({
-    email: Joi.string().email().lowercase().required().max(128)
-  })
+    email: Joi.string().email().lowercase().required().max(128),
+    actionType: Joi.string().valid(...['remove', 'add']).default('add')
+  }).required()
 })
 
 export default {
