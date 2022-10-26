@@ -42,10 +42,13 @@ const companyRoutes = (): any => {
     .get(asyncHandler(checkOwner), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CampaignController.getAll))
-  companyRouter.route('/companies/:id/user')
+  companyRouter.route('/companies/:id/users')
     .patch(asyncHandler(checkOwner), celebrate({
       [Segments.BODY]: validator.validateJoinCompany
     }, { abortEarly: false }), asyncHandler(UserController.updateCompanyId))
+    .get(asyncHandler(checkOwner), celebrate({
+      [Segments.QUERY]: validator.validateQueryParams
+    }), asyncHandler(paginate), asyncHandler(CompanyController.getAllUsers))
   return companyRouter
 }
 

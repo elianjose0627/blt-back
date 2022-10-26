@@ -327,4 +327,79 @@ describe('Company actions', () => {
       expect(res.body.errors.message).to.equal('Only the owner can perform this action')
     })
   })
+
+  describe('Get all users of a company', () => {
+    it('Should return 200 Success when an owner successfully retrieves all users of a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Best Company',
+            email: 'testbest@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/users`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'users')
+      expect(res.body.users).to.be.an('array')
+    })
+
+    it('Should return 200 Success when an owner successfully retrieves all users with negative pagination params.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .query({
+          limit: -10,
+          page: -1
+        })
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Best Company',
+            email: 'testbest@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/users`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'users')
+      expect(res.body.users).to.be.an('array')
+    })
+
+    it('Should return 403 when a non owner tries to retrieve all company users.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Best Company',
+            email: 'testbest@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner can perform this action')
+    })
+  })
 })

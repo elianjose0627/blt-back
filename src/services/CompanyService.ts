@@ -31,6 +31,23 @@ class CompanyService extends BaseService {
 
     return { response: response.toJSONFor(user), status: 201 }
   }
+
+  async getAllUsers (limit: number, offset: number, companyId: string): Promise<any> {
+    const records = await db.User.findAndCountAll({
+      limit,
+      offset,
+      where: {
+        companyId
+      },
+      order: [['createdAt', 'DESC']],
+      attributes: { exclude: [] }
+    })
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
+  }
 }
 
 export default CompanyService
