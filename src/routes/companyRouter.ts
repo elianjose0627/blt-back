@@ -49,6 +49,7 @@ const companyRoutes = (): any => {
     .get(asyncHandler(checkOwner), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CompanyController.getAllUsers))
+    .delete(asyncHandler(checkOwner), asyncHandler(UserController.removeCompanyId))
   return companyRouter
 }
 

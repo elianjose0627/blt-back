@@ -8,7 +8,7 @@ const { expect } = chai
 chai.use(chaiHttp)
 
 let tokenAdmin: string
-// let userIdAdmin: string
+let userEmail: string
 let token: string
 // let userId: string
 
@@ -33,7 +33,7 @@ describe('Company actions', () => {
 
     tokenAdmin = resAdmin.body.token
     token = res1.body.token
-    // userId = res1.body.user.id
+    userEmail = res1.body.user.email
   })
 
   after(async () => {
@@ -350,6 +350,62 @@ describe('Company actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'users')
       expect(res.body.users).to.be.an('array')
+    })
+
+    it('Should return 200 Success when an owner successfully adds a user to a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Best Company',
+            email: 'testbest@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${companyId}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: userEmail
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+    })
+
+    it('Should return 200 Success when an owner successfully removes a user to a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Best Company',
+            email: 'testbest@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      const res = await chai
+        .request(app)
+        .delete(`/api/companies/${companyId}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: userEmail
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
     })
 
     it('Should return 200 Success when an owner successfully retrieves all users with negative pagination params.', async () => {
