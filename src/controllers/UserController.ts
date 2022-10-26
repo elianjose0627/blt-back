@@ -176,8 +176,10 @@ class UserController extends BaseController {
   }
 
   async updateCompanyId (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { body: { user: { email } }, user: currentUser, record: { id: companyId, owner: { id: ownerId } } } = req
+    const { body: { user: { email, actionType } }, user: currentUser, record: { id: companyId, owner: { id: ownerId } } } = req
     const { id: userId } = currentUser
+
+    console.log(actionType)
 
     if (userId !== ownerId) {
       return res.status(statusCodes.FORBIDDEN).send({
@@ -201,43 +203,16 @@ class UserController extends BaseController {
       })
     }
 
-    const response = await userService.update(employee, { companyId })
-
-    return res.status(statusCodes.OK).send({
-      statusCode: statusCodes.OK,
-      success: true,
-      user: response
-    })
-  }
-
-  async removeCompanyId (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { body: { user: { email } }, user: currentUser, record: { owner: { id: ownerId } } } = req
-    const { id: userId } = currentUser
-
-    if (userId !== ownerId) {
-      return res.status(statusCodes.FORBIDDEN).send({
-        statusCode: statusCodes.FORBIDDEN,
-        success: false,
-        errors: {
-          message: 'Only the company owner can perform this action'
-        }
-      })
+    const selectedCompanyId = {
+      add: companyId,
+      remove: null
     }
 
-    const employee = await userService.findByEmail(email)
+    const response = await userService.update(employee, { companyId: selectedCompanyId[actionType] })
 
-    if (employee === null) {
-      return res.status(statusCodes.NOT_FOUND).send({
-        statusCode: statusCodes.NOT_FOUND,
-        success: false,
-        errors: {
-          message: 'User not found'
-        }
-      })
+    if (actionType === 'remove') {
+      response.company = null
     }
-
-    const response = await userService.update(employee, { companyId: null })
-    response.company = null
 
     return res.status(statusCodes.OK).send({
       statusCode: statusCodes.OK,
