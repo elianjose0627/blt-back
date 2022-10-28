@@ -72,6 +72,7 @@ export interface IAddress {
   createdAt?: Date
   updatedAt?: Date
   owner?: IUser
+  company?: ICompany
 }
 
 export interface IRecipient {

@@ -8,9 +8,11 @@ const addressService = new AddressService('Address')
 
 class AddressController extends BaseController {
   checkOwner (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
-    const { user: currentUser, record: { companyId } } = req
+    const { user: currentUser, record: address } = req
 
-    if (currentUser?.companyId === companyId) {
+    const isOwner = currentUser?.id === address?.company?.owner?.id
+
+    if (isOwner) {
       return next()
     } else {
       return res.status(statusCodes.FORBIDDEN).send({
