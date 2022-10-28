@@ -7,17 +7,22 @@ import * as statusCodes from '../constants/statusCodes'
 const campaignService = new CampaignService('Campaign')
 
 class CampaignController extends BaseController {
-  checkOwner (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+  checkOwnerOrCampaignManager (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: { companyId, company: { owner } } } = req
 
-    if (currentUser?.companyId === companyId || currentUser.id === owner.id) {
+    const allowedRoles = ['CampaignManager']
+
+    const isOwner = currentUser?.id === owner?.id
+    const isEmployee = currentUser?.companyId === companyId
+
+    if (isOwner || (isEmployee && allowedRoles.includes(currentUser?.role))) {
       return next()
     } else {
       return res.status(statusCodes.FORBIDDEN).send({
         statusCode: statusCodes.FORBIDDEN,
         success: false,
         errors: {
-          message: 'Only the owner can perform this action'
+          message: 'Only the owner or campaign manager can perform this action'
         }
       })
     }

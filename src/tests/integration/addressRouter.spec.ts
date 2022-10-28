@@ -41,7 +41,7 @@ describe('Address actions', () => {
   })
 
   describe('Update an address', () => {
-    xit('Should return 200 Success when a company owner successfully updates an address.', async () => {
+    it('Should return 200 Success when a company owner successfully updates an address.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -55,7 +55,7 @@ describe('Address actions', () => {
 
       const res = await chai
         .request(app)
-        .post(`/api/companies/${String(resCompany.body.company.id)}/address`)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           address: {

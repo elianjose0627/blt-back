@@ -94,21 +94,29 @@ export const createBlockedUser = async (): Promise<any> => {
   }
 }
 
-export const createUnverifiedTrainer = async (): Promise<any> => {
-  const user = await db.User.create({
-    id: uuidv1(),
-    firstName: 'Pietro',
-    lastName: 'Maximoff',
-    email: 'pietromaximoff@avengers.com',
-    phone: '2222222222',
-    password: 'quicksilver',
-    isVerified: false,
-    isActive: true,
-    role: 'trainer'
+export const createCampaignManager = async (email = 'happyhogan@starkindustries.com', password = 'pepperpotts'): Promise<any> => {
+  const user = await db.User.findOne({
+    attributes: ['id', 'email'],
+    where: {
+      email
+    }
   })
 
-  if (user !== null) {
-    return user
+  if (user === null) {
+    const user = await db.User.create({
+      id: uuidv1(),
+      firstName: 'Happy',
+      lastName: 'Hogan',
+      email,
+      role: 'CampaignManager',
+      phone: '1111111111',
+      password,
+      isVerified: true
+    })
+
+    if (user !== null) {
+      return user
+    }
   }
 }
 
