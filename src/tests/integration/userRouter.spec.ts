@@ -9,6 +9,7 @@ import {
   createUserWithOtp,
   createUserWithExpiredOtp
 } from '../utils'
+import * as userRoles from '../../utils/userRoles'
 
 const { expect } = chai
 
@@ -219,7 +220,7 @@ describe('A user', () => {
         .request(app)
         .patch(`/api/users/${userId}/role`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
-        .send({ user: { role: 'user' } })
+        .send({ user: { role: userRoles.USER } })
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'user')
@@ -245,7 +246,7 @@ describe('A user', () => {
         .request(app)
         .patch(`/api/users/${userId}/role`)
         .set('Authorization', `Bearer ${tokenUpdate}`)
-        .send({ user: { role: 'user' } })
+        .send({ user: { role: userRoles.USER } })
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
@@ -259,7 +260,7 @@ describe('A user', () => {
         .request(app)
         .patch(`/api/users/${userIdAdmin}/role`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
-        .send({ user: { role: 'user' } })
+        .send({ user: { role: userRoles.USER } })
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')

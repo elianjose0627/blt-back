@@ -1,10 +1,11 @@
 import * as statusCodes from '../constants/statusCodes'
 import { CustomNext, CustomRequest, CustomResponse } from '../types'
+import * as userRoles from '../utils/userRoles'
 
 const checkAdmin = (req: CustomRequest, res: CustomResponse, next: CustomNext): any => {
   const { role } = req.user
 
-  if (role === 'administrator') {
+  if (role === userRoles.ADMIN) {
     return next()
   }
 

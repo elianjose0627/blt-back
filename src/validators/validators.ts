@@ -1,6 +1,7 @@
 import { Joi } from 'celebrate'
 
 import * as countryList from '../utils/countries'
+import * as userRoles from '../utils/userRoles'
 
 const validateCreatedUser = Joi.object({
   user: Joi.object({
@@ -47,8 +48,8 @@ const validateUpdatedUser = Joi.object({
 
 const validateRole = Joi.object({
   user: Joi.object({
-    role: Joi.string().lowercase()
-      .valid(...['user', 'administrator', 'customer', 'company', 'CampaignManager'])
+    role: Joi.string()
+      .valid(...[userRoles.USER, userRoles.ADMIN, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
       .required()
   }).required()
 })

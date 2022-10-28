@@ -1,0 +1,5 @@
+export const ADMIN = 'Administrator'
+export const CAMPAIGNMANAGER = 'CampaignManager'
+export const COMPANYADMINISTRATOR = 'CompanyAdministrator'
+export const USER = 'User'
+export const EMPLOYEE = 'Employee'
