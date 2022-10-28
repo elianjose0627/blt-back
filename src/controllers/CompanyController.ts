@@ -1,12 +1,33 @@
 import BaseController from './BaseController'
 import CompanyService from '../services/CompanyService'
-import { CustomRequest, CustomResponse } from '../types'
+import { CustomNext, CustomRequest, CustomResponse } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 
 const companyService = new CompanyService('Company')
 
 class CompanyController extends BaseController {
+  checkOwnerOrCampaignManager (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { user: currentUser, record: company } = req
+
+    const allowedRoles = ['CampaignManager']
+
+    const isOwner = currentUser?.id === company?.owner?.id
+    const isEmployee = currentUser?.companyId === company?.id
+
+    if (isOwner || (isEmployee && allowedRoles.includes(currentUser?.role))) {
+      return next()
+    } else {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'Only the owner or campaign manager can perform this action'
+        }
+      })
+    }
+  }
+
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { user, body: { company } } = req
 

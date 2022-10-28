@@ -36,10 +36,10 @@ const companyRoutes = (): any => {
       [Segments.BODY]: validator.validateCreatedAddress
     }, { abortEarly: false }), asyncHandler(AddressController.insert))
   companyRouter.route('/companies/:id/campaigns')
-    .post(asyncHandler(checkOwner), celebrate({
+    .post(asyncHandler(CompanyController.checkOwnerOrCampaignManager), celebrate({
       [Segments.BODY]: validator.validateCampaign
     }, { abortEarly: false }), asyncHandler(CampaignController.insert))
-    .get(asyncHandler(checkOwner), celebrate({
+    .get(asyncHandler(CompanyController.checkOwnerOrCampaignManager), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CampaignController.getAll))
   companyRouter.route('/companies/:id/users')

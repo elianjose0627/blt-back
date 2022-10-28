@@ -166,7 +166,7 @@ describe('Campaign actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or campaign manager can perform this action')
     })
   })
 })

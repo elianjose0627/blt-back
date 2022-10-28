@@ -1,13 +1,14 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import app from '../../app'
-import { deleteTestUser, createAdminTestUser } from '../utils'
+import { deleteTestUser, createAdminTestUser, createCampaignManager } from '../utils'
 
 const { expect } = chai
 
 chai.use(chaiHttp)
 
 let tokenAdmin: string
+let tokenCampaignManger: string
 let userEmail: string
 let token: string
 // let userId: string
@@ -15,6 +16,7 @@ let token: string
 describe('Company actions', () => {
   before(async () => {
     await createAdminTestUser()
+    await createCampaignManager()
 
     await chai
       .request(app)
@@ -31,8 +33,14 @@ describe('Company actions', () => {
       .post('/auth/login')
       .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
 
+    const resCampaignManager = await chai
+      .request(app)
+      .post('/auth/login')
+      .send({ user: { email: 'happyhogan@starkindustries.com', password: 'pepperpotts' } })
+
     tokenAdmin = resAdmin.body.token
     token = res1.body.token
+    tokenCampaignManger = resCampaignManager.body.token
     userEmail = res1.body.user.email
   })
 
@@ -193,6 +201,87 @@ describe('Company actions', () => {
       expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'type', 'createdAt', 'updatedAt')
     })
 
+    it('Should return 201 Created when a campaign manager for a company successfully creates a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company.com'
+          }
+        })
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(resCompany.body.company.id)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'happyhogan@starkindustries.com',
+            actionType: 'add'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenCampaignManger}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Hires',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaign')
+      expect(res.body.campaign).to.be.an('object')
+      expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'type', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 403 Forbidden when a non-employee Campaign Manager tries to creates a campaign for a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company.com'
+          }
+        })
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(resCompany.body.company.id)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'happyhogan@starkindustries.com',
+            actionType: 'remove'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenCampaignManger}`)
+        .send({
+          campaign: {
+            name: 'Onboarding',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner or campaign manager can perform this action')
+    })
+
     it('Should return 200 Success when a company owner tries to create a campaign that exists.', async () => {
       const resCompany = await chai
         .request(app)
@@ -249,7 +338,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or campaign manager can perform this action')
     })
   })
 
@@ -324,7 +413,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or campaign manager can perform this action')
     })
   })
 

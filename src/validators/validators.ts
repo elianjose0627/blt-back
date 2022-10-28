@@ -48,7 +48,7 @@ const validateUpdatedUser = Joi.object({
 const validateRole = Joi.object({
   user: Joi.object({
     role: Joi.string().lowercase()
-      .valid(...['user', 'administrator', 'customer', 'company', 'manager'])
+      .valid(...['user', 'administrator', 'customer', 'company', 'CampaignManager'])
       .required()
   }).required()
 })
