@@ -1,6 +1,7 @@
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import generateToken from '../../utils/generateToken'
+import * as userRoles from '../../utils/userRoles'
 
 const { expect } = chai
 
@@ -11,7 +12,7 @@ describe('generateToken', () => {
     const user = {
       id: 'b686e980-e928-11ea-9732-ebb399168cb4',
       email: 'simiyuwire@gmail.com',
-      role: 'administrator',
+      role: userRoles.ADMIN,
       isVerified: true,
       logoutTime: '2020-08-28T12:19:25.850Z'
     }
@@ -27,7 +28,7 @@ describe('generateToken', () => {
     const user = {
       id: 'b686e980-e928-11ea-9732-ebb399168cb4',
       email: 'simiyuwire@gmail.com',
-      role: 'administrator',
+      role: userRoles.ADMIN,
       isVerified: true,
       logoutTime: '2020-08-28T12:19:25.850Z'
     }

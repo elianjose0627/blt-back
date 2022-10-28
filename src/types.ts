@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
+import * as userRoles from './utils/userRoles'
 
 export type Nullable<T> = T | null
 
@@ -9,7 +10,7 @@ export interface MediaData {
   url: Nullable<string>
 }
 
-export type Role = 'trainer' | 'administrator' | 'user'
+export type Role = typeof userRoles.USER | typeof userRoles.ADMIN | typeof userRoles.EMPLOYEE | typeof userRoles.COMPANYADMINISTRATOR | typeof userRoles.CAMPAIGNMANAGER
 
 export interface INotifications {
   expoPushToken: Nullable<string>

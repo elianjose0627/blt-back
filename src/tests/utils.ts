@@ -1,6 +1,7 @@
 import { v1 as uuidv1 } from 'uuid'
 import dayjs from 'dayjs'
 import db from '../models'
+import * as userRoles from '../utils/userRoles'
 
 import utc from 'dayjs/plugin/utc'
 dayjs.extend(utc)
@@ -33,7 +34,7 @@ export const createAdminTestUser = async (email = 'ivers@kree.kr', password = 't
       firstName: 'Carol',
       lastName: 'Danvers',
       email,
-      role: 'administrator',
+      role: userRoles.ADMIN,
       phone: '1111111111',
       password,
       isVerified: true
@@ -108,7 +109,7 @@ export const createCampaignManager = async (email = 'happyhogan@starkindustries.
       firstName: 'Happy',
       lastName: 'Hogan',
       email,
-      role: 'CampaignManager',
+      role: userRoles.CAMPAIGNMANAGER,
       phone: '1111111111',
       password,
       isVerified: true
@@ -130,7 +131,7 @@ export const createUnverifiedAdmin = async (): Promise<any> => {
     password: 'jessicajones',
     isVerified: false,
     isActive: true,
-    role: 'administrator'
+    role: userRoles.ADMIN
   })
 
   if (user !== null) {
