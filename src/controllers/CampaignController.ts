@@ -3,14 +3,15 @@ import CampaignService from '../services/CampaignService'
 import { CustomNext, CustomRequest, CustomResponse } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
+import * as userRoles from '../utils/userRoles'
 
 const campaignService = new CampaignService('Campaign')
 
 class CampaignController extends BaseController {
-  checkOwnerOrCampaignManager (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+  checkOwnerOrCompanyAdministratorOrCampaignManager (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: { companyId, company: { owner } } } = req
 
-    const allowedRoles = ['CampaignManager']
+    const allowedRoles = [userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER]
 
     const isOwner = currentUser?.id === owner?.id
     const isEmployee = currentUser?.companyId === companyId
@@ -22,7 +23,7 @@ class CampaignController extends BaseController {
         statusCode: statusCodes.FORBIDDEN,
         success: false,
         errors: {
-          message: 'Only the owner or campaign manager can perform this action'
+          message: 'Only the owner, company administrator or campaign manager can perform this action'
         }
       })
     }

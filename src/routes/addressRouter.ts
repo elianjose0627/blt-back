@@ -13,11 +13,11 @@ const AddressRoutes = (): any => {
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(AddressController.checkRecord))
   addressRouter.route('/addresses/:id')
-    .get(asyncHandler(AddressController.checkOwner), asyncHandler(AddressController.get))
-    .put(asyncHandler(AddressController.checkOwner), celebrate({
+    .get(asyncHandler(AddressController.checkOwnerOrCompanyAdministrator), asyncHandler(AddressController.get))
+    .put(asyncHandler(AddressController.checkOwnerOrCompanyAdministrator), celebrate({
       [Segments.BODY]: validator.validateUpdatedAddress
     }), asyncHandler(AddressController.update))
-    .delete(asyncHandler(AddressController.checkOwner), asyncHandler(AddressController.delete))
+    .delete(asyncHandler(AddressController.checkOwnerOrCompanyAdministrator), asyncHandler(AddressController.delete))
   return addressRouter
 }
 

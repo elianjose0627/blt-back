@@ -1,22 +1,27 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import app from '../../app'
-import { deleteTestUser, createAdminTestUser, createCampaignManager } from '../utils'
+import {
+  deleteTestUser,
+  createAdminTestUser, createCampaignManager,
+  createCompanyAdministrator
+} from '../utils'
 
 const { expect } = chai
 
 chai.use(chaiHttp)
 
 let tokenAdmin: string
-let tokenCampaignManger: string
+let tokenCampaignManager: string
+let tokenCompanyAdministrator: string
 let userEmail: string
 let token: string
-// let userId: string
 
 describe('Company actions', () => {
   before(async () => {
     await createAdminTestUser()
     await createCampaignManager()
+    await createCompanyAdministrator()
 
     await chai
       .request(app)
@@ -38,9 +43,15 @@ describe('Company actions', () => {
       .post('/auth/login')
       .send({ user: { email: 'happyhogan@starkindustries.com', password: 'pepperpotts' } })
 
+    const resCompanyAdministrator = await chai
+      .request(app)
+      .post('/auth/login')
+      .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+
     tokenAdmin = resAdmin.body.token
     token = res1.body.token
-    tokenCampaignManger = resCampaignManager.body.token
+    tokenCampaignManager = resCampaignManager.body.token
+    tokenCompanyAdministrator = resCompanyAdministrator.body.token
     userEmail = res1.body.user.email
   })
 
@@ -73,7 +84,7 @@ describe('Company actions', () => {
   })
 
   describe('Create a company', () => {
-    it('Should return 201 Create when a user creates a company.', async () => {
+    it('Should return 201 Created when a user creates a company.', async () => {
       const res = await chai
         .request(app)
         .post('/api/companies')
@@ -110,6 +121,104 @@ describe('Company actions', () => {
     })
   })
 
+  describe('Get and update a company', () => {
+    it('Should return 200 OK when an owner gets a company by id.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('id', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 200 OK when a company administrator gets a company by id.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustries.com',
+            actionType: 'add'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('id', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 403 Forbidden when a company administrator who is not an employee tries to get a company by id.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustries.com',
+            actionType: 'remove'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner or company administrator can perform this action')
+    })
+  })
+
   describe('Create an address', () => {
     it('Should return 201 Created when a company owner successfully creates an address.', async () => {
       const resCompany = await chai
@@ -135,6 +244,48 @@ describe('Company actions', () => {
         })
 
       expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'address')
+      expect(res.body.address).to.be.an('object')
+      expect(res.body.address).to.include.keys('id', 'country', 'city', 'street', 'zip', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 200 Success when a company administrator tries to create an address that exists.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustries.com',
+            actionType: 'add'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/addresses`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          address: {
+            country: 'Kenya',
+            city: 'Nakuru'
+          }
+        })
+
+      expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'address')
       expect(res.body.address).to.be.an('object')
       expect(res.body.address).to.include.keys('id', 'country', 'city', 'street', 'zip', 'createdAt', 'updatedAt')
@@ -227,7 +378,7 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
-        .set('Authorization', `Bearer ${tokenCampaignManger}`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
         .send({
           campaign: {
             name: 'Onboarding Hires',
@@ -268,7 +419,7 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
-        .set('Authorization', `Bearer ${tokenCampaignManger}`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
         .send({
           campaign: {
             name: 'Onboarding',
@@ -279,7 +430,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner or campaign manager can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner, company administrator or campaign manager can perform this action')
     })
 
     it('Should return 200 Success when a company owner tries to create a campaign that exists.', async () => {
@@ -338,7 +489,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner or campaign manager can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner, company administrator or campaign manager can perform this action')
     })
   })
 
@@ -393,6 +544,63 @@ describe('Company actions', () => {
       expect(res.body.campaigns).to.be.an('array')
     })
 
+    it('Should return 200 Success when a company administrator successfully retrieves all campaigns.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/campaigns`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaigns')
+      expect(res.body.campaigns).to.be.an('array')
+    })
+
+    it('Should return 403 Forbidden when a company admin who is not an employee tries to retrieve all campaigns.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustries.com',
+            actionType: 'remove'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/campaigns`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner, company administrator or campaign manager can perform this action')
+    })
+
     it('Should return 403 when a non owner tries to retrieve all company campaigns.', async () => {
       const resCompany = await chai
         .request(app)
@@ -413,7 +621,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner or campaign manager can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner, company administrator or campaign manager can perform this action')
     })
   })
 
@@ -435,6 +643,40 @@ describe('Company actions', () => {
         .request(app)
         .get(`/api/companies/${companyId}/users`)
         .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'users')
+      expect(res.body.users).to.be.an('array')
+    })
+
+    it('Should return 200 Success when a company admin who is an employee successfully retrieves all users of a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Best Company',
+            email: 'testbest@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustries.com',
+            actionType: 'add'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/users`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'users')
@@ -469,7 +711,7 @@ describe('Company actions', () => {
       expect(res.body.user).to.be.an('object')
     })
 
-    it('Should return 200 Success when an owner successfully removes a user to a company.', async () => {
+    it('Should return 200 Success when a company admin who is an employee successfully adds a user to a company.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -481,6 +723,86 @@ describe('Company actions', () => {
           }
         })
       const companyId = String(resCompany.body.company.id)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustries.com',
+            actionType: 'add'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${companyId}/users`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .send({
+          user: {
+            email: userEmail
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+    })
+
+    it('Should return 200 Success when an owner successfully removes a user from a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Best Company',
+            email: 'testbest@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${companyId}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: userEmail,
+            actionType: 'remove'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.user.company).to.equal(null)
+    })
+
+    it('Should return 200 Success when a company admin who is an employee successfully removes a user from a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Best Company',
+            email: 'testbest@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustries.com',
+            actionType: 'add'
+          }
+        })
 
       const res = await chai
         .request(app)
@@ -546,7 +868,41 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or company administrator can perform this action')
+    })
+
+    it('Should return 403 when a company administrator who is not an employee tries to retrieve all company users.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Best Company',
+            email: 'testbest@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustries.com',
+            actionType: 'remove'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner or company administrator can perform this action')
     })
   })
 })

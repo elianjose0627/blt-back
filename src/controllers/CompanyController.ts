@@ -3,14 +3,15 @@ import CompanyService from '../services/CompanyService'
 import { CustomNext, CustomRequest, CustomResponse } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
+import * as userRoles from '../utils/userRoles'
 
 const companyService = new CompanyService('Company')
 
 class CompanyController extends BaseController {
-  checkOwnerOrCampaignManager (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+  checkOwnerOrCompanyAdministratorOrCampaignManager (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: company } = req
 
-    const allowedRoles = ['CampaignManager']
+    const allowedRoles = [userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER]
 
     const isOwner = currentUser?.id === company?.owner?.id
     const isEmployee = currentUser?.companyId === company?.id
@@ -22,7 +23,28 @@ class CompanyController extends BaseController {
         statusCode: statusCodes.FORBIDDEN,
         success: false,
         errors: {
-          message: 'Only the owner or campaign manager can perform this action'
+          message: 'Only the owner, company administrator or campaign manager can perform this action'
+        }
+      })
+    }
+  }
+
+  checkOwnerOrCompanyAdministrator (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { user: currentUser, record: company } = req
+
+    const allowedRoles = [userRoles.COMPANYADMINISTRATOR]
+
+    const isOwner = currentUser?.id === company?.owner?.id
+    const isEmployee = currentUser?.companyId === company?.id
+
+    if (isOwner || (isEmployee && allowedRoles.includes(currentUser?.role))) {
+      return next()
+    } else {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'Only the owner or company administrator can perform this action'
         }
       })
     }

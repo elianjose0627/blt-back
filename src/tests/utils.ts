@@ -121,6 +121,32 @@ export const createCampaignManager = async (email = 'happyhogan@starkindustries.
   }
 }
 
+export const createCompanyAdministrator = async (email = 'nickfury@starkindustries.com', password = 'captainmarvel'): Promise<any> => {
+  const user = await db.User.findOne({
+    attributes: ['id', 'email'],
+    where: {
+      email
+    }
+  })
+
+  if (user === null) {
+    const user = await db.User.create({
+      id: uuidv1(),
+      firstName: 'Nick',
+      lastName: 'Fury',
+      email,
+      role: userRoles.COMPANYADMINISTRATOR,
+      phone: '1111111111',
+      password,
+      isVerified: true
+    })
+
+    if (user !== null) {
+      return user
+    }
+  }
+}
+
 export const createUnverifiedAdmin = async (): Promise<any> => {
   const user = await db.User.create({
     id: uuidv1(),
