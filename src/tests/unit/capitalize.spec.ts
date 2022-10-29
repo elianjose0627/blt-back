@@ -70,6 +70,11 @@ describe('capitalize', () => {
     expect(capitalizedname).to.equal('Shelly-Ann Fraser-Pryce')
   })
 
+  xit('tests if full name with hyphens in first and last name is capitalized', () => {
+    const capitalizedname = capitalize('Mackenzie Towne')
+    expect(capitalizedname).to.equal('Mackenzie Towne')
+  })
+
   it('tests if full name with apostrophe in last name is capitalized', () => {
     const capitalizedname = capitalize('lupita nyong\'o')
     expect(capitalizedname).to.equal('Lupita Nyong\'o')

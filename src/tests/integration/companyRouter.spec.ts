@@ -28,7 +28,7 @@ describe('Company actions', () => {
       .post('/auth/signup')
       .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustries.com', phone: '254724374281', password: 'mackone' } })
 
-    const res1 = await chai
+    const resUser = await chai
       .request(app)
       .post('/auth/login')
       .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
@@ -49,10 +49,10 @@ describe('Company actions', () => {
       .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
 
     tokenAdmin = resAdmin.body.token
-    token = res1.body.token
+    token = resUser.body.token
     tokenCampaignManager = resCampaignManager.body.token
     tokenCompanyAdministrator = resCompanyAdministrator.body.token
-    userEmail = res1.body.user.email
+    userEmail = resUser.body.user.email
   })
 
   after(async () => {
@@ -172,6 +172,13 @@ describe('Company actions', () => {
           }
         })
 
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
       const res = await chai
         .request(app)
         .get(`/api/companies/${String(companyId)}`)
@@ -207,6 +214,13 @@ describe('Company actions', () => {
             actionType: 'remove'
           }
         })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
       const res = await chai
         .request(app)
@@ -375,6 +389,13 @@ describe('Company actions', () => {
           }
         })
 
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'happyhogan@starkindustries.com', password: 'pepperpotts' } })
+
+      tokenCampaignManager = resCampaignManager.body.token
+
       const res = await chai
         .request(app)
         .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
@@ -415,6 +436,13 @@ describe('Company actions', () => {
             actionType: 'remove'
           }
         })
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'happyhogan@starkindustries.com', password: 'pepperpotts' } })
+
+      tokenCampaignManager = resCampaignManager.body.token
 
       const res = await chai
         .request(app)
@@ -545,6 +573,8 @@ describe('Company actions', () => {
     })
 
     it('Should return 200 Success when a company administrator successfully retrieves all campaigns.', async () => {
+      await deleteTestUser('nickfury@starkindustries.com')
+      await createCompanyAdministrator()
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -556,6 +586,24 @@ describe('Company actions', () => {
           }
         })
       const companyId = String(resCompany.body.company.id)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustries.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
       const res = await chai
         .request(app)
@@ -590,6 +638,13 @@ describe('Company actions', () => {
             actionType: 'remove'
           }
         })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
       const res = await chai
         .request(app)
@@ -650,6 +705,8 @@ describe('Company actions', () => {
     })
 
     it('Should return 200 Success when a company admin who is an employee successfully retrieves all users of a company.', async () => {
+      await deleteTestUser('nickfury@starkindustries.com')
+      await createCompanyAdministrator()
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -672,6 +729,13 @@ describe('Company actions', () => {
             actionType: 'add'
           }
         })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
       const res = await chai
         .request(app)
@@ -712,6 +776,16 @@ describe('Company actions', () => {
     })
 
     it('Should return 200 Success when a company admin who is an employee successfully adds a user to a company.', async () => {
+      await deleteTestUser('nickfury@starkindustries.com')
+      await createCompanyAdministrator()
+
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+
+      token = resUser.body.token
+
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -735,6 +809,13 @@ describe('Company actions', () => {
           }
         })
 
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
       const res = await chai
         .request(app)
         .patch(`/api/companies/${companyId}/users`)
@@ -751,6 +832,12 @@ describe('Company actions', () => {
     })
 
     it('Should return 200 Success when an owner successfully removes a user from a company.', async () => {
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+
+      token = resUser.body.token
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -781,6 +868,12 @@ describe('Company actions', () => {
     })
 
     it('Should return 200 Success when a company admin who is an employee successfully removes a user from a company.', async () => {
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+
+      token = resUser.body.token
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -804,6 +897,13 @@ describe('Company actions', () => {
           }
         })
 
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
       const res = await chai
         .request(app)
         .patch(`/api/companies/${companyId}/users`)
@@ -822,6 +922,12 @@ describe('Company actions', () => {
     })
 
     it('Should return 200 Success when an owner successfully retrieves all users with negative pagination params.', async () => {
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+
+      token = resUser.body.token
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -849,6 +955,12 @@ describe('Company actions', () => {
     })
 
     it('Should return 403 when a non owner tries to retrieve all company users.', async () => {
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+
+      token = resUser.body.token
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -872,6 +984,12 @@ describe('Company actions', () => {
     })
 
     it('Should return 403 when a company administrator who is not an employee tries to retrieve all company users.', async () => {
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+
+      token = resUser.body.token
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -894,6 +1012,13 @@ describe('Company actions', () => {
             actionType: 'remove'
           }
         })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
       const res = await chai
         .request(app)

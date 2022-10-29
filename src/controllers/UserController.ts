@@ -1,8 +1,12 @@
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import BaseController from './BaseController'
 import UserService from '../services/UserService'
 import * as statusCodes from '../constants/statusCodes'
 import { CustomNext, CustomRequest, CustomResponse } from '../types'
+import * as userRoles from '../utils//userRoles'
 
+dayjs.extend(utc)
 const userService = new UserService('User')
 
 class UserController extends BaseController {
@@ -212,7 +216,13 @@ class UserController extends BaseController {
       remove: null
     }
 
-    const response = await userService.update(employee, { companyId: selectedCompanyId[actionType] })
+    let updatedRole = employee.role === userRoles.USER ? userRoles.EMPLOYEE : employee.role
+
+    if (actionType === 'remove') {
+      updatedRole = userRoles.USER
+    }
+
+    const response = await userService.update(employee, { companyId: selectedCompanyId[actionType], role: updatedRole, logoutTime: dayjs.utc() })
 
     if (actionType === 'remove') {
       response.company = null
