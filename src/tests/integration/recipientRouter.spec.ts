@@ -107,6 +107,8 @@ describe('Recipient actions', () => {
     })
 
     it('Should return 200 OK when a company admin successfully gets a recipient.', async () => {
+      await deleteTestUser('nickfury@starkindustries.com')
+      await createCompanyAdministrator()
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -130,6 +132,13 @@ describe('Recipient actions', () => {
             actionType: 'add'
           }
         })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
       const resCampaign = await chai
         .request(app)
@@ -182,6 +191,9 @@ describe('Recipient actions', () => {
 
       const companyId = resCompany.body.company.id
 
+      await deleteTestUser('happyhogan@starkindustries.com')
+      await createCampaignManager()
+
       await chai
         .request(app)
         .patch(`/api/companies/${String(companyId)}/users`)
@@ -192,6 +204,13 @@ describe('Recipient actions', () => {
             actionType: 'add'
           }
         })
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'happyhogan@starkindustries.com', password: 'pepperpotts' } })
+
+      tokenCampaignManager = resCampaignManager.body.token
 
       const resCampaign = await chai
         .request(app)
@@ -255,6 +274,16 @@ describe('Recipient actions', () => {
           }
         })
 
+      await deleteTestUser('nickfury@starkindustries.com')
+      await createCompanyAdministrator()
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
       const resCampaign = await chai
         .request(app)
         .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
@@ -315,6 +344,16 @@ describe('Recipient actions', () => {
             actionType: 'remove'
           }
         })
+
+      await deleteTestUser('happyhogan@starkindustries.com')
+      await createCampaignManager()
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'happyhogan@starkindustries.com', password: 'pepperpotts' } })
+
+      tokenCampaignManager = resCampaignManager.body.token
 
       const resCampaign = await chai
         .request(app)

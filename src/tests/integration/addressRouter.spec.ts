@@ -44,6 +44,7 @@ describe('Address actions', () => {
 
   after(async () => {
     await deleteTestUser('drstrange@gmail.com')
+    await deleteTestUser('nickfury@starkindustries.com')
   })
 
   describe('Update an address', () => {
@@ -124,6 +125,13 @@ describe('Address actions', () => {
           }
         })
 
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
       const resUpdate = await chai
         .request(app)
         .put(`/api/addresses/${String(res.body.address.id)}`)
@@ -166,6 +174,13 @@ describe('Address actions', () => {
             actionType: 'remove'
           }
         })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
       const resAddress = await chai
         .request(app)
@@ -220,6 +235,13 @@ describe('Address actions', () => {
           }
         })
 
+      const resTest = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'drstrange@gmail.com', password: 'thesanctum' } })
+
+      tokenUser = resTest.body.token
+
       const resAddress = await chai
         .request(app)
         .post(`/api/companies/${String(companyId)}/addresses`)
@@ -272,6 +294,13 @@ describe('Address actions', () => {
             actionType: 'remove'
           }
         })
+
+      const resTest = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'drstrange@gmail.com', password: 'thesanctum' } })
+
+      tokenUser = resTest.body.token
 
       const resAddress = await chai
         .request(app)
