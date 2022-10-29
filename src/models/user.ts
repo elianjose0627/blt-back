@@ -2,6 +2,7 @@ import { Model } from 'sequelize'
 import bcrypt from 'bcrypt'
 import capitalize from '../utils/capitalize'
 import { LoginTime, MediaData, INotifications, Nullable, Role, IUser } from '../types'
+import * as userRoles from '../utils/userRoles'
 
 const UserModel = (sequelize: any, DataTypes: any): any => {
   interface UserAttributes {
@@ -135,7 +136,7 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
     },
     role: {
       type: DataTypes.STRING,
-      defaultValue: 'user'
+      defaultValue: userRoles.USER
     },
     isActive: {
       type: DataTypes.BOOLEAN,
