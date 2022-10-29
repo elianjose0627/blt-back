@@ -15,16 +15,16 @@ const CampaignRoutes = (): any => {
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(CampaignController.checkRecord))
   campaignRouter.route('/campaigns/:id')
-    .get(asyncHandler(CampaignController.checkOwnerOrCampaignManager), asyncHandler(CampaignController.get))
-    .put(asyncHandler(CampaignController.checkOwnerOrCampaignManager), celebrate({
+    .get(asyncHandler(CampaignController.checkOwnerOrCompanyAdministratorOrCampaignManager), asyncHandler(CampaignController.get))
+    .put(asyncHandler(CampaignController.checkOwnerOrCompanyAdministratorOrCampaignManager), celebrate({
       [Segments.BODY]: validator.validateCampaign
     }), asyncHandler(CampaignController.update))
-    .delete(asyncHandler(CampaignController.checkOwnerOrCampaignManager), asyncHandler(CampaignController.delete))
+    .delete(asyncHandler(CampaignController.checkOwnerOrCompanyAdministratorOrCampaignManager), asyncHandler(CampaignController.delete))
   campaignRouter.route('/campaigns/:id/recipients')
-    .post(asyncHandler(CampaignController.checkOwnerOrCampaignManager), celebrate({
+    .post(asyncHandler(CampaignController.checkOwnerOrCompanyAdministratorOrCampaignManager), celebrate({
       [Segments.BODY]: validator.validateCreatedRecipient
     }, { abortEarly: false }), asyncHandler(RecipientController.insert))
-    .get(asyncHandler(CampaignController.checkOwnerOrCampaignManager), celebrate({
+    .get(asyncHandler(CampaignController.checkOwnerOrCompanyAdministratorOrCampaignManager), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(RecipientController.getAll))
   return campaignRouter

@@ -1,11 +1,28 @@
 import BaseController from './BaseController'
 import UserService from '../services/UserService'
 import * as statusCodes from '../constants/statusCodes'
-import { CustomRequest, CustomResponse } from '../types'
+import { CustomNext, CustomRequest, CustomResponse } from '../types'
 
 const userService = new UserService('User')
 
 class UserController extends BaseController {
+  async checkOwner (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
+    const { user: currentUser } = req
+    const { id } = req.params
+
+    if (currentUser.id === id) {
+      return next()
+    } else {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'Only the owner can perform this action'
+        }
+      })
+    }
+  }
+
   async login (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { body: { user: { email, password } } } = req
     const response = await userService.login(email, password)
@@ -176,20 +193,7 @@ class UserController extends BaseController {
   }
 
   async updateCompanyId (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { body: { user: { email, actionType } }, user: currentUser, record: { id: companyId, owner: { id: ownerId } } } = req
-    const { id: userId } = currentUser
-
-    console.log(actionType)
-
-    if (userId !== ownerId) {
-      return res.status(statusCodes.FORBIDDEN).send({
-        statusCode: statusCodes.FORBIDDEN,
-        success: false,
-        errors: {
-          message: 'Only the company owner can perform this action'
-        }
-      })
-    }
+    const { body: { user: { email, actionType } }, record: { id: companyId } } = req
 
     const employee = await userService.findByEmail(email)
 

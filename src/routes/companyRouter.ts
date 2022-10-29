@@ -5,7 +5,6 @@ import CompanyController from '../controllers/CompanyController'
 import AddressController from '../controllers/AddressController'
 import CampaignController from '../controllers/CampaignController'
 import asyncHandler from '../middlewares/asyncHandler'
-import checkOwner from '../middlewares/checkOwner'
 import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
@@ -26,27 +25,27 @@ const companyRoutes = (): any => {
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(CompanyController.checkRecord))
   companyRouter.route('/companies/:id')
-    .get(asyncHandler(checkOwner), asyncHandler(CompanyController.get))
-    .put(asyncHandler(checkOwner), celebrate({
+    .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator), asyncHandler(CompanyController.get))
+    .put(asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator), celebrate({
       [Segments.BODY]: validator.validateUpdatedCompany
     }), asyncHandler(CompanyController.update))
     .delete(asyncHandler(checkAdmin), asyncHandler(CompanyController.delete))
   companyRouter.route('/companies/:id/addresses')
-    .post(asyncHandler(checkOwner), celebrate({
+    .post(asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator), celebrate({
       [Segments.BODY]: validator.validateCreatedAddress
     }, { abortEarly: false }), asyncHandler(AddressController.insert))
   companyRouter.route('/companies/:id/campaigns')
-    .post(asyncHandler(CompanyController.checkOwnerOrCampaignManager), celebrate({
+    .post(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManager), celebrate({
       [Segments.BODY]: validator.validateCampaign
     }, { abortEarly: false }), asyncHandler(CampaignController.insert))
-    .get(asyncHandler(CompanyController.checkOwnerOrCampaignManager), celebrate({
+    .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManager), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CampaignController.getAll))
   companyRouter.route('/companies/:id/users')
-    .patch(asyncHandler(checkOwner), celebrate({
+    .patch(asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator), celebrate({
       [Segments.BODY]: validator.validateJoinCompany
     }, { abortEarly: false }), asyncHandler(UserController.updateCompanyId))
-    .get(asyncHandler(checkOwner), celebrate({
+    .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CompanyController.getAllUsers))
   return companyRouter
