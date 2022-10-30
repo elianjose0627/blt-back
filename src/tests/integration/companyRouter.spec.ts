@@ -18,6 +18,7 @@ let tokenCompanyAdministrator: string
 let userEmail: string
 let token: string
 let userId: string
+let userIdAdmin: string
 
 describe('Company actions', () => {
   before(async () => {
@@ -56,6 +57,7 @@ describe('Company actions', () => {
     tokenCompanyAdministrator = resCompanyAdministrator.body.token
     userEmail = resUser.body.user.email
     userId = resUser.body.user.id
+    userIdAdmin = resAdmin.body.user.id
   })
 
   after(async () => {
@@ -361,6 +363,31 @@ describe('Company actions', () => {
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('You cannot update your own role')
+    })
+
+    it('Should return 403 Forbidden when a company owner tries to update the role of an admin user.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Starlink Company',
+            email: 'tars@company.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users/${String(userIdAdmin)}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ user: { role: userRoles.COMPANYADMINISTRATOR } })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You cannot update the role of an administrator')
     })
 
     it('Should return 403 Forbidden when a company campaign manager tries to update the role of an employee.', async () => {
