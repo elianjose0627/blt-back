@@ -6,6 +6,7 @@ import {
   createAdminTestUser, createCampaignManager,
   createCompanyAdministrator
 } from '../utils'
+import * as userRoles from '../../utils/userRoles'
 
 const { expect } = chai
 
@@ -16,6 +17,7 @@ let tokenCampaignManager: string
 let tokenCompanyAdministrator: string
 let userEmail: string
 let token: string
+let userId: string
 
 describe('Company actions', () => {
   before(async () => {
@@ -53,6 +55,7 @@ describe('Company actions', () => {
     tokenCampaignManager = resCampaignManager.body.token
     tokenCompanyAdministrator = resCompanyAdministrator.body.token
     userEmail = resUser.body.user.email
+    userId = resUser.body.user.id
   })
 
   after(async () => {
@@ -118,6 +121,37 @@ describe('Company actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'company')
       expect(res.body.company).to.be.an('object')
       expect(res.body.company).to.include.keys('id', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 204 when a admin deletes a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Test Company Deleted',
+            email: 'test@company.com'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .delete(`/api/companies/${String(resCompany.body.company.id)}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(204)
+    })
+
+    it('Should return 404 when a admin tries to delete a company that does not exist.', async () => {
+      const res = await chai
+        .request(app)
+        .delete('/api/companies/88D48647-ED1C-49CF-9D53-403D7DAD8DB7')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Company not found')
     })
   })
 
@@ -230,6 +264,187 @@ describe('Company actions', () => {
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('Only the owner or company administrator can perform this action')
+    })
+
+    it('Should return 200 OK when a company owner updates the role of an employee.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const resNewUser = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Blackagon', lastName: 'Boltagon', email: 'blackbolt@inhumans.com', password: 'medussa' } })
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: resNewUser.body.user.email,
+            actionType: 'add'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users/${String(resNewUser.body.user.id)}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ user: { role: userRoles.COMPANYADMINISTRATOR } })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.user).to.not.have.any.keys('password', 'otp', 'isDeleted')
+    })
+
+    it('Should return 403 Forbidden when a company owner updates the role of an non-employee.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Starlink Company',
+            email: 'tars@company.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const resNewUser = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Medusa', lastName: 'Boltagon', email: 'medusa@inhumans.com', password: 'blackbolt' } })
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users/${String(resNewUser.body.user.id)}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ user: { role: userRoles.COMPANYADMINISTRATOR } })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only an admin, the owner or company administrator can perform this action')
+    })
+
+    it('Should return 403 Forbidden when a company owner tries to update their role.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Starlink Company',
+            email: 'tars@company.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users/${String(userId)}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ user: { role: userRoles.COMPANYADMINISTRATOR } })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You cannot update your own role')
+    })
+
+    it('Should return 403 Forbidden when a company campaign manager tries to update the role of an employee.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Starlink Company',
+            email: 'tars@company.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const resNewUser = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Gorgon', lastName: 'Petragon', email: 'gorgon@inhumans.com', password: 'earthquake' } })
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: resNewUser.body.user.email,
+            actionType: 'add'
+          }
+        })
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'happyhogan@starkindustries.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'happyhogan@starkindustries.com', password: 'pepperpotts' } })
+
+      tokenCampaignManager = resCampaignManager.body.token
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users/${String(resNewUser.body.user.id)}`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+        .send({ user: { role: userRoles.COMPANYADMINISTRATOR } })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only an admin, the owner or company administrator can perform this action')
+    })
+
+    it('Should return 404 Not Found when a company owner updates the role of an non-existent employee.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Starlink Company',
+            email: 'tars@company.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users/7B98DA13-EF75-46BB-ABD5-F76D162C335A`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ user: { role: userRoles.COMPANYADMINISTRATOR } })
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('User not found')
     })
   })
 

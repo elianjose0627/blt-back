@@ -1,11 +1,13 @@
 import BaseController from './BaseController'
 import CompanyService from '../services/CompanyService'
+import UserService from '../services/UserService'
 import { CustomNext, CustomRequest, CustomResponse } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
 
 const companyService = new CompanyService('Company')
+const userService = new UserService('User')
 
 class CompanyController extends BaseController {
   checkOwnerOrCompanyAdministratorOrCampaignManager (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
@@ -84,6 +86,58 @@ class CompanyController extends BaseController {
       success: true,
       meta,
       users: records.rows
+    })
+  }
+
+  async updateUserRole (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { user: currentUser, record: company, params: { id: companyId, userId }, body: { user: { role } } } = req
+
+    const allowedRoles = [userRoles.ADMIN, userRoles.COMPANYADMINISTRATOR]
+    const isCompanyOwner = currentUser.id === company?.owner?.id
+
+    if (userId === currentUser.id) {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'You cannot update your own role'
+        }
+      })
+    }
+
+    const userToUpdate = await userService.findById(userId)
+
+    if (userToUpdate === null) {
+      return res.status(statusCodes.NOT_FOUND).send({
+        statusCode: statusCodes.NOT_FOUND,
+        success: false,
+        errors: {
+          message: `${String(userService.model)} not found`
+        }
+      })
+    }
+
+    const userToUpdateIsCompanyEmployee = userToUpdate?.company?.id === companyId
+    const currentUserIsCompanyEmployee = currentUser?.company?.id === companyId
+
+    if (userToUpdateIsCompanyEmployee &&
+      ((currentUserIsCompanyEmployee && allowedRoles.includes(currentUser.role)) || isCompanyOwner)
+    ) {
+      const response = await userService.update(userToUpdate, { role, logoutTime: Date() })
+
+      return res.status(statusCodes.OK).send({
+        statusCode: statusCodes.OK,
+        success: true,
+        user: response
+      })
+    }
+
+    return res.status(statusCodes.FORBIDDEN).send({
+      statusCode: statusCodes.FORBIDDEN,
+      success: false,
+      errors: {
+        message: 'Only an admin, the owner or company administrator can perform this action'
+      }
     })
   }
 }
