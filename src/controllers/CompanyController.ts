@@ -117,6 +117,16 @@ class CompanyController extends BaseController {
       })
     }
 
+    if (userToUpdate.role === userRoles.ADMIN) {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'You cannot update the role of an administrator'
+        }
+      })
+    }
+
     const userToUpdateIsCompanyEmployee = userToUpdate?.company?.id === companyId
     const currentUserIsCompanyEmployee = currentUser?.company?.id === companyId
 
