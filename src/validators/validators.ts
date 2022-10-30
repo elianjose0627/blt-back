@@ -54,6 +54,14 @@ const validateRole = Joi.object({
   }).required()
 })
 
+const validateUserCompanyRole = Joi.object({
+  user: Joi.object({
+    role: Joi.string()
+      .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
+      .required()
+  }).required()
+})
+
 const validatePassword = Joi.object({
   user: Joi.object({
     currentPassword: Joi.string().required(),
@@ -90,7 +98,8 @@ const validateOtp = Joi.object({
 })
 
 const validateUUID = Joi.object().keys({
-  id: Joi.string().uuid()
+  id: Joi.string().uuid(),
+  userId: Joi.string().uuid()
 })
 
 const validateUsersQueryParams = Joi.object({
@@ -226,5 +235,6 @@ export default {
   validateCreatedRecipient,
   validateUpdatedRecipient,
   validateCampaign,
-  validateJoinCompany
+  validateJoinCompany,
+  validateUserCompanyRole
 }
