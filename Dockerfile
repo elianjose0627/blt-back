@@ -1,5 +1,5 @@
 # Pull in the official version of Node 14.
-FROM node:14
+FROM node:14-alpine
 
 # Create and change to the app directory.
 WORKDIR /usr/src/app
