@@ -62,7 +62,7 @@ describe('Address actions', () => {
 
       const res = await chai
         .request(app)
-        .post(`/api/companies/${String(resCompany.body.company.id)}/addresses`)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/address`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           address: {
@@ -116,7 +116,7 @@ describe('Address actions', () => {
 
       const res = await chai
         .request(app)
-        .post(`/api/companies/${String(companyId)}/addresses`)
+        .post(`/api/companies/${String(companyId)}/address`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           address: {
@@ -184,7 +184,7 @@ describe('Address actions', () => {
 
       const resAddress = await chai
         .request(app)
-        .post(`/api/companies/${String(companyId)}/addresses`)
+        .post(`/api/companies/${String(companyId)}/address`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           address: {
@@ -244,7 +244,7 @@ describe('Address actions', () => {
 
       const resAddress = await chai
         .request(app)
-        .post(`/api/companies/${String(companyId)}/addresses`)
+        .post(`/api/companies/${String(companyId)}/address`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           address: {
@@ -304,7 +304,7 @@ describe('Address actions', () => {
 
       const resAddress = await chai
         .request(app)
-        .post(`/api/companies/${String(companyId)}/addresses`)
+        .post(`/api/companies/${String(companyId)}/address`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           address: {

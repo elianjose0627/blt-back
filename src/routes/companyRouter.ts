@@ -29,7 +29,7 @@ const companyRoutes = (): any => {
       [Segments.BODY]: validator.validateUpdatedCompany
     }), asyncHandler(CompanyController.update))
     .delete(asyncHandler(checkAdmin), asyncHandler(CompanyController.delete))
-  companyRouter.route('/companies/:id/addresses')
+  companyRouter.route('/companies/:id/address')
     .post(asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator), celebrate({
       [Segments.BODY]: validator.validateCreatedAddress
     }, { abortEarly: false }), asyncHandler(CompanyController.createAddress))
