@@ -42,6 +42,7 @@ export interface IUser {
   loginTime: LoginTime
   logoutTime?: Nullable<Date>
   company: ICompany | null
+  address: IAddress | null
 }
 
 export interface IToken {
