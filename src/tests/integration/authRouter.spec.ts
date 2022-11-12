@@ -33,7 +33,7 @@ describe('Auth Actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Peter', lastName: 'Quill', email: 'starlord1@guardiansofthegalaxy.com', phone: '254724374281', password: 'footloose' } })
+      .send({ user: { firstName: 'Peter', lastName: 'Quill', email: 'starlord1@guardiansofthegalaxy.com', phone: '254720123456', password: 'footloose' } })
 
     const res = await chai
       .request(app)
@@ -54,7 +54,7 @@ describe('Auth Actions', () => {
           lastName: 'Quill',
           username: '',
           email: 'starlord1@guardiansofthegalaxy.com',
-          phone: '254724374281',
+          phone: '254720123456',
           password: 'footloose'
         }
       })
@@ -69,7 +69,7 @@ describe('Auth Actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Mary', lastName: 'Jane', email: 'mj@spiderteam.com', phone: '254724374281', password: 'petertingle' } })
+      .send({ user: { firstName: 'Mary', lastName: 'Jane', email: 'mj@spiderteam.com', phone: '254720123456', password: 'petertingle' } })
 
     const resLogin = await chai
       .request(app)
@@ -125,7 +125,7 @@ describe('Auth Actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Luke', lastName: 'Cage', email: 'lukecage@alias.com', phone: '254724374281', password: 'stormer' } })
+      .send({ user: { firstName: 'Luke', lastName: 'Cage', email: 'lukecage@alias.com', phone: '254720123456', password: 'stormer' } })
 
     const res = await chai
       .request(app)
@@ -177,7 +177,7 @@ describe('Auth Actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254724374281', password: 'julien' } })
+      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: 'julien' } })
 
     const res = await chai
       .request(app)
@@ -194,7 +194,7 @@ describe('Auth Actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254724374281', password: 'julien' } })
+      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: 'julien' } })
 
     sgMail.setApiKey('')
 
@@ -244,7 +244,7 @@ describe('Auth Actions', () => {
     const resUser = await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Queen', lastName: 'Hippolyta', email: 'qh@themyscira.com', phone: '254724374281', password: 'iamthegreatest' } })
+      .send({ user: { firstName: 'Queen', lastName: 'Hippolyta', email: 'qh@themyscira.com', phone: '254720123456', password: 'iamthegreatest' } })
 
     const token = generateToken(resUser.body.user, 'reset', '1 minute')
 
@@ -264,7 +264,7 @@ describe('Auth Actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Gwen', lastName: 'Stacy', email: 'gs@spiderteam.com', phone: '254724374281', password: 'petertingle' } })
+      .send({ user: { firstName: 'Gwen', lastName: 'Stacy', email: 'gs@spiderteam.com', phone: '254720123456', password: 'petertingle' } })
 
     const resLogin = await chai
       .request(app)

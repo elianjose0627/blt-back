@@ -30,7 +30,7 @@ class AddressController extends BaseController {
   }
 
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { user, record: company, body: { address } } = req
+    const { record: { user, company }, body: { address } } = req
 
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 

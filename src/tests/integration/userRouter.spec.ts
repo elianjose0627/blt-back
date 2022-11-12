@@ -28,7 +28,7 @@ describe('A user', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Luke', lastName: 'Cage', email: 'ironman@starkindustries.com', phone: '254724374281', password: 'mackone' } })
+      .send({ user: { firstName: 'Tony', lastName: 'Stark', email: 'ironman@starkindustries.com', phone: '254720123456', password: 'mackone' } })
 
     const res1 = await chai
       .request(app)
@@ -234,7 +234,7 @@ describe('A user', () => {
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Pepper', lastName: 'Potts', email: 'rescure@starkindustries.com', phone: '254724374281', password: 'tonyhasaheart' } })
+        .send({ user: { firstName: 'Pepper', lastName: 'Potts', email: 'rescure@starkindustries.com', phone: '254720123456', password: 'tonyhasaheart' } })
 
       const resUpdate = await chai
         .request(app)
@@ -288,7 +288,7 @@ describe('A user', () => {
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Sookie', lastName: 'Stackhouse', email: 'sook@bontemps.com', phone: '254724374281', password: 'vampirebill' } })
+        .send({ user: { firstName: 'Sookie', lastName: 'Stackhouse', email: 'sook@bontemps.com', phone: '254720123456', password: 'vampirebill' } })
 
       const res1 = await chai
         .request(app)
@@ -311,7 +311,7 @@ describe('A user', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254724374281', password: 'julien' } })
+      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: 'julien' } })
 
     const resLogin = await chai
       .request(app)
@@ -337,7 +337,7 @@ describe('A user', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254724374281', password: 'julien' } })
+      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: 'julien' } })
 
     const resLogin = await chai
       .request(app)
@@ -364,7 +364,7 @@ describe('A user', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Diana', lastName: 'Prince', email: 'ww@themyscira.com', phone: '254724374281', password: 'ariessux' } })
+      .send({ user: { firstName: 'Diana', lastName: 'Prince', email: 'ww@themyscira.com', phone: '254720123456', password: 'ariessux' } })
 
     const resLogin = await chai
       .request(app)
@@ -494,5 +494,83 @@ describe('A user', () => {
     expect(res).to.have.status(403)
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')
     expect(res.body.errors.message).to.equal('Only the owner can perform this action')
+  })
+
+  describe('Create an address', () => {
+    before(async () => {
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Auth', lastName: 'May', email: 'auymay@starkindustries.com', phone: '254720123456', password: 'petertingle' } })
+
+      const res1 = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'auymay@starkindustries.com', password: 'petertingle' } })
+
+      const res2 = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
+
+      token = res1.body.token
+      userId = res1.body.user.id
+
+      tokenAdmin = res2.body.token
+      userIdAdmin = res2.body.user.id
+    })
+    it('Should return 201 Created when a user successfully creates an address.', async () => {
+      const res = await chai
+        .request(app)
+        .post(`/api/users/${String(userId)}/addresses`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          address: {
+            country: 'Kenya',
+            city: 'Nairobi'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'address')
+      expect(res.body.address).to.be.an('object')
+      expect(res.body.address).to.include.keys('id', 'country', 'city', 'street', 'zip', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 200 Success when a user tries to create an address that exists.', async () => {
+      const res = await chai
+        .request(app)
+        .post(`/api/users/${String(userId)}/addresses`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          address: {
+            country: 'Kenya',
+            city: 'Nakuru'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'address')
+      expect(res.body.address).to.be.an('object')
+      expect(res.body.address).to.include.keys('id', 'country', 'city', 'street', 'zip', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 403 Forbidden when a non-owner tries to create an address.', async () => {
+      const res = await chai
+        .request(app)
+        .post(`/api/users/${String(userIdAdmin)}/addresses`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          address: {
+            country: 'Kenya',
+            city: 'Nairobi'
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner can perform this action')
+      expect(res.body.success).to.equal(false)
+    })
   })
 })

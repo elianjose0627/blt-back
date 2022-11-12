@@ -2,12 +2,14 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import BaseController from './BaseController'
 import UserService from '../services/UserService'
+import AddressService from '../services/AddressService'
 import * as statusCodes from '../constants/statusCodes'
 import { CustomNext, CustomRequest, CustomResponse } from '../types'
 import * as userRoles from '../utils//userRoles'
 
 dayjs.extend(utc)
 const userService = new UserService('User')
+const addressService = new AddressService('Address')
 
 class UserController extends BaseController {
   async checkOwner (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
@@ -281,6 +283,23 @@ class UserController extends BaseController {
         username,
         photo
       }
+    })
+  }
+
+  async createAddress (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record: user, body: { address } } = req
+
+    const { response, status } = await addressService.insert({ user, company: null, address })
+
+    const statusCode = {
+      200: statusCodes.OK,
+      201: statusCodes.CREATED
+    }
+
+    return res.status(statusCode[status]).send({
+      statusCode: statusCode[status],
+      success: true,
+      address: response
     })
   }
 }
