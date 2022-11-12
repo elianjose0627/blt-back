@@ -5,9 +5,11 @@ import { CustomNext, CustomRequest, CustomResponse } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
+import AddressService from '../services/AddressService'
 
 const companyService = new CompanyService('Company')
 const userService = new UserService('User')
+const addressService = new AddressService('Address')
 
 class CompanyController extends BaseController {
   checkOwnerOrCompanyAdministratorOrCampaignManager (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
@@ -148,6 +150,23 @@ class CompanyController extends BaseController {
       errors: {
         message: 'Only an admin, the owner or company administrator can perform this action'
       }
+    })
+  }
+
+  async createAddress (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record: company, body: { address } } = req
+
+    const { response, status } = await addressService.insert({ user: null, company, address })
+
+    const statusCode = {
+      200: statusCodes.OK,
+      201: statusCodes.CREATED
+    }
+
+    return res.status(statusCode[status]).send({
+      statusCode: statusCode[status],
+      success: true,
+      address: response
     })
   }
 }
