@@ -522,7 +522,7 @@ describe('A user', () => {
     it('Should return 201 Created when a user successfully creates an address.', async () => {
       const res = await chai
         .request(app)
-        .post(`/api/users/${String(userId)}/addresses`)
+        .post(`/api/users/${String(userId)}/address`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           address: {
@@ -540,7 +540,7 @@ describe('A user', () => {
     it('Should return 200 Success when a user tries to create an address that exists.', async () => {
       const res = await chai
         .request(app)
-        .post(`/api/users/${String(userId)}/addresses`)
+        .post(`/api/users/${String(userId)}/address`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           address: {
@@ -558,7 +558,7 @@ describe('A user', () => {
     it('Should return 403 Forbidden when a non-owner tries to create an address.', async () => {
       const res = await chai
         .request(app)
-        .post(`/api/users/${String(userIdAdmin)}/addresses`)
+        .post(`/api/users/${String(userIdAdmin)}/address`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           address: {
