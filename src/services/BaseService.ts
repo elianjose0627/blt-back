@@ -63,7 +63,14 @@ export const generateInclude = (model: string): any => {
       {
         model: db.User,
         attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role', 'updatedAt', 'createdAt'],
-        as: 'owner'
+        as: 'owner',
+        include: [
+          {
+            model: db.Address,
+            attributes: ['id', 'country', 'city', 'street', 'zip'],
+            as: 'address'
+          }
+        ]
       }
     ]
   )
@@ -104,6 +111,11 @@ class BaseService {
                 as: 'owner'
               }
             ]
+          },
+          {
+            model: db.Address,
+            attributes: ['id', 'country', 'city', 'street', 'zip'],
+            as: 'address'
           }
         ]
       : generateInclude(this.model)
