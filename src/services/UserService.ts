@@ -27,7 +27,7 @@ const include = [
     include: [
       {
         model: db.Address,
-        attributes: ['id', 'country', 'city', 'street', 'zip'],
+        attributes: ['id', 'country', 'city', 'street', 'zip', 'phone'],
         as: 'address'
       },
       {

@@ -21,7 +21,7 @@ const passportAuth = (passport: PassportStatic): any => {
         include: [
           {
             model: db.Address,
-            attributes: ['id', 'country', 'city', 'street', 'zip'],
+            attributes: ['id', 'country', 'city', 'street', 'zip', 'phone'],
             as: 'address'
           },
           {
@@ -33,7 +33,7 @@ const passportAuth = (passport: PassportStatic): any => {
       },
       {
         model: db.Address,
-        attributes: ['id', 'country', 'city', 'street', 'zip'],
+        attributes: ['id', 'country', 'city', 'street', 'zip', 'phone'],
         as: 'address'
       }
     ],
