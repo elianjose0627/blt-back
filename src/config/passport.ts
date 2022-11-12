@@ -30,6 +30,11 @@ const passportAuth = (passport: PassportStatic): any => {
             as: 'owner'
           }
         ]
+      },
+      {
+        model: db.Address,
+        attributes: ['id', 'country', 'city', 'street', 'zip'],
+        as: 'address'
       }
     ],
     where: {

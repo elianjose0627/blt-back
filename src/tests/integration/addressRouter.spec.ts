@@ -20,7 +20,7 @@ describe('Address actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Jeniffer', lastName: 'Walters', email: 'jenwalters@starkindustries.com', phone: '254724374281', password: 'smashagain' } })
+      .send({ user: { firstName: 'Jeniffer', lastName: 'Walters', email: 'jenwalters@starkindustries.com', phone: '254720123456', password: 'smashagain' } })
 
     const resAdmin = await chai
       .request(app)

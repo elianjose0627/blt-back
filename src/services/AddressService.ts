@@ -14,9 +14,9 @@ class AddressService extends BaseService {
 
     response = await db[this.model].findOne({
       where: {
-        [Op.or]: [
-          { companyId: company?.id },
-          { userId: user?.id }
+        [Op.and]: [
+          { companyId: company?.id ?? null },
+          { userId: user?.id ?? null }
         ]
       },
       paranoid: false

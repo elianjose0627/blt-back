@@ -1,7 +1,7 @@
 import { Model } from 'sequelize'
 import bcrypt from 'bcrypt'
 import capitalize from '../utils/capitalize'
-import { LoginTime, MediaData, INotifications, Nullable, Role, IUser } from '../types'
+import { LoginTime, MediaData, INotifications, Nullable, Role, IUser, ICompany, IAddress } from '../types'
 import * as userRoles from '../utils/userRoles'
 
 const UserModel = (sequelize: any, DataTypes: any): any => {
@@ -43,7 +43,8 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
     private readonly password: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
-    private readonly company: any
+    private readonly company: ICompany
+    private readonly address: IAddress
 
     static associate (models: any): any {
       User.belongsTo(models.Company, {
@@ -81,7 +82,8 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
         logoutTime: this.logoutTime,
         notifications: this.notifications,
         loginTime: this.loginTime,
-        company: this.company
+        company: this.company,
+        address: this.address
       }
     }
 
