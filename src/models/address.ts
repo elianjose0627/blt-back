@@ -8,6 +8,7 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
     city: string
     street: string
     zip: string
+    phone: string
   }
 
   class Address extends Model<AddressAttributes> {
@@ -16,6 +17,7 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
     private readonly city: string
     private readonly street: string
     private readonly zip: string
+    private readonly phone: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany
@@ -40,6 +42,7 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
         city: this.city,
         street: this.street,
         zip: this.zip,
+        phone: this.phone,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         company: this.company
@@ -66,6 +69,10 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
       allowNull: true
     },
     zip: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    phone: {
       type: DataTypes.STRING,
       allowNull: true
     }

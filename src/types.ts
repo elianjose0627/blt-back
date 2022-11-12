@@ -71,6 +71,7 @@ export interface IAddress {
   city: string
   street?: string
   zip?: string
+  phone?: string
   createdAt?: Date
   updatedAt?: Date
   owner?: IUser

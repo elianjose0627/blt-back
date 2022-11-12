@@ -12,7 +12,7 @@ export const generateInclude = (model: string): any => {
         },
         {
           model: db.Address,
-          attributes: ['id', 'country', 'city', 'street', 'zip', 'updatedAt', 'createdAt'],
+          attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'updatedAt', 'createdAt'],
           as: 'address'
         }
       ]
@@ -67,7 +67,7 @@ export const generateInclude = (model: string): any => {
         include: [
           {
             model: db.Address,
-            attributes: ['id', 'country', 'city', 'street', 'zip'],
+            attributes: ['id', 'country', 'city', 'street', 'zip', 'phone'],
             as: 'address'
           }
         ]
@@ -102,7 +102,7 @@ class BaseService {
             include: [
               {
                 model: db.Address,
-                attributes: ['id', 'country', 'city', 'street', 'zip'],
+                attributes: ['id', 'country', 'city', 'street', 'zip', 'phone'],
                 as: 'address'
               },
               {
@@ -114,7 +114,7 @@ class BaseService {
           },
           {
             model: db.Address,
-            attributes: ['id', 'country', 'city', 'street', 'zip'],
+            attributes: ['id', 'country', 'city', 'street', 'zip', 'phone'],
             as: 'address'
           }
         ]
