@@ -49,7 +49,7 @@ const userRoutes = (): any => {
     .patch(asyncHandler(UserController.checkOwner), celebrate({
       [Segments.BODY]: validator.validateNotifications
     }), asyncHandler(UserController.updateNotifications))
-  userRouter.route('/users/:id/addresses')
+  userRouter.route('/users/:id/address')
     .post(asyncHandler(UserController.checkOwner), celebrate({
       [Segments.BODY]: validator.validateCreatedAddress
     }, { abortEarly: false }), asyncHandler(UserController.createAddress))

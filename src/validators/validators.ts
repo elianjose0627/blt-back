@@ -12,7 +12,7 @@ const validateCreatedUser = Joi.object({
         'string.pattern.base': '{#label} cannot contain spaces'
       }),
     email: Joi.string().email().lowercase().required().max(128),
-    phone: Joi.string().optional().allow('').allow(null).min(9).max(15).regex(/^[0-9]+$/)
+    phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
@@ -36,7 +36,7 @@ const validateUpdatedUser = Joi.object({
       .messages({
         'string.pattern.base': '{#label} cannot contain spaces'
       }),
-    phone: Joi.string().optional().allow('').allow(null).min(9).max(15).regex(/^[0-9]+$/)
+    phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
@@ -127,7 +127,7 @@ const validateCreatedCompany = Joi.object({
   company: Joi.object({
     name: Joi.string().required().max(64),
     email: Joi.string().email().lowercase().required().max(128),
-    phone: Joi.string().optional().allow('').allow(null).min(9).max(15).regex(/^[0-9]+$/)
+    phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
@@ -139,7 +139,7 @@ const validateUpdatedCompany = Joi.object({
   company: Joi.object({
     name: Joi.string().optional().max(64),
     email: Joi.string().email().lowercase().optional().max(128),
-    phone: Joi.string().optional().allow('').allow(null).min(9).max(15).regex(/^[0-9]+$/)
+    phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
@@ -152,7 +152,11 @@ const validateCreatedAddress = Joi.object({
     country: Joi.string().required().valid(...countryList.countries).max(64),
     city: Joi.string().required().max(64),
     street: Joi.string().optional().allow('').allow(null).min(9).max(64),
-    zip: Joi.string().optional().max(24)
+    zip: Joi.string().optional().max(24),
+    phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
+      .messages({
+        'string.pattern.base': '{#label} must be numeric'
+      })
   }).required()
 })
 
@@ -161,7 +165,11 @@ const validateUpdatedAddress = Joi.object({
     country: Joi.string().optional().valid(...countryList.countries).max(64),
     city: Joi.string().optional().max(64),
     street: Joi.string().optional().allow('').allow(null).min(9).max(64),
-    zip: Joi.string().optional().max(24)
+    zip: Joi.string().optional().max(24),
+    phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
+      .messages({
+        'string.pattern.base': '{#label} must be numeric'
+      })
   }).required()
 })
 
@@ -171,7 +179,7 @@ const validateCreatedRecipient = Joi.object({
     firstName: Joi.string().optional().allow('').allow(null).max(64),
     lastName: Joi.string().optional().allow('').allow(null).max(64),
     email: Joi.string().email().lowercase().required().max(128),
-    phone: Joi.string().optional().allow('').allow(null).min(9).max(15).regex(/^[0-9]+$/)
+    phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
@@ -188,7 +196,7 @@ const validateUpdatedRecipient = Joi.object({
     firstName: Joi.string().optional().allow('').allow(null).max(64),
     lastName: Joi.string().optional().allow('').allow(null).max(64),
     email: Joi.string().email().lowercase().optional().max(128),
-    phone: Joi.string().optional().allow('').allow(null).min(9).max(15).regex(/^[0-9]+$/)
+    phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
