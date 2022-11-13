@@ -18,7 +18,7 @@ class CompanyService extends BaseService {
         email: company.email,
         userId: user.id
       },
-      paranoid: false // To get soft deleted team
+      paranoid: false // To get soft deleted record
     })
 
     if (response !== null) {

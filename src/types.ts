@@ -53,6 +53,13 @@ export interface IToken {
   updatedAt: Date
 }
 
+export interface ISalutation {
+  id: string
+  title: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface ICompany {
   id: string
   name: string
