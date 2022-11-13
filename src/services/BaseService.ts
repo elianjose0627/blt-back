@@ -58,6 +58,9 @@ export const generateInclude = (model: string): any => {
       }
     ])
   }
+  if (model === 'Salutation') {
+    return ([])
+  }
   return (
     [
       {

@@ -18,6 +18,8 @@ interface Database {
   Address?: any
   Recipient?: any
   Campaign?: any
+  Salutation?: any
+  Token?: any
 }
 
 const db: Database = {}

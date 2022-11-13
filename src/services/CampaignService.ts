@@ -14,7 +14,7 @@ class CampaignService extends BaseService {
         type: campaign.type,
         companyId: company.id
       },
-      paranoid: false // To get soft deleted team
+      paranoid: false // To get soft deleted record
     })
 
     if (response !== null) {

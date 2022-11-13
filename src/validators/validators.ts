@@ -29,7 +29,7 @@ const validateLogin = Joi.object({
 
 const validateUpdatedUser = Joi.object({
   user: Joi.object({
-    salutation: Joi.string().optional().max(8),
+    salutation: Joi.string().optional().allow('').allow(null).max(8),
     firstName: Joi.string().optional().max(64),
     lastName: Joi.string().optional().max(64),
     username: Joi.string().lowercase().optional().allow(null).max(64).regex(/^\S+$/)
@@ -222,6 +222,12 @@ const validateJoinCompany = Joi.object({
   }).required()
 })
 
+const validateSalutation = Joi.object({
+  salutation: Joi.object({
+    title: Joi.string().required().max(8)
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -244,5 +250,6 @@ export default {
   validateUpdatedRecipient,
   validateCampaign,
   validateJoinCompany,
-  validateUserCompanyRole
+  validateUserCompanyRole,
+  validateSalutation
 }

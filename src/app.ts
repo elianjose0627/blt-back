@@ -38,6 +38,7 @@ app.use(apiPrefix, routers.companyRouter())
 app.use(apiPrefix, routers.addressRouter())
 app.use(apiPrefix, routers.recipientRouter())
 app.use(apiPrefix, routers.campaignRouter())
+app.use(apiPrefix, routers.salutationRouter())
 
 // Add validation middleware
 app.use(joiErrors)
