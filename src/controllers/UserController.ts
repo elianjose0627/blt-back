@@ -199,7 +199,39 @@ class UserController extends BaseController {
   }
 
   async updateCompanyId (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { body: { user: { email, actionType } }, record: { id: companyId } } = req
+    const { body: { user: { email, actionType } }, record: { id: companyId, domain, isDomainVerified } } = req
+
+    const emailDomain = email.split('@').pop()
+
+    if (domain === null || domain === '') {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'Add and verify a company domain first in order to perform this action'
+        }
+      })
+    }
+
+    if (isDomainVerified === false) {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'Verify the company domain first in order to perform this action'
+        }
+      })
+    }
+
+    if (domain !== emailDomain) {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'The email domain and the company domain do not match'
+        }
+      })
+    }
 
     const employee = await userService.findByEmail(email)
 

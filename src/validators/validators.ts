@@ -131,7 +131,8 @@ const validateCreatedCompany = Joi.object({
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
-    vat: Joi.string().optional().max(24)
+    vat: Joi.string().optional().max(24),
+    domain: Joi.string().domain().allow('').allow(null)
   }).required()
 })
 
@@ -143,7 +144,14 @@ const validateUpdatedCompany = Joi.object({
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
-    vat: Joi.string().optional().max(24)
+    vat: Joi.string().optional().max(24),
+    domain: Joi.string().domain().allow('').allow(null)
+  }).required()
+})
+
+const validateCompanyDomain = Joi.object({
+  company: Joi.object({
+    otp: Joi.number().required()
   }).required()
 })
 
@@ -251,5 +259,6 @@ export default {
   validateCampaign,
   validateJoinCompany,
   validateUserCompanyRole,
-  validateSalutation
+  validateSalutation,
+  validateCompanyDomain
 }

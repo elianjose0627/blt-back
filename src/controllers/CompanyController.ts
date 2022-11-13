@@ -17,7 +17,7 @@ class CompanyController extends BaseController {
 
     const allowedRoles = [userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER]
 
-    const isOwner = currentUser?.id === company?.owner?.id
+    const isOwner = currentUser.id === company?.owner?.id
     const isEmployee = currentUser?.companyId === company?.id
 
     if (isOwner || (isEmployee && allowedRoles.includes(currentUser?.role))) {
@@ -38,7 +38,7 @@ class CompanyController extends BaseController {
 
     const allowedRoles = [userRoles.COMPANYADMINISTRATOR]
 
-    const isOwner = currentUser?.id === company?.owner?.id
+    const isOwner = currentUser.id === company?.owner?.id
     const isEmployee = currentUser?.companyId === company?.id
 
     if (isOwner || (isEmployee && allowedRoles.includes(currentUser?.role))) {
@@ -57,9 +57,22 @@ class CompanyController extends BaseController {
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { user, body: { company } } = req
 
-    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
+    const { domain, email } = company
+
+    const emailDomain = email.split('@').pop()
+
+    if (domain !== undefined && domain !== emailDomain) {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'The email domain and the company domain do not match'
+        }
+      })
+    }
 
     const { response, status } = await companyService.insert({ user, company })
+    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 
     const statusCode = {
       200: statusCodes.OK,
