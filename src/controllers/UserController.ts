@@ -6,10 +6,15 @@ import AddressService from '../services/AddressService'
 import * as statusCodes from '../constants/statusCodes'
 import { CustomNext, CustomRequest, CustomResponse } from '../types'
 import * as userRoles from '../utils//userRoles'
+import { sendNotifierEmail } from '../utils/sendMail'
 
 dayjs.extend(utc)
 const userService = new UserService('User')
 const addressService = new AddressService('Address')
+
+const appName = String(process.env.APP_NAME)
+const appUrl = String(process.env.APP_URL)
+const mailer = String(process.env.MAILER_EMAIL)
 
 class UserController extends BaseController {
   async checkOwner (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
@@ -199,7 +204,11 @@ class UserController extends BaseController {
   }
 
   async updateCompanyId (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { body: { user: { email, actionType } }, record: { id: companyId, domain, isDomainVerified } } = req
+    const {
+      user,
+      body: { user: { email, actionType } },
+      record: { id: companyId, name, domain, isDomainVerified }
+    } = req
 
     const emailDomain = email.split('@').pop()
 
@@ -236,6 +245,33 @@ class UserController extends BaseController {
     const employee = await userService.findByEmail(email)
 
     if (employee === null) {
+      const subject = `You have been invited by ${String(user.firstName)} ${String(user.lastName)} to create an account at ${String(name)}`
+
+      const steps = `
+      <p>Steps to register an account:</p>
+      <ol>
+        <li>Register an account using your email address ${String(email)} at ${appUrl}</li>
+        <li>Verify your account to fully activate it.</li>
+      </ol>
+      `
+
+      const footer = `
+      <p>For questions regarding your order, please reach out to:
+      <br>
+        Support: ${mailer}
+      </p>
+      `
+
+      const message = `<p>Hello,</p>
+      <p>You have been invited by ${String(user.firstName)} ${String(user.lastName)} to create an account at ${appUrl}.<p>
+      ${steps}
+      <p>Best Regards,<br>
+      ${appName} team</p>
+      <p>${footer}</p>
+      `
+
+      await sendNotifierEmail(email, subject, message, false, message)
+
       return res.status(statusCodes.NOT_FOUND).send({
         statusCode: statusCodes.NOT_FOUND,
         success: false,
@@ -260,6 +296,27 @@ class UserController extends BaseController {
 
     if (actionType === 'remove') {
       response.company = null
+    }
+
+    if (actionType === 'add') {
+      const subject = `You have been granted a new user role by ${String(user.firstName)} ${String(user.lastName)} at ${String(name)}`
+
+      const footer = `
+      <p>For questions regarding your order, please reach out to:
+      <br>
+        Support: ${mailer}
+      </p>
+      `
+
+      const message = `<p>Hello,</p>
+      <p>You have been granted a new user role by ${String(user.firstName)} ${String(user.lastName)} at ${appUrl}.<p>
+      <p>Please login to your account.</p>
+      <p>Best Regards,<br>
+      ${appName} team</p>
+      <p>${footer}</p>
+      `
+
+      await sendNotifierEmail(email, subject, message, false, message)
     }
 
     return res.status(statusCodes.OK).send({
