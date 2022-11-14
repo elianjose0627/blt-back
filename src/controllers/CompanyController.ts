@@ -6,10 +6,15 @@ import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
 import AddressService from '../services/AddressService'
+import { sendNotifierEmail } from '../utils/sendMail'
 
 const companyService = new CompanyService('Company')
 const userService = new UserService('User')
 const addressService = new AddressService('Address')
+
+const appName = String(process.env.APP_NAME)
+const appUrl = String(process.env.APP_URL)
+const mailer = String(process.env.MAILER_EMAIL)
 
 class CompanyController extends BaseController {
   checkOwnerOrCompanyAdministratorOrCampaignManager (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
@@ -149,6 +154,25 @@ class CompanyController extends BaseController {
       ((currentUserIsCompanyEmployee && allowedRoles.includes(currentUser.role)) || isCompanyOwner)
     ) {
       const response = await userService.update(userToUpdate, { role, logoutTime: Date() })
+
+      const subject = `You have been granted a new user role by ${String(currentUser.firstName)} ${String(currentUser.lastName)} at ${String(company.name)}`
+
+      const footer = `
+      <p>For questions regarding your order, please reach out to:
+      <br>
+        Support: ${mailer}
+      </p>
+      `
+
+      const message = `<p>Hello,</p>
+      <p>You have been granted a new user role by ${String(currentUser.firstName)} ${String(currentUser.lastName)} at ${appUrl}.<p>
+      <p>Please login to your account.</p>
+      <p>Best Regards,<br>
+      ${appName} team</p>
+      <p>${footer}</p>
+      `
+
+      await sendNotifierEmail(userToUpdate.email, subject, message, false, message)
 
       return res.status(statusCodes.OK).send({
         statusCode: statusCodes.OK,

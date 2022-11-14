@@ -987,6 +987,40 @@ describe('Company actions', () => {
       expect(res.body.user).to.be.an('object')
     })
 
+    it('Should return 200 Success when an owner successfully adds a user to a company with a set role.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Red', lastName: 'Hulk', email: 'redhulk@starkindustries.com', phone: '254720123456', password: 'tonysuxx' } })
+
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+
+      token = resUser.body.token
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'redhulk@starkindustries.com',
+            role: userRoles.CAMPAIGNMANAGER
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.user.role).to.equal(userRoles.CAMPAIGNMANAGER)
+    })
+
     it('Should return 404 Not Found when an owner tries to add a non-existent user to a company.', async () => {
       const resCompany = await createVerifiedCompany(userId)
 

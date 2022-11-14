@@ -206,7 +206,7 @@ class UserController extends BaseController {
   async updateCompanyId (req: CustomRequest, res: CustomResponse): Promise<any> {
     const {
       user,
-      body: { user: { email, actionType } },
+      body: { user: { email, actionType, role } },
       record: { id: companyId, name, domain, isDomainVerified }
     } = req
 
@@ -290,6 +290,10 @@ class UserController extends BaseController {
 
     if (actionType === 'remove') {
       updatedRole = userRoles.USER
+    }
+
+    if (actionType === 'add' && role !== undefined) {
+      updatedRole = role
     }
 
     const response = await userService.update(employee, { companyId: selectedCompanyId[actionType], role: updatedRole, logoutTime: dayjs.utc() })
