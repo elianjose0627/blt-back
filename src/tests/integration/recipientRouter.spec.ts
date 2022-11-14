@@ -3,7 +3,7 @@ import chaiHttp from 'chai-http'
 import app from '../../app'
 import {
   deleteTestUser, createAdminTestUser,
-  createCompanyAdministrator, createCampaignManager
+  createCompanyAdministrator, createCampaignManager, createVerifiedCompany
 } from '../utils'
 
 const { expect } = chai
@@ -14,6 +14,7 @@ let tokenAdmin: string
 let tokenCompanyAdministrator: string
 let tokenCampaignManager: string
 let token: string
+let userIdAdmin: string
 
 describe('Recipient actions', () => {
   before(async () => {
@@ -26,7 +27,7 @@ describe('Recipient actions', () => {
       .post('/auth/signup')
       .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustries.com', phone: '254720123456', password: 'mackone' } })
 
-    const res1 = await chai
+    const resUser = await chai
       .request(app)
       .post('/auth/login')
       .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
@@ -49,7 +50,8 @@ describe('Recipient actions', () => {
     tokenAdmin = resAdmin.body.token
     tokenCompanyAdministrator = resCompanyAdministrator.body.token
     tokenCampaignManager = resCampaignManager.body.token
-    token = res1.body.token
+    token = resUser.body.token
+    userIdAdmin = resAdmin.body.user.id
   })
 
   after(async () => {
@@ -109,18 +111,10 @@ describe('Recipient actions', () => {
     it('Should return 200 OK when a company admin successfully gets a recipient.', async () => {
       await deleteTestUser('nickfury@starkindustries.com')
       await createCompanyAdministrator()
-      const resCompany = await chai
-        .request(app)
-        .post('/api/companies')
-        .set('Authorization', `Bearer ${tokenAdmin}`)
-        .send({
-          company: {
-            name: 'Captain Marvel Company',
-            email: 'ivers@kree.kr'
-          }
-        })
 
-      const companyId = resCompany.body.company.id
+      const resCompany = await createVerifiedCompany(userIdAdmin)
+
+      const companyId = resCompany.id
 
       await chai
         .request(app)
@@ -142,7 +136,7 @@ describe('Recipient actions', () => {
 
       const resCampaign = await chai
         .request(app)
-        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           campaign: {
@@ -178,18 +172,9 @@ describe('Recipient actions', () => {
     })
 
     it('Should return 200 OK when a campaign manager successfully gets a recipient.', async () => {
-      const resCompany = await chai
-        .request(app)
-        .post('/api/companies')
-        .set('Authorization', `Bearer ${tokenAdmin}`)
-        .send({
-          company: {
-            name: 'Captain Marvel Company',
-            email: 'ivers@kree.kr'
-          }
-        })
+      const resCompany = await createVerifiedCompany(userIdAdmin)
 
-      const companyId = resCompany.body.company.id
+      const companyId = resCompany.id
 
       await deleteTestUser('happyhogan@starkindustries.com')
       await createCampaignManager()
@@ -214,7 +199,7 @@ describe('Recipient actions', () => {
 
       const resCampaign = await chai
         .request(app)
-        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           campaign: {

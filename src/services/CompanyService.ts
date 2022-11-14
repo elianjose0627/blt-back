@@ -27,7 +27,7 @@ class CompanyService extends BaseService {
       return { response: updatedResponse.toJSONFor(), status: 200 }
     }
 
-    response = await db[this.model].create({ ...company, id: uuidv1(), userId: user?.id })
+    response = await db[this.model].create({ ...company, id: uuidv1(), userId: user.id })
 
     return { response: response.toJSONFor(user), status: 201 }
   }

@@ -22,7 +22,7 @@ const resetPasswordExpiration = '10 minutes'
 const include = [
   {
     model: db.Company,
-    attributes: ['id', 'name', 'email', 'phone', 'vat'],
+    attributes: ['id', 'name', 'email', 'phone', 'vat', 'domain'],
     as: 'company',
     include: [
       {
