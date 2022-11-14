@@ -246,3 +246,18 @@ export const createUserWithExpiredOtp = async (): Promise<any> => {
     return user
   }
 }
+
+export const createVerifiedCompany = async (userId: string, isDomainVerified = true): Promise<any> => {
+  const company = await db.Company.create({
+    id: uuidv1(),
+    name: 'Stark Industries',
+    email: 'admin@starkindustries.com',
+    domain: 'starkindustries.com',
+    isDomainVerified,
+    userId
+  })
+
+  if (company !== null) {
+    return company
+  }
+}

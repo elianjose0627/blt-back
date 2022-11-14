@@ -4,7 +4,8 @@ import app from '../../app'
 import {
   deleteTestUser,
   createAdminTestUser, createCampaignManager,
-  createCompanyAdministrator
+  createCompanyAdministrator,
+  createVerifiedCompany
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 
@@ -125,6 +126,24 @@ describe('Company actions', () => {
       expect(res.body.company).to.include.keys('id', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
     })
 
+    it('Should return 403 Forbidden when a user tries to create a company with a domain that does not match the email.', async () => {
+      const res = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company.com',
+            domain: 'company1.com'
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('The email domain and the company domain do not match')
+    })
+
     it('Should return 204 when a admin deletes a company.', async () => {
       const resCompany = await chai
         .request(app)
@@ -184,18 +203,9 @@ describe('Company actions', () => {
     })
 
     it('Should return 200 OK when a company administrator gets a company by id.', async () => {
-      const resCompany = await chai
-        .request(app)
-        .post('/api/companies')
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          company: {
-            name: 'Test Company',
-            email: 'test@company.com'
-          }
-        })
+      const resCompany = await createVerifiedCompany(userId)
 
-      const companyId = resCompany.body.company.id
+      const companyId = resCompany.id
 
       await chai
         .request(app)
@@ -269,23 +279,14 @@ describe('Company actions', () => {
     })
 
     it('Should return 200 OK when a company owner updates the role of an employee.', async () => {
-      const resCompany = await chai
-        .request(app)
-        .post('/api/companies')
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          company: {
-            name: 'Test Company',
-            email: 'test@company.com'
-          }
-        })
+      const resCompany = await createVerifiedCompany(userId)
 
-      const companyId = resCompany.body.company.id
+      const companyId = resCompany.id
 
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Blackagon', lastName: 'Boltagon', email: 'blackbolt@inhumans.com', password: 'medussa' } })
+        .send({ user: { firstName: 'Pepper', lastName: 'Potts', email: 'peppot@starkindustries.com', password: 'iamironwoman' } })
 
       await chai
         .request(app)
@@ -609,20 +610,13 @@ describe('Company actions', () => {
     })
 
     it('Should return 201 Created when a campaign manager for a company successfully creates a campaign.', async () => {
-      const resCompany = await chai
-        .request(app)
-        .post('/api/companies')
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          company: {
-            name: 'Test Company',
-            email: 'test@company.com'
-          }
-        })
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
 
       await chai
         .request(app)
-        .patch(`/api/companies/${String(resCompany.body.company.id)}/users`)
+        .patch(`/api/companies/${String(companyId)}/users`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
@@ -640,7 +634,7 @@ describe('Company actions', () => {
 
       const res = await chai
         .request(app)
-        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
         .set('Authorization', `Bearer ${tokenCampaignManager}`)
         .send({
           campaign: {
@@ -817,17 +811,9 @@ describe('Company actions', () => {
     it('Should return 200 Success when a company administrator successfully retrieves all campaigns.', async () => {
       await deleteTestUser('nickfury@starkindustries.com')
       await createCompanyAdministrator()
-      const resCompany = await chai
-        .request(app)
-        .post('/api/companies')
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          company: {
-            name: 'Test Company',
-            email: 'test@company.com'
-          }
-        })
-      const companyId = String(resCompany.body.company.id)
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
 
       await chai
         .request(app)
@@ -849,7 +835,7 @@ describe('Company actions', () => {
 
       const res = await chai
         .request(app)
-        .get(`/api/companies/${companyId}/campaigns`)
+        .get(`/api/companies/${String(companyId)}/campaigns`)
         .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
 
       expect(res).to.have.status(200)
@@ -949,17 +935,9 @@ describe('Company actions', () => {
     it('Should return 200 Success when a company admin who is an employee successfully retrieves all users of a company.', async () => {
       await deleteTestUser('nickfury@starkindustries.com')
       await createCompanyAdministrator()
-      const resCompany = await chai
-        .request(app)
-        .post('/api/companies')
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          company: {
-            name: 'Test Best Company',
-            email: 'testbest@company.com'
-          }
-        })
-      const companyId = String(resCompany.body.company.id)
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
 
       await chai
         .request(app)
@@ -981,7 +959,7 @@ describe('Company actions', () => {
 
       const res = await chai
         .request(app)
-        .get(`/api/companies/${companyId}/users`)
+        .get(`/api/companies/${String(companyId)}/users`)
         .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
 
       expect(res).to.have.status(200)
@@ -990,21 +968,13 @@ describe('Company actions', () => {
     })
 
     it('Should return 200 Success when an owner successfully adds a user to a company.', async () => {
-      const resCompany = await chai
-        .request(app)
-        .post('/api/companies')
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          company: {
-            name: 'Test Best Company',
-            email: 'testbest@company.com'
-          }
-        })
-      const companyId = String(resCompany.body.company.id)
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
 
       const res = await chai
         .request(app)
-        .patch(`/api/companies/${companyId}/users`)
+        .patch(`/api/companies/${String(companyId)}/users`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
@@ -1017,10 +987,122 @@ describe('Company actions', () => {
       expect(res.body.user).to.be.an('object')
     })
 
-    it('Should return 200 Success when a company admin who is an employee successfully adds a user to a company.', async () => {
-      await deleteTestUser('nickfury@starkindustries.com')
-      await createCompanyAdministrator()
+    it('Should return 200 Success when an owner successfully adds a user to a company with a set role.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
 
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Red', lastName: 'Hulk', email: 'redhulk@starkindustries.com', phone: '254720123456', password: 'tonysuxx' } })
+
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+
+      token = resUser.body.token
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'redhulk@starkindustries.com',
+            role: userRoles.CAMPAIGNMANAGER
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.user.role).to.equal(userRoles.CAMPAIGNMANAGER)
+    })
+
+    it('Should return 404 Not Found when an owner tries to add a non-existent user to a company.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+
+      token = resUser.body.token
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'shehulk1@starkindustries.com'
+          }
+        })
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('User not found')
+    })
+
+    it('Should return 403 Forbidden when an owner tries to add a user with a different domain to a company.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+
+      token = resUser.body.token
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'blackagonboltagon@inhumans.com'
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('The email domain and the company domain do not match')
+    })
+
+    it('Should return 403 Forbidden when an owner tries to add a user to a company with an unverified domain.', async () => {
+      const resCompany = await createVerifiedCompany(userId, false)
+
+      const companyId = resCompany.id
+
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+
+      token = resUser.body.token
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: userEmail
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Verify the company domain first in order to perform this action')
+    })
+
+    it('Should return 403 Forbidden when an owner tries to add a user to a company without a domain.', async () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
@@ -1034,11 +1116,42 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
-            name: 'Test Best Company',
-            email: 'testbest@company.com'
+            name: 'Test Company',
+            email: 'test@company.com'
           }
         })
-      const companyId = String(resCompany.body.company.id)
+
+      const companyId = resCompany.body.company.id
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: userEmail
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Add and verify a company domain first in order to perform this action')
+    })
+
+    it('Should return 200 Success when a company admin who is an employee successfully adds a user to a company.', async () => {
+      await deleteTestUser('nickfury@starkindustries.com')
+      await createCompanyAdministrator()
+
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+
+      token = resUser.body.token
+
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
 
       await chai
         .request(app)
@@ -1060,7 +1173,7 @@ describe('Company actions', () => {
 
       const res = await chai
         .request(app)
-        .patch(`/api/companies/${companyId}/users`)
+        .patch(`/api/companies/${String(companyId)}/users`)
         .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
         .send({
           user: {
@@ -1080,21 +1193,14 @@ describe('Company actions', () => {
         .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
 
       token = resUser.body.token
-      const resCompany = await chai
-        .request(app)
-        .post('/api/companies')
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          company: {
-            name: 'Test Best Company',
-            email: 'testbest@company.com'
-          }
-        })
-      const companyId = String(resCompany.body.company.id)
+
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
 
       const res = await chai
         .request(app)
-        .patch(`/api/companies/${companyId}/users`)
+        .patch(`/api/companies/${String(companyId)}/users`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
@@ -1116,17 +1222,10 @@ describe('Company actions', () => {
         .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
 
       token = resUser.body.token
-      const resCompany = await chai
-        .request(app)
-        .post('/api/companies')
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          company: {
-            name: 'Test Best Company',
-            email: 'testbest@company.com'
-          }
-        })
-      const companyId = String(resCompany.body.company.id)
+
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
 
       await chai
         .request(app)
@@ -1148,7 +1247,7 @@ describe('Company actions', () => {
 
       const res = await chai
         .request(app)
-        .patch(`/api/companies/${companyId}/users`)
+        .patch(`/api/companies/${String(companyId)}/users`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
@@ -1170,25 +1269,14 @@ describe('Company actions', () => {
         .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
 
       token = resUser.body.token
-      const resCompany = await chai
-        .request(app)
-        .post('/api/companies')
-        .query({
-          limit: -10,
-          page: -1
-        })
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          company: {
-            name: 'Test Best Company',
-            email: 'testbest@company.com'
-          }
-        })
-      const companyId = String(resCompany.body.company.id)
+
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
 
       const res = await chai
         .request(app)
-        .get(`/api/companies/${companyId}/users`)
+        .get(`/api/companies/${String(companyId)}/users`)
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)

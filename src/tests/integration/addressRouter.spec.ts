@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import app from '../../app'
-import { deleteTestUser, createAdminTestUser, createCompanyAdministrator, createTestUser } from '../utils'
+import { deleteTestUser, createAdminTestUser, createCompanyAdministrator, createTestUser, createVerifiedCompany } from '../utils'
 
 const { expect } = chai
 
@@ -10,6 +10,7 @@ chai.use(chaiHttp)
 let tokenAdmin: string
 let tokenUser: string
 let tokenCompanyAdministrator: string
+let userIdAdmin: string
 
 describe('Address actions', () => {
   before(async () => {
@@ -40,6 +41,7 @@ describe('Address actions', () => {
     tokenAdmin = resAdmin.body.token
     tokenUser = resTest.body.token
     tokenCompanyAdministrator = resCompanyAdministrator.body.token
+    userIdAdmin = resAdmin.body.user.id
   })
 
   after(async () => {
@@ -90,18 +92,9 @@ describe('Address actions', () => {
     })
 
     it('Should return 200 Success when a company administrator successfully updates an address.', async () => {
-      const resCompany = await chai
-        .request(app)
-        .post('/api/companies')
-        .set('Authorization', `Bearer ${tokenAdmin}`)
-        .send({
-          company: {
-            name: 'Test Company 2',
-            email: 'ivers@kree.kr'
-          }
-        })
+      const resCompany = await createVerifiedCompany(userIdAdmin)
 
-      const companyId = resCompany.body.company.id
+      const companyId = resCompany.id
 
       await chai
         .request(app)
