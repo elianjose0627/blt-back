@@ -66,6 +66,8 @@ export interface ICompany {
   email: string
   phone?: string
   vat?: string
+  domain?: Nullable<string>
+  isDomainVerified: boolean
   createdAt?: Date
   updatedAt?: Date
   owner?: IUser
