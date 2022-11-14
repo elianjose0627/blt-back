@@ -59,8 +59,8 @@ class CompanyController extends BaseController {
     }
   }
 
-  async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { user, body: { company } } = req
+  checkCompanyDomainAndEmailDomain (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { body: { company } } = req
 
     const { domain, email } = company
 
@@ -75,6 +75,12 @@ class CompanyController extends BaseController {
         }
       })
     }
+
+    return next()
+  }
+
+  async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { user, body: { company } } = req
 
     const { response, status } = await companyService.insert({ user, company })
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })

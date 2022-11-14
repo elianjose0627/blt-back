@@ -257,7 +257,9 @@ export const createVerifiedCompany = async (userId: string, isDomainVerified = t
     userId
   })
 
-  if (company !== null) {
-    return company
+  const updatedCompany = company.update({ isDomainVerified })
+
+  if (updatedCompany !== null) {
+    return updatedCompany
   }
 }

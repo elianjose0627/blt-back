@@ -102,6 +102,12 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     modelName: 'Company'
   })
 
+  Company.beforeSave(async (company: any) => {
+    if (company.changed('domain') === true) {
+      company.isDomainVerified = false
+    }
+  })
+
   return Company
 }
 

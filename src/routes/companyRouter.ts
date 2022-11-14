@@ -16,7 +16,8 @@ const companyRoutes = (): any => {
   companyRouter.route('/companies')
     .post(celebrate({
       [Segments.BODY]: validator.validateCreatedCompany
-    }, { abortEarly: false }), asyncHandler(CompanyController.insert))
+    }, { abortEarly: false }), asyncHandler(CompanyController.checkCompanyDomainAndEmailDomain),
+    asyncHandler(CompanyController.insert))
     .get(asyncHandler(checkAdmin), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CompanyController.getAll))
@@ -27,7 +28,7 @@ const companyRoutes = (): any => {
     .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator), asyncHandler(CompanyController.get))
     .put(asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator), celebrate({
       [Segments.BODY]: validator.validateUpdatedCompany
-    }), asyncHandler(CompanyController.update))
+    }), asyncHandler(CompanyController.checkCompanyDomainAndEmailDomain), asyncHandler(CompanyController.update))
     .delete(asyncHandler(checkAdmin), asyncHandler(CompanyController.delete))
   companyRouter.route('/companies/:id/address')
     .post(asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator), celebrate({
