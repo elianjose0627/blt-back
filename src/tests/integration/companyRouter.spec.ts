@@ -278,6 +278,87 @@ describe('Company actions', () => {
       expect(res.body.errors.message).to.equal('Only the owner or company administrator can perform this action')
     })
 
+    it('Should return 200 OK when a company administrator updates a company.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustries.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .put(`/api/companies/${String(companyId)}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .send({
+          company: {
+            domain: 'starkindustries.com'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('id', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
+      expect(res.body.company.isDomainVerified).to.equal(true)
+    })
+
+    it('Should return 200 OK when a company administrator updates a company.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustries.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .put(`/api/companies/${String(companyId)}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .send({
+          company: {
+            email: 'nickfury@starkindustries.com',
+            domain: 'starkindustries.com'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('id', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
+      expect(res.body.company.isDomainVerified).to.equal(true)
+    })
+
     it('Should return 200 OK when a company owner updates the role of an employee.', async () => {
       const resCompany = await createVerifiedCompany(userId)
 

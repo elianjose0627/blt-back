@@ -60,11 +60,13 @@ class CompanyController extends BaseController {
   }
 
   checkCompanyDomainAndEmailDomain (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
-    const { body: { company } } = req
+    const { body: { company }, record } = req
 
     const { domain, email } = company
 
-    const emailDomain = email.split('@').pop()
+    const companyEmail = email ?? record.email
+
+    const emailDomain = companyEmail.split('@').pop()
 
     if (domain !== undefined && domain !== emailDomain) {
       return res.status(statusCodes.FORBIDDEN).send({
