@@ -11,12 +11,12 @@ module.exports = {
         allowNull: true
       }),
       queryInterface.addColumn('Recipients', 'addressAddition', {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
+        type: Sequelize.STRING,
+        allowNull: true
       }),
       queryInterface.addColumn('Recipients', 'salutation', {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
+        type: Sequelize.STRING,
+        allowNull: true
       })
     ])
   },
