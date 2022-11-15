@@ -174,10 +174,10 @@ describe('Auth Actions', () => {
   })
 
   it('should return 200 when a reset link is requested', async () => {
-    await chai
-      .request(app)
-      .post('/auth/signup')
-      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: 'julien' } })
+    // await chai
+    //   .request(app)
+    //   .post('/auth/signup')
+    //   .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: 'julien' } })
 
     const res = await chai
       .request(app)

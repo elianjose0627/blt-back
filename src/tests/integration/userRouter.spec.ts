@@ -308,10 +308,10 @@ describe('A user', () => {
   })
 
   it('should return 200 when a verification code is requested', async () => {
-    await chai
-      .request(app)
-      .post('/auth/signup')
-      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: 'julien' } })
+    // await chai
+    //   .request(app)
+    //   .post('/auth/signup')
+    //   .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: 'julien' } })
 
     const resLogin = await chai
       .request(app)
