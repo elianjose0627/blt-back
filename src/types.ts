@@ -68,6 +68,7 @@ export interface ICompany {
   vat?: string
   domain?: Nullable<string>
   isDomainVerified: boolean
+  domainVerificationCode: { value: string, createdAt: Date }
   createdAt?: Date
   updatedAt?: Date
   owner?: IUser
