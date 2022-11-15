@@ -1,4 +1,4 @@
-import { v1 as uuidv1 } from 'uuid'
+import { v1 as uuidv1, v4 as uuidv4 } from 'uuid'
 import dayjs from 'dayjs'
 import db from '../models'
 import * as userRoles from '../utils/userRoles'
@@ -258,6 +258,29 @@ export const createVerifiedCompany = async (userId: string, isDomainVerified = t
   })
 
   const updatedCompany = company.update({ isDomainVerified })
+
+  if (updatedCompany !== null) {
+    return updatedCompany
+  }
+}
+
+export const createUnVerifiedCompanyWithExpiredDomainCode = async (userId: string): Promise<any> => {
+  const uuid = uuidv4()
+  const company = await db.Company.create({
+    id: uuidv1(),
+    name: 'Test Company',
+    email: 'admin@testcompanyfour.com',
+    domain: 'testcompanyfour.com',
+    isDomainVerified: false,
+    userId
+  })
+
+  const updatedCompany = company.update({
+    domainVerificationCode: {
+      createdAt: dayjs.utc().subtract(8, 'days'),
+      value: `biglittlethings-domain-verification=${uuidv4().substring(uuid.length - 12)}`
+    }
+  })
 
   if (updatedCompany !== null) {
     return updatedCompany
