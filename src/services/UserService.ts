@@ -58,11 +58,10 @@ class UserService extends BaseService {
   async insert (data: any): Promise<any> {
     const record = await db[this.model].create({ ...data, id: uuidv1() })
 
-    if (record !== null) {
-      const { email, firstName } = record
-      const subject = `Verify your email for ${appName}`
+    const { email, firstName } = record
+    const subject = `Verify your email for ${appName}`
 
-      const steps = `
+    const steps = `
       <p>Steps to verify:</p>
       <ol>
         <li>Login to your account at ${appUrl}.</li>
@@ -71,7 +70,7 @@ class UserService extends BaseService {
       </ol>
       `
 
-      const footer = `
+    const footer = `
       <p>For questions regarding your order, please reach out to:
       <br>
         Support: ${mailer}
@@ -80,7 +79,7 @@ class UserService extends BaseService {
       </p>
       `
 
-      const message = `<p>Dear ${String(firstName)},</p>
+    const message = `<p>Dear ${String(firstName)},</p>
       <p>Thank you very much for registering an account at ${appName}.<br>
       To activate your account, please verify the ownership of the associated email address.</p>
       ${steps}
@@ -89,8 +88,7 @@ class UserService extends BaseService {
       <p>${footer}</p>
       `
 
-      await sendNotifierEmail(email, subject, message, false, message)
-    }
+    await sendNotifierEmail(email, subject, message, false, message)
 
     return record.toJSONFor()
   }

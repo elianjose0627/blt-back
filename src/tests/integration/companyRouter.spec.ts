@@ -1102,6 +1102,33 @@ describe('Company actions', () => {
       expect(res.body.campaigns).to.be.an('array')
     })
 
+    it('Should return 200 Success when an owner successfully retrieves all campaigns with pagination params.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .query({
+          limit: 1,
+          page: 1
+        })
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaigns')
+      expect(res.body.campaigns).to.be.an('array')
+    })
+
     it('Should return 200 Success when a company administrator successfully retrieves all campaigns.', async () => {
       await deleteTestUser('nickfury@starkindustries.com')
       await createCompanyAdministrator()
