@@ -292,7 +292,7 @@ class UserController extends BaseController {
       updatedRole = userRoles.USER
     }
 
-    if (actionType === 'add' && role !== undefined) {
+    if (actionType === 'add' && role !== undefined && role !== userRoles.ADMIN) {
       updatedRole = role
     }
 
