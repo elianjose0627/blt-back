@@ -4,10 +4,6 @@ import BaseService from './BaseService'
 import db from '../models'
 
 class AddressService extends BaseService {
-  manyRecords (): string {
-    return 'addresses'
-  }
-
   async insert (data: any): Promise<any> {
     const { user, company, address } = data
     let response: any

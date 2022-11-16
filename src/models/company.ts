@@ -10,6 +10,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     vat: string
     domain: string
     isDomainVerified: boolean
+    domainVerificationCode: { value: string, createdAt: Date }
   }
 
   class Company extends Model<CompanyAttributes> {
@@ -20,6 +21,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     private readonly vat: string
     private readonly domain: string
     private readonly isDomainVerified: boolean
+    private readonly domainVerificationCode: { value: string, createdAt: Date }
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly owner: IUser
@@ -57,6 +59,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         vat: this.vat,
         domain: this.domain,
         isDomainVerified: this.isDomainVerified,
+        domainVerificationCode: this.domainVerificationCode,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         owner: this.owner,
@@ -95,6 +98,13 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
+    },
+    domainVerificationCode: {
+      type: DataTypes.JSON,
+      defaultValue: {
+        createdAt: null,
+        value: null
+      }
     }
   }, {
     sequelize,
@@ -105,6 +115,8 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
   Company.beforeSave(async (company: any) => {
     if (company.changed('domain') === true) {
       company.isDomainVerified = false
+      company.domainVerificationCode.value = null
+      company.domainVerificationCode.createdAt = null
     }
   })
 
