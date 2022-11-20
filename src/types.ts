@@ -63,6 +63,7 @@ export interface ISalutation {
 export interface ICompany {
   id: string
   name: string
+  suffix: string
   email: string
   phone?: string
   vat?: string

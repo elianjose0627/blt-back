@@ -18,7 +18,7 @@ const companyRoutes = (): any => {
       [Segments.BODY]: validator.validateCreatedCompany
     }, { abortEarly: false }), asyncHandler(CompanyController.checkCompanyDomainAndEmailDomain),
     asyncHandler(CompanyController.insert))
-    .get(asyncHandler(checkAdmin), celebrate({
+    .get(celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CompanyController.getAll))
   companyRouter.use('/companies/:id', celebrate({

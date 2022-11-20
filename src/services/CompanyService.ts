@@ -1,10 +1,39 @@
 import { v1 as uuidv1 } from 'uuid'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
+import * as userRoles from '../utils/userRoles'
 
 class CompanyService extends BaseService {
   manyRecords (): string {
     return 'companies'
+  }
+
+  async getAll (limit: number, offset: number, user?: any): Promise<any> {
+    let records
+
+    if (user.role === userRoles.ADMIN) {
+      records = await db[this.model].findAndCountAll({
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude: [] }
+      })
+    } else {
+      records = await db[this.model].findAndCountAll({
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude: [] },
+        where: {
+          userId: user.id
+        }
+      })
+    }
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
   }
 
   async insert (data: any): Promise<any> {

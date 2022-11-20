@@ -5,6 +5,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
   interface CompanyAttributes {
     id: string
     name: string
+    suffix: string
     email: string
     phone: string
     vat: string
@@ -16,6 +17,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
   class Company extends Model<CompanyAttributes> {
     private readonly id: string
     private readonly name: string
+    private readonly suffix: string
     private readonly email: string
     private readonly phone: string
     private readonly vat: string
@@ -54,6 +56,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
       return {
         id: this.id,
         name: this.name,
+        suffix: this.suffix,
         email: this.email,
         phone: this.phone,
         vat: this.vat,
@@ -75,6 +78,10 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false
     },
     name: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    suffix: {
       type: DataTypes.STRING,
       allowNull: true
     },
