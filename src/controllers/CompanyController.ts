@@ -115,6 +115,25 @@ class CompanyController extends BaseController {
     return next()
   }
 
+  async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { query: { limit, page, offset }, user } = req
+
+    const records = await this.service.getAll(limit, offset, user)
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / limit),
+      perPage: limit,
+      page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      [this.service.manyRecords()]: records.rows
+    })
+  }
+
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { user, body: { company } } = req
 

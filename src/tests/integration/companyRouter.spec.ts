@@ -78,15 +78,15 @@ describe('Company actions', () => {
       expect(res.body.companies).to.be.an('array')
     })
 
-    it('Should return 403 when a non admin tries to retrieve all companies.', async () => {
+    it('Should return 200 when a non admin tries to retrieve all companies.', async () => {
       const res = await chai
         .request(app)
         .get('/api/companies')
         .set('Authorization', `Bearer ${token}`)
 
-      expect(res).to.have.status(403)
-      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only an admin can perform this action')
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'companies')
+      expect(res.body.companies).to.be.an('array')
     })
   })
 

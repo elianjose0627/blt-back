@@ -126,6 +126,7 @@ const validateNotifications = Joi.object({
 const validateCreatedCompany = Joi.object({
   company: Joi.object({
     name: Joi.string().required().max(64),
+    suffix: Joi.string().max(32).allow('').allow(null),
     email: Joi.string().email().lowercase().required().max(128),
     phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
       .messages({
@@ -139,6 +140,7 @@ const validateCreatedCompany = Joi.object({
 const validateUpdatedCompany = Joi.object({
   company: Joi.object({
     name: Joi.string().optional().max(64),
+    suffix: Joi.string().max(32).allow('').allow(null),
     email: Joi.string().email().lowercase().optional().max(128),
     phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
       .messages({
