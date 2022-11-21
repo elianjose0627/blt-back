@@ -126,12 +126,13 @@ const validateNotifications = Joi.object({
 const validateCreatedCompany = Joi.object({
   company: Joi.object({
     name: Joi.string().required().max(64),
+    suffix: Joi.string().max(32).allow('').allow(null),
     email: Joi.string().email().lowercase().required().max(128),
     phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
-    vat: Joi.string().optional().max(24),
+    vat: Joi.string().optional().max(24).allow('').allow(null),
     domain: Joi.string().domain().allow('').allow(null)
   }).required()
 })
@@ -139,6 +140,7 @@ const validateCreatedCompany = Joi.object({
 const validateUpdatedCompany = Joi.object({
   company: Joi.object({
     name: Joi.string().optional().max(64),
+    suffix: Joi.string().max(32).allow('').allow(null),
     email: Joi.string().email().lowercase().optional().max(128),
     phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
       .messages({
@@ -153,12 +155,14 @@ const validateCreatedAddress = Joi.object({
   address: Joi.object({
     country: Joi.string().required().valid(...countryList.countries).max(64),
     city: Joi.string().required().max(64),
-    street: Joi.string().optional().allow('').allow(null).min(9).max(64),
+    street: Joi.string().optional().allow('').allow(null).max(64),
     zip: Joi.string().optional().max(24),
     phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
-      })
+      }),
+    addressAddition: Joi.string().allow('').allow(null).max(256),
+    vat: Joi.string().allow('').allow(null).max(24)
   }).required()
 })
 
@@ -166,18 +170,21 @@ const validateUpdatedAddress = Joi.object({
   address: Joi.object({
     country: Joi.string().optional().valid(...countryList.countries).max(64),
     city: Joi.string().optional().max(64),
-    street: Joi.string().optional().allow('').allow(null).min(9).max(64),
+    street: Joi.string().optional().allow('').allow(null).max(64),
     zip: Joi.string().optional().max(24),
     phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
-      })
+      }),
+    addressAddition: Joi.string().allow('').allow(null).max(256),
+    vat: Joi.string().allow('').allow(null).max(24)
   }).required()
 })
 
 const validateCreatedRecipient = Joi.object({
   recipient: Joi.object({
     companyName: Joi.string().optional().allow('').allow(null).max(64),
+    salutation: Joi.string().optional().allow('').allow(null).max(8),
     firstName: Joi.string().optional().allow('').allow(null).max(64),
     lastName: Joi.string().optional().allow('').allow(null).max(64),
     email: Joi.string().email().lowercase().required().max(128),
@@ -187,14 +194,16 @@ const validateCreatedRecipient = Joi.object({
       }),
     country: Joi.string().required().valid(...countryList.countries).max(64),
     city: Joi.string().required().max(64),
-    street: Joi.string().optional().allow('').allow(null).min(9).max(64),
-    zip: Joi.string().optional().max(24)
+    street: Joi.string().optional().allow('').allow(null).max(64),
+    zip: Joi.string().optional().max(24),
+    addressAddition: Joi.string().allow('').allow(null).max(256)
   }).required()
 })
 
 const validateUpdatedRecipient = Joi.object({
   recipient: Joi.object({
     companyName: Joi.string().optional().allow('').allow(null).max(64),
+    salutation: Joi.string().optional().allow('').allow(null).max(8),
     firstName: Joi.string().optional().allow('').allow(null).max(64),
     lastName: Joi.string().optional().allow('').allow(null).max(64),
     email: Joi.string().email().lowercase().optional().max(128),
@@ -204,8 +213,9 @@ const validateUpdatedRecipient = Joi.object({
       }),
     country: Joi.string().optional().valid(...countryList.countries).max(64),
     city: Joi.string().optional().max(64),
-    street: Joi.string().optional().allow('').allow(null).min(9).max(64),
-    zip: Joi.string().optional().max(24)
+    street: Joi.string().optional().allow('').allow(null).max(64),
+    zip: Joi.string().optional().max(24),
+    addressAddition: Joi.string().allow('').allow(null).max(256)
   }).required()
 })
 

@@ -18,7 +18,7 @@ const companyRoutes = (): any => {
       [Segments.BODY]: validator.validateCreatedCompany
     }, { abortEarly: false }), asyncHandler(CompanyController.checkCompanyDomainAndEmailDomain),
     asyncHandler(CompanyController.insert))
-    .get(asyncHandler(checkAdmin), celebrate({
+    .get(celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CompanyController.getAll))
   companyRouter.use('/companies/:id', celebrate({
@@ -41,6 +41,12 @@ const companyRoutes = (): any => {
     .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManager), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CampaignController.getAll))
+  companyRouter.route('/companies/:id/request-domain-verification')
+    .get(asyncHandler(CompanyController.checkCompanyDomain), asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator),
+      asyncHandler(CompanyController.getDomainVerificationCode))
+  companyRouter.route('/companies/:id/verify-domain')
+    .get(asyncHandler(CompanyController.checkCompanyDomain), asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator),
+      asyncHandler(CompanyController.verifyDomain))
   companyRouter.route('/companies/:id/users')
     .patch(asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator), celebrate({
       [Segments.BODY]: validator.validateJoinCompany

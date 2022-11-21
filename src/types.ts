@@ -63,11 +63,13 @@ export interface ISalutation {
 export interface ICompany {
   id: string
   name: string
+  suffix: string
   email: string
   phone?: string
   vat?: string
   domain?: Nullable<string>
   isDomainVerified: boolean
+  domainVerificationCode: { value: string, createdAt: Date }
   createdAt?: Date
   updatedAt?: Date
   owner?: IUser
@@ -81,6 +83,8 @@ export interface IAddress {
   street?: string
   zip?: string
   phone?: string
+  addressAddition?: string
+  vat?: string
   createdAt?: Date
   updatedAt?: Date
   owner?: IUser
@@ -90,6 +94,7 @@ export interface IAddress {
 export interface IRecipient {
   id: string
   companyName: Nullable<string>
+  salutation: Nullable<string>
   firstName: Nullable<string>
   lastName: Nullable<string>
   email: string
@@ -98,6 +103,7 @@ export interface IRecipient {
   city: string
   street?: string
   zip?: string
+  addressAddition?: string
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany

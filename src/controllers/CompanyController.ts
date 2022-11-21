@@ -1,3 +1,7 @@
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import { v4 as uuidv4 } from 'uuid'
+import dns from 'dns'
 import BaseController from './BaseController'
 import CompanyService from '../services/CompanyService'
 import UserService from '../services/UserService'
@@ -8,6 +12,8 @@ import * as userRoles from '../utils/userRoles'
 import AddressService from '../services/AddressService'
 import { sendNotifierEmail } from '../utils/sendMail'
 
+dayjs.extend(utc)
+
 const companyService = new CompanyService('Company')
 const userService = new UserService('User')
 const addressService = new AddressService('Address')
@@ -15,6 +21,8 @@ const addressService = new AddressService('Address')
 const appName = String(process.env.APP_NAME)
 const appUrl = String(process.env.APP_URL)
 const mailer = String(process.env.MAILER_EMAIL)
+
+const mininumWaitDaysForDomainVerificationCode = 7
 
 class CompanyController extends BaseController {
   checkOwnerOrCompanyAdministratorOrCampaignManager (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
@@ -79,6 +87,51 @@ class CompanyController extends BaseController {
     }
 
     return next()
+  }
+
+  checkCompanyDomain (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { record } = req
+
+    const { domain, isDomainVerified } = record
+
+    if (domain === null || domain === '') {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'Add a company domain first in order to perform this action'
+        }
+      })
+    }
+
+    if (isDomainVerified === true) {
+      return res.status(statusCodes.OK).send({
+        statusCode: statusCodes.OK,
+        success: true,
+        company: record.toJSONFor()
+      })
+    }
+
+    return next()
+  }
+
+  async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { query: { limit, page, offset }, user } = req
+
+    const records = await this.service.getAll(limit, offset, user)
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / limit),
+      perPage: limit,
+      page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      [this.service.manyRecords()]: records.rows
+    })
   }
 
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
@@ -213,6 +266,102 @@ class CompanyController extends BaseController {
       success: true,
       address: response
     })
+  }
+
+  async getDomainVerificationCode (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record: company } = req
+
+    const { domainVerificationCode } = company
+
+    const now = dayjs.utc()
+    const createdTime = domainVerificationCode.createdAt
+    const diff = now.diff(createdTime, 'days')
+
+    const uuid = uuidv4()
+    let value = `biglittlethings-domain-verification=${uuidv4().substring(uuid.length - 12)}`
+    let createdAt = now
+
+    if (domainVerificationCode.value !== null &&
+        domainVerificationCode.createdAt !== null &&
+        diff < mininumWaitDaysForDomainVerificationCode
+    ) {
+      value = domainVerificationCode.value
+      createdAt = domainVerificationCode.createdAt
+    }
+
+    const response = await companyService.update(company, {
+      domainVerificationCode: {
+        value,
+        createdAt
+      }
+    })
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      company: response
+    })
+  }
+
+  async verifyDomain (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record: company } = req
+
+    const { domainVerificationCode } = company
+
+    const getTxtAddresses = function (domain: string): any {
+      return new Promise((resolve, reject) => {
+        dns.resolveTxt(domain, (err: any, addresses: string[][]) => {
+          if (err !== null) reject(err)
+          else resolve(addresses)
+        })
+      })
+    }
+
+    if (domainVerificationCode.value === null || domainVerificationCode.createdAt === null) {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'Request domain verification first to get a domain verification code'
+        }
+      })
+    }
+
+    const now = dayjs.utc()
+    const createdAt = domainVerificationCode.createdAt
+    const diff = now.diff(createdAt, 'days')
+
+    if (diff > mininumWaitDaysForDomainVerificationCode) {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'This domain verification code has expired kindly request another one'
+        }
+      })
+    }
+
+    try {
+      const addresses = await getTxtAddresses(company.domain)
+
+      const isDomainVerificationCodePresent = addresses.flat(1).includes(domainVerificationCode.value)
+
+      const response = await companyService.update(company, { isDomainVerified: isDomainVerificationCodePresent })
+
+      return res.status(statusCodes.OK).send({
+        statusCode: statusCodes.OK,
+        success: true,
+        company: response
+      })
+    } catch (error: any) {
+      return res.status(statusCodes.BAD_REQUEST).send({
+        statusCode: statusCodes.BAD_REQUEST,
+        success: false,
+        errors: {
+          message: error.message
+        }
+      })
+    }
   }
 }
 

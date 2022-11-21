@@ -5,7 +5,8 @@ import {
   deleteTestUser,
   createAdminTestUser, createCampaignManager,
   createCompanyAdministrator,
-  createVerifiedCompany
+  createVerifiedCompany,
+  createUnVerifiedCompanyWithExpiredDomainCode
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 
@@ -77,15 +78,15 @@ describe('Company actions', () => {
       expect(res.body.companies).to.be.an('array')
     })
 
-    it('Should return 403 when a non admin tries to retrieve all companies.', async () => {
+    it('Should return 200 when a non admin tries to retrieve all companies.', async () => {
       const res = await chai
         .request(app)
         .get('/api/companies')
         .set('Authorization', `Bearer ${token}`)
 
-      expect(res).to.have.status(403)
-      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only an admin can perform this action')
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'companies')
+      expect(res.body.companies).to.be.an('array')
     })
   })
 
@@ -557,6 +558,218 @@ describe('Company actions', () => {
     })
   })
 
+  describe('Domain Verification', () => {
+    it('Should return 200 OK when a company owner requests a domain verification code', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company.com',
+            domain: 'company.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/request-domain-verification`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('id', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
+      expect(res.body.company.isDomainVerified).to.equal(false)
+    })
+
+    it('Should return 200 OK when a company owner requests a domain verification code for a verified company', async () => {
+      const resCompany = await createVerifiedCompany(userIdAdmin, true)
+
+      const companyId = resCompany.id
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/request-domain-verification`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('id', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
+      expect(res.body.company.isDomainVerified).to.equal(true)
+    })
+
+    it('Should return 200 OK when a company owner requests a domain verification code while the other one has not yet expired', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@companytwo.com',
+            domain: 'companytwo.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const resCompanyVerification = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/request-domain-verification`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      const domainVerificationCode = resCompanyVerification.body.company.domainVerificationCode.value
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/request-domain-verification`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('id', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
+      expect(res.body.company.isDomainVerified).to.equal(false)
+      expect(res.body.company.domainVerificationCode.value).to.equal(domainVerificationCode)
+    })
+
+    it('Should return 403 Forbidden when a company owner requests a domain verification code with a company without a domain', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@companyone.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/request-domain-verification`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Add a company domain first in order to perform this action')
+    })
+
+    it('Should return 403 Forbidden when a company owner tries to verify a domain without requesting for a code', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@companythree.com',
+            domain: 'companythree.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/verify-domain`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Request domain verification first to get a domain verification code')
+    })
+
+    it('Should return 403 Forbidden when a company owner tries to verify a domain with an expired code', async () => {
+      const resCompany = await createUnVerifiedCompanyWithExpiredDomainCode(userIdAdmin)
+
+      const companyId = resCompany.id
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/verify-domain`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('This domain verification code has expired kindly request another one')
+    })
+
+    it('Should return 200 OK when a company owner requests a domain verification code and tries to verify the domain', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Gmail Company',
+            email: 'raywiretest@gmail.com',
+            domain: 'gmail.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const resCompanyVerification = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/request-domain-verification`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      const domainVerificationCode = resCompanyVerification.body.company.domainVerificationCode.value
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/verify-domain`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('id', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
+      expect(res.body.company.isDomainVerified).to.equal(false)
+      expect(res.body.company.domainVerificationCode.value).to.equal(domainVerificationCode)
+    })
+
+    it('Should return 400 Bad Request when a company owner tries to verify a non existent domain', async () => {
+      const domain = 'companyfive224fwdcvsfe.com'
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: `test@${domain}`,
+            domain
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/request-domain-verification`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/verify-domain`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(400)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal(`queryTxt ENOTFOUND ${domain}`)
+    })
+  })
+
   describe('Create an address', () => {
     it('Should return 201 Created when a company owner successfully creates an address.', async () => {
       const resCompany = await chai
@@ -869,6 +1082,33 @@ describe('Company actions', () => {
         .query({
           limit: -10,
           page: -1
+        })
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaigns')
+      expect(res.body.campaigns).to.be.an('array')
+    })
+
+    it('Should return 200 Success when an owner successfully retrieves all campaigns with pagination params.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .query({
+          limit: 1,
+          page: 1
         })
         .set('Authorization', `Bearer ${token}`)
         .send({

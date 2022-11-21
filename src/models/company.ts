@@ -5,21 +5,25 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
   interface CompanyAttributes {
     id: string
     name: string
+    suffix: string
     email: string
     phone: string
     vat: string
     domain: string
     isDomainVerified: boolean
+    domainVerificationCode: { value: string, createdAt: Date }
   }
 
   class Company extends Model<CompanyAttributes> {
     private readonly id: string
     private readonly name: string
+    private readonly suffix: string
     private readonly email: string
     private readonly phone: string
     private readonly vat: string
     private readonly domain: string
     private readonly isDomainVerified: boolean
+    private readonly domainVerificationCode: { value: string, createdAt: Date }
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly owner: IUser
@@ -52,11 +56,13 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
       return {
         id: this.id,
         name: this.name,
+        suffix: this.suffix,
         email: this.email,
         phone: this.phone,
         vat: this.vat,
         domain: this.domain,
         isDomainVerified: this.isDomainVerified,
+        domainVerificationCode: this.domainVerificationCode,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         owner: this.owner,
@@ -72,6 +78,10 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false
     },
     name: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    suffix: {
       type: DataTypes.STRING,
       allowNull: true
     },
@@ -95,6 +105,13 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
+    },
+    domainVerificationCode: {
+      type: DataTypes.JSON,
+      defaultValue: {
+        createdAt: null,
+        value: null
+      }
     }
   }, {
     sequelize,
@@ -105,6 +122,8 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
   Company.beforeSave(async (company: any) => {
     if (company.changed('domain') === true) {
       company.isDomainVerified = false
+      company.domainVerificationCode.value = null
+      company.domainVerificationCode.createdAt = null
     }
   })
 
