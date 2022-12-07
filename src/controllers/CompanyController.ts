@@ -46,10 +46,10 @@ class CompanyController extends BaseController {
     }
   }
 
-  checkOwnerOrCompanyAdministrator (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+  checkOwnerOrCompanyAdministratorOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: company } = req
 
-    const allowedRoles = [userRoles.COMPANYADMINISTRATOR]
+    const allowedRoles = [userRoles.COMPANYADMINISTRATOR, userRoles.ADMIN]
 
     const isOwner = currentUser.id === company?.owner?.id
     const isEmployee = currentUser?.companyId === company?.id
@@ -61,7 +61,7 @@ class CompanyController extends BaseController {
         statusCode: statusCodes.FORBIDDEN,
         success: false,
         errors: {
-          message: 'Only the owner or company administrator can perform this action'
+          message: 'Only the owner, company administrator or administrator can perform this action'
         }
       })
     }
