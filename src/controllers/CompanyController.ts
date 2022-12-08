@@ -173,8 +173,8 @@ class CompanyController extends BaseController {
   async updateUserRole (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { user: currentUser, record: company, params: { id: companyId, userId }, body: { user: { role } } } = req
 
-    const allowedRoles = [userRoles.ADMIN, userRoles.COMPANYADMINISTRATOR]
-    const isCompanyOwner = currentUser.id === company?.owner?.id
+    const allowedRoles = [userRoles.COMPANYADMINISTRATOR]
+    const isCompanyOwnerOrAdmin = currentUser.id === company?.owner?.id || currentUser.role === userRoles.ADMIN
 
     if (userId === currentUser.id) {
       return res.status(statusCodes.FORBIDDEN).send({
@@ -212,7 +212,7 @@ class CompanyController extends BaseController {
     const currentUserIsCompanyEmployee = currentUser?.company?.id === companyId
 
     if (userToUpdateIsCompanyEmployee &&
-      ((currentUserIsCompanyEmployee && allowedRoles.includes(currentUser.role)) || isCompanyOwner)
+      ((currentUserIsCompanyEmployee && allowedRoles.includes(currentUser.role)) || isCompanyOwnerOrAdmin)
     ) {
       const response = await userService.update(userToUpdate, { role, logoutTime: Date() })
 
