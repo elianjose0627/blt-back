@@ -21,7 +21,7 @@ const userRoutes = (): any => {
   }, { abortEarly: false }), asyncHandler(UserController.checkRecord))
   userRouter.route('/users/:id')
     .get(asyncHandler(UserController.checkOwner), asyncHandler(UserController.get))
-    .put(asyncHandler(UserController.checkOwner), celebrate({
+    .put(asyncHandler(UserController.checkOwnerOrAdmin), celebrate({
       [Segments.BODY]: validator.validateUpdatedUser
     }), asyncHandler(UserController.update))
     .delete(asyncHandler(checkAdmin), asyncHandler(UserController.delete))
