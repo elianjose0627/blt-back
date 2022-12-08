@@ -151,6 +151,12 @@ const validateUpdatedCompany = Joi.object({
   }).required()
 })
 
+const validateDomain = Joi.object({
+  company: Joi.object({
+    isDomainVerified: Joi.boolean().required()
+  }).required()
+})
+
 const validateCreatedAddress = Joi.object({
   address: Joi.object({
     country: Joi.string().required().valid(...countryList.countries).max(64),
@@ -265,5 +271,6 @@ export default {
   validateCampaign,
   validateJoinCompany,
   validateUserCompanyRole,
-  validateSalutation
+  validateSalutation,
+  validateDomain
 }

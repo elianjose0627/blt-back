@@ -662,6 +662,36 @@ describe('Company actions', () => {
       expect(res.body.errors.message).to.equal('Add a company domain first in order to perform this action')
     })
 
+    it('Should return 200 OK when an admin updates domain verification status', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Test Company Four',
+            email: 'test@companyfour.com',
+            domain: 'companyfour.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/verify-domain`)
+        .send({
+          company: {
+            isDomainVerified: true
+          }
+        })
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+    })
+
     it('Should return 403 Forbidden when a company owner tries to verify a domain without requesting for a code', async () => {
       const resCompany = await chai
         .request(app)

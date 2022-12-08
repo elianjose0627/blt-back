@@ -47,6 +47,11 @@ const companyRoutes = (): any => {
   companyRouter.route('/companies/:id/verify-domain')
     .get(asyncHandler(CompanyController.checkCompanyDomain), asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin),
       asyncHandler(CompanyController.verifyDomain))
+  companyRouter.route('/companies/:id/verify-domain')
+    .patch(asyncHandler(checkAdmin), celebrate({
+      [Segments.BODY]: validator.validateDomain
+    }, { abortEarly: false }),
+    asyncHandler(CompanyController.update))
   companyRouter.route('/companies/:id/users')
     .patch(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin), celebrate({
       [Segments.BODY]: validator.validateJoinCompany
