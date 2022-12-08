@@ -309,6 +309,27 @@ class UserService extends BaseService {
 
     return users
   }
+
+  async getAll (limit: number, offset: number): Promise<any> {
+    const records = await db[this.model].findAndCountAll({
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+      attributes: { exclude: [] },
+      include: [
+        {
+          model: db.Address,
+          attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition'],
+          as: 'address'
+        }
+      ]
+    })
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
+  }
 }
 
 export default UserService
