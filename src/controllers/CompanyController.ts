@@ -49,12 +49,12 @@ class CompanyController extends BaseController {
   checkOwnerOrCompanyAdministratorOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: company } = req
 
-    const allowedRoles = [userRoles.COMPANYADMINISTRATOR, userRoles.ADMIN]
+    const allowedRoles = [userRoles.COMPANYADMINISTRATOR]
 
-    const isOwner = currentUser.id === company?.owner?.id
+    const isOwnerOrAdmin = currentUser.id === company?.owner?.id || currentUser.role === userRoles.ADMIN
     const isEmployee = currentUser?.companyId === company?.id
 
-    if (isOwner || (isEmployee && allowedRoles.includes(currentUser?.role))) {
+    if (isOwnerOrAdmin || (isEmployee && allowedRoles.includes(currentUser?.role))) {
       return next()
     } else {
       return res.status(statusCodes.FORBIDDEN).send({

@@ -1605,7 +1605,7 @@ describe('Company actions', () => {
       expect(res.body.users).to.be.an('array')
     })
 
-    it('Should return 403 when a non owner tries to retrieve all company users.', async () => {
+    it('Should return 200 when a non-owner admin retrieve all company users.', async () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
@@ -1629,12 +1629,12 @@ describe('Company actions', () => {
         .get(`/api/companies/${companyId}/users`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
-      expect(res).to.have.status(403)
-      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator or administrator can perform this action')
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'users')
+      expect(res.body.users).to.be.an('array')
     })
 
-    it('Should return 403 when a company administrator who is not an employee tries to retrieve all company users.', async () => {
+    it('Should return 200 when a company administrator who is not an employee to retrieves all company users.', async () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
@@ -1676,9 +1676,9 @@ describe('Company actions', () => {
         .get(`/api/companies/${companyId}/users`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
-      expect(res).to.have.status(403)
-      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator or administrator can perform this action')
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'users')
+      expect(res.body.users).to.be.an('array')
     })
   })
 })
