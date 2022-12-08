@@ -50,7 +50,7 @@ const userRoutes = (): any => {
       [Segments.BODY]: validator.validateNotifications
     }), asyncHandler(UserController.updateNotifications))
   userRouter.route('/users/:id/address')
-    .post(asyncHandler(UserController.checkOwner), celebrate({
+    .post(asyncHandler(UserController.checkOwnerOrAdmin), celebrate({
       [Segments.BODY]: validator.validateCreatedAddress
     }, { abortEarly: false }), asyncHandler(UserController.createAddress))
   return userRouter

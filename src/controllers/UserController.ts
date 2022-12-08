@@ -395,7 +395,9 @@ class UserController extends BaseController {
   }
 
   async createAddress (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { record: user, body: { address } } = req
+    const { body: { address }, params: { id } } = req
+
+    const user = await userService.findById(id)
 
     const { response, status } = await addressService.insert({ user, company: null, address })
 
