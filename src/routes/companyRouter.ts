@@ -25,13 +25,13 @@ const companyRoutes = (): any => {
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(CompanyController.checkRecord))
   companyRouter.route('/companies/:id')
-    .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator), asyncHandler(CompanyController.get))
-    .put(asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator), celebrate({
+    .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin), asyncHandler(CompanyController.get))
+    .put(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin), celebrate({
       [Segments.BODY]: validator.validateUpdatedCompany
     }), asyncHandler(CompanyController.checkCompanyDomainAndEmailDomain), asyncHandler(CompanyController.update))
     .delete(asyncHandler(checkAdmin), asyncHandler(CompanyController.delete))
   companyRouter.route('/companies/:id/address')
-    .post(asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator), celebrate({
+    .post(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin), celebrate({
       [Segments.BODY]: validator.validateCreatedAddress
     }, { abortEarly: false }), asyncHandler(CompanyController.createAddress))
   companyRouter.route('/companies/:id/campaigns')
@@ -42,16 +42,21 @@ const companyRoutes = (): any => {
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CampaignController.getAll))
   companyRouter.route('/companies/:id/request-domain-verification')
-    .get(asyncHandler(CompanyController.checkCompanyDomain), asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator),
+    .get(asyncHandler(CompanyController.checkCompanyDomain), asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin),
       asyncHandler(CompanyController.getDomainVerificationCode))
   companyRouter.route('/companies/:id/verify-domain')
-    .get(asyncHandler(CompanyController.checkCompanyDomain), asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator),
+    .get(asyncHandler(CompanyController.checkCompanyDomain), asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin),
       asyncHandler(CompanyController.verifyDomain))
+  companyRouter.route('/companies/:id/verify-domain')
+    .patch(asyncHandler(checkAdmin), celebrate({
+      [Segments.BODY]: validator.validateDomain
+    }, { abortEarly: false }),
+    asyncHandler(CompanyController.update))
   companyRouter.route('/companies/:id/users')
-    .patch(asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator), celebrate({
+    .patch(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin), celebrate({
       [Segments.BODY]: validator.validateJoinCompany
     }, { abortEarly: false }), asyncHandler(UserController.updateCompanyId))
-    .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministrator), celebrate({
+    .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CompanyController.getAllUsers))
   companyRouter.route('/companies/:id/users/:userId')

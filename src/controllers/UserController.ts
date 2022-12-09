@@ -18,8 +18,7 @@ const mailer = String(process.env.MAILER_EMAIL)
 
 class UserController extends BaseController {
   async checkOwner (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
-    const { user: currentUser } = req
-    const { id } = req.params
+    const { user: currentUser, params: { id } } = req
 
     if (currentUser.id === id) {
       return next()
@@ -29,6 +28,22 @@ class UserController extends BaseController {
         success: false,
         errors: {
           message: 'Only the owner can perform this action'
+        }
+      })
+    }
+  }
+
+  async checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
+    const { user: currentUser, params: { id } } = req
+
+    if (currentUser.id === id || currentUser.role === userRoles.ADMIN) {
+      return next()
+    } else {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'Only the owner or admin can perform this action'
         }
       })
     }
@@ -380,7 +395,9 @@ class UserController extends BaseController {
   }
 
   async createAddress (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { record: user, body: { address } } = req
+    const { body: { address }, params: { id } } = req
+
+    const user = await userService.findById(id)
 
     const { response, status } = await addressService.insert({ user, company: null, address })
 
