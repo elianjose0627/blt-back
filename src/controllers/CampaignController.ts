@@ -48,10 +48,10 @@ class CampaignController extends BaseController {
     })
   }
 
-  async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
+  async getAllForCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { limit, page, offset } = req.query
     const { id } = req.params
-    const records = await this.service.getAll(limit, offset, id)
+    const records = await campaignService.getAllForCompany(limit, offset, id)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),
@@ -63,7 +63,7 @@ class CampaignController extends BaseController {
       statusCode: statusCodes.OK,
       success: true,
       meta,
-      [this.service.manyRecords()]: records.rows
+      [campaignService.manyRecords()]: records.rows
     })
   }
 }

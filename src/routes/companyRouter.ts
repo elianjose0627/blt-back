@@ -40,7 +40,7 @@ const companyRoutes = (): any => {
     }, { abortEarly: false }), asyncHandler(CampaignController.insert))
     .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManager), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
-    }), asyncHandler(paginate), asyncHandler(CampaignController.getAll))
+    }), asyncHandler(paginate), asyncHandler(CampaignController.getAllForCompany))
   companyRouter.route('/companies/:id/request-domain-verification')
     .get(asyncHandler(CompanyController.checkCompanyDomain), asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin),
       asyncHandler(CompanyController.getDomainVerificationCode))

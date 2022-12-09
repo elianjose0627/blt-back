@@ -37,6 +37,30 @@ describe('Campaign actions', () => {
     await deleteTestUser('drstrange@gmail.com')
   })
 
+  describe('Get all campaigns', () => {
+    it('Should return 200 OK when an admin fetches all campaigns', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/campaigns')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaigns')
+      expect(res.body.campaigns).to.be.an('array')
+    })
+
+    it('Should return 403 Forbidden when an non-admin tries to fetch all campaigns', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/campaigns')
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only an admin can perform this action')
+    })
+  })
+
   describe('Add a recipient to a campaign', () => {
     it('Should return 201 Created when a recipient is added to a campaign.', async () => {
       const resCompany = await chai
