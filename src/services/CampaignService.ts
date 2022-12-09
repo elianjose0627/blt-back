@@ -28,7 +28,7 @@ class CampaignService extends BaseService {
     return { response: response.toJSONFor(company), status: 201 }
   }
 
-  async getAll (limit: number, offset: number, companyId?: string): Promise<any> {
+  async getAllForCompany (limit: number, offset: number, companyId: string): Promise<any> {
     const records = await db[this.model].findAndCountAll({
       limit,
       offset,
@@ -37,6 +37,25 @@ class CampaignService extends BaseService {
       where: {
         companyId
       }
+    })
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
+  }
+
+  async getAll (limit: number, offset: number): Promise<any> {
+    const records = await db[this.model].findAndCountAll({
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+      attributes: { exclude: [] },
+      include: [{
+        model: db.Company,
+        attributes: ['id', 'name', 'email', 'phone', 'vat', 'domain'],
+        as: 'company'
+      }]
     })
 
     return {
