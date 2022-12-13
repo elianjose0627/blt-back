@@ -109,6 +109,45 @@ describe('A user', () => {
       expect(res.body.user.username).to.equal((username).toLowerCase())
     })
 
+    it('Should return 200 when an admin user updates a username.', async () => {
+      const resUser = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Lady', lastName: 'Siff', email: 'siff@asgard.com', phone: '254720123456', password: 'thorisgreat' } })
+
+      const username = faker.internet.userName()
+      const userId: string = resUser.body.user.id
+      const res = await chai
+        .request(app)
+        .put(`/api/users/${userId}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({ user: { username } })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user.username).to.equal((username).toLowerCase())
+    })
+
+    it('Should return 403 when a user tries to update a username of another user.', async () => {
+      const resUser = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Hela', lastName: 'Odindittur', email: 'hela@asgard.com', phone: '254720123456', password: 'fenrir' } })
+
+      const username = faker.internet.userName()
+      const userId: string = resUser.body.user.id
+      const res = await chai
+        .request(app)
+        .put(`/api/users/${userId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ user: { username } })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('Only the owner or admin can perform this action')
+    })
+
     it('Should return 200 when a user updates their username with null.', async () => {
       const res = await chai
         .request(app)
@@ -555,6 +594,24 @@ describe('A user', () => {
       expect(res.body.address).to.include.keys('id', 'country', 'city', 'street', 'zip', 'createdAt', 'updatedAt')
     })
 
+    it('Should return 200 Success when an admin tries to create an address that exists.', async () => {
+      const res = await chai
+        .request(app)
+        .post(`/api/users/${String(userId)}/address`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          address: {
+            country: 'Kenya',
+            city: 'Nakuru'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'address')
+      expect(res.body.address).to.be.an('object')
+      expect(res.body.address).to.include.keys('id', 'country', 'city', 'street', 'zip', 'createdAt', 'updatedAt')
+    })
+
     it('Should return 403 Forbidden when a non-owner tries to create an address.', async () => {
       const res = await chai
         .request(app)
@@ -569,7 +626,7 @@ describe('A user', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or admin can perform this action')
       expect(res.body.success).to.equal(false)
     })
   })

@@ -69,7 +69,14 @@ class CompanyService extends BaseService {
         companyId
       },
       order: [['createdAt', 'DESC']],
-      attributes: { exclude: [] }
+      attributes: { exclude: [] },
+      include: [
+        {
+          model: db.Address,
+          attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition'],
+          as: 'address'
+        }
+      ]
     })
 
     return {

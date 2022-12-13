@@ -8,22 +8,22 @@ import * as userRoles from '../utils/userRoles'
 const campaignService = new CampaignService('Campaign')
 
 class CampaignController extends BaseController {
-  checkOwnerOrCompanyAdministratorOrCampaignManager (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+  checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: { companyId, company: { owner } } } = req
 
     const allowedRoles = [userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER]
 
-    const isOwner = currentUser?.id === owner?.id
+    const isOwnerOrAdmin = currentUser?.id === owner?.id || currentUser.role === userRoles.ADMIN
     const isEmployee = currentUser?.companyId === companyId
 
-    if (isOwner || (isEmployee && allowedRoles.includes(currentUser?.role))) {
+    if (isOwnerOrAdmin || (isEmployee && allowedRoles.includes(currentUser?.role))) {
       return next()
     } else {
       return res.status(statusCodes.FORBIDDEN).send({
         statusCode: statusCodes.FORBIDDEN,
         success: false,
         errors: {
-          message: 'Only the owner, company administrator or campaign manager can perform this action'
+          message: 'Only the owner, admin, company administrator or campaign manager can perform this action'
         }
       })
     }
@@ -48,10 +48,10 @@ class CampaignController extends BaseController {
     })
   }
 
-  async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
+  async getAllForCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { limit, page, offset } = req.query
     const { id } = req.params
-    const records = await this.service.getAll(limit, offset, id)
+    const records = await campaignService.getAllForCompany(limit, offset, id)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),
@@ -63,7 +63,7 @@ class CampaignController extends BaseController {
       statusCode: statusCodes.OK,
       success: true,
       meta,
-      [this.service.manyRecords()]: records.rows
+      [campaignService.manyRecords()]: records.rows
     })
   }
 }
