@@ -54,6 +54,13 @@ const validateRole = Joi.object({
   }).required()
 })
 
+const validateEmailVerification = Joi.object({
+  user: Joi.object({
+    isVerified: Joi.bool()
+      .required()
+  }).required()
+})
+
 const validateUserCompanyRole = Joi.object({
   user: Joi.object({
     role: Joi.string()
@@ -272,5 +279,6 @@ export default {
   validateJoinCompany,
   validateUserCompanyRole,
   validateSalutation,
-  validateDomain
+  validateDomain,
+  validateEmailVerification
 }
