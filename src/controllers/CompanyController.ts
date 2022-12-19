@@ -25,22 +25,22 @@ const mailer = String(process.env.MAILER_EMAIL)
 const mininumWaitDaysForDomainVerificationCode = 7
 
 class CompanyController extends BaseController {
-  checkOwnerOrCompanyAdministratorOrCampaignManager (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+  checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: company } = req
 
     const allowedRoles = [userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER]
 
-    const isOwner = currentUser.id === company?.owner?.id
+    const isOwnerOrAdmin = currentUser.id === company?.owner?.id || currentUser.role === userRoles.ADMIN
     const isEmployee = currentUser?.companyId === company?.id
 
-    if (isOwner || (isEmployee && allowedRoles.includes(currentUser?.role))) {
+    if (isOwnerOrAdmin || (isEmployee && allowedRoles.includes(currentUser?.role))) {
       return next()
     } else {
       return res.status(statusCodes.FORBIDDEN).send({
         statusCode: statusCodes.FORBIDDEN,
         success: false,
         errors: {
-          message: 'Only the owner, company administrator or campaign manager can perform this action'
+          message: 'Only the owner, company administrator, campaign manager or administrator can perform this action'
         }
       })
     }

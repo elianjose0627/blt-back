@@ -35,10 +35,10 @@ const companyRoutes = (): any => {
       [Segments.BODY]: validator.validateCreatedAddress
     }, { abortEarly: false }), asyncHandler(CompanyController.createAddress))
   companyRouter.route('/companies/:id/campaigns')
-    .post(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManager), celebrate({
+    .post(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin), celebrate({
       [Segments.BODY]: validator.validateCampaign
     }, { abortEarly: false }), asyncHandler(CampaignController.insert))
-    .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManager), celebrate({
+    .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CampaignController.getAllForCompany))
   companyRouter.route('/companies/:id/request-domain-verification')

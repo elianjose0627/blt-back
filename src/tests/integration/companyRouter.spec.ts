@@ -1018,7 +1018,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator or campaign manager can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
     })
 
     it('Should return 200 Success when a company owner tries to create a campaign that exists.', async () => {
@@ -1051,7 +1051,7 @@ describe('Company actions', () => {
       expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'type', 'createdAt', 'updatedAt')
     })
 
-    it('Should return 403 Forbidden when a non owner tries to create a campaign.', async () => {
+    it('Should return 200 OK when an admin creates a campaign.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -1075,9 +1075,10 @@ describe('Company actions', () => {
           }
         })
 
-      expect(res).to.have.status(403)
-      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator or campaign manager can perform this action')
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaign')
+      expect(res.body.campaign).to.be.an('object')
+      expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'type', 'createdAt', 'updatedAt')
     })
   })
 
@@ -1232,10 +1233,10 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator or campaign manager can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
     })
 
-    it('Should return 403 when a non owner tries to retrieve all company campaigns.', async () => {
+    it('Should return 200 when an admin retrieves all company campaigns.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -1253,9 +1254,9 @@ describe('Company actions', () => {
         .get(`/api/companies/${companyId}/campaigns`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
-      expect(res).to.have.status(403)
-      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator or campaign manager can perform this action')
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaigns')
+      expect(res.body.campaigns).to.be.an('array')
     })
   })
 
