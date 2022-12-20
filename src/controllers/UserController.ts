@@ -96,11 +96,23 @@ class UserController extends BaseController {
     })
   }
 
+  async updateEmailVerification (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record, body: { user: { isVerified } } } = req
+
+    const response = await userService.update(record, { isVerified, logoutTime: Date() })
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      user: response
+    })
+  }
+
   async updatePassword (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { record } = req
     const { password, currentPassword } = req.body.user
 
-    const response = await userService.updatePassword(record, { password, currentPassword, logoutTime: Date() })
+    const response = await userService.updatePassword(record, { password, currentPassword, logoutTime: Date(), isActive: true })
 
     if (response.message !== undefined) {
       return res.status(statusCodes.FORBIDDEN).send({

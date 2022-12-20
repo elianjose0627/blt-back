@@ -295,6 +295,7 @@ class UserService extends BaseService {
   async searchUsers (limit: any, offset: any, email: string): Promise<any> {
     const users = await db[this.model].findAndCountAll({
       attributes: { exclude: ['password', 'otp'] },
+      include,
       where: {
         [Op.or]: [
           { email: { [Op.iLike]: `%${email}%` } }
@@ -316,13 +317,7 @@ class UserService extends BaseService {
       offset,
       order: [['createdAt', 'DESC']],
       attributes: { exclude: [] },
-      include: [
-        {
-          model: db.Address,
-          attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition'],
-          as: 'address'
-        }
-      ]
+      include
     })
 
     return {
