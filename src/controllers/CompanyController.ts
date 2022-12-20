@@ -21,6 +21,7 @@ const addressService = new AddressService('Address')
 const appName = String(process.env.APP_NAME)
 const appUrl = String(process.env.APP_URL)
 const mailer = String(process.env.MAILER_EMAIL)
+const salesMailer = String(process.env.SALES_MAILER_EMAIL)
 
 const mininumWaitDaysForDomainVerificationCode = 7
 
@@ -137,6 +138,86 @@ class CompanyController extends BaseController {
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { user, body: { company } } = req
 
+    const adminUser = await userService.findByEmail(company.email)
+
+    if (adminUser === null) {
+      const temporaryPassword = uuidv4().substring(0, 8)
+      const temporaryUser = {
+        firstName: '',
+        lastName: '',
+        email: company.email,
+        password: temporaryPassword,
+        isActive: false,
+        role: userRoles.COMPANYADMINISTRATOR
+      }
+      const createdTemporaryUser = await userService.insert(temporaryUser)
+
+      const subject = `An account has been created on your behalf at ${appUrl}`
+
+      const steps = `
+      <p>Steps to register an account:</p>
+      <ol>
+        <li>Please login to your personal user account at ${appUrl} and change your password.</li>
+        <li>Please verify your user account.</li>
+      </ol>
+      `
+
+      const footer = `
+      <p>For questions, please reach out to:
+      <br>
+      General Support: ${mailer}
+      <br>
+      Orders: ${salesMailer}
+      </p>
+      `
+
+      const message = `<p>Hello,</p>
+      <p>Your account has been created at ${appUrl} in order to grant you access to the ${appName} corporate merchandise platform on behalf of ${String(company.name)}.<p>
+      <p>Your temporary password is: ${temporaryPassword}.</p>
+      ${steps}
+      <p>You have been granted elevated rights as company administrator of ${String(company.name)}.</p>
+      <p>Best Regards,<br>
+      ${appName} team</p>
+      <p>${footer}</p>
+      `
+      await sendNotifierEmail(createdTemporaryUser.email, subject, message, false, message)
+    } else {
+      if (adminUser.role === userRoles.USER) {
+        await userService.update(adminUser, { role: userRoles.COMPANYADMINISTRATOR })
+
+        const subject = `You have been granted elevated rights as company admin of (${String(company.name)})`
+
+        const footer = `
+        <p>For questions, please reach out to:
+        <br>
+        General Support: ${mailer}
+        <br>
+        Orders: ${salesMailer}
+        </p>
+        `
+
+        const message = `<p>Hello ${String(adminUser.firstName)},</p>
+        <p>To make full use of the ${String(appName)} corporate merchandise platform your company ${String(company.name)} has been setup.<p>
+        <p>You have been granted elevated rights as company admin of ${String(company.name)}.</p>
+        <p>Please login to your user account at ${appUrl}</p>
+        <p>Best Regards,<br>
+        ${appName} team</p>
+        <p>${footer}</p>
+        `
+        await sendNotifierEmail(adminUser.email, subject, message, false, message)
+      }
+
+      if (adminUser.role === userRoles.COMPANYADMINISTRATOR) {
+        return res.status(statusCodes.FORBIDDEN).send({
+          statusCode: statusCodes.FORBIDDEN,
+          success: false,
+          errors: {
+            message: 'User specified is already a company admin'
+          }
+        })
+      }
+    }
+
     const { response, status } = await companyService.insert({ user, company })
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 
@@ -144,6 +225,9 @@ class CompanyController extends BaseController {
       200: statusCodes.OK,
       201: statusCodes.CREATED
     }
+
+    const userToUpdate = await userService.findByEmail(company.email)
+    await userService.update(userToUpdate, { companyId: response.id })
 
     return res.status(statusCode[status]).send({
       statusCode: statusCode[status],

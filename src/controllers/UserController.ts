@@ -112,7 +112,7 @@ class UserController extends BaseController {
     const { record } = req
     const { password, currentPassword } = req.body.user
 
-    const response = await userService.updatePassword(record, { password, currentPassword, logoutTime: Date() })
+    const response = await userService.updatePassword(record, { password, currentPassword, logoutTime: Date(), isActive: true })
 
     if (response.message !== undefined) {
       return res.status(statusCodes.FORBIDDEN).send({
