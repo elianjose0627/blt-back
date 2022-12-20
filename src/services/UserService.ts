@@ -7,6 +7,7 @@ import BaseService from './BaseService'
 import { sendNotifierEmail } from '../utils/sendMail'
 import generateToken from '../utils/generateToken'
 import generateOtp from '../utils/generateOtp'
+import * as userRoles from '../utils/userRoles'
 
 dayjs.extend(utc)
 
@@ -58,7 +59,14 @@ class UserService extends BaseService {
   async insert (data: any): Promise<any> {
     const record = await db[this.model].create({ ...data, id: uuidv1() })
 
-    const { email, firstName } = record
+    const { email, firstName, role } = record
+    const { password } = data
+
+    let customMessage = `Thank you very much for registering an account at ${appName}.`
+    if (role === userRoles.ADMIN) {
+      customMessage = `<p>Your account has been created at ${appUrl} with a role of ${String(role)}.<p>
+      <p>Your temporary password is: ${String(password)}.</p>`
+    }
     const subject = `Verify your email for ${appName}`
 
     const steps = `
@@ -80,7 +88,7 @@ class UserService extends BaseService {
       `
 
     const message = `<p>Dear ${String(firstName)},</p>
-      <p>Thank you very much for registering an account at ${appName}.<br>
+      <p>${customMessage}<br>
       To activate your account, please verify the ownership of the associated email address.</p>
       ${steps}
       <p>Best Regards,<br>
