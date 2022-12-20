@@ -31,6 +31,10 @@ const userRoutes = (): any => {
     .patch(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateRole
     }), asyncHandler(UserController.updateRole))
+  userRouter.route('/users/:id/email-verification')
+    .patch(asyncHandler(checkAdmin), celebrate({
+      [Segments.BODY]: validator.validateEmailVerification
+    }), asyncHandler(UserController.updateEmailVerification))
   userRouter.route('/users/:id/photo')
     .patch(asyncHandler(UserController.checkOwner), celebrate({
       [Segments.BODY]: validator.validateUserPhoto

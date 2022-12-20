@@ -64,6 +64,7 @@ describe('Company actions', () => {
 
   after(async () => {
     await deleteTestUser('drstrange@gmail.com')
+    await deleteTestUser('raywiretest@gmail.com')
   })
 
   describe('Get all companies', () => {
@@ -109,7 +110,7 @@ describe('Company actions', () => {
       expect(res.body.company).to.include.keys('id', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
     })
 
-    it('Should return 200 OK when a user creates the same company.', async () => {
+    it('Should return 403 Forbidden when a user tries to create a company with an admin email account that is a company admin.', async () => {
       const res = await chai
         .request(app)
         .post('/api/companies')
@@ -121,10 +122,9 @@ describe('Company actions', () => {
           }
         })
 
-      expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'company')
-      expect(res.body.company).to.be.an('object')
-      expect(res.body.company).to.include.keys('id', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('User specified is already a company admin')
     })
 
     it('Should return 403 Forbidden when a user tries to create a company with a domain that does not match the email.', async () => {
@@ -145,7 +145,7 @@ describe('Company actions', () => {
       expect(res.body.errors.message).to.equal('The email domain and the company domain do not match')
     })
 
-    it('Should return 204 when a admin deletes a company.', async () => {
+    it('Should return 204 when an admin deletes a company.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -153,7 +153,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company Deleted',
-            email: 'test@company.com'
+            email: 'test@company23.com'
           }
         })
 
@@ -185,8 +185,8 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
-            name: 'Test Company',
-            email: 'test@company.com'
+            name: 'Test Company Begot',
+            email: 'test@companybegot.com'
           }
         })
 
@@ -245,7 +245,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company',
-            email: 'test@company.com'
+            email: 'test@company24.com'
           }
         })
 
@@ -431,7 +431,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Starlink Company',
-            email: 'tars@company.com'
+            email: 'tars@company22.com'
           }
         })
 
@@ -456,7 +456,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Starlink Company',
-            email: 'tars@company.com'
+            email: 'tars@company21.com'
           }
         })
 
@@ -481,7 +481,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Starlink Company',
-            email: 'tars@company.com'
+            email: 'tars@company20.com'
           }
         })
 
@@ -540,7 +540,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Starlink Company',
-            email: 'tars@company.com'
+            email: 'tars@company19.com'
           }
         })
 
@@ -567,8 +567,8 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company',
-            email: 'test@company.com',
-            domain: 'company.com'
+            email: 'test@company18.com',
+            domain: 'company18.com'
           }
         })
 
@@ -809,7 +809,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company',
-            email: 'test@company.com'
+            email: 'test@company17.com'
           }
         })
 
@@ -838,7 +838,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company',
-            email: 'test@company.com'
+            email: 'test@company16.com'
           }
         })
 
@@ -852,6 +852,17 @@ describe('Company actions', () => {
           user: {
             email: 'nickfury@starkindustries.com',
             actionType: 'add'
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/address`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          address: {
+            country: 'Kenya',
+            city: 'Nakuru'
           }
         })
 
@@ -880,7 +891,18 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company',
-            email: 'test@company.com'
+            email: 'test@company15.com'
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/address`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          address: {
+            country: 'Kenya',
+            city: 'Nairobi'
           }
         })
 
@@ -911,7 +933,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company',
-            email: 'test@company.com'
+            email: 'test@company14.com'
           }
         })
 
@@ -982,7 +1004,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company',
-            email: 'test@company.com'
+            email: 'test@company13.com'
           }
         })
 
@@ -1018,7 +1040,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator or campaign manager can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
     })
 
     it('Should return 200 Success when a company owner tries to create a campaign that exists.', async () => {
@@ -1029,7 +1051,19 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company',
-            email: 'test@company.com'
+            email: 'test@company12.com'
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding',
+            type: 'onboarding',
+            status: 'draft'
           }
         })
 
@@ -1051,7 +1085,7 @@ describe('Company actions', () => {
       expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'type', 'createdAt', 'updatedAt')
     })
 
-    it('Should return 403 Forbidden when a non owner tries to create a campaign.', async () => {
+    it('Should return 201 Created when an admin creates a campaign.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -1059,7 +1093,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company',
-            email: 'test@company.com'
+            email: 'test@company11.com'
           }
         })
 
@@ -1075,9 +1109,10 @@ describe('Company actions', () => {
           }
         })
 
-      expect(res).to.have.status(403)
-      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator or campaign manager can perform this action')
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaign')
+      expect(res.body.campaign).to.be.an('object')
+      expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'type', 'createdAt', 'updatedAt')
     })
   })
 
@@ -1090,7 +1125,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company',
-            email: 'test@company.com'
+            email: 'test@company10.com'
           }
         })
       const companyId = String(resCompany.body.company.id)
@@ -1117,7 +1152,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company',
-            email: 'test@company.com'
+            email: 'test@company9.com'
           }
         })
       const companyId = String(resCompany.body.company.id)
@@ -1144,7 +1179,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company',
-            email: 'test@company.com'
+            email: 'test@company8.com'
           }
         })
       const companyId = String(resCompany.body.company.id)
@@ -1202,7 +1237,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company',
-            email: 'test@company.com'
+            email: 'test@company6.com'
           }
         })
       const companyId = String(resCompany.body.company.id)
@@ -1232,10 +1267,10 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator or campaign manager can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
     })
 
-    it('Should return 403 when a non owner tries to retrieve all company campaigns.', async () => {
+    it('Should return 200 when an admin retrieves all company campaigns.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -1243,7 +1278,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company',
-            email: 'test@company.com'
+            email: 'test@company5.com'
           }
         })
       const companyId = String(resCompany.body.company.id)
@@ -1253,9 +1288,9 @@ describe('Company actions', () => {
         .get(`/api/companies/${companyId}/campaigns`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
-      expect(res).to.have.status(403)
-      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator or campaign manager can perform this action')
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaigns')
+      expect(res.body.campaigns).to.be.an('array')
     })
   })
 
@@ -1468,7 +1503,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company',
-            email: 'test@company.com'
+            email: 'test@company4.com'
           }
         })
 
@@ -1649,7 +1684,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Best Company',
-            email: 'testbest@company.com'
+            email: 'testbest@company3.com'
           }
         })
       const companyId = String(resCompany.body.company.id)
@@ -1664,7 +1699,7 @@ describe('Company actions', () => {
       expect(res.body.users).to.be.an('array')
     })
 
-    it('Should return 200 when a company administrator who is not an employee to retrieves all company users.', async () => {
+    it('Should return 200 when a company administrator who is not an employee retrieves all company users.', async () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
@@ -1678,7 +1713,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Best Company',
-            email: 'testbest@company.com'
+            email: 'testbest@company2.com'
           }
         })
       const companyId = String(resCompany.body.company.id)

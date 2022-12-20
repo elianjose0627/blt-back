@@ -293,6 +293,31 @@ describe('A user', () => {
     })
   })
 
+  describe('Verify the email of a user', () => {
+    it('Should return 200 OK when an admin verifies the email of a user.', async () => {
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Iron', lastName: 'Heart', email: 'iheart@starkindustries.com', phone: '254720123456', password: 'tonyhasaheart' } })
+
+      const resUpdate = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'iheart@starkindustries.com', password: 'tonyhasaheart' } })
+      const userId = String(resUpdate.body.user.id)
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${userId}/email-verification`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({ user: { isVerified: true } })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user.isVerified).to.equal(true)
+    })
+  })
+
   describe('Update your own role as an admin', () => {
     it('Should return 403 Forbidden when a user tries to update their own role as an admin.', async () => {
       const res = await chai
