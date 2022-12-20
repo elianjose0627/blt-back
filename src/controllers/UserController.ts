@@ -172,7 +172,7 @@ class UserController extends BaseController {
     const { password } = req.body.user
     const { user } = req
 
-    const response = await userService.update(user, { password, logoutTime: Date() })
+    const response = await userService.update(user, { password, logoutTime: Date(), isActive: true })
 
     return res.status(statusCodes.OK).send({
       statusCode: statusCodes.OK,
