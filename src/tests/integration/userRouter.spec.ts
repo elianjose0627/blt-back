@@ -55,6 +55,20 @@ describe('A user', () => {
     sgMail.setApiKey(String(process.env.SENDGRID_API_KEY))
   })
 
+  describe('Create a user', () => {
+    it('Should return 201 Create, on successfully creating a user.', async () => {
+      const res = await chai
+        .request(app)
+        .post('/api/users')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({ user: { firstName: 'Warriors', lastName: 'Three', email: 'warthree@asgard.com', phone: '254720123456', password: 'thorisgreat', role: userRoles.ADMIN } })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+    })
+  })
+
   describe('Get users', () => {
     it('Should return 200 Success, on successfully retrieving users.', async () => {
       const res = await chai
