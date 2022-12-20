@@ -20,6 +20,27 @@ const validateCreatedUser = Joi.object({
   }).required()
 })
 
+const validateCreatedUserAdmin = Joi.object({
+  user: Joi.object({
+    firstName: Joi.string().required().max(64),
+    lastName: Joi.string().required().max(64),
+    username: Joi.string().lowercase().optional().allow(null).max(64).regex(/^\S+$/)
+      .messages({
+        'string.pattern.base': '{#label} cannot contain spaces'
+      }),
+    email: Joi.string().email().lowercase().required().max(128),
+    phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
+      .messages({
+        'string.pattern.base': '{#label} must be numeric'
+      }),
+    password: Joi.string().min(6).max(64).required(),
+    role: Joi.string()
+      .valid(...[userRoles.USER, userRoles.ADMIN, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
+      .required(),
+    isActive: Joi.boolean().default(false)
+  }).required()
+})
+
 const validateLogin = Joi.object({
   user: Joi.object({
     email: Joi.string().lowercase().email().required(),
@@ -280,5 +301,6 @@ export default {
   validateUserCompanyRole,
   validateSalutation,
   validateDomain,
-  validateEmailVerification
+  validateEmailVerification,
+  validateCreatedUserAdmin
 }
