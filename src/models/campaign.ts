@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { CampaignStatus, CampaignType, ICampaign, ICompany } from '../types'
+import { CampaignStatus, CampaignType, IBundle, ICampaign, ICompany } from '../types'
 
 const CampaignModel = (sequelize: any, DataTypes: any): any => {
   interface CampaignAttributes {
@@ -17,6 +17,7 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany
+    private readonly bundles: IBundle
 
     static associate (models: any): any {
       Campaign.belongsTo(models.Company, {
@@ -44,7 +45,8 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
         type: this.type,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
-        company: this.company
+        company: this.company,
+        bundles: this.bundles
       }
     }
   };

@@ -128,6 +128,7 @@ export interface ICampaign {
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
+  bundles?: IBundle
 }
 
 export interface CustomRequest extends Request {
