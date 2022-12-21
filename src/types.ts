@@ -60,6 +60,14 @@ export interface ISalutation {
   updatedAt: Date
 }
 
+export interface IBundle {
+  id: string
+  name: string
+  createdAt: Date
+  updatedAt: Date
+  campaign: ICampaign
+}
+
 export interface ICompany {
   id: string
   name: string

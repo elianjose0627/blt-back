@@ -58,6 +58,15 @@ export const generateInclude = (model: string): any => {
       }
     ])
   }
+  if (model === 'Bundle') {
+    return ([
+      {
+        model: db.Campaign,
+        attributes: ['id', 'name', 'status', 'type', 'updatedAt', 'createdAt'],
+        as: 'campaign'
+      }
+    ])
+  }
   if (model === 'Salutation') {
     return ([])
   }

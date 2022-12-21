@@ -39,6 +39,7 @@ app.use(apiPrefix, routers.addressRouter())
 app.use(apiPrefix, routers.recipientRouter())
 app.use(apiPrefix, routers.campaignRouter())
 app.use(apiPrefix, routers.salutationRouter())
+app.use(apiPrefix, routers.bundleRouter())
 
 // Add validation middleware
 app.use(joiErrors)

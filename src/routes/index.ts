@@ -6,6 +6,7 @@ import addressRouter from './addressRouter'
 import recipientRouter from './recipientRouter'
 import campaignRouter from './campaignRouter'
 import salutationRouter from './salutationRouter'
+import bundleRouter from './bundleRouter'
 
 const routers = {
   authRouter,
@@ -15,7 +16,8 @@ const routers = {
   addressRouter,
   recipientRouter,
   campaignRouter,
-  salutationRouter
+  salutationRouter,
+  bundleRouter
 }
 
 export default routers
