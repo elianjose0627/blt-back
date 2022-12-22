@@ -57,15 +57,15 @@ class UserService extends BaseService {
   }
 
   async insert (data: any): Promise<any> {
-    const record = await db[this.model].create({ ...data, id: uuidv1() })
+    const { user, currentUser } = data
+    const record = await db[this.model].create({ ...user, id: uuidv1() })
 
     const { email, firstName, role } = record
-    const { password } = data
 
     let customMessage = `Thank you very much for registering an account at ${appName}.`
-    if (role === userRoles.ADMIN) {
+    if (currentUser?.role === userRoles.ADMIN) {
       customMessage = `<p>Your account has been created at ${appUrl} with a role of ${String(role)}.<p>
-      <p>Your temporary password is: ${String(password)}.</p>`
+      <p>Your temporary password is: ${String(user.password)}.</p>`
     }
     const subject = `Verify your email for ${appName}`
 

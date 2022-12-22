@@ -7,6 +7,7 @@ import * as statusCodes from '../constants/statusCodes'
 import { CustomNext, CustomRequest, CustomResponse } from '../types'
 import * as userRoles from '../utils//userRoles'
 import { sendNotifierEmail } from '../utils/sendMail'
+import { io } from '../utils/socket'
 
 dayjs.extend(utc)
 const userService = new UserService('User')
@@ -47,6 +48,20 @@ class UserController extends BaseController {
         }
       })
     }
+  }
+
+  async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { body: { user }, user: currentUser } = req
+
+    const record = await userService.insert({ user, currentUser })
+
+    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
+
+    return res.status(statusCodes.CREATED).send({
+      statusCode: statusCodes.CREATED,
+      success: true,
+      [this.service.singleRecord()]: record
+    })
   }
 
   async login (req: CustomRequest, res: CustomResponse): Promise<any> {
