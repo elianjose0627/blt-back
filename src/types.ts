@@ -60,12 +60,21 @@ export interface ISalutation {
   updatedAt: Date
 }
 
+export interface IItem {
+  id: string
+  jfsku: string
+  merchantSku: string
+  name: string
+  createdAt: Date
+  updatedAt: Date
+}
 export interface IBundle {
   id: string
   name: string
   createdAt: Date
   updatedAt: Date
   campaign: ICampaign
+  items: IItem[]
 }
 
 export interface ICompany {

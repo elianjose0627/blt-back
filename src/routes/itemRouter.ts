@@ -1,7 +1,6 @@
 import express from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
-import BundleController from '../controllers/BundleController'
 import asyncHandler from '../middlewares/asyncHandler'
 import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
@@ -11,24 +10,20 @@ import ItemController from '../controllers/ItemController'
 const bundleRoutes = (): any => {
   const bundleRouter = express.Router()
 
-  bundleRouter.use('/bundles', checkAuth)
-  bundleRouter.route('/bundles')
+  bundleRouter.use('/items', checkAuth)
+  bundleRouter.route('/items')
     .get(celebrate({
       [Segments.QUERY]: validator.validateQueryParams
-    }), asyncHandler(paginate), asyncHandler(BundleController.getAll))
-  bundleRouter.use('/bundles/:id', celebrate({
+    }), asyncHandler(paginate), asyncHandler(ItemController.getAll))
+  bundleRouter.use('/items/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
-  }, { abortEarly: false }), asyncHandler(BundleController.checkRecord))
-  bundleRouter.route('/bundles/:id')
-    .get(asyncHandler(BundleController.get))
+  }, { abortEarly: false }), asyncHandler(ItemController.checkRecord))
+  bundleRouter.route('/items/:id')
+    .get(asyncHandler(ItemController.get))
     .put(asyncHandler(checkAdmin), celebrate({
-      [Segments.BODY]: validator.validateBundle
-    }), asyncHandler(BundleController.update))
-    .delete(asyncHandler(checkAdmin), asyncHandler(BundleController.delete))
-  bundleRouter.route('/bundles/:id/items')
-    .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateBundleItem
-    }), asyncHandler(ItemController.insert))
+    }), asyncHandler(ItemController.update))
+    .delete(asyncHandler(checkAdmin), asyncHandler(ItemController.delete))
   return bundleRouter
 }
 

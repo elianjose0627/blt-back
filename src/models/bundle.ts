@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { IBundle, ICampaign } from '../types'
+import { IBundle, ICampaign, IItem } from '../types'
 
 const BundleModel = (sequelize: any, DataTypes: any): any => {
   interface BundleAttributes {
@@ -13,11 +13,17 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly campaign: ICampaign
+    private readonly items: IItem[]
 
     static associate (models: any): any {
       Bundle.belongsTo(models.Campaign, {
         foreignKey: 'campaignId',
         as: 'campaign',
+        onDelete: 'CASCADE'
+      })
+      Bundle.hasMany(models.Item, {
+        foreignKey: 'bundleId',
+        as: 'items',
         onDelete: 'CASCADE'
       })
     }
@@ -28,7 +34,8 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
         name: this.name,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
-        campaign: this.campaign
+        campaign: this.campaign,
+        items: this.items
       }
     }
   };
