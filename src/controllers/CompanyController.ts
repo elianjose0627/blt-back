@@ -183,7 +183,7 @@ class CompanyController extends BaseController {
       await sendNotifierEmail(createdTemporaryUser.email, subject, message, false, message)
     } else {
       if (adminCreatedUser.role === userRoles.USER) {
-        await userService.update(adminCreatedUser, { role: userRoles.COMPANYADMINISTRATOR })
+        await userService.update(adminCreatedUser, { role: userRoles.COMPANYADMINISTRATOR, logoutTime: Date() })
 
         const subject = `You have been granted elevated rights as company admin of (${String(company.name)})`
 
