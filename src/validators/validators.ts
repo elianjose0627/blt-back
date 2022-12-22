@@ -20,7 +20,7 @@ const validateCreatedUser = Joi.object({
   }).required()
 })
 
-const validateCreatedUserAdmin = Joi.object({
+const validateCreatedUserByAdmin = Joi.object({
   user: Joi.object({
     firstName: Joi.string().required().max(64),
     lastName: Joi.string().required().max(64),
@@ -316,7 +316,7 @@ export default {
   validateSalutation,
   validateDomain,
   validateEmailVerification,
-  validateCreatedUserAdmin,
+  validateCreatedUserByAdmin,
   validateBundle,
   validateBundleItem
 }

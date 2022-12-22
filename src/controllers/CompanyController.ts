@@ -207,7 +207,7 @@ class CompanyController extends BaseController {
         await sendNotifierEmail(adminCreatedUser.email, subject, message, false, message)
       }
 
-      if (adminCreatedUser.role === userRoles.COMPANYADMINISTRATOR) {
+      if (adminCreatedUser.role === userRoles.COMPANYADMINISTRATOR && adminCreatedUser.company !== null) {
         return res.status(statusCodes.FORBIDDEN).send({
           statusCode: statusCodes.FORBIDDEN,
           success: false,
