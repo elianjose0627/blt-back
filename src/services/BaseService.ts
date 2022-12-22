@@ -18,7 +18,37 @@ export const generateInclude = (model: string): any => {
       ]
     )
   }
-  if (model === 'Campaign' || model === 'Address') {
+  if (model === 'Campaign') {
+    return (
+      [
+        {
+          model: db.Company,
+          attributes: ['id', 'name', 'email', 'phone', 'vat', 'domain'],
+          as: 'company',
+          include: [
+            {
+              model: db.User,
+              attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'updatedAt', 'createdAt'],
+              as: 'owner'
+            }
+          ]
+        },
+        {
+          model: db.Bundle,
+          attributes: ['id', 'name', 'updatedAt', 'createdAt'],
+          as: 'bundles',
+          include: [
+            {
+              model: db.Item,
+              attributes: ['id', 'jfsku', 'merchantSku', 'name', 'updatedAt', 'createdAt'],
+              as: 'items'
+            }
+          ]
+        }
+      ]
+    )
+  }
+  if (model === 'Address') {
     return (
       [
         {
@@ -57,6 +87,23 @@ export const generateInclude = (model: string): any => {
         ]
       }
     ])
+  }
+  if (model === 'Bundle') {
+    return ([
+      {
+        model: db.Campaign,
+        attributes: ['id', 'name', 'status', 'type', 'updatedAt', 'createdAt'],
+        as: 'campaign'
+      },
+      {
+        model: db.Item,
+        attributes: ['id', 'jfsku', 'merchantSku', 'name', 'updatedAt', 'createdAt'],
+        as: 'items'
+      }
+    ])
+  }
+  if (model === 'Item') {
+    return ([])
   }
   if (model === 'Salutation') {
     return ([])

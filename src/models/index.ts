@@ -20,6 +20,8 @@ interface Database {
   Campaign?: any
   Salutation?: any
   Token?: any
+  Bundle?: any
+  Item?: any
 }
 
 const db: Database = {}
