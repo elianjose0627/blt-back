@@ -147,7 +147,7 @@ class CompanyController extends BaseController {
         lastName: '',
         email: company.email,
         password: temporaryPassword,
-        isActive: false,
+        isActive: true,
         role: userRoles.COMPANYADMINISTRATOR
       }
       const createdTemporaryUser = await userService.insert({ user: temporaryUser })
