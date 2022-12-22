@@ -37,7 +37,7 @@ const validateCreatedUserAdmin = Joi.object({
     role: Joi.string()
       .valid(...[userRoles.USER, userRoles.ADMIN, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
       .required(),
-    isActive: Joi.boolean().default(false)
+    isActive: Joi.boolean().default(true)
   }).required()
 })
 
