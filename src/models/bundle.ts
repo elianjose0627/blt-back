@@ -1,19 +1,22 @@
 import { Model } from 'sequelize'
-import { IBundle, ICampaign, IItem } from '../types'
+import { IBundle, ICampaign } from '../types'
 
 const BundleModel = (sequelize: any, DataTypes: any): any => {
   interface BundleAttributes {
     id: string
+    jfsku: string
+    merchantSku: string
     name: string
   }
 
   class Bundle extends Model<BundleAttributes> {
     private readonly id: string
+    private readonly jfsku: string
+    private readonly merchantSku: string
     private readonly name: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly campaign: ICampaign
-    private readonly items: IItem[]
 
     static associate (models: any): any {
       Bundle.belongsTo(models.Campaign, {
@@ -21,21 +24,17 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
         as: 'campaign',
         onDelete: 'CASCADE'
       })
-      Bundle.hasMany(models.Item, {
-        foreignKey: 'bundleId',
-        as: 'items',
-        onDelete: 'CASCADE'
-      })
     }
 
     toJSONFor (): IBundle {
       return {
         id: this.id,
+        jfsku: this.jfsku,
+        merchantSku: this.merchantSku,
         name: this.name,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
-        campaign: this.campaign,
-        items: this.items
+        campaign: this.campaign
       }
     }
   };
@@ -44,6 +43,14 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
+      allowNull: false
+    },
+    jfsku: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    merchantSku: {
+      type: DataTypes.STRING,
       allowNull: false
     },
     name: {

@@ -278,12 +278,6 @@ const validateSalutation = Joi.object({
 
 const validateBundle = Joi.object({
   bundle: Joi.object({
-    name: Joi.string().required().max(128)
-  }).required()
-})
-
-const validateBundleItem = Joi.object({
-  item: Joi.object({
     jfsku: Joi.string().required().max(16),
     merchantSku: Joi.string().required().max(32),
     name: Joi.string().required().max(128)
@@ -317,6 +311,5 @@ export default {
   validateDomain,
   validateEmailVerification,
   validateCreatedUserByAdmin,
-  validateBundle,
-  validateBundleItem
+  validateBundle
 }

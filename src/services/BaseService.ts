@@ -35,15 +35,8 @@ export const generateInclude = (model: string): any => {
         },
         {
           model: db.Bundle,
-          attributes: ['id', 'name', 'updatedAt', 'createdAt'],
-          as: 'bundles',
-          include: [
-            {
-              model: db.Item,
-              attributes: ['id', 'jfsku', 'merchantSku', 'name', 'updatedAt', 'createdAt'],
-              as: 'items'
-            }
-          ]
+          attributes: ['id', 'jfsku', 'merchantSku', 'name', 'updatedAt', 'createdAt'],
+          as: 'bundles'
         }
       ]
     )
@@ -94,11 +87,6 @@ export const generateInclude = (model: string): any => {
         model: db.Campaign,
         attributes: ['id', 'name', 'status', 'type', 'updatedAt', 'createdAt'],
         as: 'campaign'
-      },
-      {
-        model: db.Item,
-        attributes: ['id', 'jfsku', 'merchantSku', 'name', 'updatedAt', 'createdAt'],
-        as: 'items'
       }
     ])
   }
