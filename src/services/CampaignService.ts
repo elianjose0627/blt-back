@@ -30,6 +30,7 @@ class CampaignService extends BaseService {
 
   async getAllForCompany (limit: number, offset: number, companyId: string): Promise<any> {
     const records = await db[this.model].findAndCountAll({
+      include: generateInclude(this.model),
       limit,
       offset,
       order: [['createdAt', 'DESC']],
