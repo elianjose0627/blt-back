@@ -6,7 +6,6 @@ import asyncHandler from '../middlewares/asyncHandler'
 import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
-import ItemController from '../controllers/ItemController'
 
 const bundleRoutes = (): any => {
   const bundleRouter = express.Router()
@@ -25,10 +24,6 @@ const bundleRoutes = (): any => {
       [Segments.BODY]: validator.validateBundle
     }), asyncHandler(BundleController.update))
     .delete(asyncHandler(checkAdmin), asyncHandler(BundleController.delete))
-  bundleRouter.route('/bundles/:id/items')
-    .post(asyncHandler(checkAdmin), celebrate({
-      [Segments.BODY]: validator.validateBundleItem
-    }), asyncHandler(ItemController.insert))
   return bundleRouter
 }
 

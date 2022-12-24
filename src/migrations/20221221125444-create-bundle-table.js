@@ -7,7 +7,15 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.UUID
       },
+      jfsku: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
       name: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+      merchantSku: {
         allowNull: false,
         type: Sequelize.STRING
       },
