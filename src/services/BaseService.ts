@@ -18,30 +18,7 @@ export const generateInclude = (model: string): any => {
       ]
     )
   }
-  if (model === 'Campaign') {
-    return (
-      [
-        {
-          model: db.Company,
-          attributes: ['id', 'name', 'email', 'phone', 'vat', 'domain'],
-          as: 'company',
-          include: [
-            {
-              model: db.User,
-              attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'updatedAt', 'createdAt'],
-              as: 'owner'
-            }
-          ]
-        },
-        {
-          model: db.Bundle,
-          attributes: ['id', 'jfsku', 'merchantSku', 'name', 'updatedAt', 'createdAt'],
-          as: 'bundles'
-        }
-      ]
-    )
-  }
-  if (model === 'Address') {
+  if (model === 'Campaign' || model === 'Address') {
     return (
       [
         {
@@ -59,6 +36,7 @@ export const generateInclude = (model: string): any => {
       ]
     )
   }
+
   if (model === 'Recipient') {
     return ([
       {

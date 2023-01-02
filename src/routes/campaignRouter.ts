@@ -37,6 +37,9 @@ const CampaignRoutes = (): any => {
     .post(asyncHandler(CampaignController.checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager), celebrate({
       [Segments.BODY]: validator.validateBundle
     }, { abortEarly: false }), asyncHandler(BundleController.insert))
+    .get(asyncHandler(CampaignController.checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager), celebrate({
+      [Segments.QUERY]: validator.validateQueryParams
+    }), asyncHandler(paginate), asyncHandler(BundleController.getAll))
   return campaignRouter
 }
 

@@ -25,6 +25,25 @@ class BundleController extends BaseController {
       [this.recordName()]: response
     })
   }
+
+  async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { limit, page, offset } = req.query
+    const { id } = req.params
+    const records = await this.service.getAll(limit, offset, id)
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / limit),
+      perPage: limit,
+      page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      [this.service.manyRecords()]: records.rows
+    })
+  }
 }
 
 export default new BundleController(bundleService)
