@@ -26,6 +26,23 @@ class BundleService extends BaseService {
 
     return { response: response.toJSONFor(), status: 201 }
   }
+
+  async getAll (limit: number, offset: number, campaignId?: string): Promise<any> {
+    const records = await db[this.model].findAndCountAll({
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+      attributes: { exclude: [] },
+      where: {
+        campaignId
+      }
+    })
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
+  }
 }
 
 export default BundleService
