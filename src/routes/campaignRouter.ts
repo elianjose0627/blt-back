@@ -3,6 +3,7 @@ import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import CampaignController from '../controllers/CampaignController'
 import RecipientController from '../controllers/RecipientController'
+import BundleController from '../controllers/BundleController'
 import asyncHandler from '../middlewares/asyncHandler'
 import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
@@ -32,6 +33,13 @@ const CampaignRoutes = (): any => {
     .get(asyncHandler(CampaignController.checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(RecipientController.getAll))
+  campaignRouter.route('/campaigns/:id/bundles')
+    .post(asyncHandler(CampaignController.checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager), celebrate({
+      [Segments.BODY]: validator.validateBundle
+    }, { abortEarly: false }), asyncHandler(BundleController.insert))
+    .get(asyncHandler(CampaignController.checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager), celebrate({
+      [Segments.QUERY]: validator.validateQueryParams
+    }), asyncHandler(paginate), asyncHandler(BundleController.getAll))
   return campaignRouter
 }
 

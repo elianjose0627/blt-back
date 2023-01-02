@@ -20,7 +20,7 @@ const validateCreatedUser = Joi.object({
   }).required()
 })
 
-const validateCreatedUserAdmin = Joi.object({
+const validateCreatedUserByAdmin = Joi.object({
   user: Joi.object({
     firstName: Joi.string().required().max(64),
     lastName: Joi.string().required().max(64),
@@ -37,7 +37,7 @@ const validateCreatedUserAdmin = Joi.object({
     role: Joi.string()
       .valid(...[userRoles.USER, userRoles.ADMIN, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
       .required(),
-    isActive: Joi.boolean().default(false)
+    isActive: Joi.boolean().default(true)
   }).required()
 })
 
@@ -276,6 +276,14 @@ const validateSalutation = Joi.object({
   }).required()
 })
 
+const validateBundle = Joi.object({
+  bundle: Joi.object({
+    jfsku: Joi.string().required().max(16),
+    merchantSku: Joi.string().required().max(32),
+    name: Joi.string().required().max(128)
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -302,5 +310,6 @@ export default {
   validateSalutation,
   validateDomain,
   validateEmailVerification,
-  validateCreatedUserAdmin
+  validateCreatedUserByAdmin,
+  validateBundle
 }

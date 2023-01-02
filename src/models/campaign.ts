@@ -29,6 +29,11 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
         as: 'recipients',
         onDelete: 'CASCADE'
       })
+      Campaign.hasMany(models.Bundle, {
+        foreignKey: 'campaignId',
+        as: 'bundles',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): ICampaign {

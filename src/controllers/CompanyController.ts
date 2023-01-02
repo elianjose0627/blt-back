@@ -138,19 +138,19 @@ class CompanyController extends BaseController {
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { user, body: { company } } = req
 
-    const adminUser = await userService.findByEmail(company.email)
+    const adminCreatedUser = await userService.findByEmail(company.email)
 
-    if (adminUser === null) {
+    if (adminCreatedUser === null) {
       const temporaryPassword = uuidv4().substring(0, 8)
       const temporaryUser = {
         firstName: '',
         lastName: '',
         email: company.email,
         password: temporaryPassword,
-        isActive: false,
+        isActive: true,
         role: userRoles.COMPANYADMINISTRATOR
       }
-      const createdTemporaryUser = await userService.insert(temporaryUser)
+      const createdTemporaryUser = await userService.insert({ user: temporaryUser })
 
       const subject = `An account has been created on your behalf at ${appUrl}`
 
@@ -182,8 +182,8 @@ class CompanyController extends BaseController {
       `
       await sendNotifierEmail(createdTemporaryUser.email, subject, message, false, message)
     } else {
-      if (adminUser.role === userRoles.USER) {
-        await userService.update(adminUser, { role: userRoles.COMPANYADMINISTRATOR })
+      if (adminCreatedUser.role === userRoles.USER) {
+        await userService.update(adminCreatedUser, { role: userRoles.COMPANYADMINISTRATOR, logoutTime: Date() })
 
         const subject = `You have been granted elevated rights as company admin of (${String(company.name)})`
 
@@ -196,7 +196,7 @@ class CompanyController extends BaseController {
         </p>
         `
 
-        const message = `<p>Hello ${String(adminUser.firstName)},</p>
+        const message = `<p>Hello ${String(adminCreatedUser.firstName)},</p>
         <p>To make full use of the ${String(appName)} corporate merchandise platform your company ${String(company.name)} has been setup.<p>
         <p>You have been granted elevated rights as company admin of ${String(company.name)}.</p>
         <p>Please login to your user account at ${appUrl}</p>
@@ -204,10 +204,10 @@ class CompanyController extends BaseController {
         ${appName} team</p>
         <p>${footer}</p>
         `
-        await sendNotifierEmail(adminUser.email, subject, message, false, message)
+        await sendNotifierEmail(adminCreatedUser.email, subject, message, false, message)
       }
 
-      if (adminUser.role === userRoles.COMPANYADMINISTRATOR) {
+      if (adminCreatedUser.role === userRoles.COMPANYADMINISTRATOR && adminCreatedUser.company !== null) {
         return res.status(statusCodes.FORBIDDEN).send({
           statusCode: statusCodes.FORBIDDEN,
           success: false,
