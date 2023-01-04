@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import app from '../../app'
-import { deleteTestUser, createAdminTestUser, createCompanyAdministrator, createTestUser, createVerifiedCompany } from '../utils'
+import { deleteTestUser, createAdminTestUser, createCompanyAdministrator, createTestUser, createVerifiedCompany, verifyUser } from '../utils'
 
 const { expect } = chai
 
@@ -22,6 +22,8 @@ describe('Address actions', () => {
       .request(app)
       .post('/auth/signup')
       .send({ user: { firstName: 'Jeniffer', lastName: 'Walters', email: 'jenwalters@starkindustries.com', phone: '254720123456', password: 'smashagain' } })
+
+    await verifyUser('jenwalters@starkindustries.com')
 
     const resAdmin = await chai
       .request(app)

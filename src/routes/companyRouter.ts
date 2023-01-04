@@ -9,11 +9,12 @@ import asyncHandler from '../middlewares/asyncHandler'
 import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
+import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 
 const companyRoutes = (): any => {
   const companyRouter = express.Router()
 
-  companyRouter.use('/companies', checkAuth)
+  companyRouter.use('/companies', checkAuth, checkUserIsVerifiedStatus)
   companyRouter.route('/companies')
     .post(celebrate({
       [Segments.BODY]: validator.validateCreatedCompany

@@ -6,11 +6,12 @@ import asyncHandler from '../middlewares/asyncHandler'
 import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
+import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 
 const bundleRoutes = (): any => {
   const bundleRouter = express.Router()
 
-  bundleRouter.use('/bundles', checkAuth)
+  bundleRouter.use('/bundles', checkAuth, checkUserIsVerifiedStatus)
   bundleRouter.route('/bundles')
     .get(celebrate({
       [Segments.QUERY]: validator.validateQueryParams

@@ -6,7 +6,8 @@ import {
   createAdminTestUser, createCampaignManager,
   createCompanyAdministrator,
   createVerifiedCompany,
-  createUnVerifiedCompanyWithExpiredDomainCode
+  createUnVerifiedCompanyWithExpiredDomainCode,
+  verifyUser
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 
@@ -32,6 +33,7 @@ describe('Company actions', () => {
       .request(app)
       .post('/auth/signup')
       .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustries.com', phone: '254720123456', password: 'mackone' } })
+    await verifyUser('shehulk@starkindustries.com')
 
     const resUser = await chai
       .request(app)

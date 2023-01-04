@@ -4,11 +4,12 @@ import validator from '../validators/validators'
 import AddressController from '../controllers/AddressController'
 import asyncHandler from '../middlewares/asyncHandler'
 import checkAuth from '../middlewares/checkAuth'
+import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 
 const AddressRoutes = (): any => {
   const addressRouter = express.Router()
 
-  addressRouter.use('/addresses', checkAuth)
+  addressRouter.use('/addresses', checkAuth, checkUserIsVerifiedStatus)
   addressRouter.use('/addresses/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(AddressController.checkRecord))

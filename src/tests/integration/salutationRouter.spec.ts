@@ -3,7 +3,8 @@ import chaiHttp from 'chai-http'
 import app from '../../app'
 import {
   deleteTestUser,
-  createAdminTestUser
+  createAdminTestUser,
+  verifyUser
 } from '../utils'
 
 const { expect } = chai
@@ -21,6 +22,8 @@ describe('Salutation actions', () => {
       .request(app)
       .post('/auth/signup')
       .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustries.com', phone: '254720123456', password: 'mackone' } })
+
+    await verifyUser('shehulk@starkindustries.com')
 
     const resUser = await chai
       .request(app)

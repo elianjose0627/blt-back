@@ -6,11 +6,12 @@ import asyncHandler from '../middlewares/asyncHandler'
 import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
+import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 
 const salutationRoutes = (): any => {
   const salutationRouter = express.Router()
 
-  salutationRouter.use('/salutations', checkAuth)
+  salutationRouter.use('/salutations', checkAuth, checkUserIsVerifiedStatus)
   salutationRouter.route('/salutations')
     .post(celebrate({
       [Segments.BODY]: validator.validateSalutation

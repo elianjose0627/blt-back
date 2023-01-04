@@ -286,3 +286,17 @@ export const createUnVerifiedCompanyWithExpiredDomainCode = async (userId: strin
     return updatedCompany
   }
 }
+
+export const verifyUser = async (email: string): Promise<any> => {
+  const user = await db.User.findOne({
+    where: {
+      email
+    }
+  })
+
+  if (user !== null) {
+    await user.update({
+      isVerified: true
+    })
+  }
+}
