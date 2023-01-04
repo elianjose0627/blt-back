@@ -569,7 +569,7 @@ describe('Company actions', () => {
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Queen', lastName: 'Ramond', email: 'qr@starkindustries.com', password: 'iamironwoman' } })
+        .send({ user: { firstName: 'Queen', lastName: 'Ramonda', email: 'qr@starkindustries.com', password: 'iamironwoman' } })
 
       await chai
         .request(app)
@@ -618,6 +618,71 @@ describe('Company actions', () => {
         .put(`/api/companies/${String(companyId)}/users/${String(resNewUser.body.user.id)}`)
         .set('Authorization', `Bearer ${token}`)
         .send({ user: { firstName: 'Crystalia' } })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner or your company administrator can perform this action')
+    })
+  })
+
+  describe('Company Address Data Update', () => {
+    it('Should return 200 OK when a company owner updates the address of an employee.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      const resNewUser = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Natasha', lastName: 'Romanoff', email: 'natrom@starkindustries.com', password: 'theredroom' } })
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: resNewUser.body.user.email,
+            actionType: 'add'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/users/${String(resNewUser.body.user.id)}/address`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ address: { country: 'Kenya', city: 'Nairobi' } })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'address')
+      expect(res.body.address).to.be.an('object')
+      expect(res.body.address).to.have.keys('id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'vat', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 403 Forbidden when a company owner updates the address of an non-employee.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Starlink Company',
+            email: 'starlinks@company.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const resNewUser = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Maximus', lastName: 'Boltagon', email: 'maxbolt@inhumans.com', password: 'pureevil' } })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/users/${String(resNewUser.body.user.id)}/address`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ address: { country: 'Kenya', city: 'Nairobi' } })
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')

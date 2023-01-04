@@ -73,6 +73,11 @@ const companyRoutes = (): any => {
       [Segments.PARAMS]: validator.validateUUID,
       [Segments.BODY]: validator.validateUpdatedUser
     }, { abortEarly: false }), asyncHandler(CompanyController.updateCompanyEmployee))
+  companyRouter.route('/companies/:id/users/:userId/address')
+    .post(celebrate({
+      [Segments.PARAMS]: validator.validateUUID,
+      [Segments.BODY]: validator.validateCreatedAddress
+    }, { abortEarly: false }), asyncHandler(CompanyController.createEmployeeAddress))
   return companyRouter
 }
 

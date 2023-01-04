@@ -377,6 +377,53 @@ class CompanyController extends BaseController {
     })
   }
 
+  async createEmployeeAddress (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { user: currentUser, record: company, params: { id: companyId, userId }, body: { address } } = req
+
+    const allowedRoles = [userRoles.COMPANYADMINISTRATOR]
+    const isCompanyOwner = currentUser.id === company?.owner?.id
+
+    const userToUpdate = await userService.findById(userId)
+
+    if (userToUpdate === null) {
+      return res.status(statusCodes.NOT_FOUND).send({
+        statusCode: statusCodes.NOT_FOUND,
+        success: false,
+        errors: {
+          message: `${String(userService.model)} not found`
+        }
+      })
+    }
+
+    const userToUpdateIsCompanyEmployee = userToUpdate?.company?.id === companyId
+    const currentUserIsCompanyEmployee = currentUser?.company?.id === companyId
+
+    if (userToUpdateIsCompanyEmployee &&
+      ((currentUserIsCompanyEmployee && allowedRoles.includes(currentUser.role)) || isCompanyOwner)
+    ) {
+      const { response, status } = await addressService.insert({ user: userToUpdate, company: null, address })
+
+      const statusCode = {
+        200: statusCodes.OK,
+        201: statusCodes.CREATED
+      }
+
+      return res.status(statusCode[status]).send({
+        statusCode: statusCode[status],
+        success: true,
+        address: response
+      })
+    }
+
+    return res.status(statusCodes.FORBIDDEN).send({
+      statusCode: statusCodes.FORBIDDEN,
+      success: false,
+      errors: {
+        message: 'Only the owner or your company administrator can perform this action'
+      }
+    })
+  }
+
   async createAddress (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { record: company, body: { address } } = req
 
