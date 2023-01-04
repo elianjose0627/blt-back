@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import BaseController from './BaseController'
 import UserService from '../services/UserService'
+import CompanyService from '../services/CompanyService'
 import AddressService from '../services/AddressService'
 import * as statusCodes from '../constants/statusCodes'
 import { CustomNext, CustomRequest, CustomResponse } from '../types'
@@ -12,6 +13,7 @@ import { io } from '../utils/socket'
 dayjs.extend(utc)
 const userService = new UserService('User')
 const addressService = new AddressService('Address')
+const companyService = new CompanyService('Company')
 
 const appName = String(process.env.APP_NAME)
 const appUrl = String(process.env.APP_URL)
@@ -52,6 +54,20 @@ class UserController extends BaseController {
 
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { body: { user }, user: currentUser } = req
+
+    // Used != to capture value that is undefined
+    if (user?.companyId != null) {
+      const company = await companyService.findById(user.companyId)
+      if (company === null) {
+        return res.status(statusCodes.NOT_FOUND).send({
+          statusCode: statusCodes.NOT_FOUND,
+          success: false,
+          errors: {
+            message: 'Company not found'
+          }
+        })
+      }
+    }
 
     const record = await userService.insert({ user, currentUser })
 
