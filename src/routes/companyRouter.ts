@@ -3,11 +3,12 @@ import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import CompanyController from '../controllers/CompanyController'
 import CampaignController from '../controllers/CampaignController'
+import UserController from '../controllers/UserController'
+import AddressController from '../controllers/AddressController'
 import asyncHandler from '../middlewares/asyncHandler'
 import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
-import UserController from '../controllers/UserController'
 
 const companyRoutes = (): any => {
   const companyRouter = express.Router()
@@ -30,10 +31,13 @@ const companyRoutes = (): any => {
       [Segments.BODY]: validator.validateUpdatedCompany
     }), asyncHandler(CompanyController.checkCompanyDomainAndEmailDomain), asyncHandler(CompanyController.update))
     .delete(asyncHandler(checkAdmin), asyncHandler(CompanyController.delete))
-  companyRouter.route('/companies/:id/address')
+  companyRouter.route('/companies/:id/addresses')
     .post(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin), celebrate({
       [Segments.BODY]: validator.validateCreatedAddress
     }, { abortEarly: false }), asyncHandler(CompanyController.createAddress))
+    .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin), celebrate({
+      [Segments.QUERY]: validator.validateQueryParams
+    }), asyncHandler(paginate), asyncHandler(AddressController.getAllForCompany))
   companyRouter.route('/companies/:id/campaigns')
     .post(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin), celebrate({
       [Segments.BODY]: validator.validateCampaign

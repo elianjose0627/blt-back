@@ -815,7 +815,7 @@ describe('Company actions', () => {
 
       const res = await chai
         .request(app)
-        .post(`/api/companies/${String(resCompany.body.company.id)}/address`)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/addresses`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           address: {
@@ -857,7 +857,7 @@ describe('Company actions', () => {
 
       await chai
         .request(app)
-        .post(`/api/companies/${String(companyId)}/address`)
+        .post(`/api/companies/${String(companyId)}/addresses`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           address: {
@@ -868,7 +868,7 @@ describe('Company actions', () => {
 
       const res = await chai
         .request(app)
-        .post(`/api/companies/${String(companyId)}/address`)
+        .post(`/api/companies/${String(companyId)}/addresses`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           address: {
@@ -897,7 +897,7 @@ describe('Company actions', () => {
 
       await chai
         .request(app)
-        .post(`/api/companies/${String(resCompany.body.company.id)}/address`)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/addresses`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           address: {
@@ -908,7 +908,7 @@ describe('Company actions', () => {
 
       const res = await chai
         .request(app)
-        .post(`/api/companies/${String(resCompany.body.company.id)}/address`)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/addresses`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           address: {
@@ -921,6 +921,39 @@ describe('Company actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'address')
       expect(res.body.address).to.be.an('object')
       expect(res.body.address).to.include.keys('id', 'country', 'city', 'street', 'zip', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 200 Success when a company owner gets company addresses.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company17254.com'
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/addresses`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          address: {
+            country: 'Kenya',
+            city: 'Nairobi'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(resCompany.body.company.id)}/addresses`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'addresses', 'meta')
+      expect(res.body.addresses).to.be.an('array')
     })
   })
 
