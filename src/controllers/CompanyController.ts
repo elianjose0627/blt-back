@@ -330,7 +330,49 @@ class CompanyController extends BaseController {
       statusCode: statusCodes.FORBIDDEN,
       success: false,
       errors: {
-        message: 'Only an admin, the owner or company administrator can perform this action'
+        message: 'Only an admin, the owner or your company administrator can perform this action'
+      }
+    })
+  }
+
+  async updateCompanyEmployee (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { user: currentUser, record: company, params: { id: companyId, userId }, body: { user } } = req
+
+    const allowedRoles = [userRoles.COMPANYADMINISTRATOR]
+    const isCompanyOwner = currentUser.id === company?.owner?.id
+
+    const userToUpdate = await userService.findById(userId)
+
+    if (userToUpdate === null) {
+      return res.status(statusCodes.NOT_FOUND).send({
+        statusCode: statusCodes.NOT_FOUND,
+        success: false,
+        errors: {
+          message: `${String(userService.model)} not found`
+        }
+      })
+    }
+
+    const userToUpdateIsCompanyEmployee = userToUpdate?.company?.id === companyId
+    const currentUserIsCompanyEmployee = currentUser?.company?.id === companyId
+
+    if (userToUpdateIsCompanyEmployee &&
+      ((currentUserIsCompanyEmployee && allowedRoles.includes(currentUser.role)) || isCompanyOwner)
+    ) {
+      const response = await userService.update(userToUpdate, { ...user })
+
+      return res.status(statusCodes.OK).send({
+        statusCode: statusCodes.OK,
+        success: true,
+        user: response
+      })
+    }
+
+    return res.status(statusCodes.FORBIDDEN).send({
+      statusCode: statusCodes.FORBIDDEN,
+      success: false,
+      errors: {
+        message: 'Only the owner or your company administrator can perform this action'
       }
     })
   }

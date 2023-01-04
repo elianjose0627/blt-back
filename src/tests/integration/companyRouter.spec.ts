@@ -422,7 +422,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only an admin, the owner or company administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only an admin, the owner or your company administrator can perform this action')
     })
 
     it('Should return 403 Forbidden when a company owner tries to update their role.', async () => {
@@ -531,7 +531,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only an admin, the owner or company administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only an admin, the owner or your company administrator can perform this action')
     })
 
     it('Should return 404 Not Found when a company owner updates the role of an non-existent employee.', async () => {
@@ -557,6 +557,71 @@ describe('Company actions', () => {
       expect(res).to.have.status(404)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('User not found')
+    })
+  })
+
+  describe('Company Employee Data Update', () => {
+    it('Should return 200 OK when a company owner updates the data of an employee.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      const resNewUser = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Queen', lastName: 'Ramond', email: 'qr@starkindustries.com', password: 'iamironwoman' } })
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: resNewUser.body.user.email,
+            actionType: 'add'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .put(`/api/companies/${String(companyId)}/users/${String(resNewUser.body.user.id)}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ user: { username: 'queenregent' } })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.user).to.not.have.any.keys('password', 'otp', 'isDeleted')
+    })
+
+    it('Should return 403 Forbidden when a company owner updates the data of an non-employee.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Starlink Company',
+            email: 'stars@company.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const resNewUser = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Crystal', lastName: 'Amaquelin', email: 'crystal@inhumans.com', password: 'quicksilver' } })
+
+      const res = await chai
+        .request(app)
+        .put(`/api/companies/${String(companyId)}/users/${String(resNewUser.body.user.id)}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ user: { firstName: 'Crystalia' } })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner or your company administrator can perform this action')
     })
   })
 

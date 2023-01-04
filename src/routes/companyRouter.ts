@@ -69,6 +69,10 @@ const companyRoutes = (): any => {
       [Segments.PARAMS]: validator.validateUUID,
       [Segments.BODY]: validator.validateUserCompanyRole
     }, { abortEarly: false }), asyncHandler(CompanyController.updateUserRole))
+    .put(celebrate({
+      [Segments.PARAMS]: validator.validateUUID,
+      [Segments.BODY]: validator.validateUpdatedUser
+    }, { abortEarly: false }), asyncHandler(CompanyController.updateCompanyEmployee))
   return companyRouter
 }
 
