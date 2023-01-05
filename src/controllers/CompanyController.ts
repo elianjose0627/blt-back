@@ -116,6 +116,42 @@ class CompanyController extends BaseController {
     return next()
   }
 
+  async checkCompanyMembership (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
+    const { user: currentUser, record: company, params: { id: companyId, userId } } = req
+
+    const allowedRoles = [userRoles.COMPANYADMINISTRATOR]
+    const isCompanyOwner = currentUser.id === company?.owner?.id
+
+    const userToUpdate = await userService.findById(userId)
+
+    if (userToUpdate === null) {
+      return res.status(statusCodes.NOT_FOUND).send({
+        statusCode: statusCodes.NOT_FOUND,
+        success: false,
+        errors: {
+          message: `${String(userService.model)} not found`
+        }
+      })
+    }
+
+    req.employee = userToUpdate
+
+    const userToUpdateIsCompanyEmployee = userToUpdate?.company?.id === companyId
+    const currentUserIsCompanyEmployee = currentUser?.company?.id === companyId
+
+    if (!userToUpdateIsCompanyEmployee && (!(currentUserIsCompanyEmployee && allowedRoles.includes(currentUser.role)) || !isCompanyOwner)) {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'Only the owner or your company administrator can perform this action'
+        }
+      })
+    }
+
+    return next()
+  }
+
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { query: { limit, page, offset }, user } = req
 
@@ -336,91 +372,43 @@ class CompanyController extends BaseController {
   }
 
   async updateCompanyEmployee (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { user: currentUser, record: company, params: { id: companyId, userId }, body: { user } } = req
+    const { employee, body: { user } } = req
 
-    const allowedRoles = [userRoles.COMPANYADMINISTRATOR]
-    const isCompanyOwner = currentUser.id === company?.owner?.id
+    const response = await userService.update(employee, { ...user })
 
-    const userToUpdate = await userService.findById(userId)
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      user: response
+    })
+  }
 
-    if (userToUpdate === null) {
-      return res.status(statusCodes.NOT_FOUND).send({
-        statusCode: statusCodes.NOT_FOUND,
-        success: false,
-        errors: {
-          message: `${String(userService.model)} not found`
-        }
-      })
-    }
+  async updateEmailVerification (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { body: { user: { isVerified } }, employee } = req
 
-    const userToUpdateIsCompanyEmployee = userToUpdate?.company?.id === companyId
-    const currentUserIsCompanyEmployee = currentUser?.company?.id === companyId
+    const response = await userService.update(employee, { isVerified, logoutTime: Date() })
 
-    if (userToUpdateIsCompanyEmployee &&
-      ((currentUserIsCompanyEmployee && allowedRoles.includes(currentUser.role)) || isCompanyOwner)
-    ) {
-      const response = await userService.update(userToUpdate, { ...user })
-
-      return res.status(statusCodes.OK).send({
-        statusCode: statusCodes.OK,
-        success: true,
-        user: response
-      })
-    }
-
-    return res.status(statusCodes.FORBIDDEN).send({
-      statusCode: statusCodes.FORBIDDEN,
-      success: false,
-      errors: {
-        message: 'Only the owner or your company administrator can perform this action'
-      }
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      user: response
     })
   }
 
   async createEmployeeAddress (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { user: currentUser, record: company, params: { id: companyId, userId }, body: { address } } = req
+    const { employee, body: { address } } = req
 
-    const allowedRoles = [userRoles.COMPANYADMINISTRATOR]
-    const isCompanyOwner = currentUser.id === company?.owner?.id
+    const { response, status } = await addressService.insert({ user: employee, company: null, address })
 
-    const userToUpdate = await userService.findById(userId)
-
-    if (userToUpdate === null) {
-      return res.status(statusCodes.NOT_FOUND).send({
-        statusCode: statusCodes.NOT_FOUND,
-        success: false,
-        errors: {
-          message: `${String(userService.model)} not found`
-        }
-      })
+    const statusCode = {
+      200: statusCodes.OK,
+      201: statusCodes.CREATED
     }
 
-    const userToUpdateIsCompanyEmployee = userToUpdate?.company?.id === companyId
-    const currentUserIsCompanyEmployee = currentUser?.company?.id === companyId
-
-    if (userToUpdateIsCompanyEmployee &&
-      ((currentUserIsCompanyEmployee && allowedRoles.includes(currentUser.role)) || isCompanyOwner)
-    ) {
-      const { response, status } = await addressService.insert({ user: userToUpdate, company: null, address })
-
-      const statusCode = {
-        200: statusCodes.OK,
-        201: statusCodes.CREATED
-      }
-
-      return res.status(statusCode[status]).send({
-        statusCode: statusCode[status],
-        success: true,
-        address: response
-      })
-    }
-
-    return res.status(statusCodes.FORBIDDEN).send({
-      statusCode: statusCodes.FORBIDDEN,
-      success: false,
-      errors: {
-        message: 'Only the owner or your company administrator can perform this action'
-      }
+    return res.status(statusCode[status]).send({
+      statusCode: statusCode[status],
+      success: true,
+      address: response
     })
   }
 

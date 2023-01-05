@@ -64,20 +64,24 @@ const companyRoutes = (): any => {
     .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CompanyController.getAllUsers))
+  companyRouter.use('/companies/:id/users/:userId', celebrate({
+    [Segments.PARAMS]: validator.validateUUID
+  }, { abortEarly: false }))
   companyRouter.route('/companies/:id/users/:userId')
     .patch(celebrate({
-      [Segments.PARAMS]: validator.validateUUID,
       [Segments.BODY]: validator.validateUserCompanyRole
     }, { abortEarly: false }), asyncHandler(CompanyController.updateUserRole))
     .put(celebrate({
-      [Segments.PARAMS]: validator.validateUUID,
       [Segments.BODY]: validator.validateUpdatedUser
-    }, { abortEarly: false }), asyncHandler(CompanyController.updateCompanyEmployee))
+    }, { abortEarly: false }), asyncHandler(CompanyController.checkCompanyMembership), asyncHandler(CompanyController.updateCompanyEmployee))
   companyRouter.route('/companies/:id/users/:userId/address')
     .post(celebrate({
-      [Segments.PARAMS]: validator.validateUUID,
       [Segments.BODY]: validator.validateCreatedAddress
-    }, { abortEarly: false }), asyncHandler(CompanyController.createEmployeeAddress))
+    }, { abortEarly: false }), asyncHandler(CompanyController.checkCompanyMembership), asyncHandler(CompanyController.createEmployeeAddress))
+  companyRouter.route('/companies/:id/users/:userId/email-verification')
+    .patch(celebrate({
+      [Segments.BODY]: validator.validateEmailVerification
+    }), asyncHandler(CompanyController.checkCompanyMembership), asyncHandler(CompanyController.updateEmailVerification))
   return companyRouter
 }
 

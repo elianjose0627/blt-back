@@ -625,6 +625,71 @@ describe('Company actions', () => {
     })
   })
 
+  describe('Company Employee Email Verification', () => {
+    it('Should return 200 OK when a company owner verifies the email of an employee.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      const resNewUser = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Okoye', lastName: 'Dora', email: 'okoyedora@starkindustries.com', password: 'iamironwoman' } })
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: resNewUser.body.user.email,
+            actionType: 'add'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users/${String(resNewUser.body.user.id)}/email-verification`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ user: { isVerified: true } })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.user).to.not.have.any.keys('password', 'otp', 'isDeleted')
+    })
+
+    it('Should return 403 Forbidden when a company owner tries to verify the email of an non-employee.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Starlink Company',
+            email: 'starsaligned@company.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const resNewUser = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Gorgon', lastName: 'Boltagon', email: 'gorgonboltagon@inhumans.com', password: 'smashsmash' } })
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users/${String(resNewUser.body.user.id)}/email-verification`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ user: { isVerified: true } })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner or your company administrator can perform this action')
+    })
+  })
+
   describe('Company Address Data Update', () => {
     it('Should return 200 OK when a company owner updates the address of an employee.', async () => {
       const resCompany = await createVerifiedCompany(userId)
