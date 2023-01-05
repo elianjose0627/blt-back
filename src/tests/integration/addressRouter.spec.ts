@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import app from '../../app'
-import { deleteTestUser, createAdminTestUser, createCompanyAdministrator, createTestUser, createVerifiedCompany } from '../utils'
+import { deleteTestUser, createAdminTestUser, createCompanyAdministrator, createTestUser, createVerifiedCompany, verifyUser } from '../utils'
 
 const { expect } = chai
 
@@ -22,6 +22,8 @@ describe('Address actions', () => {
       .request(app)
       .post('/auth/signup')
       .send({ user: { firstName: 'Jeniffer', lastName: 'Walters', email: 'jenwalters@starkindustries.com', phone: '254720123456', password: 'smashagain' } })
+
+    await verifyUser('jenwalters@starkindustries.com')
 
     const resAdmin = await chai
       .request(app)
@@ -64,7 +66,7 @@ describe('Address actions', () => {
 
       const res = await chai
         .request(app)
-        .post(`/api/companies/${String(resCompany.body.company.id)}/address`)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           address: {
@@ -109,7 +111,7 @@ describe('Address actions', () => {
 
       const res = await chai
         .request(app)
-        .post(`/api/companies/${String(companyId)}/address`)
+        .post(`/api/companies/${String(companyId)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           address: {
@@ -177,7 +179,7 @@ describe('Address actions', () => {
 
       const resAddress = await chai
         .request(app)
-        .post(`/api/companies/${String(companyId)}/address`)
+        .post(`/api/companies/${String(companyId)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           address: {
@@ -237,7 +239,7 @@ describe('Address actions', () => {
 
       const resAddress = await chai
         .request(app)
-        .post(`/api/companies/${String(companyId)}/address`)
+        .post(`/api/companies/${String(companyId)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           address: {
@@ -297,7 +299,7 @@ describe('Address actions', () => {
 
       const resAddress = await chai
         .request(app)
-        .post(`/api/companies/${String(companyId)}/address`)
+        .post(`/api/companies/${String(companyId)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           address: {

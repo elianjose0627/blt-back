@@ -4,6 +4,10 @@ import BaseService from './BaseService'
 import db from '../models'
 
 class AddressService extends BaseService {
+  manyRecords (): string {
+    return 'addresses'
+  }
+
   async insert (data: any): Promise<any> {
     const { user, company, address } = data
     let response: any
@@ -31,6 +35,23 @@ class AddressService extends BaseService {
     }
 
     return { response: response.toJSONFor(user), status: 201 }
+  }
+
+  async getAllForCompany (limit: number, offset: number, companyId: string): Promise<any> {
+    const records = await db[this.model].findAndCountAll({
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+      attributes: { exclude: [] },
+      where: {
+        companyId
+      }
+    })
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
   }
 }
 

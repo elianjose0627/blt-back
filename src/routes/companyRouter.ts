@@ -3,16 +3,18 @@ import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import CompanyController from '../controllers/CompanyController'
 import CampaignController from '../controllers/CampaignController'
+import UserController from '../controllers/UserController'
+import AddressController from '../controllers/AddressController'
 import asyncHandler from '../middlewares/asyncHandler'
 import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
-import UserController from '../controllers/UserController'
+import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 
 const companyRoutes = (): any => {
   const companyRouter = express.Router()
 
-  companyRouter.use('/companies', checkAuth)
+  companyRouter.use('/companies', checkAuth, checkUserIsVerifiedStatus)
   companyRouter.route('/companies')
     .post(celebrate({
       [Segments.BODY]: validator.validateCreatedCompany
@@ -30,10 +32,13 @@ const companyRoutes = (): any => {
       [Segments.BODY]: validator.validateUpdatedCompany
     }), asyncHandler(CompanyController.checkCompanyDomainAndEmailDomain), asyncHandler(CompanyController.update))
     .delete(asyncHandler(checkAdmin), asyncHandler(CompanyController.delete))
-  companyRouter.route('/companies/:id/address')
+  companyRouter.route('/companies/:id/addresses')
     .post(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin), celebrate({
       [Segments.BODY]: validator.validateCreatedAddress
     }, { abortEarly: false }), asyncHandler(CompanyController.createAddress))
+    .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin), celebrate({
+      [Segments.QUERY]: validator.validateQueryParams
+    }), asyncHandler(paginate), asyncHandler(AddressController.getAllForCompany))
   companyRouter.route('/companies/:id/campaigns')
     .post(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin), celebrate({
       [Segments.BODY]: validator.validateCampaign
@@ -59,11 +64,24 @@ const companyRoutes = (): any => {
     .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CompanyController.getAllUsers))
+  companyRouter.use('/companies/:id/users/:userId', celebrate({
+    [Segments.PARAMS]: validator.validateUUID
+  }, { abortEarly: false }))
   companyRouter.route('/companies/:id/users/:userId')
     .patch(celebrate({
-      [Segments.PARAMS]: validator.validateUUID,
       [Segments.BODY]: validator.validateUserCompanyRole
     }, { abortEarly: false }), asyncHandler(CompanyController.updateUserRole))
+    .put(celebrate({
+      [Segments.BODY]: validator.validateUpdatedUser
+    }, { abortEarly: false }), asyncHandler(CompanyController.checkCompanyMembership), asyncHandler(CompanyController.updateCompanyEmployee))
+  companyRouter.route('/companies/:id/users/:userId/address')
+    .post(celebrate({
+      [Segments.BODY]: validator.validateCreatedAddress
+    }, { abortEarly: false }), asyncHandler(CompanyController.checkCompanyMembership), asyncHandler(CompanyController.createEmployeeAddress))
+  companyRouter.route('/companies/:id/users/:userId/email-verification')
+    .patch(celebrate({
+      [Segments.BODY]: validator.validateEmailVerification
+    }), asyncHandler(CompanyController.checkCompanyMembership), asyncHandler(CompanyController.updateEmailVerification))
   return companyRouter
 }
 
