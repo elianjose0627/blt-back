@@ -7,7 +7,8 @@ import {
   createCompanyAdministrator,
   createVerifiedCompany,
   createUnVerifiedCompanyWithExpiredDomainCode,
-  verifyUser
+  verifyUser,
+  verifyCompanyDomain
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 
@@ -408,6 +409,7 @@ describe('Company actions', () => {
         })
 
       const companyId = resCompany.body.company.id
+      await verifyCompanyDomain(String(companyId))
 
       const resNewUser = await chai
         .request(app)
@@ -439,6 +441,8 @@ describe('Company actions', () => {
 
       const companyId = resCompany.body.company.id
 
+      await verifyCompanyDomain(String(companyId))
+
       const res = await chai
         .request(app)
         .patch(`/api/companies/${String(companyId)}/users/${String(userId)}`)
@@ -464,6 +468,8 @@ describe('Company actions', () => {
 
       const companyId = resCompany.body.company.id
 
+      await verifyCompanyDomain(String(companyId))
+
       const res = await chai
         .request(app)
         .patch(`/api/companies/${String(companyId)}/users/${String(userIdAdmin)}`)
@@ -488,6 +494,8 @@ describe('Company actions', () => {
         })
 
       const companyId = resCompany.body.company.id
+
+      await verifyCompanyDomain(String(companyId))
 
       const resNewUser = await chai
         .request(app)
@@ -548,6 +556,8 @@ describe('Company actions', () => {
 
       const companyId = resCompany.body.company.id
 
+      await verifyCompanyDomain(String(companyId))
+
       const res = await chai
         .request(app)
         .patch(`/api/companies/${String(companyId)}/users/7B98DA13-EF75-46BB-ABD5-F76D162C335A`)
@@ -607,6 +617,8 @@ describe('Company actions', () => {
         })
 
       const companyId = resCompany.body.company.id
+
+      await verifyCompanyDomain(String(companyId))
 
       const resNewUser = await chai
         .request(app)
@@ -673,6 +685,8 @@ describe('Company actions', () => {
 
       const companyId = resCompany.body.company.id
 
+      await verifyCompanyDomain(String(companyId))
+
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
@@ -737,6 +751,7 @@ describe('Company actions', () => {
         })
 
       const companyId = resCompany.body.company.id
+      await verifyCompanyDomain(String(companyId))
 
       const resNewUser = await chai
         .request(app)
@@ -1010,6 +1025,8 @@ describe('Company actions', () => {
           }
         })
 
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
       const res = await chai
         .request(app)
         .post(`/api/companies/${String(resCompany.body.company.id)}/addresses`)
@@ -1040,6 +1057,7 @@ describe('Company actions', () => {
         })
 
       const companyId = resCompany.body.company.id
+      await verifyCompanyDomain(String(companyId))
 
       await chai
         .request(app)
@@ -1092,6 +1110,8 @@ describe('Company actions', () => {
           }
         })
 
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
       await chai
         .request(app)
         .post(`/api/companies/${String(resCompany.body.company.id)}/addresses`)
@@ -1132,6 +1152,8 @@ describe('Company actions', () => {
           }
         })
 
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
       await chai
         .request(app)
         .post(`/api/companies/${String(resCompany.body.company.id)}/addresses`)
@@ -1166,6 +1188,8 @@ describe('Company actions', () => {
             email: 'test@company14.com'
           }
         })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
 
       const res = await chai
         .request(app)
@@ -1285,6 +1309,8 @@ describe('Company actions', () => {
           }
         })
 
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
       await chai
         .request(app)
         .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
@@ -1327,6 +1353,8 @@ describe('Company actions', () => {
           }
         })
 
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
       const res = await chai
         .request(app)
         .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
@@ -1359,6 +1387,7 @@ describe('Company actions', () => {
           }
         })
       const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
 
       const res = await chai
         .request(app)
@@ -1387,6 +1416,8 @@ describe('Company actions', () => {
         })
       const companyId = String(resCompany.body.company.id)
 
+      await verifyCompanyDomain(String(companyId))
+
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/campaigns`)
@@ -1413,6 +1444,7 @@ describe('Company actions', () => {
           }
         })
       const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
 
       const res = await chai
         .request(app)
@@ -1512,6 +1544,7 @@ describe('Company actions', () => {
           }
         })
       const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
 
       const res = await chai
         .request(app)
