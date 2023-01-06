@@ -152,6 +152,22 @@ class CompanyController extends BaseController {
     return next()
   }
 
+  async checkCompanyDomainVerification (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
+    const { record: { isDomainVerified } } = req
+
+    if (isDomainVerified === true) {
+      return next()
+    }
+
+    return res.status(statusCodes.FORBIDDEN).send({
+      statusCode: statusCodes.FORBIDDEN,
+      success: false,
+      errors: {
+        message: 'Kindly verify your company domain'
+      }
+    })
+  }
+
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { query: { limit, page, offset }, user } = req
 

@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import app from '../../app'
-import { deleteTestUser, createAdminTestUser, createCompanyAdministrator, createTestUser, createVerifiedCompany, verifyUser } from '../utils'
+import { deleteTestUser, createAdminTestUser, createCompanyAdministrator, createTestUser, createVerifiedCompany, verifyUser, verifyCompanyDomain } from '../utils'
 
 const { expect } = chai
 
@@ -63,6 +63,8 @@ describe('Address actions', () => {
             email: 'ivers@kree.kr'
           }
         })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
 
       const res = await chai
         .request(app)
@@ -159,6 +161,8 @@ describe('Address actions', () => {
 
       const companyId = resCompany.body.company.id
 
+      await verifyCompanyDomain(String(companyId))
+
       await chai
         .request(app)
         .patch(`/api/companies/${String(companyId)}/users`)
@@ -219,6 +223,8 @@ describe('Address actions', () => {
 
       const companyId = resCompany.body.company.id
 
+      await verifyCompanyDomain(String(companyId))
+
       await chai
         .request(app)
         .patch(`/api/companies/${String(companyId)}/users`)
@@ -278,6 +284,8 @@ describe('Address actions', () => {
         })
 
       const companyId = resCompany.body.company.id
+
+      await verifyCompanyDomain(String(companyId))
 
       await chai
         .request(app)

@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import app from '../../app'
-import { deleteTestUser, createAdminTestUser, verifyUser } from '../utils'
+import { deleteTestUser, createAdminTestUser, verifyUser, verifyCompanyDomain } from '../utils'
 
 const { expect } = chai
 
@@ -75,6 +75,8 @@ describe('Campaign actions', () => {
           }
         })
 
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
       const resCampaign = await chai
         .request(app)
         .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
@@ -121,6 +123,8 @@ describe('Campaign actions', () => {
           }
         })
       const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
 
       const resCampaign = await chai
         .request(app)
@@ -171,6 +175,7 @@ describe('Campaign actions', () => {
           }
         })
       const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
 
       const resCampaign = await chai
         .request(app)
@@ -206,6 +211,7 @@ describe('Campaign actions', () => {
           }
         })
       const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
 
       const resCampaign = await chai
         .request(app)

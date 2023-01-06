@@ -3,7 +3,7 @@ import chaiHttp from 'chai-http'
 import app from '../../app'
 import {
   deleteTestUser, createAdminTestUser,
-  createCompanyAdministrator, createCampaignManager, createVerifiedCompany, verifyUser
+  createCompanyAdministrator, createCampaignManager, createVerifiedCompany, verifyUser, verifyCompanyDomain
 } from '../utils'
 
 const { expect } = chai
@@ -72,6 +72,8 @@ describe('Recipient actions', () => {
             email: 'ivers@kree.kr'
           }
         })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
 
       const resCampaign = await chai
         .request(app)
@@ -249,6 +251,7 @@ describe('Recipient actions', () => {
         })
 
       const companyId = resCompany.body.company.id
+      await verifyCompanyDomain(String(companyId))
 
       await chai
         .request(app)
@@ -320,6 +323,7 @@ describe('Recipient actions', () => {
         })
 
       const companyId = resCompany.body.company.id
+      await verifyCompanyDomain(String(companyId))
 
       await chai
         .request(app)
@@ -389,6 +393,8 @@ describe('Recipient actions', () => {
             email: 'ivers@kree.kr'
           }
         })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
 
       const resCampaign = await chai
         .request(app)

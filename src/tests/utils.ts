@@ -300,3 +300,17 @@ export const verifyUser = async (email: string): Promise<any> => {
     })
   }
 }
+
+export const verifyCompanyDomain = async (id: string): Promise<any> => {
+  const user = await db.Company.findOne({
+    where: {
+      id
+    }
+  })
+
+  if (user !== null) {
+    await user.update({
+      isDomainVerified: true
+    })
+  }
+}
