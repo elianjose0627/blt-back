@@ -95,7 +95,7 @@ export const createBlockedUser = async (): Promise<any> => {
   }
 }
 
-export const createCampaignManager = async (email = 'happyhogan@starkindustries.com', password = 'pepperpotts'): Promise<any> => {
+export const createCampaignManager = async (email = 'happyhogan@starkindustriesmarvel.com', password = 'pepperpotts'): Promise<any> => {
   const user = await db.User.findOne({
     attributes: ['id', 'email'],
     where: {
@@ -121,7 +121,7 @@ export const createCampaignManager = async (email = 'happyhogan@starkindustries.
   }
 }
 
-export const createCompanyAdministrator = async (email = 'nickfury@starkindustries.com', password = 'captainmarvel'): Promise<any> => {
+export const createCompanyAdministrator = async (email = 'nickfury@starkindustriesmarvel.com', password = 'captainmarvel'): Promise<any> => {
   const user = await db.User.findOne({
     attributes: ['id', 'email'],
     where: {
@@ -251,8 +251,8 @@ export const createVerifiedCompany = async (userId: string, isDomainVerified = t
   const company = await db.Company.create({
     id: uuidv1(),
     name: 'Stark Industries',
-    email: 'admin@starkindustries.com',
-    domain: 'starkindustries.com',
+    email: 'admin@starkindustriesmarvel.com',
+    domain: 'starkindustriesmarvel.com',
     isDomainVerified,
     userId
   })

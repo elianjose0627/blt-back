@@ -83,6 +83,13 @@ const validateEmailVerification = Joi.object({
   }).required()
 })
 
+const validateUserActivation = Joi.object({
+  user: Joi.object({
+    isActive: Joi.bool()
+      .required()
+  }).required()
+})
+
 const validateUserCompanyRole = Joi.object({
   user: Joi.object({
     role: Joi.string()
@@ -311,6 +318,7 @@ export default {
   validateSalutation,
   validateDomain,
   validateEmailVerification,
+  validateUserActivation,
   validateCreatedUserByAdmin,
   validateBundle
 }

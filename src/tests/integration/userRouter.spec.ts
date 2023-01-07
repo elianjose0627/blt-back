@@ -28,12 +28,12 @@ describe('A user', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Tony', lastName: 'Stark', email: 'ironman@starkindustries.com', phone: '254720123456', password: 'mackone' } })
+      .send({ user: { firstName: 'Tony', lastName: 'Stark', email: 'ironman@starkindustriesmarvel.com', phone: '254720123456', password: 'mackone' } })
 
     const res1 = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ironman@starkindustries.com', password: 'mackone' } })
+      .send({ user: { email: 'ironman@starkindustriesmarvel.com', password: 'mackone' } })
 
     const res2 = await chai
       .request(app)
@@ -48,7 +48,7 @@ describe('A user', () => {
   })
 
   after(async () => {
-    await deleteTestUser('ironman@starkindustries.com')
+    await deleteTestUser('ironman@starkindustriesmarvel.com')
     await deleteTestUser('ivers@kree.kr')
     await deleteTestUser('thenaeternal@celestial.com')
     await deleteTestUser('sersieternal@celestial.com')
@@ -86,7 +86,7 @@ describe('A user', () => {
     it('Should return 200 Success, on successfully retrieving users.', async () => {
       const res = await chai
         .request(app)
-        .get('/api/users?email=ironman@starkindustries.com')
+        .get('/api/users?email=ironman@starkindustriesmarvel.com')
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(200)
@@ -287,12 +287,12 @@ describe('A user', () => {
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Pepper', lastName: 'Potts', email: 'rescure@starkindustries.com', phone: '254720123456', password: 'tonyhasaheart' } })
+        .send({ user: { firstName: 'Pepper', lastName: 'Potts', email: 'rescure@starkindustriesmarvel.com', phone: '254720123456', password: 'tonyhasaheart' } })
 
       const resUpdate = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'rescure@starkindustries.com', password: 'tonyhasaheart' } })
+        .send({ user: { email: 'rescure@starkindustriesmarvel.com', password: 'tonyhasaheart' } })
       const tokenUpdate = String(resUpdate.body.token)
 
       const res = await chai
@@ -312,12 +312,12 @@ describe('A user', () => {
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Iron', lastName: 'Heart', email: 'iheart@starkindustries.com', phone: '254720123456', password: 'tonyhasaheart' } })
+        .send({ user: { firstName: 'Iron', lastName: 'Heart', email: 'iheart@starkindustriesmarvel.com', phone: '254720123456', password: 'tonyhasaheart' } })
 
       const resUpdate = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'iheart@starkindustries.com', password: 'tonyhasaheart' } })
+        .send({ user: { email: 'iheart@starkindustriesmarvel.com', password: 'tonyhasaheart' } })
       const userId = String(resUpdate.body.user.id)
 
       const res = await chai
@@ -329,6 +329,66 @@ describe('A user', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'user')
       expect(res.body.user.isVerified).to.equal(true)
+    })
+  })
+
+  describe('Set active state of a user', () => {
+    it('Should return 200 OK when an admin activates a user.', async () => {
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Shuri', lastName: 'Shuri', email: 'shuri@starkindustriesmarvel.com', phone: '254720123456', password: 'whatarethose' } })
+
+      const resUpdate = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'shuri@starkindustriesmarvel.com', password: 'whatarethose' } })
+      const userId = String(resUpdate.body.user.id)
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${userId}/activate`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({ user: { isActive: true } })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user.isActive).to.equal(true)
+    })
+
+    it('Should return 200 OK when an admin deactivates a user.', async () => {
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Nakia', lastName: 'Nakia', email: 'nakia@starkindustriesmarvel.com', phone: '254720123456', password: 'wakandaforever' } })
+
+      const resUpdate = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nakia@starkindustriesmarvel.com', password: 'wakandaforever' } })
+      const userId = String(resUpdate.body.user.id)
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${userId}/activate`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({ user: { isActive: false } })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user.isActive).to.equal(false)
+    })
+
+    it('Should return 403 Forbidden when an admin tries to update theri active state.', async () => {
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${userIdAdmin}/activate`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({ user: { isActive: false } })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You cannot update your own active status')
     })
   })
 
@@ -579,12 +639,12 @@ describe('A user', () => {
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Auth', lastName: 'May', email: 'auymay@starkindustries.com', phone: '254720123456', password: 'petertingle' } })
+        .send({ user: { firstName: 'Auth', lastName: 'May', email: 'auymay@starkindustriesmarvel.com', phone: '254720123456', password: 'petertingle' } })
 
       const res1 = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'auymay@starkindustries.com', password: 'petertingle' } })
+        .send({ user: { email: 'auymay@starkindustriesmarvel.com', password: 'petertingle' } })
 
       const res2 = await chai
         .request(app)

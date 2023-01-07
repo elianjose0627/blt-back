@@ -21,9 +21,9 @@ describe('Address actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Jeniffer', lastName: 'Walters', email: 'jenwalters@starkindustries.com', phone: '254720123456', password: 'smashagain' } })
+      .send({ user: { firstName: 'Jeniffer', lastName: 'Walters', email: 'jenwalters@starkindustriesmarvel.com', phone: '254720123456', password: 'smashagain' } })
 
-    await verifyUser('jenwalters@starkindustries.com')
+    await verifyUser('jenwalters@starkindustriesmarvel.com')
 
     const resAdmin = await chai
       .request(app)
@@ -38,7 +38,7 @@ describe('Address actions', () => {
     const resCompanyAdministrator = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+      .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
     tokenAdmin = resAdmin.body.token
     tokenUser = resTest.body.token
@@ -48,7 +48,7 @@ describe('Address actions', () => {
 
   after(async () => {
     await deleteTestUser('drstrange@gmail.com')
-    await deleteTestUser('nickfury@starkindustries.com')
+    await deleteTestUser('nickfury@starkindustriesmarvel.com')
   })
 
   describe('Update an address', () => {
@@ -106,7 +106,7 @@ describe('Address actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           user: {
-            email: 'nickfury@starkindustries.com',
+            email: 'nickfury@starkindustriesmarvel.com',
             actionType: 'add'
           }
         })
@@ -125,7 +125,7 @@ describe('Address actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -169,7 +169,7 @@ describe('Address actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           user: {
-            email: 'nickfury@starkindustries.com',
+            email: 'nickfury@starkindustriesmarvel.com',
             actionType: 'remove'
           }
         })
@@ -177,7 +177,7 @@ describe('Address actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
