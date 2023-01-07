@@ -4,11 +4,12 @@ import validator from '../validators/validators'
 import RecipientController from '../controllers/RecipientController'
 import asyncHandler from '../middlewares/asyncHandler'
 import checkAuth from '../middlewares/checkAuth'
+import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 
 const RecipientRoutes = (): any => {
   const recipientRouter = express.Router()
 
-  recipientRouter.use('/recipients', checkAuth)
+  recipientRouter.use('/recipients', checkAuth, checkUserIsVerifiedStatus)
   recipientRouter.use('/recipients/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(RecipientController.checkRecord))

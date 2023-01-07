@@ -37,7 +37,8 @@ const validateCreatedUserByAdmin = Joi.object({
     role: Joi.string()
       .valid(...[userRoles.USER, userRoles.ADMIN, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
       .required(),
-    isActive: Joi.boolean().default(true)
+    isActive: Joi.boolean().default(true),
+    companyId: Joi.string().uuid().allow(null).default(null)
   }).required()
 })
 
@@ -78,6 +79,13 @@ const validateRole = Joi.object({
 const validateEmailVerification = Joi.object({
   user: Joi.object({
     isVerified: Joi.bool()
+      .required()
+  }).required()
+})
+
+const validateUserActivation = Joi.object({
+  user: Joi.object({
+    isActive: Joi.bool()
       .required()
   }).required()
 })
@@ -310,6 +318,7 @@ export default {
   validateSalutation,
   validateDomain,
   validateEmailVerification,
+  validateUserActivation,
   validateCreatedUserByAdmin,
   validateBundle
 }

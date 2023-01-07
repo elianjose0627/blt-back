@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import app from '../../app'
-import { deleteTestUser, createAdminTestUser, createCompanyAdministrator, createTestUser, createVerifiedCompany } from '../utils'
+import { deleteTestUser, createAdminTestUser, createCompanyAdministrator, createTestUser, createVerifiedCompany, verifyUser, verifyCompanyDomain } from '../utils'
 
 const { expect } = chai
 
@@ -21,7 +21,9 @@ describe('Address actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Jeniffer', lastName: 'Walters', email: 'jenwalters@starkindustries.com', phone: '254720123456', password: 'smashagain' } })
+      .send({ user: { firstName: 'Jeniffer', lastName: 'Walters', email: 'jenwalters@starkindustriesmarvel.com', phone: '254720123456', password: 'smashagain' } })
+
+    await verifyUser('jenwalters@starkindustriesmarvel.com')
 
     const resAdmin = await chai
       .request(app)
@@ -36,7 +38,7 @@ describe('Address actions', () => {
     const resCompanyAdministrator = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+      .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
     tokenAdmin = resAdmin.body.token
     tokenUser = resTest.body.token
@@ -46,7 +48,7 @@ describe('Address actions', () => {
 
   after(async () => {
     await deleteTestUser('drstrange@gmail.com')
-    await deleteTestUser('nickfury@starkindustries.com')
+    await deleteTestUser('nickfury@starkindustriesmarvel.com')
   })
 
   describe('Update an address', () => {
@@ -62,9 +64,11 @@ describe('Address actions', () => {
           }
         })
 
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
       const res = await chai
         .request(app)
-        .post(`/api/companies/${String(resCompany.body.company.id)}/address`)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           address: {
@@ -102,14 +106,14 @@ describe('Address actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           user: {
-            email: 'nickfury@starkindustries.com',
+            email: 'nickfury@starkindustriesmarvel.com',
             actionType: 'add'
           }
         })
 
       const res = await chai
         .request(app)
-        .post(`/api/companies/${String(companyId)}/address`)
+        .post(`/api/companies/${String(companyId)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           address: {
@@ -121,7 +125,7 @@ describe('Address actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -157,13 +161,15 @@ describe('Address actions', () => {
 
       const companyId = resCompany.body.company.id
 
+      await verifyCompanyDomain(String(companyId))
+
       await chai
         .request(app)
         .patch(`/api/companies/${String(companyId)}/users`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           user: {
-            email: 'nickfury@starkindustries.com',
+            email: 'nickfury@starkindustriesmarvel.com',
             actionType: 'remove'
           }
         })
@@ -171,13 +177,13 @@ describe('Address actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
       const resAddress = await chai
         .request(app)
-        .post(`/api/companies/${String(companyId)}/address`)
+        .post(`/api/companies/${String(companyId)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           address: {
@@ -217,6 +223,8 @@ describe('Address actions', () => {
 
       const companyId = resCompany.body.company.id
 
+      await verifyCompanyDomain(String(companyId))
+
       await chai
         .request(app)
         .patch(`/api/companies/${String(companyId)}/users`)
@@ -237,7 +245,7 @@ describe('Address actions', () => {
 
       const resAddress = await chai
         .request(app)
-        .post(`/api/companies/${String(companyId)}/address`)
+        .post(`/api/companies/${String(companyId)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           address: {
@@ -277,6 +285,8 @@ describe('Address actions', () => {
 
       const companyId = resCompany.body.company.id
 
+      await verifyCompanyDomain(String(companyId))
+
       await chai
         .request(app)
         .patch(`/api/companies/${String(companyId)}/users`)
@@ -297,7 +307,7 @@ describe('Address actions', () => {
 
       const resAddress = await chai
         .request(app)
-        .post(`/api/companies/${String(companyId)}/address`)
+        .post(`/api/companies/${String(companyId)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           address: {

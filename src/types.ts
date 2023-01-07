@@ -133,6 +133,7 @@ export interface ICampaign {
 
 export interface CustomRequest extends Request {
   user?: any
+  employee?: any
   record?: any
   query: any
   company?: any

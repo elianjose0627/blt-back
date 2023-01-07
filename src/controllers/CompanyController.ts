@@ -116,6 +116,58 @@ class CompanyController extends BaseController {
     return next()
   }
 
+  async checkCompanyMembership (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
+    const { user: currentUser, record: company, params: { id: companyId, userId } } = req
+
+    const allowedRoles = [userRoles.COMPANYADMINISTRATOR]
+    const isCompanyOwner = currentUser.id === company?.owner?.id
+
+    const userToUpdate = await userService.findById(userId)
+
+    if (userToUpdate === null) {
+      return res.status(statusCodes.NOT_FOUND).send({
+        statusCode: statusCodes.NOT_FOUND,
+        success: false,
+        errors: {
+          message: `${String(userService.model)} not found`
+        }
+      })
+    }
+
+    req.employee = userToUpdate
+
+    const userToUpdateIsCompanyEmployee = userToUpdate?.company?.id === companyId
+    const currentUserIsCompanyEmployee = currentUser?.company?.id === companyId
+
+    if (!userToUpdateIsCompanyEmployee && (!(currentUserIsCompanyEmployee && allowedRoles.includes(currentUser.role)) || !isCompanyOwner)) {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'Only the owner or your company administrator can perform this action'
+        }
+      })
+    }
+
+    return next()
+  }
+
+  async checkCompanyDomainVerification (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
+    const { record: { isDomainVerified } } = req
+
+    if (isDomainVerified === true) {
+      return next()
+    }
+
+    return res.status(statusCodes.FORBIDDEN).send({
+      statusCode: statusCodes.FORBIDDEN,
+      success: false,
+      errors: {
+        message: 'Kindly verify your company domain'
+      }
+    })
+  }
+
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { query: { limit, page, offset }, user } = req
 
@@ -330,8 +382,49 @@ class CompanyController extends BaseController {
       statusCode: statusCodes.FORBIDDEN,
       success: false,
       errors: {
-        message: 'Only an admin, the owner or company administrator can perform this action'
+        message: 'Only an admin, the owner or your company administrator can perform this action'
       }
+    })
+  }
+
+  async updateCompanyEmployee (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { employee, body: { user } } = req
+
+    const response = await userService.update(employee, { ...user })
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      user: response
+    })
+  }
+
+  async updateEmailVerification (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { body: { user: { isVerified } }, employee } = req
+
+    const response = await userService.update(employee, { isVerified, logoutTime: Date() })
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      user: response
+    })
+  }
+
+  async createEmployeeAddress (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { employee, body: { address } } = req
+
+    const { response, status } = await addressService.insert({ user: employee, company: null, address })
+
+    const statusCode = {
+      200: statusCodes.OK,
+      201: statusCodes.CREATED
+    }
+
+    return res.status(statusCode[status]).send({
+      statusCode: statusCode[status],
+      success: true,
+      address: response
     })
   }
 

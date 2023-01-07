@@ -8,11 +8,12 @@ import asyncHandler from '../middlewares/asyncHandler'
 import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
 import checkAdmin from '../middlewares/checkAdmin'
+import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 
 const CampaignRoutes = (): any => {
   const campaignRouter = express.Router()
 
-  campaignRouter.use('/campaigns', checkAuth)
+  campaignRouter.use('/campaigns', checkAuth, checkUserIsVerifiedStatus)
   campaignRouter.route('/campaigns')
     .get(asyncHandler(checkAdmin), celebrate({
       [Segments.QUERY]: validator.validateUsersQueryParams

@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import app from '../../app'
-import { deleteTestUser, createAdminTestUser } from '../utils'
+import { deleteTestUser, createAdminTestUser, verifyUser, verifyCompanyDomain } from '../utils'
 
 const { expect } = chai
 
@@ -17,12 +17,13 @@ describe('Campaign actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustries.com', phone: '254720123456', password: 'mackone' } })
+      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: 'mackone' } })
+    await verifyUser('shehulk@starkindustriesmarvel.com')
 
     const res1 = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
 
     const resAdmin = await chai
       .request(app)
@@ -74,6 +75,8 @@ describe('Campaign actions', () => {
           }
         })
 
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
       const resCampaign = await chai
         .request(app)
         .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
@@ -120,6 +123,8 @@ describe('Campaign actions', () => {
           }
         })
       const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
 
       const resCampaign = await chai
         .request(app)
@@ -170,6 +175,7 @@ describe('Campaign actions', () => {
           }
         })
       const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
 
       const resCampaign = await chai
         .request(app)
@@ -205,6 +211,7 @@ describe('Campaign actions', () => {
           }
         })
       const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
 
       const resCampaign = await chai
         .request(app)
