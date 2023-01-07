@@ -139,6 +139,30 @@ class UserController extends BaseController {
     })
   }
 
+  async updateActiveState (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record, user, params: { id }, body: { user: { isActive } } } = req
+
+    if (user.id === id) {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'You cannot update your own active status'
+        }
+      })
+    }
+
+    const logoutTime = isActive === true ? null : Date()
+
+    const response = await userService.update(record, { isActive, logoutTime })
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      user: response
+    })
+  }
+
   async updatePassword (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { record } = req
     const { password, currentPassword } = req.body.user

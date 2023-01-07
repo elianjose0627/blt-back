@@ -33,13 +33,13 @@ describe('Company actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustries.com', phone: '254720123456', password: 'mackone' } })
-    await verifyUser('shehulk@starkindustries.com')
+      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: 'mackone' } })
+    await verifyUser('shehulk@starkindustriesmarvel.com')
 
     const resUser = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
 
     const resAdmin = await chai
       .request(app)
@@ -49,12 +49,12 @@ describe('Company actions', () => {
     const resCampaignManager = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'happyhogan@starkindustries.com', password: 'pepperpotts' } })
+      .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
 
     const resCompanyAdministrator = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+      .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
     tokenAdmin = resAdmin.body.token
     token = resUser.body.token
@@ -217,7 +217,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'nickfury@starkindustries.com',
+            email: 'nickfury@starkindustriesmarvel.com',
             actionType: 'add'
           }
         })
@@ -225,7 +225,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -260,7 +260,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'nickfury@starkindustries.com',
+            email: 'nickfury@starkindustriesmarvel.com',
             actionType: 'remove'
           }
         })
@@ -268,7 +268,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -293,7 +293,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'nickfury@starkindustries.com',
+            email: 'nickfury@starkindustriesmarvel.com',
             actionType: 'add'
           }
         })
@@ -301,7 +301,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -311,7 +311,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
         .send({
           company: {
-            domain: 'starkindustries.com'
+            domain: 'starkindustriesmarvel.com'
           }
         })
 
@@ -333,7 +333,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'nickfury@starkindustries.com',
+            email: 'nickfury@starkindustriesmarvel.com',
             actionType: 'add'
           }
         })
@@ -341,7 +341,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -351,8 +351,8 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
         .send({
           company: {
-            email: 'nickfury@starkindustries.com',
-            domain: 'starkindustries.com'
+            email: 'nickfury@starkindustriesmarvel.com',
+            domain: 'starkindustriesmarvel.com'
           }
         })
 
@@ -371,7 +371,7 @@ describe('Company actions', () => {
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Pepper', lastName: 'Potts', email: 'peppot@starkindustries.com', password: 'iamironwoman' } })
+        .send({ user: { firstName: 'Pepper', lastName: 'Potts', email: 'peppot@starkindustriesmarvel.com', password: 'iamironwoman' } })
 
       await chai
         .request(app)
@@ -519,7 +519,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'happyhogan@starkindustries.com',
+            email: 'happyhogan@starkindustriesmarvel.com',
             actionType: 'add'
           }
         })
@@ -527,7 +527,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustries.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -579,7 +579,7 @@ describe('Company actions', () => {
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Queen', lastName: 'Ramonda', email: 'qr@starkindustries.com', password: 'iamironwoman' } })
+        .send({ user: { firstName: 'Queen', lastName: 'Ramonda', email: 'qr@starkindustriesmarvel.com', password: 'iamironwoman' } })
 
       await chai
         .request(app)
@@ -646,7 +646,7 @@ describe('Company actions', () => {
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Okoye', lastName: 'Dora', email: 'okoyedora@starkindustries.com', password: 'iamironwoman' } })
+        .send({ user: { firstName: 'Okoye', lastName: 'Dora', email: 'okoyedora@starkindustriesmarvel.com', password: 'iamironwoman' } })
 
       await chai
         .request(app)
@@ -713,7 +713,7 @@ describe('Company actions', () => {
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Natasha', lastName: 'Romanoff', email: 'natrom@starkindustries.com', password: 'theredroom' } })
+        .send({ user: { firstName: 'Natasha', lastName: 'Romanoff', email: 'natrom@starkindustriesmarvel.com', password: 'theredroom' } })
 
       await chai
         .request(app)
@@ -1065,7 +1065,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'nickfury@starkindustries.com',
+            email: 'nickfury@starkindustriesmarvel.com',
             actionType: 'add'
           }
         })
@@ -1220,7 +1220,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'happyhogan@starkindustries.com',
+            email: 'happyhogan@starkindustriesmarvel.com',
             actionType: 'add'
           }
         })
@@ -1228,7 +1228,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustries.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -1268,7 +1268,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'happyhogan@starkindustries.com',
+            email: 'happyhogan@starkindustriesmarvel.com',
             actionType: 'remove'
           }
         })
@@ -1276,7 +1276,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustries.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -1457,7 +1457,7 @@ describe('Company actions', () => {
     })
 
     it('Should return 200 Success when a company administrator successfully retrieves all campaigns.', async () => {
-      await deleteTestUser('nickfury@starkindustries.com')
+      await deleteTestUser('nickfury@starkindustriesmarvel.com')
       await createCompanyAdministrator()
       const resCompany = await createVerifiedCompany(userId)
 
@@ -1469,7 +1469,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'nickfury@starkindustries.com',
+            email: 'nickfury@starkindustriesmarvel.com',
             actionType: 'add'
           }
         })
@@ -1477,7 +1477,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -1510,7 +1510,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'nickfury@starkindustries.com',
+            email: 'nickfury@starkindustriesmarvel.com',
             actionType: 'remove'
           }
         })
@@ -1518,7 +1518,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -1582,7 +1582,7 @@ describe('Company actions', () => {
     })
 
     it('Should return 200 Success when a company admin who is an employee successfully retrieves all users of a company.', async () => {
-      await deleteTestUser('nickfury@starkindustries.com')
+      await deleteTestUser('nickfury@starkindustriesmarvel.com')
       await createCompanyAdministrator()
       const resCompany = await createVerifiedCompany(userId)
 
@@ -1594,7 +1594,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'nickfury@starkindustries.com',
+            email: 'nickfury@starkindustriesmarvel.com',
             actionType: 'add'
           }
         })
@@ -1602,7 +1602,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -1644,12 +1644,12 @@ describe('Company actions', () => {
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Red', lastName: 'Hulk', email: 'redhulk@starkindustries.com', phone: '254720123456', password: 'tonysuxx' } })
+        .send({ user: { firstName: 'Red', lastName: 'Hulk', email: 'redhulk@starkindustriesmarvel.com', phone: '254720123456', password: 'tonysuxx' } })
 
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
 
       token = resUser.body.token
 
@@ -1659,7 +1659,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'redhulk@starkindustries.com',
+            email: 'redhulk@starkindustriesmarvel.com',
             role: userRoles.CAMPAIGNMANAGER
           }
         })
@@ -1678,7 +1678,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
 
       token = resUser.body.token
 
@@ -1688,7 +1688,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'shehulk1@starkindustries.com'
+            email: 'shehulk1@starkindustriesmarvel.com'
           }
         })
 
@@ -1705,7 +1705,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
 
       token = resUser.body.token
 
@@ -1732,7 +1732,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
 
       token = resUser.body.token
 
@@ -1755,7 +1755,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
 
       token = resUser.body.token
 
@@ -1788,13 +1788,13 @@ describe('Company actions', () => {
     })
 
     it('Should return 200 Success when a company admin who is an employee successfully adds a user to a company.', async () => {
-      await deleteTestUser('nickfury@starkindustries.com')
+      await deleteTestUser('nickfury@starkindustriesmarvel.com')
       await createCompanyAdministrator()
 
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
 
       token = resUser.body.token
 
@@ -1808,7 +1808,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'nickfury@starkindustries.com',
+            email: 'nickfury@starkindustriesmarvel.com',
             actionType: 'add'
           }
         })
@@ -1816,7 +1816,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -1839,7 +1839,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
 
       token = resUser.body.token
 
@@ -1868,7 +1868,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
 
       token = resUser.body.token
 
@@ -1882,7 +1882,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'nickfury@starkindustries.com',
+            email: 'nickfury@starkindustriesmarvel.com',
             actionType: 'add'
           }
         })
@@ -1890,7 +1890,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -1915,7 +1915,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
 
       token = resUser.body.token
 
@@ -1937,7 +1937,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
 
       token = resUser.body.token
       const resCompany = await chai
@@ -1966,7 +1966,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustries.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
 
       token = resUser.body.token
       const resCompany = await chai
@@ -1987,7 +1987,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'nickfury@starkindustries.com',
+            email: 'nickfury@starkindustriesmarvel.com',
             actionType: 'remove'
           }
         })
@@ -1995,7 +1995,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustries.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
