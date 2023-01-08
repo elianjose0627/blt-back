@@ -66,7 +66,7 @@ describe('Company actions', () => {
   })
 
   after(async () => {
-    await deleteTestUser('drstrange@gmail.com')
+    await deleteTestUser('drstrange@starkindustriesmarvel.com')
     await deleteTestUser('raywiretest@gmail.com')
   })
 
@@ -111,6 +111,33 @@ describe('Company actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'company')
       expect(res.body.company).to.be.an('object')
       expect(res.body.company).to.include.keys('id', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 403 Forbidden when an unverified user tries to create a company.', async () => {
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'The', lastName: 'Hulk', email: 'thehulk@starkindustriesmarvel.com', phone: '254720123456', password: 'smashsmash' } })
+
+      const resUnverifiedUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'thehulk@starkindustriesmarvel.com', password: 'smashsmash' } })
+
+      const res = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${String(resUnverifiedUser.body.token)}`)
+        .send({
+          company: {
+            name: 'Test Company Hulk Out',
+            email: 'test@companyhulkout.com'
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Kindly verify your email address')
     })
 
     it('Should return 403 Forbidden when a user tries to create a company with an admin email account that is a company admin.', async () => {

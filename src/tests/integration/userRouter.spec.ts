@@ -50,8 +50,8 @@ describe('A user', () => {
   after(async () => {
     await deleteTestUser('ironman@starkindustriesmarvel.com')
     await deleteTestUser('ivers@kree.kr')
-    await deleteTestUser('thenaeternal@celestial.com')
-    await deleteTestUser('sersieternal@celestial.com')
+    await deleteTestUser('thenaeternal@celestialmarvel.com')
+    await deleteTestUser('sersieternal@celestialmarvel.com')
     sgMail.setApiKey(String(process.env.SENDGRID_API_KEY))
   })
 
@@ -527,7 +527,7 @@ describe('A user', () => {
     const resLogin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'thenaeternal@celestial.com', password: 'kingo123' } })
+      .send({ user: { email: 'thenaeternal@celestialmarvel.com', password: 'kingo123' } })
 
     const token = String(resLogin.body.token)
     const userId = String(resLogin.body.user.id)
@@ -536,7 +536,7 @@ describe('A user', () => {
       .request(app)
       .patch(`/api/users/${userId}/verify`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ user: { otp: 123456, email: 'thenaeternal@celestial.com' } })
+      .send({ user: { otp: 123456, email: 'thenaeternal@celestialmarvel.com' } })
 
     expect(res).to.have.status(200)
     expect(res.body).to.include.keys('statusCode', 'success', 'user')
@@ -546,7 +546,7 @@ describe('A user', () => {
     const resLogin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'thenaeternal@celestial.com', password: 'kingo123' } })
+      .send({ user: { email: 'thenaeternal@celestialmarvel.com', password: 'kingo123' } })
 
     const token = String(resLogin.body.token)
     const userId = String(resLogin.body.user.id)
@@ -565,7 +565,7 @@ describe('A user', () => {
     const resLogin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'sersieternal@celestial.com', password: 'icarussux' } })
+      .send({ user: { email: 'sersieternal@celestialmarvel.com', password: 'icarussux' } })
 
     const token = String(resLogin.body.token)
     const userId = String(resLogin.body.user.id)
@@ -574,7 +574,7 @@ describe('A user', () => {
       .request(app)
       .patch(`/api/users/${userId}/verify`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ user: { otp: 123456, email: 'sersieternal@celestial.com' } })
+      .send({ user: { otp: 123456, email: 'sersieternal@celestialmarvel.com' } })
 
     expect(res).to.have.status(403)
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')

@@ -25,7 +25,7 @@ describe('Auth Actions', () => {
     await deleteTestUser('lukecage@alias.com')
     await deleteTestUser('starlord@guardiansofthegalaxy.com')
     await deleteTestUser('raywiretest@gmail.com')
-    await deleteTestUser('thenaeternal@celestial.com')
+    await deleteTestUser('thenaeternal@celestialmarvel.com')
     sgMail.setApiKey(String(process.env.SENDGRID_API_KEY))
   })
 
@@ -103,7 +103,7 @@ describe('Auth Actions', () => {
     const res = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'monicarambeau@sword.com', password: 'photonrox' } })
+      .send({ user: { email: 'monicarambeau@swordmarvel.com', password: 'photonrox' } })
 
     expect(res).to.have.status(401)
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')
@@ -114,7 +114,7 @@ describe('Auth Actions', () => {
     const res = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'mariarambeau@sword.com', password: 'photonrox' } })
+      .send({ user: { email: 'mariarambeau@swordmarvel.com', password: 'photonrox' } })
 
     expect(res).to.have.status(401)
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')
