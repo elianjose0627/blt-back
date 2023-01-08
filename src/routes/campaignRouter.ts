@@ -35,7 +35,7 @@ const CampaignRoutes = (): any => {
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(RecipientController.getAll))
   campaignRouter.route('/campaigns/:id/bundles')
-    .post(asyncHandler(CampaignController.checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager), celebrate({
+    .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateBundle
     }, { abortEarly: false }), asyncHandler(BundleController.insert))
     .get(asyncHandler(CampaignController.checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager), celebrate({

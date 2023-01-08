@@ -33,7 +33,7 @@ describe('Address actions', () => {
     const resTest = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'drstrange@gmail.com', password: 'thesanctum' } })
+      .send({ user: { email: 'drstrange@starkindustriesmarvel.com', password: 'thesanctum' } })
 
     const resCompanyAdministrator = await chai
       .request(app)
@@ -47,7 +47,7 @@ describe('Address actions', () => {
   })
 
   after(async () => {
-    await deleteTestUser('drstrange@gmail.com')
+    await deleteTestUser('drstrange@starkindustriesmarvel.com')
     await deleteTestUser('nickfury@starkindustriesmarvel.com')
   })
 
@@ -231,7 +231,7 @@ describe('Address actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           user: {
-            email: 'drstrange@gmail.com',
+            email: 'drstrange@starkindustriesmarvel.com',
             actionType: 'add'
           }
         })
@@ -239,7 +239,7 @@ describe('Address actions', () => {
       const resTest = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'drstrange@gmail.com', password: 'thesanctum' } })
+        .send({ user: { email: 'drstrange@starkindustriesmarvel.com', password: 'thesanctum' } })
 
       tokenUser = resTest.body.token
 
@@ -293,7 +293,7 @@ describe('Address actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           user: {
-            email: 'drstrange@gmail.com',
+            email: 'drstrange@starkindustriesmarvel.com',
             actionType: 'remove'
           }
         })
@@ -301,7 +301,7 @@ describe('Address actions', () => {
       const resTest = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'drstrange@gmail.com', password: 'thesanctum' } })
+        .send({ user: { email: 'drstrange@starkindustriesmarvel.com', password: 'thesanctum' } })
 
       tokenUser = resTest.body.token
 

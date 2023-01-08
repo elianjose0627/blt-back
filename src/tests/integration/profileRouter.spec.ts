@@ -37,7 +37,7 @@ describe('Profile actions', () => {
   })
 
   after(async () => {
-    await deleteTestUser('drstrange@gmail.com')
+    await deleteTestUser('drstrange@starkindustriesmarvel.com')
   })
 
   describe('Get my Profile', () => {

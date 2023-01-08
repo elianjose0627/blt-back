@@ -87,7 +87,7 @@ class UserService extends BaseService {
       </p>
       `
 
-    const message = `<p>Dear ${String(firstName)},</p>
+    const message = `<p>Hello ${String(firstName)},</p>
       <p>${customMessage}<br>
       To activate your account, please verify the ownership of the associated email address.</p>
       ${steps}
@@ -187,7 +187,7 @@ class UserService extends BaseService {
         const updatedRecord = await record.update({ password, logoutTime })
 
         const bccStatus = false
-        const message = `Dear ${String(updatedRecord.firstName)}, your password for ${appName} App has been updated. \nIf you didn't ask to change your password, contact us immediately through ${adminEmail}. \n\nThanks,\n\n${appName} Application team`
+        const message = `Hello ${String(updatedRecord.firstName)}, your password for ${appName} App has been updated. \nIf you didn't ask to change your password, contact us immediately through ${adminEmail}. \n\nThanks,\n\n${appName} Application team`
         try {
           await sendNotifierEmail(updatedRecord.email, 'Password Change', message, bccStatus)
         } catch (error) {}
@@ -227,7 +227,7 @@ class UserService extends BaseService {
       </p>
       `
 
-      const message = `<p>Dear ${String(firstName)},</p>
+      const message = `<p>Hello ${String(firstName)},</p>
       ${steps}
       <p>Best Regards,<br>
       ${appName} team</p>
@@ -275,7 +275,7 @@ class UserService extends BaseService {
     </p>
     `
 
-    const message = `<p>Dear ${String(firstName)},</p>
+    const message = `<p>Hello ${String(firstName)},</p>
     <p>You have requested a verification OTP to activate your account at ${appName}.<br>
     Your OTP is: <span style="font-size:1.5em;"><strong>${otp}</strong></span>
     </p>
