@@ -35,7 +35,7 @@ describe('Campaign actions', () => {
   })
 
   after(async () => {
-    await deleteTestUser('drstrange@gmail.com')
+    await deleteTestUser('drstrange@starkindustriesmarvel.com')
   })
 
   describe('Get all campaigns', () => {
@@ -233,6 +233,210 @@ describe('Campaign actions', () => {
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('Only the owner, admin, company administrator or campaign manager can perform this action')
+    })
+  })
+
+  describe('Campaign Bundles Actions', () => {
+    it('Should return 201 Created when an admin successfully adds a bundle to a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Marvel Three',
+            email: 'test3@companymarvelthree.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${String(campaignId)}/bundles`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          bundle: {
+            jfsku: 'VZ9N0173Y92',
+            merchantSku: '39262696145050',
+            name: 'Staffbase Bundle 1'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'bundle')
+      expect(res.body.bundle).to.be.an('object')
+    })
+
+    it('Should return 403 Forbidden when a non-admin user tries to add a bundle to a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Marvel Fifty Three',
+            email: 'test3@companymarvelfiftythree.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${String(campaignId)}/bundles`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          bundle: {
+            jfsku: 'VZ9N0173Y92',
+            merchantSku: '39262696145050',
+            name: 'Staffbase Bundle 1'
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only an admin can perform this action')
+    })
+
+    it('Should return 200 OK when an admin successfully adds the same bundle to a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Marvel Four',
+            email: 'test4@companymarvelfour.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${String(campaignId)}/bundles`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          bundle: {
+            jfsku: 'VZ9N0173Y92',
+            merchantSku: '39262696145050',
+            name: 'Staffbase Bundle 1'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${String(campaignId)}/bundles`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          bundle: {
+            jfsku: 'VZ9N0173Y92',
+            merchantSku: '39262696145050',
+            name: 'Staffbase Bundle 1'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'bundle')
+      expect(res.body.bundle).to.be.an('object')
+    })
+
+    it('Should return 200 Success when an owner successfully retrieves all bundles of a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Marvel',
+            email: 'test2@companymarvel.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/bundles`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          bundle: {
+            jfsku: 'VZ9N0173Y92',
+            merchantSku: '39262696145050',
+            name: 'Staffbase Bundle 1'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${campaignId}/bundles`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'bundles')
+      expect(res.body.bundles).to.be.an('array')
+      expect(res.body.bundles).to.have.lengthOf.above(0)
     })
   })
 })
