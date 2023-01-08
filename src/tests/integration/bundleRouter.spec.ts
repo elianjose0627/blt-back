@@ -45,7 +45,7 @@ describe('Bundle actions', () => {
   })
 
   describe('Bundles Actions', () => {
-    it('Should return 200 Success when an owner successfully retrieves a bundle by id.', async () => {
+    it('Should return 200 Success when a user successfully retrieves a bundle by id.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -77,7 +77,7 @@ describe('Bundle actions', () => {
       const resBundle = await chai
         .request(app)
         .post(`/api/campaigns/${campaignId}/bundles`)
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           bundle: {
             jfsku: 'VZ9N0173Y92',
@@ -128,7 +128,7 @@ describe('Bundle actions', () => {
       const resBundle = await chai
         .request(app)
         .post(`/api/campaigns/${campaignId}/bundles`)
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           bundle: {
             jfsku: 'VZ9N0173Y92',

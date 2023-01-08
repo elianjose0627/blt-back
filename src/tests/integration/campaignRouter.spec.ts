@@ -269,7 +269,7 @@ describe('Campaign actions', () => {
       const res = await chai
         .request(app)
         .post(`/api/campaigns/${String(campaignId)}/bundles`)
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           bundle: {
             jfsku: 'VZ9N0173Y92',
@@ -281,6 +281,52 @@ describe('Campaign actions', () => {
       expect(res).to.have.status(201)
       expect(res.body).to.include.keys('statusCode', 'success', 'bundle')
       expect(res.body.bundle).to.be.an('object')
+    })
+
+    it('Should return 403 Forbidden when a non-admin user tries to add a bundle to a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Marvel Fifty Three',
+            email: 'test3@companymarvelfiftythree.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${String(campaignId)}/bundles`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          bundle: {
+            jfsku: 'VZ9N0173Y92',
+            merchantSku: '39262696145050',
+            name: 'Staffbase Bundle 1'
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only an admin can perform this action')
     })
 
     it('Should return 200 OK when an admin successfully adds the same bundle to a campaign.', async () => {
@@ -315,7 +361,7 @@ describe('Campaign actions', () => {
       await chai
         .request(app)
         .post(`/api/campaigns/${String(campaignId)}/bundles`)
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           bundle: {
             jfsku: 'VZ9N0173Y92',
@@ -327,7 +373,7 @@ describe('Campaign actions', () => {
       const res = await chai
         .request(app)
         .post(`/api/campaigns/${String(campaignId)}/bundles`)
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           bundle: {
             jfsku: 'VZ9N0173Y92',
@@ -373,7 +419,7 @@ describe('Campaign actions', () => {
       await chai
         .request(app)
         .post(`/api/campaigns/${campaignId}/bundles`)
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           bundle: {
             jfsku: 'VZ9N0173Y92',
