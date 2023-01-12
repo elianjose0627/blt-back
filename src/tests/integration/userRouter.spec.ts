@@ -2,6 +2,7 @@ import sgMail from '@sendgrid/mail'
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import { faker } from '@faker-js/faker'
+import { v1 as uuidv1 } from 'uuid'
 import app from '../../app'
 import {
   deleteTestUser,
@@ -66,6 +67,29 @@ describe('A user', () => {
       expect(res).to.have.status(201)
       expect(res.body).to.include.keys('statusCode', 'success', 'user')
       expect(res.body.user).to.be.an('object')
+    })
+
+    it('Should return 404 Not Found, on creating a user with a company that does not exist.', async () => {
+      const res = await chai
+        .request(app)
+        .post('/api/users')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user:
+          {
+            firstName: 'Warriors',
+            lastName: 'Three',
+            email: 'warthree@asgard.com',
+            phone: '254720123456',
+            password: 'thorisgreat',
+            role: userRoles.ADMIN,
+            companyId: uuidv1()
+          }
+        })
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Company not found')
     })
   })
 
