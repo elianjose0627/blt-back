@@ -13,7 +13,7 @@ class RecipientController extends BaseController {
 
     const allowedRoles = [userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER]
 
-    const isOwner = currentUser.id === owner?.id
+    const isOwner = currentUser.id === owner.id
     const isEmployee = currentUser?.companyId === companyId
 
     if (isOwner || (isEmployee && allowedRoles.includes(currentUser?.role))) {

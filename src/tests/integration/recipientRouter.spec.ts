@@ -310,7 +310,7 @@ describe('Recipient actions', () => {
       expect(res.body.errors.message).to.equal('Only the owner, company administrator or campaign manager can perform this action')
     })
 
-    it('Should return 403 Forbidden when a campaign who is not an employee tries to get a recipient.', async () => {
+    it('Should return 403 Forbidden when a user who is not an employee tries to get a recipient.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
