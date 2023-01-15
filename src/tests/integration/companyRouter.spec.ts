@@ -1606,6 +1606,7 @@ describe('Company actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'users')
       expect(res.body.users).to.be.an('array')
+      expect(res.body.users).to.not.include.keys('isGhost')
     })
 
     it('Should return 200 Success when a company admin who is an employee successfully retrieves all users of a company.', async () => {

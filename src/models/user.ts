@@ -79,6 +79,7 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
         role: this.role,
         isActive: this.isActive,
         isVerified: this.isVerified,
+        isGhost: this.isGhost,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         logoutTime: this.logoutTime,
