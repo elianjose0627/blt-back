@@ -66,7 +66,8 @@ class CompanyService extends BaseService {
       limit,
       offset,
       where: {
-        companyId
+        companyId,
+        isGhost: false
       },
       order: [['createdAt', 'DESC']],
       attributes: { exclude: [] },
@@ -81,7 +82,11 @@ class CompanyService extends BaseService {
 
     return {
       count: records.count,
-      rows: records.rows.map((record: any) => record.toJSONFor())
+      rows: records.rows.map((record: any) => {
+        const item = record.toJSONFor()
+        delete item.isGhost
+        return item
+      })
     }
   }
 }

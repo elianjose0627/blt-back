@@ -36,6 +36,7 @@ export interface IUser {
   role: Role
   isActive: boolean
   isVerified: boolean
+  isGhost?: boolean
   createdAt: Date
   updatedAt: Date
   notifications: INotifications
