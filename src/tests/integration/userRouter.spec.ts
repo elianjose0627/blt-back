@@ -62,7 +62,74 @@ describe('A user', () => {
         .request(app)
         .post('/api/users')
         .set('Authorization', `Bearer ${tokenAdmin}`)
-        .send({ user: { firstName: 'Warriors', lastName: 'Three', email: 'warthree@asgard.com', phone: '254720123456', password: 'thorisgreat', role: userRoles.ADMIN } })
+        .send({
+          user: {
+            firstName: 'Warriors',
+            lastName: 'Three',
+            email: 'warthree@asgard.com',
+            phone: '254720123456',
+            password: 'thorisgreat',
+            role: userRoles.ADMIN
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+    })
+
+    it('Should return 201 Create, on successfully creating a ghost user.', async () => {
+      const res = await chai
+        .request(app)
+        .post('/api/users')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            firstName: 'Kang',
+            lastName: 'Conqueror',
+            email: 'kq@mkangdynastyarvel.com',
+            phone: '254720123456',
+            password: 'timeandspace',
+            role: userRoles.COMPANYADMINISTRATOR,
+            isGhost: true
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+    })
+
+    it('Should return 201 Create, on successfully creating a ghost user who belongs to a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Test Dynasty Company',
+            email: 'test@company16dynastymarvel.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const res = await chai
+        .request(app)
+        .post('/api/users')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            firstName: 'Kang',
+            lastName: 'Conqueror',
+            email: 'kqvariant1@mkangdynastyarvel.com',
+            phone: '254720123456',
+            password: 'timeandspace',
+            role: userRoles.COMPANYADMINISTRATOR,
+            companyId,
+            isGhost: true
+          }
+        })
 
       expect(res).to.have.status(201)
       expect(res.body).to.include.keys('statusCode', 'success', 'user')

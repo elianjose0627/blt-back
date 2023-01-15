@@ -18,6 +18,7 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
     role: Role
     isActive: boolean
     isVerified: boolean
+    isGhost: boolean
     logoutTime: Date
     notifications: INotifications
     loginTime: Nullable<LoginTime>
@@ -37,6 +38,7 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
     private readonly role: Role
     private readonly isActive: boolean
     private readonly isVerified: boolean
+    private readonly isGhost: boolean
     private readonly logoutTime: Nullable<Date>
     private readonly notifications: INotifications
     private readonly loginTime: LoginTime
@@ -145,6 +147,10 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
       defaultValue: true
     },
     isVerified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    isGhost: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
