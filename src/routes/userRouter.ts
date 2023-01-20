@@ -64,6 +64,10 @@ const userRoutes = (): any => {
     .post(asyncHandler(UserController.checkOwnerOrAdmin), celebrate({
       [Segments.BODY]: validator.validateCreatedAddress
     }, { abortEarly: false }), asyncHandler(UserController.createAddress))
+  userRouter.route('/users/:id/company')
+    .patch(asyncHandler(checkAdmin), celebrate({
+      [Segments.BODY]: validator.validateUserCompany
+    }, { abortEarly: false }), asyncHandler(UserController.updateUserCompany))
   return userRouter
 }
 

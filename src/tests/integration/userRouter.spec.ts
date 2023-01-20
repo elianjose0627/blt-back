@@ -820,4 +820,58 @@ describe('A user', () => {
       expect(res.body.success).to.equal(false)
     })
   })
+
+  describe('Update user company', () => {
+    it('Should return 404 when an admin tries to update the company of a user with a company that does not exist', async () => {
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${String(userId)}/company`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            companyId: uuidv1()
+          }
+        })
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Company not found')
+      expect(res.body.success).to.equal(false)
+    })
+
+    it('Should return 200 OK when an admin updates the company of a user', async () => {
+      const resUser = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser@biglittlethings.de', phone: '254720123456', password: 'testuser' } })
+
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Test Dynasty Company',
+            email: 'test@company17dynastymarvel.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${String(resUser.body.user.id)}/company`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            companyId
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.success).to.equal(true)
+    })
+  })
 })
