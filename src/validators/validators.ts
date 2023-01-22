@@ -99,6 +99,12 @@ const validateUserCompanyRole = Joi.object({
   }).required()
 })
 
+const validateUserCompany = Joi.object({
+  user: Joi.object({
+    companyId: Joi.string().uuid().required()
+  }).required()
+})
+
 const validatePassword = Joi.object({
   user: Joi.object({
     currentPassword: Joi.string().required(),
@@ -321,5 +327,6 @@ export default {
   validateEmailVerification,
   validateUserActivation,
   validateCreatedUserByAdmin,
-  validateBundle
+  validateBundle,
+  validateUserCompany
 }

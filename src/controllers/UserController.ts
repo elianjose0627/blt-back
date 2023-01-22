@@ -285,7 +285,7 @@ class UserController extends BaseController {
     })
   }
 
-  async updateCompanyId (req: CustomRequest, res: CustomResponse): Promise<any> {
+  async addOrRemoveUserFromCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
     const {
       user,
       body: { user: { email, actionType, role } },
@@ -358,7 +358,7 @@ class UserController extends BaseController {
         statusCode: statusCodes.NOT_FOUND,
         success: false,
         errors: {
-          message: 'User not found'
+          message: `The user was not found, an invitation email has been sent to ${String(email)}`
         }
       })
     }
@@ -404,6 +404,33 @@ class UserController extends BaseController {
 
       await sendNotifierEmail(email, subject, message, false, message)
     }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      user: response
+    })
+  }
+
+  async updateUserCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const {
+      record: user,
+      body: { user: { companyId } }
+    } = req
+
+    const company = await companyService.findById(companyId)
+
+    if (company === null) {
+      return res.status(statusCodes.NOT_FOUND).send({
+        statusCode: statusCodes.NOT_FOUND,
+        success: false,
+        errors: {
+          message: 'Company not found'
+        }
+      })
+    }
+
+    const response = await userService.update(user, { companyId, logoutTime: dayjs.utc() })
 
     return res.status(statusCodes.OK).send({
       statusCode: statusCodes.OK,

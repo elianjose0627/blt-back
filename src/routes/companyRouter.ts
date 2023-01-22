@@ -64,7 +64,7 @@ const companyRoutes = (): any => {
   companyRouter.route('/companies/:id/users')
     .patch(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin), celebrate({
       [Segments.BODY]: validator.validateJoinCompany
-    }, { abortEarly: false }), asyncHandler(UserController.updateCompanyId))
+    }, { abortEarly: false }), asyncHandler(UserController.addOrRemoveUserFromCompany))
     .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CompanyController.getAllUsers))
