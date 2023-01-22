@@ -1700,13 +1700,15 @@ describe('Company actions', () => {
 
     it('Should return 404 Not Found when an owner tries to add a non-existent user to a company.', async () => {
       const resCompany = await createVerifiedCompany(userId)
+      const email = 'shehulk@starkindustriesmarvel.com'
+      const nonExistentEmail = 'shehulk1@starkindustriesmarvel.com'
 
       const companyId = resCompany.id
 
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+        .send({ user: { email, password: 'mackone' } })
 
       token = resUser.body.token
 
@@ -1716,13 +1718,13 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'shehulk1@starkindustriesmarvel.com'
+            email: nonExistentEmail
           }
         })
 
       expect(res).to.have.status(404)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('User not found')
+      expect(res.body.errors.message).to.equal(`The user was not found, an invitation email has been sent to ${String(nonExistentEmail)}`)
     })
 
     it('Should return 403 Forbidden when an owner tries to add a user with a different domain to a company.', async () => {

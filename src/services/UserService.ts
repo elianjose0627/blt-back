@@ -57,46 +57,48 @@ class UserService extends BaseService {
   }
 
   async insert (data: any): Promise<any> {
-    const { user, currentUser } = data
+    const { user, currentUser, isTemporary } = data
     const record = await db[this.model].create({ ...user, id: uuidv1() })
 
     const { email, firstName, role } = record
 
-    let customMessage = `Thank you very much for registering an account at ${appName}.`
-    if (currentUser?.role === userRoles.ADMIN) {
-      customMessage = `<p>Your account has been created at ${appUrl} with a role of ${String(role)}.<p>
-      <p>Your temporary password is: ${String(user.password)}.</p>`
+    if (isTemporary !== true) {
+      let customMessage = `Thank you very much for registering an account at ${appName}.`
+      if (currentUser?.role === userRoles.ADMIN) {
+        customMessage = `<p>Your account has been created at ${appUrl} with a role of ${String(role)}.<p>
+        <p>Your temporary password is: ${String(user.password)}.</p>`
+      }
+      const subject = `Verify your email for ${appName}`
+
+      const steps = `
+        <p>Steps to verify:</p>
+        <ol>
+          <li>Login to your account at ${appUrl}.</li>
+          <li>Click on the profile picture at the top right corner of the screen and select "Profile".</li>
+          <li>Under the Pending Actions Section, click "Request Verification OTP" to receive your code via email.</li>
+        </ol>
+        `
+
+      const footer = `
+        <p>For questions regarding your order, please reach out to:
+        <br>
+          Support: ${mailer}
+        <br>
+          Sales: ${salesMailer}
+        </p>
+        `
+
+      const message = `<p>Hello ${String(firstName)},</p>
+        <p>${customMessage}<br>
+        To activate your account, please verify the ownership of the associated email address.</p>
+        ${steps}
+        <p>Best Regards,<br>
+        ${appName} team</p>
+        <p>${footer}</p>
+        `
+
+      await sendNotifierEmail(email, subject, message, false, message)
     }
-    const subject = `Verify your email for ${appName}`
-
-    const steps = `
-      <p>Steps to verify:</p>
-      <ol>
-        <li>Login to your account at ${appUrl}.</li>
-        <li>Click on the profile picture at the top right corner of the screen and select "Profile".</li>
-        <li>Under the Pending Actions Section, click "Request Verification OTP" to receive your code via email.</li>
-      </ol>
-      `
-
-    const footer = `
-      <p>For questions regarding your order, please reach out to:
-      <br>
-        Support: ${mailer}
-      <br>
-        Sales: ${salesMailer}
-      </p>
-      `
-
-    const message = `<p>Hello ${String(firstName)},</p>
-      <p>${customMessage}<br>
-      To activate your account, please verify the ownership of the associated email address.</p>
-      ${steps}
-      <p>Best Regards,<br>
-      ${appName} team</p>
-      <p>${footer}</p>
-      `
-
-    await sendNotifierEmail(email, subject, message, false, message)
 
     return record.toJSONFor()
   }
