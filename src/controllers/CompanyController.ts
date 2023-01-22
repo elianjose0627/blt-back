@@ -202,7 +202,7 @@ class CompanyController extends BaseController {
         isActive: true,
         role: userRoles.COMPANYADMINISTRATOR
       }
-      const createdTemporaryUser = await userService.insert({ user: temporaryUser })
+      const createdTemporaryUser = await userService.insert({ user: temporaryUser, isTemporary: true })
 
       const subject = `An account has been created on your behalf at ${appUrl}`
 
@@ -211,6 +211,8 @@ class CompanyController extends BaseController {
       <ol>
         <li>Please login to your personal user account at ${appUrl} and change your password.</li>
         <li>Please verify your user account.</li>
+        <li>Click on the profile picture at the top right corner of the screen and select "Profile".</li>
+        <li>Under the Pending Actions Section, click "Request Verification OTP" to receive your code via email.</li>
       </ol>
       `
 
@@ -225,9 +227,9 @@ class CompanyController extends BaseController {
 
       const message = `<p>Hello,</p>
       <p>Your account has been created at ${appUrl} in order to grant you access to the ${appName} corporate merchandise platform on behalf of ${String(company.name)}.<p>
-      <p>Your temporary password is: ${temporaryPassword}.</p>
+      <p>Your e-mail is: ${String(createdTemporaryUser.email)}. <br/>Your temporary password is: ${temporaryPassword}.</p>
       ${steps}
-      <p>You have been granted elevated rights as company administrator of ${String(company.name)}.</p>
+      <p>You have been granted elevated rights as a company administrator of ${String(company.name)}.</p>
       <p>Best Regards,<br>
       ${appName} team</p>
       <p>${footer}</p>
