@@ -7,6 +7,8 @@ class BundleService extends BaseService {
     const { bundle, campaign } = data
     let response: any
 
+    const bundleData = { jfsku: bundle.jfsku, merchantSku: bundle.merchantSku, name: bundle.name }
+
     response = await db[this.model].findOne({
       include: generateInclude(this.model),
       where: {
@@ -18,11 +20,17 @@ class BundleService extends BaseService {
 
     if (response !== null) {
       await response.restore()
-      const updatedResponse = await response.update({ ...bundle })
+      const updatedResponse = await response.update({ ...bundleData })
       return { response: updatedResponse.toJSONFor(), status: 200 }
     }
 
-    response = await db[this.model].create({ ...bundle, id: uuidv1(), campaignId: campaign.id })
+    response = await db[this.model].create({ ...bundleData, id: uuidv1(), campaignId: campaign.id })
+
+    if (bundle?.items?.length > 0) {
+      const items = bundle.items.map((item: any) => ({ id: uuidv1(), bundleId: response.id, ...item }))
+
+      await db.BundleItem.bulkCreate(items)
+    }
 
     return { response: response.toJSONFor(), status: 201 }
   }
@@ -32,10 +40,18 @@ class BundleService extends BaseService {
       limit,
       offset,
       order: [['createdAt', 'DESC']],
+      include: [
+        {
+          model: db.BundleItem,
+          attributes: ['id', 'name', 'jfsku', 'merchantSku', 'updatedAt', 'createdAt'],
+          as: 'items'
+        }
+      ],
       attributes: { exclude: [] },
       where: {
         campaignId
-      }
+      },
+      distinct: true
     })
 
     return {

@@ -21,6 +21,7 @@ interface Database {
   Salutation?: any
   Token?: any
   Bundle?: any
+  BundleItem?: any
 }
 
 const db: Database = {}

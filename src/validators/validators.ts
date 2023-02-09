@@ -293,9 +293,16 @@ const validateSalutation = Joi.object({
 
 const validateBundle = Joi.object({
   bundle: Joi.object({
-    jfsku: Joi.string().required().max(16),
-    merchantSku: Joi.string().required().max(32),
-    name: Joi.string().required().max(128)
+    jfsku: Joi.string().allow('').allow(null).max(16),
+    merchantSku: Joi.string().allow('').allow(null).max(32),
+    name: Joi.string().required().max(128),
+    items: Joi.array().items(
+      Joi.object({
+        name: Joi.string().required().max(128),
+        jfsku: Joi.string().required().max(16),
+        merchantSku: Joi.string().required().max(32)
+      })
+    )
   }).required()
 })
 

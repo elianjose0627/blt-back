@@ -1,52 +1,43 @@
 import { Model } from 'sequelize'
-import { IBundle, IBundleItem, ICampaign } from '../types'
+import { IBundleItem } from '../types'
 
-const BundleModel = (sequelize: any, DataTypes: any): any => {
-  interface BundleAttributes {
+const BundleItemModel = (sequelize: any, DataTypes: any): any => {
+  interface BundleItemAttributes {
     id: string
     jfsku: string
     merchantSku: string
     name: string
   }
 
-  class Bundle extends Model<BundleAttributes> {
+  class BundleItem extends Model<BundleItemAttributes> {
     private readonly id: string
     private readonly jfsku: string
     private readonly merchantSku: string
     private readonly name: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
-    private readonly campaign: ICampaign
-    private readonly items: IBundleItem
 
     static associate (models: any): any {
-      Bundle.belongsTo(models.Campaign, {
-        foreignKey: 'campaignId',
-        as: 'campaign',
-        onDelete: 'CASCADE'
-      })
-      Bundle.hasMany(models.BundleItem, {
+      BundleItem.belongsTo(models.Bundle, {
         foreignKey: 'bundleId',
-        as: 'items',
+        as: 'bundle',
         onDelete: 'CASCADE'
       })
     }
 
-    toJSONFor (): IBundle {
+    toJSONFor (): IBundleItem {
       return {
         id: this.id,
         jfsku: this.jfsku,
         merchantSku: this.merchantSku,
         name: this.name,
         createdAt: this.createdAt,
-        updatedAt: this.updatedAt,
-        campaign: this.campaign,
-        items: this.items
+        updatedAt: this.updatedAt
       }
     }
   };
 
-  Bundle.init({
+  BundleItem.init({
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
@@ -54,11 +45,11 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
     },
     jfsku: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: false
     },
     merchantSku: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: false
     },
     name: {
       type: DataTypes.STRING,
@@ -67,10 +58,10 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
   }, {
     sequelize,
     paranoid: true,
-    modelName: 'Bundle'
+    modelName: 'BundleItem'
   })
 
-  return Bundle
+  return BundleItem
 }
 
-module.exports = BundleModel
+module.exports = BundleItemModel

@@ -283,6 +283,64 @@ describe('Campaign actions', () => {
       expect(res.body.bundle).to.be.an('object')
     })
 
+    it('Should return 201 Created when an admin successfully adds a bundle with items to a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Marvel Three Items',
+            email: 'test3@companymarvelthreeitems.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${String(campaignId)}/bundles`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          bundle: {
+            jfsku: 'VZ9N0173Y92',
+            merchantSku: '39262696145050',
+            name: 'Staffbase Bundle Items',
+            items: [
+              {
+                jfsku: 'VZ9N0173Y92',
+                merchantSku: '39262696145050',
+                name: 'Staffbase Bundle 1'
+              },
+              {
+                jfsku: 'VZ9N0173Y92',
+                merchantSku: '39262696145050',
+                name: 'Staffbase Bundle 12'
+              }
+            ]
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'bundle')
+      expect(res.body.bundle).to.be.an('object')
+    })
+
     it('Should return 403 Forbidden when a non-admin user tries to add a bundle to a campaign.', async () => {
       const resCompany = await chai
         .request(app)

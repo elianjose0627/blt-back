@@ -60,6 +60,15 @@ export interface ISalutation {
   createdAt: Date
   updatedAt: Date
 }
+export interface IBundleItem {
+  id: string
+  jfsku: string
+  merchantSku: string
+  name: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface IBundle {
   id: string
   jfsku: string
@@ -68,6 +77,7 @@ export interface IBundle {
   createdAt: Date
   updatedAt: Date
   campaign: ICampaign
+  items: IBundleItem
 }
 
 export interface ICompany {
