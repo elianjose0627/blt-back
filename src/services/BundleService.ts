@@ -7,13 +7,21 @@ class BundleService extends BaseService {
     const { bundle, campaign } = data
     let response: any
 
-    const bundleData = { jfsku: bundle.jfsku, merchantSku: bundle.merchantSku, name: bundle.name }
+    const bundleData = {
+      jfsku: bundle.jfsku,
+      merchantSku: bundle.merchantSku,
+      name: bundle.name,
+      description: bundle.description,
+      price: bundle.price
+    }
 
     response = await db[this.model].findOne({
       include: generateInclude(this.model),
       where: {
         name: bundle.name,
-        campaignId: campaign.id
+        campaignId: campaign.id,
+        jfsku: bundle.jfsku,
+        merchantSku: bundle.merchantSku
       },
       paranoid: false // To get soft deleted record
     })

@@ -296,6 +296,8 @@ const validateBundle = Joi.object({
     jfsku: Joi.string().allow('').allow(null).max(16),
     merchantSku: Joi.string().allow('').allow(null).max(32),
     name: Joi.string().required().max(128),
+    description: Joi.string().allow(null).allow('').max(128),
+    price: Joi.number().max(1000000).min(0),
     items: Joi.array().items(
       Joi.object({
         name: Joi.string().required().max(128),

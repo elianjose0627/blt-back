@@ -74,6 +74,8 @@ export interface IBundle {
   jfsku: string
   merchantSku: string
   name: string
+  description: string
+  price: number
   createdAt: Date
   updatedAt: Date
   campaign: ICampaign

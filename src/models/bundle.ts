@@ -7,6 +7,8 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
     jfsku: string
     merchantSku: string
     name: string
+    description: string
+    price: number
   }
 
   class Bundle extends Model<BundleAttributes> {
@@ -14,6 +16,8 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
     private readonly jfsku: string
     private readonly merchantSku: string
     private readonly name: string
+    private readonly description: string
+    private readonly price: number
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly campaign: ICampaign
@@ -38,6 +42,8 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
         jfsku: this.jfsku,
         merchantSku: this.merchantSku,
         name: this.name,
+        description: this.description,
+        price: this.price,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         campaign: this.campaign,
@@ -63,6 +69,14 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
     name: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    price: {
+      type: DataTypes.FLOAT,
+      defaultValue: 0
     }
   }, {
     sequelize,
