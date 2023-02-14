@@ -3,6 +3,7 @@ import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 import compareArrays from '../utils/compareArrays'
 import { IBundleItem } from '../types'
+import { PubSub } from '@google-cloud/pubsub'
 
 class BundleService extends BaseService {
   async insert (data: any): Promise<any> {
@@ -54,6 +55,67 @@ class BundleService extends BaseService {
         })
 
       await db.BundleItem.bulkCreate(items)
+    }
+
+    // Send to pub sub
+    const product = {
+      name: bundle.name,
+      merchantSku: response.id,
+      productGroup: null,
+      originCountry: 'DE',
+      manufacturer: null,
+      note: null,
+      identifier: {
+        mpn: null,
+        ean: null,
+        isbn: null,
+        upc: null,
+        asin: null
+      },
+      specifications: {
+        unNumber: null,
+        hazardIdentifier: null,
+        taric: null,
+        fnsku: null,
+        isBatch: false,
+        isDivisible: false,
+        isBestBefore: false,
+        isSerialNumber: false,
+        isBillOfMaterials: true,
+        billOfMaterialsComponents: bundle?.items?.length > 0 ? bundle.items.map((item: IBundleItem) => ({ jfsku: item.jfsku, quantity: 1 })) : null
+      },
+      dimensions: null,
+      attributes: [
+        {
+          key: 'campaignId',
+          value: campaign.id,
+          attributeType: 'String'
+        }
+      ],
+      netRetailPrice: {
+        amount: bundle.price,
+        currency: 'USD'
+      },
+      bundles: null,
+      condition: 'Default'
+    }
+
+    // Instantiates a client
+    const pubSubClient = new PubSub()
+
+    const topicId = String(process.env.PUB_SUB_TOPIC_ID)
+    // Send a message to the topic
+    const message = Buffer.from(JSON.stringify(product))
+    const attributes = { kind: 'post' }
+    try {
+      await pubSubClient
+        .topic(topicId)
+        .publishMessage({
+          data: message,
+          attributes
+        })
+    } catch (error) {
+
     }
 
     return { response: response.toJSONFor(), status: 201 }

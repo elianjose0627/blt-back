@@ -19,6 +19,7 @@ steps:
     - 'APP_NAME=${_APP_NAME}'
     - 'APP_URL=${_APP_URL}'
     - 'API_DOCUMENTATION_URL=${_API_DOCUMENTATION_URL}'
+    - 'PUB_SUB_TOPIC_ID=${_PUB_SUB_TOPIC_ID}'
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'migrate']
 - name: 'gcr.io/cloud-builders/npm'
