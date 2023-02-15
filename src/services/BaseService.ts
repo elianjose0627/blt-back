@@ -70,6 +70,11 @@ export const generateInclude = (model: string): any => {
         model: db.BundleItem,
         attributes: ['id', 'name', 'jfsku', 'merchantSku', 'updatedAt', 'createdAt'],
         as: 'items'
+      },
+      {
+        model: db.Picture,
+        attributes: ['id', 'filename', 'url', 'size', 'mimeType', 'updatedAt', 'createdAt'],
+        as: 'pictures'
       }
     ])
   }
@@ -77,6 +82,9 @@ export const generateInclude = (model: string): any => {
     return ([])
   }
   if (model === 'Salutation') {
+    return ([])
+  }
+  if (model === 'Picture') {
     return ([])
   }
   return (

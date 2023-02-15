@@ -6,6 +6,7 @@ import asyncHandler from '../middlewares/asyncHandler'
 import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
+import PictureController from '../controllers/PictureController'
 
 const bundleRoutes = (): any => {
   const bundleRouter = express.Router()
@@ -20,6 +21,10 @@ const bundleRoutes = (): any => {
       [Segments.BODY]: validator.validateBundle
     }), asyncHandler(BundleController.update))
     .delete(asyncHandler(checkAdmin), asyncHandler(BundleController.delete))
+  bundleRouter.route('/bundles/:id/pictures')
+    .post(asyncHandler(checkAdmin), celebrate({
+      [Segments.BODY]: validator.validatePicture
+    }), asyncHandler(PictureController.insert))
   return bundleRouter
 }
 

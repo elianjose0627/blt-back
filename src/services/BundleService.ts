@@ -191,6 +191,11 @@ class BundleService extends BaseService {
           model: db.BundleItem,
           attributes: ['id', 'name', 'jfsku', 'merchantSku', 'updatedAt', 'createdAt'],
           as: 'items'
+        },
+        {
+          model: db.Picture,
+          attributes: ['id', 'filename', 'url', 'size', 'mimeType', 'updatedAt', 'createdAt'],
+          as: 'pictures'
         }
       ],
       attributes: { exclude: [] },

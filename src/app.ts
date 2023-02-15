@@ -41,6 +41,7 @@ app.use(apiPrefix, routers.campaignRouter())
 app.use(apiPrefix, routers.salutationRouter())
 app.use(apiPrefix, routers.bundleRouter())
 app.use(apiPrefix, routers.bundleItemRouter())
+app.use(apiPrefix, routers.pictureRouter())
 
 // Add validation middleware
 app.use(joiErrors)

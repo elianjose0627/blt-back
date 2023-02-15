@@ -79,7 +79,8 @@ export interface IBundle {
   createdAt: Date
   updatedAt: Date
   campaign: ICampaign
-  items: IBundleItem
+  items: IBundleItem[]
+  pictures: IPicture[]
 }
 
 export interface ICompany {
@@ -129,6 +130,16 @@ export interface IRecipient {
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
+}
+
+export interface IPicture {
+  id: string
+  url: string
+  filename: string
+  size: number
+  mimeType: Nullable<string>
+  createdAt: Date
+  updatedAt: Date
 }
 
 export type CampaignStatus = 'draft' | 'submitted'

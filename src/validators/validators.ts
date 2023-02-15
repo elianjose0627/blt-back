@@ -3,6 +3,8 @@ import { Joi } from 'celebrate'
 import * as countryList from '../utils/countries'
 import * as userRoles from '../utils/userRoles'
 
+const imageMimeTypes = ['image/bmp', 'image/jpeg', 'image/x-png', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+
 const validateCreatedUser = Joi.object({
   user: Joi.object({
     firstName: Joi.string().required().max(64),
@@ -308,6 +310,15 @@ const validateBundle = Joi.object({
   }).required()
 })
 
+const validatePicture = Joi.object({
+  picture: Joi.object({
+    url: Joi.string().uri().required(),
+    filename: Joi.string().required(),
+    size: Joi.number(),
+    mimeType: Joi.string().valid(...imageMimeTypes).allow(null).allow('')
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -337,5 +348,6 @@ export default {
   validateUserActivation,
   validateCreatedUserByAdmin,
   validateBundle,
-  validateUserCompany
+  validateUserCompany,
+  validatePicture
 }
