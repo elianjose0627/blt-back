@@ -20,7 +20,8 @@ module.exports = {
       }),
       queryInterface.changeColumn('Bundles', 'merchantSku', {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
+        defaultValue: ''
       })
     ])
   }

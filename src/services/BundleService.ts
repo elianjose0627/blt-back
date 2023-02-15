@@ -5,13 +5,20 @@ import compareArrays from '../utils/compareArrays'
 import { IBundleItem } from '../types'
 import { PubSub } from '@google-cloud/pubsub'
 
+// Instantiates a client
+const pubSubClient = new PubSub()
+
+const topicId = String(process.env.PUB_SUB_TOPIC_ID)
+
 class BundleService extends BaseService {
   async insert (data: any): Promise<any> {
     const { bundle, campaign } = data
     let response: any
 
+    const { jfsku = null } = bundle
+
     const bundleData = {
-      jfsku: bundle.jfsku,
+      jfsku,
       merchantSku: bundle.merchantSku,
       name: bundle.name,
       description: bundle.description,
@@ -23,7 +30,7 @@ class BundleService extends BaseService {
       where: {
         name: bundle.name,
         campaignId: campaign.id,
-        jfsku: bundle.jfsku,
+        jfsku,
         merchantSku: bundle.merchantSku
       },
       paranoid: false // To get soft deleted record
@@ -100,10 +107,6 @@ class BundleService extends BaseService {
       condition: 'Default'
     }
 
-    // Instantiates a client
-    const pubSubClient = new PubSub()
-
-    const topicId = String(process.env.PUB_SUB_TOPIC_ID)
     // Send a message to the topic
     const message = Buffer.from(JSON.stringify(product))
     const attributes = { kind: 'post' }
@@ -122,7 +125,7 @@ class BundleService extends BaseService {
   }
 
   async update (record: any, data: any): Promise<any> {
-    const { jfsku, merchantSku, name, price, description } = data
+    const { merchantSku, name, price, description } = data
 
     if (data?.items?.length > 0) {
       data.items.forEach((item: IBundleItem) => {
@@ -149,7 +152,31 @@ class BundleService extends BaseService {
       })
     }
 
-    const updatedRecord = await record.update({ jfsku, merchantSku, name, price, description })
+    const updatedRecord = await record.update({ merchantSku, name, price, description })
+
+    const product = {
+      name,
+      specifications: {
+        billOfMaterialsComponents: data.items.map((item: IBundleItem) => ({ jfsku: item.jfsku, quantity: 1 }))
+      },
+      netRetailPrice: {
+        amount: price,
+        currency: 'USD'
+      }
+    }
+    // Send a message to the topic
+    const message = Buffer.from(JSON.stringify(product))
+    const attributes = { kind: 'patch', jfsku: record.jfsku }
+    try {
+      await pubSubClient
+        .topic(topicId)
+        .publishMessage({
+          data: message,
+          attributes
+        })
+    } catch (error) {
+
+    }
 
     return updatedRecord.toJSONFor()
   }

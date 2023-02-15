@@ -272,9 +272,15 @@ describe('Campaign actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           bundle: {
-            jfsku: 'VZ9N0173Y92',
             merchantSku: '39262696145050',
-            name: 'Staffbase Bundle 1'
+            name: 'Staffbase Bundle 1',
+            items: [
+              {
+                name: 'Interdimensional Goggles',
+                jfsku: '26CJ0114JWR',
+                merchantSku: 'ART2394871'
+              }
+            ]
           }
         })
 
@@ -318,19 +324,18 @@ describe('Campaign actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           bundle: {
-            jfsku: 'VZ9N0173Y92',
             merchantSku: '39262696145050',
             name: 'Staffbase Bundle Items',
             items: [
               {
-                jfsku: 'VZ9N0173Y92',
-                merchantSku: '39262696145050',
-                name: 'Staffbase Bundle 1'
+                jfsku: '26CJ0114JWR',
+                merchantSku: 'ART2394871',
+                name: 'Interdimensional Goggles'
               },
               {
-                jfsku: 'VZ9N0173Y92',
-                merchantSku: '39262696145050',
-                name: 'Staffbase Bundle 12'
+                jfsku: '26CJ0114JWR',
+                merchantSku: 'ART2394871',
+                name: 'Interdimensional Goggles'
               }
             ]
           }
@@ -376,9 +381,15 @@ describe('Campaign actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           bundle: {
-            jfsku: 'VZ9N0173Y92',
-            merchantSku: '39262696145050',
-            name: 'Staffbase Bundle 1'
+            merchantSku: 'ART2394871',
+            name: 'Interdimensional Goggles',
+            items: [
+              {
+                name: 'Interdimensional Goggles',
+                jfsku: '26CJ0114JWR',
+                merchantSku: 'ART2394871'
+              }
+            ]
           }
         })
 
@@ -422,9 +433,15 @@ describe('Campaign actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           bundle: {
-            jfsku: 'VZ9N0173Y92',
             merchantSku: '39262696145050',
-            name: 'Staffbase Bundle 1'
+            name: 'Staffbase Bundle 1',
+            items: [
+              {
+                name: 'Interdimensional Goggles',
+                jfsku: '26CJ0114JWR',
+                merchantSku: 'ART2394871'
+              }
+            ]
           }
         })
 
@@ -434,9 +451,15 @@ describe('Campaign actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           bundle: {
-            jfsku: 'VZ9N0173Y92',
             merchantSku: '39262696145050',
-            name: 'Staffbase Bundle 1'
+            name: 'Staffbase Bundle 1',
+            items: [
+              {
+                name: 'Interdimensional Goggles',
+                jfsku: '26CJ0114JWR',
+                merchantSku: 'ART2394871'
+              }
+            ]
           }
         })
 
@@ -480,9 +503,15 @@ describe('Campaign actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           bundle: {
-            jfsku: 'VZ9N0173Y92',
             merchantSku: '39262696145050',
-            name: 'Staffbase Bundle 1'
+            name: 'Staffbase Bundle 1',
+            items: [
+              {
+                name: 'Interdimensional Goggles',
+                jfsku: '26CJ0114JWR',
+                merchantSku: 'ART2394871'
+              }
+            ]
           }
         })
 
