@@ -3,6 +3,8 @@ import { Joi } from 'celebrate'
 import * as countryList from '../utils/countries'
 import * as userRoles from '../utils/userRoles'
 
+const imageMimeTypes = ['image/bmp', 'image/jpeg', 'image/x-png', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+
 const validateCreatedUser = Joi.object({
   user: Joi.object({
     firstName: Joi.string().required().max(64),
@@ -293,18 +295,27 @@ const validateSalutation = Joi.object({
 
 const validateBundle = Joi.object({
   bundle: Joi.object({
-    jfsku: Joi.string().allow('').allow(null).max(16),
-    merchantSku: Joi.string().allow('').allow(null).max(32),
+    jfsku: Joi.string().allow('').allow(null).max(20),
+    merchantSku: Joi.string().allow('').allow(null).max(40),
     name: Joi.string().required().max(128),
     description: Joi.string().allow(null).allow('').max(128),
     price: Joi.number().max(1000000).min(0),
     items: Joi.array().items(
       Joi.object({
         name: Joi.string().required().max(128),
-        jfsku: Joi.string().required().max(16),
-        merchantSku: Joi.string().required().max(32)
+        jfsku: Joi.string().required().max(20),
+        merchantSku: Joi.string().required().max(40)
       })
-    )
+    ).min(1)
+  }).required()
+})
+
+const validatePicture = Joi.object({
+  picture: Joi.object({
+    url: Joi.string().uri().required(),
+    filename: Joi.string().required(),
+    size: Joi.number(),
+    mimeType: Joi.string().valid(...imageMimeTypes).allow(null).allow('')
   }).required()
 })
 
@@ -337,5 +348,6 @@ export default {
   validateUserActivation,
   validateCreatedUserByAdmin,
   validateBundle,
-  validateUserCompany
+  validateUserCompany,
+  validatePicture
 }

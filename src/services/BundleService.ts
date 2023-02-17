@@ -3,14 +3,22 @@ import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 import compareArrays from '../utils/compareArrays'
 import { IBundleItem } from '../types'
+import { PubSub } from '@google-cloud/pubsub'
+
+// Instantiates a client
+const pubSubClient = new PubSub()
+
+const topicId = String(process.env.PUB_SUB_TOPIC_ID)
 
 class BundleService extends BaseService {
   async insert (data: any): Promise<any> {
     const { bundle, campaign } = data
     let response: any
 
+    const { jfsku = null } = bundle
+
     const bundleData = {
-      jfsku: bundle.jfsku,
+      jfsku,
       merchantSku: bundle.merchantSku,
       name: bundle.name,
       description: bundle.description,
@@ -22,7 +30,7 @@ class BundleService extends BaseService {
       where: {
         name: bundle.name,
         campaignId: campaign.id,
-        jfsku: bundle.jfsku,
+        jfsku,
         merchantSku: bundle.merchantSku
       },
       paranoid: false // To get soft deleted record
@@ -56,11 +64,68 @@ class BundleService extends BaseService {
       await db.BundleItem.bulkCreate(items)
     }
 
+    // Send to pub sub
+    const product = {
+      name: bundle.name,
+      merchantSku: response.id,
+      productGroup: null,
+      originCountry: 'DE',
+      manufacturer: null,
+      note: null,
+      identifier: {
+        mpn: null,
+        ean: null,
+        isbn: null,
+        upc: null,
+        asin: null
+      },
+      specifications: {
+        unNumber: null,
+        hazardIdentifier: null,
+        taric: null,
+        fnsku: null,
+        isBatch: false,
+        isDivisible: false,
+        isBestBefore: false,
+        isSerialNumber: false,
+        isBillOfMaterials: true,
+        billOfMaterialsComponents: bundle?.items?.length > 0 ? bundle.items.map((item: IBundleItem) => ({ jfsku: item.jfsku, quantity: 1 })) : null
+      },
+      dimensions: null,
+      attributes: [
+        {
+          key: 'campaignId',
+          value: campaign.id,
+          attributeType: 'String'
+        }
+      ],
+      netRetailPrice: {
+        amount: bundle.price,
+        currency: 'USD'
+      },
+      bundles: null,
+      condition: 'Default'
+    }
+
+    // Send a message to the topic
+    const message = Buffer.from(JSON.stringify(product))
+    const attributes = { kind: 'post' }
+    try {
+      await pubSubClient
+        .topic(topicId)
+        .publishMessage({
+          data: message,
+          attributes
+        })
+    } catch (error) {
+
+    }
+
     return { response: response.toJSONFor(), status: 201 }
   }
 
   async update (record: any, data: any): Promise<any> {
-    const { jfsku, merchantSku, name, price, description } = data
+    const { merchantSku, name, price, description } = data
 
     if (data?.items?.length > 0) {
       data.items.forEach((item: IBundleItem) => {
@@ -87,7 +152,31 @@ class BundleService extends BaseService {
       })
     }
 
-    const updatedRecord = await record.update({ jfsku, merchantSku, name, price, description })
+    const updatedRecord = await record.update({ merchantSku, name, price, description })
+
+    const product = {
+      name,
+      specifications: {
+        billOfMaterialsComponents: data.items.map((item: IBundleItem) => ({ jfsku: item.jfsku, quantity: 1 }))
+      },
+      netRetailPrice: {
+        amount: price,
+        currency: 'USD'
+      }
+    }
+    // Send a message to the topic
+    const message = Buffer.from(JSON.stringify(product))
+    const attributes = { kind: 'patch', jfsku: record.jfsku }
+    try {
+      await pubSubClient
+        .topic(topicId)
+        .publishMessage({
+          data: message,
+          attributes
+        })
+    } catch (error) {
+
+    }
 
     return updatedRecord.toJSONFor()
   }
@@ -102,6 +191,11 @@ class BundleService extends BaseService {
           model: db.BundleItem,
           attributes: ['id', 'name', 'jfsku', 'merchantSku', 'updatedAt', 'createdAt'],
           as: 'items'
+        },
+        {
+          model: db.Picture,
+          attributes: ['id', 'filename', 'url', 'size', 'mimeType', 'updatedAt', 'createdAt'],
+          as: 'pictures'
         }
       ],
       attributes: { exclude: [] },

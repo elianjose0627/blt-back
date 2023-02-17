@@ -22,6 +22,7 @@ interface Database {
   Token?: any
   Bundle?: any
   BundleItem?: any
+  Picture?: any
 }
 
 const db: Database = {}
