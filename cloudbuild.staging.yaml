@@ -20,6 +20,10 @@ steps:
     - 'APP_URL=${_APP_URL}'
     - 'API_DOCUMENTATION_URL=${_API_DOCUMENTATION_URL}'
     - 'PUB_SUB_TOPIC_ID=${_PUB_SUB_TOPIC_ID}'
+    - 'FIREBASE_PRIVATE_KEY=${_FIREBASE_PRIVATE_KEY}'
+    - 'FIREBASE_PROJECT_ID=${_FIREBASE_PROJECT_ID}'
+    - 'FIREBASE_CLIENT_EMAIL=${_FIREBASE_CLIENT_EMAIL}'
+    - 'STORAGE_BUCKET=${_STORAGE_BUCKET}'
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'migrate']
 - name: 'gcr.io/cloud-builders/npm'
