@@ -16,7 +16,7 @@ const pictureRoutes = (): any => {
   }, { abortEarly: false }), asyncHandler(PictureController.checkRecord))
   pictureRouter.route('/pictures/:id')
     .get(asyncHandler(PictureController.get))
-    .delete(asyncHandler(checkAdmin), asyncHandler(PictureController.delete))
+    .delete(asyncHandler(checkAdmin), asyncHandler(PictureController.purge))
   return pictureRouter
 }
 
