@@ -14,11 +14,11 @@ const RecipientRoutes = (): any => {
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(RecipientController.checkRecord))
   recipientRouter.route('/recipients/:id')
-    .get(asyncHandler(RecipientController.checkOwnerOrCompanyAdministratorOrCampaignManager), asyncHandler(RecipientController.get))
-    .put(asyncHandler(RecipientController.checkOwnerOrCompanyAdministratorOrCampaignManager), celebrate({
+    .get(asyncHandler(RecipientController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin), asyncHandler(RecipientController.get))
+    .put(asyncHandler(RecipientController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin), celebrate({
       [Segments.BODY]: validator.validateUpdatedRecipient
     }), asyncHandler(RecipientController.update))
-    .delete(asyncHandler(RecipientController.checkOwnerOrCompanyAdministratorOrCampaignManager), asyncHandler(RecipientController.delete))
+    .delete(asyncHandler(RecipientController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin), asyncHandler(RecipientController.delete))
   return recipientRouter
 }
 
