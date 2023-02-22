@@ -238,7 +238,7 @@ const validateCreatedRecipient = Joi.object({
     salutation: Joi.string().optional().allow('').allow(null).max(8),
     firstName: Joi.string().optional().allow('').allow(null).max(64),
     lastName: Joi.string().optional().allow('').allow(null).max(64),
-    email: Joi.string().email().lowercase().required().max(128),
+    email: Joi.string().email().lowercase().optional().allow('').allow(null).max(128),
     phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
@@ -257,7 +257,7 @@ const validateUpdatedRecipient = Joi.object({
     salutation: Joi.string().optional().allow('').allow(null).max(8),
     firstName: Joi.string().optional().allow('').allow(null).max(64),
     lastName: Joi.string().optional().allow('').allow(null).max(64),
-    email: Joi.string().email().lowercase().optional().max(128),
+    email: Joi.string().email().lowercase().optional().allow('').allow(null).max(128),
     phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
