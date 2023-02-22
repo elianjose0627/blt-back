@@ -1,28 +1,12 @@
 import { v1 as uuidv1 } from 'uuid'
-import BaseService, { generateInclude } from './BaseService'
+import BaseService from './BaseService'
 import db from '../models'
 
 class RecipientService extends BaseService {
   async insert (data: any): Promise<any> {
     const { campaign, recipient } = data
-    let response: any
 
-    response = await db[this.model].findOne({
-      include: generateInclude(this.model),
-      where: {
-        campaignId: campaign?.id,
-        email: recipient?.email
-      },
-      paranoid: false
-    })
-
-    if (response !== null) {
-      await response.restore()
-      const updatedResponse = await response.update({ ...recipient })
-      return { response: updatedResponse.toJSONFor(campaign), status: 200 }
-    }
-
-    response = await db[this.model].create({ ...recipient, id: uuidv1(), campaignId: campaign?.id })
+    const response = await db[this.model].create({ ...recipient, id: uuidv1(), campaignId: campaign?.id })
 
     return { response: response.toJSONFor(campaign), status: 201 }
   }

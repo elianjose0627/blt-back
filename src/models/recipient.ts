@@ -87,7 +87,7 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     phone: {
       type: DataTypes.STRING,
