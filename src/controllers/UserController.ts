@@ -314,7 +314,7 @@ class UserController extends BaseController {
       })
     }
 
-    if (domain !== emailDomain) {
+    if (domain !== emailDomain && actionType === 'add') {
       return res.status(statusCodes.FORBIDDEN).send({
         statusCode: statusCodes.FORBIDDEN,
         success: false,
