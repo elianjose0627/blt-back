@@ -24,6 +24,8 @@ steps:
     - 'FIREBASE_PROJECT_ID=${_FIREBASE_PROJECT_ID}'
     - 'FIREBASE_CLIENT_EMAIL=${_FIREBASE_CLIENT_EMAIL}'
     - 'STORAGE_BUCKET=${_STORAGE_BUCKET}'
+    - 'DHL_API_URL=${_DHL_API_URL}'
+    - 'DHL_API_KEY=${_DHL_API_KEY}'
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'migrate']
 - name: 'gcr.io/cloud-builders/npm'
