@@ -9,6 +9,7 @@ import salutationRouter from './salutationRouter'
 import bundleRouter from './bundleRouter'
 import bundleItemRouter from './bundleItemRouter'
 import pictureRouter from './pictureRouter'
+import shipmentRouter from './shipmentRouter'
 
 const routers = {
   authRouter,
@@ -21,7 +22,8 @@ const routers = {
   salutationRouter,
   bundleRouter,
   bundleItemRouter,
-  pictureRouter
+  pictureRouter,
+  shipmentRouter
 }
 
 export default routers

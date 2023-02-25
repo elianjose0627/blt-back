@@ -147,6 +147,10 @@ const validateUUID = Joi.object().keys({
   userId: Joi.string().uuid()
 })
 
+const validateTrackingId = Joi.object().keys({
+  trackingId: Joi.string()
+})
+
 const validateUsersQueryParams = Joi.object({
   limit: Joi.number().optional(),
   page: Joi.number().optional(),
@@ -349,5 +353,6 @@ export default {
   validateCreatedUserByAdmin,
   validateBundle,
   validateUserCompany,
-  validatePicture
+  validatePicture,
+  validateTrackingId
 }
