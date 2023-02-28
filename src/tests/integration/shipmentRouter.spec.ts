@@ -14,6 +14,7 @@ chai.use(chaiHttp)
 let tokenAdmin: string
 let token: string
 const trackingId = '00340434694295150696'
+const notFoundTrackingId = '00340434655780035478'
 
 describe('Shipment actions', () => {
   before(async () => {
@@ -67,6 +68,18 @@ describe('Shipment actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'shipment')
       expect(res.body.shipment).to.be.an('object')
       expect(res.body.shipment).to.include.keys('id', 'trackingId', 'statusCode', 'data', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 404 Not Found when an admin gets a shipment for a non-existent tracking id.', async () => {
+      const res = await chai
+        .request(app)
+        .get(`/api/shipments/${notFoundTrackingId}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('No shipment with given tracking number found.')
+      expect(res.body.success).to.equal(false)
     })
   })
 })
