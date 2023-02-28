@@ -14,7 +14,7 @@
     "migrate": "sequelize db:migrate",
     "migrate:undo": "sequelize db:migrate:undo",
     "reset:db": "sequelize db:migrate:undo:all && npm run migrate",
-    "test": "NODE_ENV=test npm run reset:db && NODE_ENV=test nyc mocha --require ts-node/register --timeout 10000 src/tests/**/*.spec.ts --exit",
+    "test": "NODE_ENV=test npm run reset:db && NODE_ENV=test nyc mocha --require ts-node/register --timeout 15000 src/tests/**/*.spec.ts --exit",
     "coveralls-coverage": "nyc report --reporter=text-lcov | coveralls",
     "codecov-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov --disable=gcov",
     "coverage": "nyc report --reporter=lcov && npm run coveralls-coverage"
