@@ -49,7 +49,8 @@ class PictureService extends BaseService {
     })
 
     const posterFileName = String(record.filename)
-    const file = bucket.file(`bundles/images/${posterFileName}`)
+    const firebaseStorageEnvironment = process.env.FIREBASE_STORAGE_ENVIRONMENT as string
+    const file = bucket.file(`${firebaseStorageEnvironment}/bundles/images/${posterFileName}`)
 
     try {
       await file.delete()
