@@ -3,6 +3,8 @@ import { Joi } from 'celebrate'
 import * as countryList from '../utils/countries'
 import * as userRoles from '../utils/userRoles'
 
+const imageMimeTypes = ['image/bmp', 'image/jpeg', 'image/x-png', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+
 const validateCreatedUser = Joi.object({
   user: Joi.object({
     firstName: Joi.string().required().max(64),
@@ -145,6 +147,10 @@ const validateUUID = Joi.object().keys({
   userId: Joi.string().uuid()
 })
 
+const validateTrackingId = Joi.object().keys({
+  trackingId: Joi.string()
+})
+
 const validateUsersQueryParams = Joi.object({
   limit: Joi.number().optional(),
   page: Joi.number().optional(),
@@ -236,7 +242,7 @@ const validateCreatedRecipient = Joi.object({
     salutation: Joi.string().optional().allow('').allow(null).max(8),
     firstName: Joi.string().optional().allow('').allow(null).max(64),
     lastName: Joi.string().optional().allow('').allow(null).max(64),
-    email: Joi.string().email().lowercase().required().max(128),
+    email: Joi.string().email().lowercase().optional().allow('').allow(null).max(128),
     phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
@@ -255,7 +261,7 @@ const validateUpdatedRecipient = Joi.object({
     salutation: Joi.string().optional().allow('').allow(null).max(8),
     firstName: Joi.string().optional().allow('').allow(null).max(64),
     lastName: Joi.string().optional().allow('').allow(null).max(64),
-    email: Joi.string().email().lowercase().optional().max(128),
+    email: Joi.string().email().lowercase().optional().allow('').allow(null).max(128),
     phone: Joi.string().optional().allow('').allow(null).min(8).max(15).regex(/^[0-9]+$/)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
@@ -293,9 +299,27 @@ const validateSalutation = Joi.object({
 
 const validateBundle = Joi.object({
   bundle: Joi.object({
-    jfsku: Joi.string().required().max(16),
-    merchantSku: Joi.string().required().max(32),
-    name: Joi.string().required().max(128)
+    jfsku: Joi.string().allow('').allow(null).max(20),
+    merchantSku: Joi.string().allow('').allow(null).max(40),
+    name: Joi.string().required().max(128),
+    description: Joi.string().allow(null).allow('').max(128),
+    price: Joi.number().max(1000000).min(0),
+    items: Joi.array().items(
+      Joi.object({
+        name: Joi.string().required().max(128),
+        jfsku: Joi.string().required().max(20),
+        merchantSku: Joi.string().required().max(40)
+      })
+    ).min(1)
+  }).required()
+})
+
+const validatePicture = Joi.object({
+  picture: Joi.object({
+    url: Joi.string().uri().required(),
+    filename: Joi.string().required(),
+    size: Joi.number(),
+    mimeType: Joi.string().valid(...imageMimeTypes).allow(null).allow('')
   }).required()
 })
 
@@ -328,5 +352,7 @@ export default {
   validateUserActivation,
   validateCreatedUserByAdmin,
   validateBundle,
-  validateUserCompany
+  validateUserCompany,
+  validatePicture,
+  validateTrackingId
 }

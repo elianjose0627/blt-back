@@ -54,20 +54,42 @@ export interface IToken {
   updatedAt: Date
 }
 
+export interface IShipment {
+  id: string
+  trackingId: string
+  statusCode: string
+  data: object
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface ISalutation {
   id: string
   title: string
   createdAt: Date
   updatedAt: Date
 }
-export interface IBundle {
+export interface IBundleItem {
   id: string
   jfsku: string
   merchantSku: string
   name: string
   createdAt: Date
   updatedAt: Date
+}
+
+export interface IBundle {
+  id: string
+  jfsku: string
+  merchantSku: string
+  name: string
+  description: string
+  price: number
+  createdAt: Date
+  updatedAt: Date
   campaign: ICampaign
+  items: IBundleItem[]
+  pictures: IPicture[]
 }
 
 export interface ICompany {
@@ -119,6 +141,16 @@ export interface IRecipient {
   company?: ICompany
 }
 
+export interface IPicture {
+  id: string
+  url: string
+  filename: string
+  size: number
+  mimeType: Nullable<string>
+  createdAt: Date
+  updatedAt: Date
+}
+
 export type CampaignStatus = 'draft' | 'submitted'
 export type CampaignType = 'onboarding' | 'birthday' | 'christmas'
 
@@ -161,3 +193,94 @@ export interface EmailMessage {
 export interface CustomResponse extends Response {}
 
 export interface CustomNext extends NextFunction {}
+
+export interface Address {
+  countryCode: string
+}
+
+export interface Origin {
+  address: Address
+}
+
+export interface Address2 {
+  countryCode: string
+}
+
+export interface Destination {
+  address: Address2
+}
+
+export interface Status {
+  timestamp: Date
+  statusCode: string
+  status: string
+  description: string
+}
+
+export interface Product {
+  productName: string
+}
+
+export interface Weight {
+  value: number
+  unitText: string
+}
+
+export interface Width {
+  value: number
+  unitText: string
+}
+
+export interface Height {
+  value: number
+  unitText: string
+}
+
+export interface Length {
+  value: number
+  unitText: string
+}
+
+export interface Dimensions {
+  width: Width
+  height: Height
+  length: Length
+}
+
+export interface Details {
+  product: Product
+  proofOfDeliverySignedAvailable: boolean
+  totalNumberOfPieces: number
+  pieceIds: string[]
+  weight: Weight
+  dimensions: Dimensions
+}
+
+export interface Event {
+  timestamp: Date
+  statusCode: string
+  status?: string
+  description: string
+  location?: {
+    address: {
+      addressLocality: string
+    }
+  }
+}
+
+export interface Shipment {
+  serviceUrl: string
+  rerouteUrl: string
+  id: string
+  service: string
+  origin: Origin
+  destination: Destination
+  status: Status
+  details: Details
+  events: Event[]
+}
+
+export interface TrackingData {
+  shipments: Shipment[]
+  possibleAdditionalShipmentsUrl: string[]
+}

@@ -1,23 +1,23 @@
 'use strict'
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Bundles', {
+    await queryInterface.createTable('Shipments', {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID
       },
-      jfsku: {
-        allowNull: true,
-        type: Sequelize.STRING
-      },
-      name: {
+      trackingId: {
         allowNull: false,
         type: Sequelize.STRING
       },
-      merchantSku: {
-        allowNull: true,
+      statusCode: {
+        allowNull: false,
         type: Sequelize.STRING
+      },
+      data: {
+        allowNull: true,
+        type: Sequelize.JSON
       },
       createdAt: {
         allowNull: false,
@@ -30,20 +30,10 @@ module.exports = {
       deletedAt: {
         allowNull: true,
         type: Sequelize.DATE
-      },
-      campaignId: {
-        allowNull: true,
-        type: Sequelize.UUID,
-        onDelete: 'CASCADE',
-        references: {
-          model: 'Campaigns',
-          key: 'id',
-          as: 'campaignId'
-        }
       }
     })
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Bundles')
+    await queryInterface.dropTable('Shipments')
   }
 }

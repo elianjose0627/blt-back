@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { IBundle, ICampaign } from '../types'
+import { IBundle, IBundleItem, ICampaign, IPicture } from '../types'
 
 const BundleModel = (sequelize: any, DataTypes: any): any => {
   interface BundleAttributes {
@@ -7,6 +7,8 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
     jfsku: string
     merchantSku: string
     name: string
+    description: string
+    price: number
   }
 
   class Bundle extends Model<BundleAttributes> {
@@ -14,14 +16,28 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
     private readonly jfsku: string
     private readonly merchantSku: string
     private readonly name: string
+    private readonly description: string
+    private readonly price: number
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly campaign: ICampaign
+    private readonly items: IBundleItem[]
+    private readonly pictures: IPicture[]
 
     static associate (models: any): any {
       Bundle.belongsTo(models.Campaign, {
         foreignKey: 'campaignId',
         as: 'campaign',
+        onDelete: 'CASCADE'
+      })
+      Bundle.hasMany(models.BundleItem, {
+        foreignKey: 'bundleId',
+        as: 'items',
+        onDelete: 'CASCADE'
+      })
+      Bundle.hasMany(models.Picture, {
+        foreignKey: 'bundleId',
+        as: 'pictures',
         onDelete: 'CASCADE'
       })
     }
@@ -32,9 +48,13 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
         jfsku: this.jfsku,
         merchantSku: this.merchantSku,
         name: this.name,
+        description: this.description,
+        price: this.price,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
-        campaign: this.campaign
+        campaign: this.campaign,
+        items: this.items,
+        pictures: this.pictures
       }
     }
   };
@@ -47,15 +67,23 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
     },
     jfsku: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     merchantSku: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     name: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    price: {
+      type: DataTypes.FLOAT,
+      defaultValue: 0
     }
   }, {
     sequelize,

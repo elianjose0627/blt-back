@@ -272,9 +272,72 @@ describe('Campaign actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           bundle: {
-            jfsku: 'VZ9N0173Y92',
             merchantSku: '39262696145050',
-            name: 'Staffbase Bundle 1'
+            name: 'Staffbase Bundle 1',
+            items: [
+              {
+                name: 'Interdimensional Goggles',
+                jfsku: '26CJ0114JWR',
+                merchantSku: 'ART2394871'
+              }
+            ]
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'bundle')
+      expect(res.body.bundle).to.be.an('object')
+    })
+
+    it('Should return 201 Created when an admin successfully adds a bundle with items to a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Marvel Three Items',
+            email: 'test3@companymarvelthreeitems.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${String(campaignId)}/bundles`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          bundle: {
+            merchantSku: '39262696145050',
+            name: 'Staffbase Bundle Items',
+            items: [
+              {
+                jfsku: '26CJ0114JWR',
+                merchantSku: 'ART2394871',
+                name: 'Interdimensional Goggles'
+              },
+              {
+                jfsku: '26CJ0114JWR',
+                merchantSku: 'ART2394871',
+                name: 'Interdimensional Goggles'
+              }
+            ]
           }
         })
 
@@ -318,9 +381,15 @@ describe('Campaign actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           bundle: {
-            jfsku: 'VZ9N0173Y92',
-            merchantSku: '39262696145050',
-            name: 'Staffbase Bundle 1'
+            merchantSku: 'ART2394871',
+            name: 'Interdimensional Goggles',
+            items: [
+              {
+                name: 'Interdimensional Goggles',
+                jfsku: '26CJ0114JWR',
+                merchantSku: 'ART2394871'
+              }
+            ]
           }
         })
 
@@ -364,9 +433,15 @@ describe('Campaign actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           bundle: {
-            jfsku: 'VZ9N0173Y92',
             merchantSku: '39262696145050',
-            name: 'Staffbase Bundle 1'
+            name: 'Staffbase Bundle 1',
+            items: [
+              {
+                name: 'Interdimensional Goggles',
+                jfsku: '26CJ0114JWR',
+                merchantSku: 'ART2394871'
+              }
+            ]
           }
         })
 
@@ -376,9 +451,15 @@ describe('Campaign actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           bundle: {
-            jfsku: 'VZ9N0173Y92',
             merchantSku: '39262696145050',
-            name: 'Staffbase Bundle 1'
+            name: 'Staffbase Bundle 1',
+            items: [
+              {
+                name: 'Interdimensional Goggles',
+                jfsku: '26CJ0114JWR',
+                merchantSku: 'ART2394871'
+              }
+            ]
           }
         })
 
@@ -422,9 +503,15 @@ describe('Campaign actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           bundle: {
-            jfsku: 'VZ9N0173Y92',
             merchantSku: '39262696145050',
-            name: 'Staffbase Bundle 1'
+            name: 'Staffbase Bundle 1',
+            items: [
+              {
+                name: 'Interdimensional Goggles',
+                jfsku: '26CJ0114JWR',
+                merchantSku: 'ART2394871'
+              }
+            ]
           }
         })
 
