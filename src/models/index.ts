@@ -47,4 +47,6 @@ Object.keys(db).forEach((modelName) => {
 db.sequelize = sequelize
 db.Sequelize = Sequelize
 
+export const sequelizeInstance = sequelize
+
 export default db

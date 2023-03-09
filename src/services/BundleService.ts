@@ -1,6 +1,6 @@
 import { v1 as uuidv1 } from 'uuid'
 import BaseService, { generateInclude } from './BaseService'
-import db from '../models'
+import db, { sequelizeInstance } from '../models'
 import compareArrays from '../utils/compareArrays'
 import { IBundleItem } from '../types'
 import { PubSub } from '@google-cloud/pubsub'
@@ -50,19 +50,23 @@ class BundleService extends BaseService {
       }
     }
 
-    response = await db[this.model].create({ ...bundleData, id: uuidv1(), campaignId: campaign.id })
+    response = await sequelizeInstance.transaction(async (t) => {
+      const createdBundle = await db[this.model].create({ ...bundleData, id: uuidv1(), campaignId: campaign.id }, { transaction: t })
 
-    if (bundle?.items?.length > 0) {
-      const items: any[] = []
-      bundle.items
-        .map((item: any) => ({ bundleId: response.id, ...item }))
-        .forEach((item: any) => {
-          item.id = uuidv1()
-          items.push(item)
-        })
+      if (bundle?.items?.length > 0) {
+        const items: any[] = []
+        bundle.items
+          .map((item: any) => ({ bundleId: createdBundle.id, ...item }))
+          .forEach((item: any) => {
+            item.id = uuidv1()
+            items.push(item)
+          })
 
-      await db.BundleItem.bulkCreate(items)
-    }
+        await db.BundleItem.bulkCreate(items, { transaction: t })
+      }
+
+      return createdBundle
+    })
 
     // Send to pub sub
     const product = {
@@ -127,32 +131,36 @@ class BundleService extends BaseService {
   async update (record: any, data: any): Promise<any> {
     const { merchantSku, name, price, description } = data
 
-    if (data?.items?.length > 0) {
-      data.items.forEach((item: IBundleItem) => {
-        const found = record.items.find((element: IBundleItem) => element.jfsku === item.jfsku && element.name === item.name && element.merchantSku === item.merchantSku)
+    const updatedRecord = await sequelizeInstance.transaction(async (t) => {
+      if (data?.items?.length > 0) {
+        data.items.forEach((item: IBundleItem) => {
+          const found = record.items.find((element: IBundleItem) => element.jfsku === item.jfsku && element.name === item.name && element.merchantSku === item.merchantSku)
 
-        if (found === undefined) {
-          db.BundleItem.create({ ...item, id: uuidv1(), bundleId: record.id })
-        }
-      })
-    }
+          if (found === undefined) {
+            db.BundleItem.create({ ...item, id: uuidv1(), bundleId: record.id }, { transaction: t })
+          }
+        })
+      }
 
-    if (data?.items?.length < record.items.length) {
-      record.items.forEach((item: IBundleItem) => {
-        const found = data.items.find((element: IBundleItem) => element.jfsku === item.jfsku && element.name === item.name && element.merchantSku === item.merchantSku)
+      if (data?.items?.length < record.items.length) {
+        record.items.forEach((item: IBundleItem) => {
+          const found = data.items.find((element: IBundleItem) => element.jfsku === item.jfsku && element.name === item.name && element.merchantSku === item.merchantSku)
 
-        if (found === undefined) {
-          db.BundleItem.destroy({
-            where: {
-              id: item.id
-            },
-            force: true
-          })
-        }
-      })
-    }
+          if (found === undefined) {
+            db.BundleItem.destroy({
+              where: {
+                id: item.id
+              },
+              force: true
+            }, { transaction: t })
+          }
+        })
+      }
 
-    const updatedRecord = await record.update({ merchantSku, name, price, description })
+      const updatedBundle = await record.update({ merchantSku, name, price, description }, { transaction: t })
+
+      return updatedBundle
+    })
 
     const product = {
       name,
