@@ -110,7 +110,7 @@ describe('Company actions', () => {
       expect(res).to.have.status(201)
       expect(res.body).to.include.keys('statusCode', 'success', 'company')
       expect(res.body.company).to.be.an('object')
-      expect(res.body.company).to.include.keys('id', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
+      expect(res.body.company).to.include.keys('id', 'customerId', 'suffix', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
     })
 
     it('Should return 403 Forbidden when an unverified user tries to create a company.', async () => {
