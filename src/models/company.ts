@@ -4,6 +4,7 @@ import { IAddress, ICompany, IUser } from '../types'
 const CompanyModel = (sequelize: any, DataTypes: any): any => {
   interface CompanyAttributes {
     id: string
+    customerId: number
     name: string
     suffix: string
     email: string
@@ -16,6 +17,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
 
   class Company extends Model<CompanyAttributes> {
     private readonly id: string
+    private readonly customerId: number
     private readonly name: string
     private readonly suffix: string
     private readonly email: string
@@ -55,6 +57,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     toJSONFor (): ICompany {
       return {
         id: this.id,
+        customerId: this.customerId,
         name: this.name,
         suffix: this.suffix,
         email: this.email,
@@ -76,6 +79,10 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
       type: DataTypes.UUID,
       primaryKey: true,
       allowNull: false
+    },
+    customerId: {
+      allowNull: true,
+      type: DataTypes.INTEGER
     },
     name: {
       type: DataTypes.STRING,

@@ -182,7 +182,8 @@ const validateCreatedCompany = Joi.object({
         'string.pattern.base': '{#label} must be numeric'
       }),
     vat: Joi.string().optional().max(24).allow('').allow(null),
-    domain: Joi.string().domain().allow('').allow(null)
+    domain: Joi.string().domain().allow('').allow(null),
+    customerId: Joi.number().optional().allow('').allow(null)
   }).required()
 })
 
@@ -196,7 +197,8 @@ const validateUpdatedCompany = Joi.object({
         'string.pattern.base': '{#label} must be numeric'
       }),
     vat: Joi.string().optional().max(24).allow('').allow(null),
-    domain: Joi.string().domain().allow('').allow(null)
+    domain: Joi.string().domain().allow('').allow(null),
+    customerId: Joi.number().optional().allow('').allow(null)
   }).required()
 })
 
