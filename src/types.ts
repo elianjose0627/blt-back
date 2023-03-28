@@ -94,6 +94,7 @@ export interface IBundle {
 
 export interface ICompany {
   id: string
+  customerId: number
   name: string
   suffix: string
   email: string
