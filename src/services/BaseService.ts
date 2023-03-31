@@ -23,7 +23,7 @@ export const generateInclude = (model: string): any => {
       [
         {
           model: db.Company,
-          attributes: ['id', 'name', 'email', 'phone', 'vat', 'domain'],
+          attributes: ['id', 'customerId', 'name', 'email', 'phone', 'vat', 'domain'],
           as: 'company',
           include: [
             {
@@ -45,7 +45,7 @@ export const generateInclude = (model: string): any => {
         include: [
           {
             model: db.Company,
-            attributes: ['id', 'name', 'email', 'phone', 'vat', 'domain'],
+            attributes: ['id', 'customerId', 'name', 'email', 'phone', 'vat', 'domain'],
             as: 'company',
             include: [
               {
@@ -126,7 +126,7 @@ class BaseService {
       ? [
           {
             model: db.Company,
-            attributes: ['id', 'name', 'email', 'phone', 'vat', 'domain'],
+            attributes: ['id', 'customerId', 'name', 'email', 'phone', 'vat', 'domain'],
             as: 'company',
             include: [
               {
