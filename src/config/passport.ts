@@ -16,7 +16,7 @@ const passportAuth = (passport: PassportStatic): any => {
     include: [
       {
         model: db.Company,
-        attributes: ['id', 'name', 'email', 'phone', 'vat', 'domain'],
+        attributes: ['id', 'customerId', 'name', 'email', 'phone', 'vat', 'domain'],
         as: 'company',
         include: [
           {
