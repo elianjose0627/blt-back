@@ -7,7 +7,7 @@ class ShipmentService extends BaseService {
       where: {
         trackingId
       },
-      paranoid: true
+      paranoid: false
     })
 
     return record
