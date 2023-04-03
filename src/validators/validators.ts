@@ -299,6 +299,12 @@ const validateSalutation = Joi.object({
   }).required()
 })
 
+const validateCostCenter = Joi.object({
+  costCenter: Joi.object({
+    center: Joi.number().required()
+  }).required()
+})
+
 const validateBundle = Joi.object({
   bundle: Joi.object({
     jfsku: Joi.string().allow('').allow(null).max(20),
@@ -349,6 +355,7 @@ export default {
   validateJoinCompany,
   validateUserCompanyRole,
   validateSalutation,
+  validateCostCenter,
   validateDomain,
   validateEmailVerification,
   validateUserActivation,

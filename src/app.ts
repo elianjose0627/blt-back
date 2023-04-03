@@ -43,6 +43,7 @@ app.use(apiPrefix, routers.bundleRouter())
 app.use(apiPrefix, routers.bundleItemRouter())
 app.use(apiPrefix, routers.pictureRouter())
 app.use(apiPrefix, routers.shipmentRouter())
+app.use(apiPrefix, routers.costCenterRouter())
 
 // Add validation middleware
 app.use(joiErrors)

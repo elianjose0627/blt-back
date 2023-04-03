@@ -69,6 +69,13 @@ export interface ISalutation {
   createdAt: Date
   updatedAt: Date
 }
+
+export interface ICostCenter {
+  id: string
+  center: number
+  createdAt: Date
+  updatedAt: Date
+}
 export interface IBundleItem {
   id: string
   jfsku: string

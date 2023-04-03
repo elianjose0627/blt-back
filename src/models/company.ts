@@ -52,6 +52,11 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         as: 'campaigns',
         onDelete: 'CASCADE'
       })
+      Company.hasMany(models.CostCenter, {
+        foreignKey: 'companyId',
+        as: 'costCenters',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): ICompany {

@@ -24,6 +24,7 @@ interface Database {
   BundleItem?: any
   Picture?: any
   Shipment?: any
+  CostCenter?: any
 }
 
 const db: Database = {}
