@@ -1,4 +1,5 @@
 import { v1 as uuidv1 } from 'uuid'
+import sequelize, { Op } from 'sequelize'
 import BaseService from './BaseService'
 import db from '../models'
 
@@ -41,6 +42,28 @@ class CostCenterService extends BaseService {
       count: records.count,
       rows: records.rows.map((record: any) => record.toJSONFor())
     }
+  }
+
+  async searchCostCenters (limit: any, offset: any, companyId: string, searchString: string): Promise<any> {
+    const centers = await db[this.model].findAndCountAll({
+      attributes: { exclude: ['companyId', 'deletedAt'] },
+      where: {
+        [Op.and]: [
+          { companyId },
+          sequelize.where(
+            sequelize.cast(sequelize.col('CostCenter.center'), 'varchar'),
+            { [Op.iLike]: `%${searchString}%` }
+          )
+        ]
+      },
+      limit,
+      offset,
+      order: [
+        ['createdAt', 'DESC']
+      ]
+    })
+
+    return centers
   }
 }
 
