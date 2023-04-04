@@ -3,7 +3,6 @@ import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import CostCenterController from '../controllers/CostCenterController'
 import asyncHandler from '../middlewares/asyncHandler'
-import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 
@@ -16,10 +15,10 @@ const costCenterRoutes = (): any => {
   }, { abortEarly: false }), asyncHandler(CostCenterController.checkRecord))
   costCenterRouter.route('/cost-centers/:id')
     .get(asyncHandler(CostCenterController.get))
-    .put(asyncHandler(checkAdmin), celebrate({
+    .put(asyncHandler(CostCenterController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin), celebrate({
       [Segments.BODY]: validator.validateCostCenter
     }), asyncHandler(CostCenterController.update))
-    .delete(asyncHandler(checkAdmin), asyncHandler(CostCenterController.delete))
+    .delete(asyncHandler(CostCenterController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin), asyncHandler(CostCenterController.delete))
   return costCenterRouter
 }
 
