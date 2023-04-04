@@ -1840,7 +1840,8 @@ describe('Company actions', () => {
         .post('/api/companies')
         .query({
           limit: 1,
-          page: 1
+          page: 1,
+          search: 1
         })
         .set('Authorization', `Bearer ${token}`)
         .send({
