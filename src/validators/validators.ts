@@ -161,7 +161,8 @@ const validateUsersQueryParams = Joi.object({
 const validateQueryParams = Joi.object({
   limit: Joi.number().optional(),
   page: Joi.number().optional(),
-  offset: Joi.number().optional()
+  offset: Joi.number().optional(),
+  search: Joi.any().optional()
 })
 
 const validateNotifications = Joi.object({

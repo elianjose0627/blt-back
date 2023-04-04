@@ -51,9 +51,15 @@ class CostCenterController extends BaseController {
   }
 
   async getAllForCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { limit, page, offset } = req.query
+    const { limit, page, offset, search } = req.query
     const { id } = req.params
-    const records = await costCenterService.getAllForCompany(limit, offset, id)
+    let records
+
+    if (search !== undefined) {
+      records = await costCenterService.searchCostCenters(limit, offset, id, search)
+    } else {
+      records = await costCenterService.getAllForCompany(limit, offset, id)
+    }
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),

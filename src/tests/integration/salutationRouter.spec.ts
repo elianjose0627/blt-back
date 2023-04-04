@@ -103,7 +103,7 @@ describe('Salutation actions', () => {
     })
 
     it('Should return 204 when a admin deletes a salutation.', async () => {
-      const resCompany = await chai
+      const resSalutation = await chai
         .request(app)
         .post('/api/salutations')
         .set('Authorization', `Bearer ${tokenAdmin}`)
@@ -115,7 +115,7 @@ describe('Salutation actions', () => {
 
       const res = await chai
         .request(app)
-        .delete(`/api/salutations/${String(resCompany.body.salutation.id)}`)
+        .delete(`/api/salutations/${String(resSalutation.body.salutation.id)}`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(204)
@@ -135,7 +135,7 @@ describe('Salutation actions', () => {
 
   describe('Get, update and delete a salutation', () => {
     it('Should return 200 OK when an owner gets a salutation by id.', async () => {
-      const resCompany = await chai
+      const resSalutation = await chai
         .request(app)
         .post('/api/salutations')
         .set('Authorization', `Bearer ${tokenAdmin}`)
@@ -145,7 +145,7 @@ describe('Salutation actions', () => {
           }
         })
 
-      const salutationId = resCompany.body.salutation.id
+      const salutationId = resSalutation.body.salutation.id
 
       const res = await chai
         .request(app)
