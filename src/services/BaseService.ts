@@ -18,12 +18,12 @@ export const generateInclude = (model: string): any => {
       ]
     )
   }
-  if (model === 'Campaign' || model === 'Address') {
+  if (model === 'Campaign' || model === 'Address' || model === 'CostCenter') {
     return (
       [
         {
           model: db.Company,
-          attributes: ['id', 'name', 'email', 'phone', 'vat', 'domain'],
+          attributes: ['id', 'customerId', 'name', 'email', 'phone', 'vat', 'domain'],
           as: 'company',
           include: [
             {
@@ -45,7 +45,7 @@ export const generateInclude = (model: string): any => {
         include: [
           {
             model: db.Company,
-            attributes: ['id', 'name', 'email', 'phone', 'vat', 'domain'],
+            attributes: ['id', 'customerId', 'name', 'email', 'phone', 'vat', 'domain'],
             as: 'company',
             include: [
               {
@@ -126,7 +126,7 @@ class BaseService {
       ? [
           {
             model: db.Company,
-            attributes: ['id', 'name', 'email', 'phone', 'vat', 'domain'],
+            attributes: ['id', 'customerId', 'name', 'email', 'phone', 'vat', 'domain'],
             as: 'company',
             include: [
               {
