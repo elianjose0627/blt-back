@@ -92,6 +92,8 @@ export interface IBundle {
   name: string
   description: string
   price: number
+  isLocked: boolean
+  isBillOfMaterials: boolean
   createdAt: Date
   updatedAt: Date
   campaign: ICampaign

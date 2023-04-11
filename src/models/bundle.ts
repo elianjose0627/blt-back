@@ -9,6 +9,8 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
     name: string
     description: string
     price: number
+    isLocked: boolean
+    isBillOfMaterials: boolean
   }
 
   class Bundle extends Model<BundleAttributes> {
@@ -18,6 +20,8 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
     private readonly name: string
     private readonly description: string
     private readonly price: number
+    private readonly isLocked: boolean
+    private readonly isBillOfMaterials: boolean
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly campaign: ICampaign
@@ -50,6 +54,8 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
         name: this.name,
         description: this.description,
         price: this.price,
+        isLocked: this.isLocked,
+        isBillOfMaterials: this.isBillOfMaterials,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         campaign: this.campaign,
@@ -84,6 +90,14 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
     price: {
       type: DataTypes.FLOAT,
       defaultValue: 0
+    },
+    isLocked: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    isBillOfMaterials: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   }, {
     sequelize,

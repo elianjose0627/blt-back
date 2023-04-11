@@ -313,6 +313,8 @@ const validateBundle = Joi.object({
     name: Joi.string().required().max(128),
     description: Joi.string().allow(null).allow('').max(128),
     price: Joi.number().max(1000000).min(0),
+    isLocked: Joi.boolean(),
+    isBillOfMaterials: Joi.boolean(),
     items: Joi.array().items(
       Joi.object({
         name: Joi.string().required().max(128),
