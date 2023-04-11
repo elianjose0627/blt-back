@@ -22,7 +22,9 @@ class BundleService extends BaseService {
       merchantSku: bundle.merchantSku,
       name: bundle.name,
       description: bundle.description,
-      price: bundle.price
+      price: bundle.price,
+      isLocked: bundle.isLocked,
+      isBillOfMaterials: bundle.isBillOfMaterials
     }
 
     response = await db[this.model].findOne({
@@ -129,7 +131,7 @@ class BundleService extends BaseService {
   }
 
   async update (record: any, data: any): Promise<any> {
-    const { merchantSku, name, price, description } = data
+    const { merchantSku, name, price, description, isLocked, isBillOfMaterials } = data
 
     const updatedRecord = await sequelizeInstance.transaction(async (t) => {
       if (data?.items?.length > 0) {
@@ -157,7 +159,14 @@ class BundleService extends BaseService {
         })
       }
 
-      const updatedBundle = await record.update({ merchantSku, name, price, description }, { transaction: t })
+      const updatedBundle = await record.update({
+        merchantSku,
+        name,
+        price,
+        description,
+        isLocked,
+        isBillOfMaterials
+      }, { transaction: t })
 
       return updatedBundle
     })
