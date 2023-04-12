@@ -7,11 +7,13 @@ class ProductService extends BaseService {
     const { company, product } = data
     let response: any
 
+    const companyId = company?.id ?? product?.companyId ?? null
+
     response = await db[this.model].findOne({
       include: generateInclude(this.model),
       where: {
         jfsku: product.jfsku,
-        companyId: company?.id ?? null
+        companyId
       },
       paranoid: false // To get soft deleted record
     })
@@ -22,7 +24,7 @@ class ProductService extends BaseService {
       return { response: updatedResponse.toJSONFor(company), status: 200 }
     }
 
-    response = await db[this.model].create({ ...product, id: uuidv1(), companyId: company?.id ?? null })
+    response = await db[this.model].create({ ...product, id: uuidv1(), companyId })
 
     return { response: response.toJSONFor(company), status: 201 }
   }

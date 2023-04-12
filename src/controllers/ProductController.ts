@@ -1,11 +1,13 @@
 import BaseController from './BaseController'
 import ProductService from '../services/ProductService'
+import CompanyService from '../services/CompanyService'
 import { CustomNext, CustomRequest, CustomResponse } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
 
 const productService = new ProductService('Product')
+const companyService = new CompanyService('Company')
 
 class ProductController extends BaseController {
   checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
@@ -32,9 +34,23 @@ class ProductController extends BaseController {
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { record: company, body: { product } } = req
 
-    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
+    // Used != to capture value that is undefined
+    if (product?.companyId != null) {
+      const company = await companyService.findById(product.companyId)
+      if (company === null) {
+        return res.status(statusCodes.NOT_FOUND).send({
+          statusCode: statusCodes.NOT_FOUND,
+          success: false,
+          errors: {
+            message: 'Company not found'
+          }
+        })
+      }
+    }
 
     const { response, status } = await productService.insert({ company, product })
+
+    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 
     const statusCode = {
       200: statusCodes.OK,
