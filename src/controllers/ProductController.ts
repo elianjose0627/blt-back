@@ -9,11 +9,11 @@ const productService = new ProductService('Product')
 
 class ProductController extends BaseController {
   checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
-    const { user: currentUser, record: { companyId, company: { owner } } } = req
+    const { user: currentUser, record: { companyId, company } } = req
 
     const allowedRoles = [userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER]
 
-    const isOwnerOrAdmin = currentUser?.id === owner?.id || currentUser.role === userRoles.ADMIN
+    const isOwnerOrAdmin = currentUser?.id === company?.owner?.id || currentUser.role === userRoles.ADMIN
     const isEmployee = currentUser?.companyId === companyId
 
     if (isOwnerOrAdmin || (isEmployee && allowedRoles.includes(currentUser?.role))) {
