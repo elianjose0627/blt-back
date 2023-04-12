@@ -11,7 +11,7 @@ class ProductService extends BaseService {
       include: generateInclude(this.model),
       where: {
         jfsku: product.jfsku,
-        companyId: company.id
+        companyId: company?.id ?? null
       },
       paranoid: false // To get soft deleted record
     })
@@ -22,7 +22,7 @@ class ProductService extends BaseService {
       return { response: updatedResponse.toJSONFor(company), status: 200 }
     }
 
-    response = await db[this.model].create({ ...product, id: uuidv1(), companyId: company?.id })
+    response = await db[this.model].create({ ...product, id: uuidv1(), companyId: company?.id ?? null })
 
     return { response: response.toJSONFor(company), status: 201 }
   }

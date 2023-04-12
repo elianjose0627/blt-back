@@ -13,6 +13,9 @@ const ProductRoutes = (): any => {
 
   productRouter.use('/products', checkAuth, checkUserIsVerifiedStatus)
   productRouter.route('/products')
+    .post(asyncHandler(checkAdmin), celebrate({
+      [Segments.BODY]: validator.validateProduct
+    }), asyncHandler(ProductController.insert))
     .get(asyncHandler(checkAdmin), celebrate({
       [Segments.QUERY]: validator.validateUsersQueryParams
     }), asyncHandler(paginate), asyncHandler(ProductController.getAll))
