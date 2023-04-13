@@ -11,6 +11,7 @@ import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import CostCenterController from '../controllers/CostCenterController'
+import ProductController from '../controllers/ProductController'
 
 const companyRoutes = (): any => {
   const companyRouter = express.Router()
@@ -60,6 +61,15 @@ const companyRoutes = (): any => {
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(CostCenterController.getAllForCompany))
+  companyRouter.route('/companies/:id/products')
+    .post(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin),
+      asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
+        [Segments.BODY]: validator.validateProduct
+      }, { abortEarly: false }), asyncHandler(ProductController.insert))
+    .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin),
+      asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
+        [Segments.QUERY]: validator.validateQueryParams
+      }), asyncHandler(paginate), asyncHandler(ProductController.getAllForCompany))
   companyRouter.route('/companies/:id/request-domain-verification')
     .get(asyncHandler(CompanyController.checkCompanyDomain), asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin),
       asyncHandler(CompanyController.getDomainVerificationCode))

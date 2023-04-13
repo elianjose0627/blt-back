@@ -133,6 +133,8 @@ class BundleService extends BaseService {
   async update (record: any, data: any): Promise<any> {
     const { merchantSku, name, price, description, isLocked, isBillOfMaterials } = data
 
+    // skip update of items when isLocked is true
+
     const updatedRecord = await sequelizeInstance.transaction(async (t) => {
       if (data?.items?.length > 0) {
         data.items.forEach((item: IBundleItem) => {

@@ -18,7 +18,7 @@ export const generateInclude = (model: string): any => {
       ]
     )
   }
-  if (model === 'Campaign' || model === 'Address' || model === 'CostCenter') {
+  if (model === 'Campaign' || model === 'Address' || model === 'CostCenter' || model === 'Product') {
     return (
       [
         {
