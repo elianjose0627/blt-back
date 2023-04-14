@@ -174,6 +174,26 @@ export interface ICampaign {
   company?: ICompany
 }
 
+export type ProductType = 'generic' | 'custom'
+export interface NetRetailPrice {
+  amount: number
+  currency: string
+  discount: number
+}
+
+export interface IProduct {
+  id: string
+  jfsku: string
+  name: string
+  merchantSku: string
+  productGroup: string
+  type: ProductType
+  netRetailPrice: NetRetailPrice
+  createdAt?: Date
+  updatedAt?: Date
+  company?: ICompany
+}
+
 export interface CustomRequest extends Request {
   user?: any
   employee?: any

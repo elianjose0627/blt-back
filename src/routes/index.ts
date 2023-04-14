@@ -11,6 +11,7 @@ import bundleItemRouter from './bundleItemRouter'
 import pictureRouter from './pictureRouter'
 import shipmentRouter from './shipmentRouter'
 import costCenterRouter from './costCenterRouter'
+import productRouter from './productRouter'
 
 const routers = {
   authRouter,
@@ -25,7 +26,8 @@ const routers = {
   bundleItemRouter,
   pictureRouter,
   shipmentRouter,
-  costCenterRouter
+  costCenterRouter,
+  productRouter
 }
 
 export default routers
