@@ -2219,7 +2219,8 @@ describe('Company actions', () => {
         .post('/api/companies')
         .query({
           limit: -10,
-          page: -1
+          page: -1,
+          search: '123'
         })
         .set('Authorization', `Bearer ${token}`)
         .send({
