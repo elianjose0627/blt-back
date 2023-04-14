@@ -44,6 +44,7 @@ app.use(apiPrefix, routers.bundleItemRouter())
 app.use(apiPrefix, routers.pictureRouter())
 app.use(apiPrefix, routers.shipmentRouter())
 app.use(apiPrefix, routers.costCenterRouter())
+app.use(apiPrefix, routers.productRouter())
 
 // Add validation middleware
 app.use(joiErrors)

@@ -2,6 +2,7 @@ import { Joi } from 'celebrate'
 
 import * as countryList from '../utils/countries'
 import * as userRoles from '../utils/userRoles'
+import * as currencies from '../utils/currencies'
 
 const imageMimeTypes = ['image/bmp', 'image/jpeg', 'image/x-png', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
 
@@ -334,6 +335,37 @@ const validatePicture = Joi.object({
   }).required()
 })
 
+const validateProduct = Joi.object({
+  product: Joi.object({
+    name: Joi.string().required().max(64),
+    jfsku: Joi.string().required().max(64),
+    merchantSku: Joi.string().required().max(64),
+    productGroup: Joi.string().required().max(64),
+    type: Joi.string().required().valid(...['generic', 'custom']),
+    netRetailPrice: Joi.object({
+      amount: Joi.number(),
+      currency: Joi.string().required().valid(...currencies.currencies),
+      discount: Joi.number()
+    })
+  }).required()
+})
+
+const validateProductAdmin = Joi.object({
+  product: Joi.object({
+    companyId: Joi.string().uuid().allow(null).default(null),
+    name: Joi.string().required().max(64),
+    jfsku: Joi.string().required().max(64),
+    merchantSku: Joi.string().required().max(64),
+    productGroup: Joi.string().required().max(64),
+    type: Joi.string().required().valid(...['generic', 'custom']),
+    netRetailPrice: Joi.object({
+      amount: Joi.number(),
+      currency: Joi.string().required().valid(...currencies.currencies),
+      discount: Joi.number()
+    })
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -366,5 +398,7 @@ export default {
   validateBundle,
   validateUserCompany,
   validatePicture,
-  validateTrackingId
+  validateTrackingId,
+  validateProduct,
+  validateProductAdmin
 }

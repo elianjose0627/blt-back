@@ -1964,6 +1964,415 @@ describe('Company actions', () => {
     })
   })
 
+  describe('Create a product', () => {
+    it('Should return 201 Created when a company owner successfully creates a product.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company14products.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/products`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: '123',
+            merchantSku: '123',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 201 Created when a campaign manager for a company successfully creates a product.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'happyhogan@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+
+      tokenCampaignManager = resCampaignManager.body.token
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/products`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: '1234',
+            merchantSku: '1234',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 403 Forbidden when a non-employee Campaign Manager tries to creates a product for a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company13product.com'
+          }
+        })
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(resCompany.body.company.id)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'happyhogan@starkindustriesmarvel.com',
+            actionType: 'remove'
+          }
+        })
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+
+      tokenCampaignManager = resCampaignManager.body.token
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/products`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: '123',
+            merchantSku: '123',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+    })
+
+    it('Should return 200 Success when a company owner tries to create a product that exists.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company12product.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/products`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: '123456',
+            merchantSku: '123456',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/products`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: '123456',
+            merchantSku: '123456',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 201 Created when an admin creates a product.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company11products.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: '1234567',
+            merchantSku: '1234567',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
+    })
+  })
+
+  describe('Get products', () => {
+    it('Should return 200 Success when an owner successfully retrieves all products.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company10productblt.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/products`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: '123',
+            merchantSku: '123',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/products`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array')
+    })
+
+    it('Should return 200 Success when an owner successfully retrieves all products with negative pagination params.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .query({
+          limit: -10,
+          page: -1,
+          search: '123'
+        })
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company9products.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/products`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array')
+    })
+
+    it('Should return 200 Success when an owner successfully retrieves all products with pagination params.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .query({
+          limit: 1,
+          page: 1,
+          search: 1
+        })
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company8products.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/products`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array')
+    })
+
+    it('Should return 200 Success when a company administrator successfully retrieves all products.', async () => {
+      await deleteTestUser('nickfury@starkindustriesmarvel.com')
+      await createCompanyAdministrator()
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/products`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array')
+    })
+
+    it('Should return 403 Forbidden when a company admin who is not an employee tries to retrieve all products.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company6products.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustriesmarvel.com',
+            actionType: 'remove'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/products`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+    })
+
+    it('Should return 200 when an admin retrieves all company products.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company5products.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array')
+    })
+  })
+
   describe('Get all users of a company', () => {
     it('Should return 200 Success when an owner successfully retrieves all users of a company.', async () => {
       const resCompany = await chai
