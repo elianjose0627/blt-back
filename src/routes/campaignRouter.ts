@@ -16,7 +16,7 @@ const CampaignRoutes = (): any => {
   campaignRouter.use('/campaigns', checkAuth, checkUserIsVerifiedStatus)
   campaignRouter.route('/campaigns')
     .get(asyncHandler(checkAdmin), celebrate({
-      [Segments.QUERY]: validator.validateUsersQueryParams
+      [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CampaignController.getAll))
   campaignRouter.use('/campaigns/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
