@@ -57,6 +57,22 @@ describe('Product actions', () => {
       expect(res.body.products).to.be.an('array')
     })
 
+    it('Should return 200 Success when an admin successfully retrieves all products with params.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/products')
+        .query({
+          limit: 10,
+          page: 1,
+          search: '123'
+        })
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array')
+    })
+
     it('Should return 403 when a non-admin retrieves all products.', async () => {
       const res = await chai
         .request(app)

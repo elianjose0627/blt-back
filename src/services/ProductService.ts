@@ -1,4 +1,5 @@
 import { v1 as uuidv1 } from 'uuid'
+import { Op } from 'sequelize'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 
@@ -63,6 +64,51 @@ class ProductService extends BaseService {
       count: records.count,
       rows: records.rows.map((record: any) => record.toJSONFor())
     }
+  }
+
+  async searchCompanyProducts (limit: any, offset: any, companyId: string, searchString: string): Promise<any> {
+    const products = await db[this.model].findAndCountAll({
+      attributes: { exclude: ['companyId', 'deletedAt'] },
+      where: {
+        [Op.and]: [
+          { companyId },
+          {
+            [Op.or]: [
+              { name: { [Op.iLike]: `%${searchString}%` } },
+              { jfsku: { [Op.iLike]: `%${searchString}%` } },
+              { merchantSku: { [Op.iLike]: `%${searchString}%` } }
+            ]
+          }
+        ]
+      },
+      limit,
+      offset,
+      order: [
+        ['createdAt', 'DESC']
+      ]
+    })
+
+    return products
+  }
+
+  async searchProducts (limit: any, offset: any, searchString: string): Promise<any> {
+    const products = await db[this.model].findAndCountAll({
+      attributes: { exclude: ['companyId', 'deletedAt'] },
+      where: {
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${searchString}%` } },
+          { jfsku: { [Op.iLike]: `%${searchString}%` } },
+          { merchantSku: { [Op.iLike]: `%${searchString}%` } }
+        ]
+      },
+      limit,
+      offset,
+      order: [
+        ['createdAt', 'DESC']
+      ]
+    })
+
+    return products
   }
 }
 

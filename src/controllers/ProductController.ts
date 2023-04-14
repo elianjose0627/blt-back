@@ -64,10 +64,40 @@ class ProductController extends BaseController {
     })
   }
 
+  async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { limit, page, offset, search } = req.query
+    let records
+
+    if (search !== undefined) {
+      records = await productService.searchProducts(limit, offset, search)
+    } else {
+      records = await productService.getAll(limit, offset)
+    }
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / limit),
+      perPage: limit,
+      page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      [productService.manyRecords()]: records.rows
+    })
+  }
+
   async getAllForCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { limit, page, offset } = req.query
+    const { limit, page, offset, search } = req.query
     const { id } = req.params
-    const records = await productService.getAllForCompany(limit, offset, id)
+    let records
+
+    if (search !== undefined) {
+      records = await productService.searchCompanyProducts(limit, offset, id, search)
+    } else {
+      records = await productService.getAllForCompany(limit, offset, id)
+    }
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),
