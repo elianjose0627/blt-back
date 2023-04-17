@@ -35,11 +35,11 @@ const companyRoutes = (): any => {
     }), asyncHandler(CompanyController.checkCompanyDomainAndEmailDomain), asyncHandler(CompanyController.update))
     .delete(asyncHandler(checkAdmin), asyncHandler(CompanyController.delete))
   companyRouter.route('/companies/:id/addresses')
-    .post(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin),
+    .post(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin),
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.BODY]: validator.validateCreatedAddress
       }, { abortEarly: false }), asyncHandler(CompanyController.createAddress))
-    .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin),
+    .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin),
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(AddressController.getAllForCompany))
