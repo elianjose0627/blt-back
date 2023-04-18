@@ -218,6 +218,11 @@ export interface EmailMessage {
   subject: string
   text: string
   html?: string
+  mail_settings?: {
+    sandbox_mode: {
+      enable: boolean
+    }
+  }
 }
 
 export interface CustomResponse extends Response {}

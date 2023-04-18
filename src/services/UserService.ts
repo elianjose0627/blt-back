@@ -19,6 +19,7 @@ const mailer = String(process.env.MAILER_EMAIL)
 const salesMailer = String(process.env.SALES_MAILER_EMAIL)
 const adminEmail = String(process.env.ADMIN_EMAIL)
 const resetPasswordExpiration = '10 minutes'
+const sandboxMode = process.env.NODE_ENV === 'test'
 
 const include = [
   {
@@ -97,7 +98,7 @@ class UserService extends BaseService {
         <p>${footer}</p>
         `
 
-      await sendNotifierEmail(email, subject, message, false, message)
+      await sendNotifierEmail(email, subject, message, false, message, sandboxMode)
     }
 
     return record.toJSONFor()
@@ -191,7 +192,7 @@ class UserService extends BaseService {
         const bccStatus = false
         const message = `Hello ${String(updatedRecord.firstName)}, your password for ${appName} App has been updated. \nIf you didn't ask to change your password, contact us immediately through ${adminEmail}. \n\nThanks,\n\n${appName} Application team`
         try {
-          await sendNotifierEmail(updatedRecord.email, 'Password Change', message, bccStatus)
+          await sendNotifierEmail(updatedRecord.email, 'Password Change', message, bccStatus, '', sandboxMode)
         } catch (error) {}
 
         return updatedRecord.toJSONFor()
@@ -236,7 +237,7 @@ class UserService extends BaseService {
       <p>${footer}</p>
       `
 
-      const info = await sendNotifierEmail(email, subject, message, false, message)
+      const info = await sendNotifierEmail(email, subject, message, false, message, false)
 
       if (info[0].statusCode === 202) {
         return info
@@ -290,7 +291,7 @@ class UserService extends BaseService {
 
     await user.update({ otp: { createdAt: dayjs.utc(), value: otp } })
 
-    const info = await sendNotifierEmail(email, subject, message, false, message)
+    const info = await sendNotifierEmail(email, subject, message, false, message, false)
 
     if (info[0].statusCode === 202) {
       return info

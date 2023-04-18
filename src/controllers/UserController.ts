@@ -18,6 +18,7 @@ const companyService = new CompanyService('Company')
 const appName = String(process.env.APP_NAME)
 const appUrl = String(process.env.APP_URL)
 const mailer = String(process.env.MAILER_EMAIL)
+const sandboxMode = process.env.NODE_ENV === 'test'
 
 class UserController extends BaseController {
   async checkOwner (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
@@ -352,7 +353,7 @@ class UserController extends BaseController {
       <p>${footer}</p>
       `
 
-      await sendNotifierEmail(email, subject, message, false, message)
+      await sendNotifierEmail(email, subject, message, false, message, sandboxMode)
 
       return res.status(statusCodes.NOT_FOUND).send({
         statusCode: statusCodes.NOT_FOUND,
@@ -402,7 +403,7 @@ class UserController extends BaseController {
       <p>${footer}</p>
       `
 
-      await sendNotifierEmail(email, subject, message, false, message)
+      await sendNotifierEmail(email, subject, message, false, message, sandboxMode)
     }
 
     return res.status(statusCodes.OK).send({
