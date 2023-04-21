@@ -12,6 +12,7 @@ import pictureRouter from './pictureRouter'
 import shipmentRouter from './shipmentRouter'
 import costCenterRouter from './costCenterRouter'
 import productRouter from './productRouter'
+import orderRouter from './orderRouter'
 
 const routers = {
   authRouter,
@@ -27,7 +28,8 @@ const routers = {
   pictureRouter,
   shipmentRouter,
   costCenterRouter,
-  productRouter
+  productRouter,
+  orderRouter
 }
 
 export default routers

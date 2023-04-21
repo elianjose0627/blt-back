@@ -194,6 +194,108 @@ export interface IProduct {
   company?: ICompany
 }
 
+export interface ShippingAddress {
+  lastname: string
+  city: string
+  email: string
+  firstname: string
+  street: string
+  zip: string
+  country: string
+  extraAddressLine?: string
+}
+
+export interface Item {
+  jfsku: string
+  outboundItemId: string
+  name: string
+  merchantSku: string
+  quantity: number
+  itemType: string
+  quantityOpen: number
+  externalNumber: string
+  price: number
+  vat: number
+  billOfMaterialsId?: string
+}
+
+export interface SenderAddress {
+  company: string
+  city: string
+  email: string
+  street: string
+  zip: string
+  country: string
+  phone: string
+}
+
+export interface Attribute {
+  key: string
+  value: string
+  attributeType: string
+}
+
+export interface StatusTimestamp {
+  pending: string
+  preparation: string
+  acknowledged: string
+}
+
+export interface ModificationInfo {
+  createdAt: string
+  updatedAt: string
+  state: string
+}
+
+export interface Outbound {
+  outboundId: string
+  fulfillerId: string
+  merchantOutboundNumber: string
+  warehouseId: string
+  status: string
+  shippingAddress: ShippingAddress
+  items: Item[]
+  senderAddress: SenderAddress
+  attributes: Attribute[]
+  statusTimestamp: StatusTimestamp
+  priority: number
+  currency: string
+  externalNote: string
+  salesChannel: string
+  desiredDeliveryDate: string
+  shippingMethodId: string
+  shippingType: string
+  shippingFee: number
+  orderValue: number
+  attachments: any[]
+  modificationInfo: ModificationInfo
+}
+
+export interface IOrder {
+  id: string
+  outboundId: string
+  fulfillerId: string
+  merchantOutboundNumber: string
+  warehouseId: string
+  status: string
+  shippingAddress: ShippingAddress
+  items: Item[]
+  senderAddress: SenderAddress
+  attributes: Attribute[]
+  priority: number
+  currency: string
+  externalNote: string
+  salesChannel: string
+  desiredDeliveryDate: string
+  shippingMethodId: string
+  shippingType: string
+  shippingFee: number
+  orderValue: number
+  createdAt?: Date
+  updatedAt?: Date
+  company?: ICompany
+}
+
 export interface CustomRequest extends Request {
   user?: any
   employee?: any

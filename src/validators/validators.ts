@@ -366,6 +366,69 @@ const validateProductAdmin = Joi.object({
   }).required()
 })
 
+const validateOrder = Joi.object({
+  order: Joi.object({
+    outboundId: Joi.string().required(),
+    fulfillerId: Joi.string().required(),
+    merchantOutboundNumber: Joi.string().required(),
+    warehouseId: Joi.string().required(),
+    status: Joi.string().required(),
+    shippingAddress: Joi.object({
+      lastname: Joi.string(),
+      city: Joi.string().required(),
+      email: Joi.string(),
+      firstname: Joi.string(),
+      street: Joi.string().required(),
+      zip: Joi.string().required(),
+      country: Joi.string().required()
+    }),
+    items: Joi.array().items(
+      Joi.object({
+        jfsku: Joi.string().required().max(20),
+        outboundItemId: Joi.string().required(),
+        name: Joi.string().required().max(128),
+        merchantSku: Joi.string().required().max(40),
+        quantity: Joi.number(),
+        itemType: Joi.string().required().valid(...['BillOfMaterials', 'Product']),
+        quantityOpen: Joi.number(),
+        externalNumber: Joi.string().allow('').allow(null),
+        price: Joi.number(),
+        vat: Joi.number(),
+        billOfMaterialsId: Joi.string()
+
+      })
+    ).min(1),
+    senderAddress: Joi.object({
+      company: Joi.string(),
+      city: Joi.string().required(),
+      email: Joi.string(),
+      street: Joi.string().required(),
+      zip: Joi.string().required(),
+      country: Joi.string().required(),
+      phone: Joi.string().required()
+    }),
+    attributes: Joi.array().items(
+      Joi.object(
+        {
+          key: Joi.string(),
+          value: Joi.string(),
+          attributeType: Joi.string()
+        }
+      )
+    ),
+    priority: Joi.number(),
+    currency: Joi.string(),
+    externalNote: Joi.string(),
+    salesChannel: Joi.string(),
+    desiredDeliveryDate: Joi.date(),
+    shippingMethodId: Joi.string(),
+    shippingType: Joi.string(),
+    shippingFee: Joi.number(),
+    orderValue: Joi.number(),
+    attachments: Joi.any()
+  })
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -400,5 +463,6 @@ export default {
   validatePicture,
   validateTrackingId,
   validateProduct,
-  validateProductAdmin
+  validateProductAdmin,
+  validateOrder
 }
