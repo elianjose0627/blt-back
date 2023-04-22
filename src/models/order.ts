@@ -136,7 +136,7 @@ const SalutationModel = (sequelize: any, DataTypes: any): any => {
     },
     externalNote: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     salesChannel: {
       type: DataTypes.STRING,
