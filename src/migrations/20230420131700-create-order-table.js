@@ -45,31 +45,31 @@ module.exports = {
       },
       priority: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       currency: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       externalNote: {
-        type: Sequelize.STRING,
-        allowNull: false
+        type: Sequelize.TEXT,
+        allowNull: true
       },
       salesChannel: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       desiredDeliveryDate: {
         type: Sequelize.DATE,
-        allowNull: false
+        allowNull: true
       },
       shippingMethodId: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       shippingType: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       shippingFee: {
         type: Sequelize.DOUBLE,

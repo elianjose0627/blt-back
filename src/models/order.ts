@@ -128,31 +128,31 @@ const SalutationModel = (sequelize: any, DataTypes: any): any => {
     },
     priority: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     currency: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     externalNote: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: true
     },
     salesChannel: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     desiredDeliveryDate: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: true
     },
     shippingMethodId: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     shippingType: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     shippingFee: {
       type: DataTypes.DOUBLE,
