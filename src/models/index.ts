@@ -26,6 +26,7 @@ interface Database {
   Shipment?: any
   CostCenter?: any
   Product?: any
+  Order?: any
 }
 
 const db: Database = {}

@@ -1,6 +1,8 @@
 import { v1 as uuidv1 } from 'uuid'
 import db from '../models'
 
+const includeCompany = ['Campaign', 'Address', 'CostCenter', 'Product', 'Order']
+
 export const generateInclude = (model: string): any => {
   if (model === 'Company') {
     return (
@@ -18,7 +20,7 @@ export const generateInclude = (model: string): any => {
       ]
     )
   }
-  if (model === 'Campaign' || model === 'Address' || model === 'CostCenter' || model === 'Product') {
+  if (includeCompany.includes(model)) {
     return (
       [
         {

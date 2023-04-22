@@ -314,3 +314,225 @@ export const verifyCompanyDomain = async (id: string): Promise<any> => {
     })
   }
 }
+
+export const order = {
+  outboundId: 'VZ9N02A3Y4',
+  fulfillerId: 'NDZ2',
+  merchantOutboundNumber: 'AU-2023-21635-001',
+  warehouseId: 'NDZ204DE-12589-0002',
+  status: 'Acknowledged',
+  shippingAddress: {
+    lastname: 'Wire',
+    city: 'Nairobi',
+    email: 'rayosim09@gmail.com',
+    firstname: 'Ryan',
+    street: 'Kiu River Road',
+    zip: '254724374281',
+    country: 'KE'
+  },
+  items: [
+    {
+      jfsku: 'VZ9N01SJN9E',
+      outboundItemId: '222495',
+      name: 'Zeppelin Box - Apriil 2023',
+      merchantSku: '1552',
+      quantity: 1,
+      itemType: 'BillOfMaterials',
+      quantityOpen: 1,
+      externalNumber: '',
+      price: 0,
+      vat: 19
+    },
+    {
+      jfsku: 'VZ9N016LAW1',
+      outboundItemId: '222496',
+      name: 'Rettergut - Schokolade - Dark Milk',
+      merchantSku: '245',
+      quantity: 1,
+      itemType: 'Product',
+      quantityOpen: 1,
+      externalNumber: '',
+      price: 0,
+      vat: 0,
+      billOfMaterialsId: '222495'
+    },
+    {
+      jfsku: 'VZ9N019D762',
+      outboundItemId: '222497',
+      name: 'Heimatgut - Bio Popcorn Zimt',
+      merchantSku: '324',
+      quantity: 1,
+      itemType: 'Product',
+      quantityOpen: 1,
+      externalNumber: '',
+      price: 0,
+      vat: 0,
+      billOfMaterialsId: '222495'
+    },
+    {
+      jfsku: 'VZ9N019TCQE',
+      outboundItemId: '222498',
+      name: 'Grußkarte - Zeppelin',
+      merchantSku: '999400000001',
+      quantity: 1,
+      itemType: 'Product',
+      quantityOpen: 1,
+      externalNumber: '',
+      price: 0,
+      vat: 0,
+      billOfMaterialsId: '222495'
+    },
+    {
+      jfsku: 'VZ9N015EGTB',
+      outboundItemId: '222499',
+      name: 'Kartonage - Zeppelin',
+      merchantSku: '000000000016',
+      quantity: 1,
+      itemType: 'Product',
+      quantityOpen: 1,
+      externalNumber: '',
+      price: 0,
+      vat: 0,
+      billOfMaterialsId: '222495'
+    },
+    {
+      jfsku: 'VZ9N01EQJ3X',
+      outboundItemId: '222500',
+      name: 'Notizbuch - Corknote - 1c - kork - Zeppelin',
+      merchantSku: '777',
+      quantity: 1,
+      itemType: 'Product',
+      quantityOpen: 1,
+      externalNumber: '',
+      price: 0,
+      vat: 0,
+      billOfMaterialsId: '222495'
+    },
+    {
+      jfsku: 'VZ9N01LYRMJ',
+      outboundItemId: '222501',
+      name: 'Kugelschreiber - Sumatra - laser - Zeppelin',
+      merchantSku: '778',
+      quantity: 1,
+      itemType: 'Product',
+      quantityOpen: 1,
+      externalNumber: '',
+      price: 0,
+      vat: 0,
+      billOfMaterialsId: '222495'
+    },
+    {
+      jfsku: 'VZ9N014DZ4U',
+      outboundItemId: '222502',
+      name: 'Antistressball - 1c- white - Zeppelin',
+      merchantSku: '780',
+      quantity: 1,
+      itemType: 'Product',
+      quantityOpen: 1,
+      externalNumber: '',
+      price: 0,
+      vat: 0,
+      billOfMaterialsId: '222495'
+    },
+    {
+      jfsku: 'VZ9N01RFJSG',
+      outboundItemId: '222503',
+      name: 'Füllmaterial - Natur ',
+      merchantSku: '1341',
+      quantity: 1,
+      itemType: 'Product',
+      quantityOpen: 1,
+      externalNumber: '',
+      price: 0,
+      vat: 0,
+      billOfMaterialsId: '222495'
+    },
+    {
+      jfsku: 'VZ9N018R1P3',
+      outboundItemId: '222504',
+      name: 'Pflanzwürfel - Riesenbambus - Zeppelin',
+      merchantSku: '1484',
+      quantity: 1,
+      itemType: 'Product',
+      quantityOpen: 1,
+      externalNumber: '',
+      price: 0,
+      vat: 0,
+      billOfMaterialsId: '222495'
+    },
+    {
+      jfsku: 'VZ9N01JY2YR',
+      outboundItemId: '222505',
+      name: 'Toolie+ - laser - Zeppelin',
+      merchantSku: '1495',
+      quantity: 1,
+      itemType: 'Product',
+      quantityOpen: 1,
+      externalNumber: '',
+      price: 0,
+      vat: 0,
+      billOfMaterialsId: '222495'
+    }
+  ],
+  senderAddress: {
+    company: 'big little things GmbH',
+    city: 'München',
+    email: 'hello@biglittlethings.de',
+    street: 'Kaufingerstraße 15',
+    zip: '80331',
+    country: 'DE',
+    phone: '(089) 2009 2033'
+  },
+  attributes: [
+    {
+      key: 'Firma',
+      value: 'Zeppelin GmbH',
+      attributeType: 'String'
+    },
+    {
+      key: 'Vorname',
+      value: 'Katrin',
+      attributeType: 'String'
+    },
+    {
+      key: 'Nachname',
+      value: 'Banks',
+      attributeType: 'String'
+    },
+    {
+      key: 'Straße',
+      value: 'Graf-Zeppelin-Platz 1',
+      attributeType: 'String'
+    },
+    {
+      key: 'PLZ',
+      value: '85748',
+      attributeType: 'String'
+    },
+    {
+      key: 'Ort',
+      value: 'Garching bei München',
+      attributeType: 'String'
+    },
+    {
+      key: 'Land',
+      value: 'Deutschland',
+      attributeType: 'String'
+    },
+    {
+      key: 'E-Mail-Adresse',
+      value: 'hello@biglittlethings.de',
+      attributeType: 'String'
+    }
+  ],
+  priority: 0,
+  currency: 'EUR',
+  externalNote: 'Mit DHL versenden. Versanddatum: 20.04.2023',
+  salesChannel: 'XML-Import',
+  desiredDeliveryDate: '2023-04-19T22:00:00.000+00:00',
+  shippingMethodId: 'NDZ20AAFC64A2SER',
+  shippingType: 'Standard',
+  shippingFee: 0,
+  orderValue: 0,
+  attachments: []
+}
