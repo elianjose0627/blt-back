@@ -22,6 +22,7 @@ const appName = String(process.env.APP_NAME)
 const appUrl = String(process.env.APP_URL)
 const mailer = String(process.env.MAILER_EMAIL)
 const salesMailer = String(process.env.SALES_MAILER_EMAIL)
+const sandboxMode = process.env.NODE_ENV === 'test'
 
 const mininumWaitDaysForDomainVerificationCode = 7
 
@@ -234,7 +235,7 @@ class CompanyController extends BaseController {
       ${appName} team</p>
       <p>${footer}</p>
       `
-      await sendNotifierEmail(createdTemporaryUser.email, subject, message, false, message)
+      await sendNotifierEmail(createdTemporaryUser.email, subject, message, false, message, sandboxMode)
     } else {
       if (adminCreatedUser.role === userRoles.USER) {
         await userService.update(adminCreatedUser, { role: userRoles.COMPANYADMINISTRATOR, logoutTime: Date() })
@@ -258,7 +259,7 @@ class CompanyController extends BaseController {
         ${appName} team</p>
         <p>${footer}</p>
         `
-        await sendNotifierEmail(adminCreatedUser.email, subject, message, false, message)
+        await sendNotifierEmail(adminCreatedUser.email, subject, message, false, message, sandboxMode)
       }
 
       if (adminCreatedUser.role === userRoles.COMPANYADMINISTRATOR && adminCreatedUser.company !== null) {
@@ -371,7 +372,7 @@ class CompanyController extends BaseController {
       <p>${footer}</p>
       `
 
-      await sendNotifierEmail(userToUpdate.email, subject, message, false, message)
+      await sendNotifierEmail(userToUpdate.email, subject, message, false, message, sandboxMode)
 
       return res.status(statusCodes.OK).send({
         statusCode: statusCodes.OK,
