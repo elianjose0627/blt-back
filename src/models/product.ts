@@ -68,11 +68,11 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     },
     type: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     productGroup: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     netRetailPrice: {
       type: DataTypes.JSON,
