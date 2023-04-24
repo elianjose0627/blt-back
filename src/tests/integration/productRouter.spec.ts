@@ -277,6 +277,17 @@ describe('Product actions', () => {
       expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
     })
 
+    it('Should return 422 Unprocessable entity when an administrator gets a product using an invalid id.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/products/123')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('A validation error has occured')
+    })
+
     it('Should return 200 OK when an administrator updates a product by id.', async () => {
       const resProduct = await chai
         .request(app)
