@@ -23,6 +23,24 @@ class OrderService extends BaseService {
     let records
     const allowedCompanyRoles = [userRoles.CAMPAIGNMANAGER, userRoles.COMPANYADMINISTRATOR]
 
+    let where = generateFilterQuery(filter)
+    if (search !== undefined || search !== '') {
+      where = {
+        [Op.and]: [
+          {
+            [Op.or]: [
+              { 'shippingAddress.firstname': { [Op.iLike]: `%${search}%` } },
+              { 'shippingAddress.lastname': { [Op.iLike]: `%${search}%` } },
+              { 'shippingAddress.email': { [Op.iLike]: `%${search}%` } },
+              { 'shippingAddress.company': { [Op.iLike]: `%${search}%` } },
+              { 'shippingAddress.city': { [Op.iLike]: `%${search}%` } }
+            ]
+          },
+          where
+        ]
+      }
+    }
+
     if (user.role === userRoles.ADMIN) {
       records = await db[this.model].findAndCountAll({
         include: generateInclude(this.model),
@@ -30,16 +48,7 @@ class OrderService extends BaseService {
         offset,
         order: [['createdAt', 'DESC']],
         attributes: { exclude: [] },
-        where: {
-          [Op.or]: [
-            { 'shippingAddress.firstname': { [Op.iLike]: `%${search}%` } },
-            { 'shippingAddress.lastname': { [Op.iLike]: `%${search}%` } },
-            { 'shippingAddress.email': { [Op.iLike]: `%${search}%` } },
-            { 'shippingAddress.company': { [Op.iLike]: `%${search}%` } },
-            { 'shippingAddress.city': { [Op.iLike]: `%${search}%` } }
-          ],
-          ...generateFilterQuery(filter)
-        }
+        where
       })
     } else if (allowedCompanyRoles.includes(user.role)) {
       records = await db[this.model].findAndCountAll({
@@ -48,19 +57,7 @@ class OrderService extends BaseService {
         offset,
         order: [['createdAt', 'DESC']],
         attributes: { exclude: [] },
-        where: {
-          [Op.and]: {
-            companyId: user.company.id,
-            [Op.or]: [
-              { 'shippingAddress.firstname': { [Op.iLike]: `%${search}%` } },
-              { 'shippingAddress.lastname': { [Op.iLike]: `%${search}%` } },
-              { 'shippingAddress.email': { [Op.iLike]: `%${search}%` } },
-              { 'shippingAddress.company': { [Op.iLike]: `%${search}%` } },
-              { 'shippingAddress.city': { [Op.iLike]: `%${search}%` } }
-            ],
-            ...generateFilterQuery(filter)
-          }
-        }
+        where
       })
     } else {
       records = await db[this.model].findAndCountAll({
@@ -69,19 +66,7 @@ class OrderService extends BaseService {
         offset,
         order: [['createdAt', 'DESC']],
         attributes: { exclude: [] },
-        where: {
-          [Op.and]: {
-            'shippingAddress.email': user.email,
-            [Op.or]: [
-              { 'shippingAddress.firstname': { [Op.iLike]: `%${search}%` } },
-              { 'shippingAddress.lastname': { [Op.iLike]: `%${search}%` } },
-              { 'shippingAddress.email': { [Op.iLike]: `%${search}%` } },
-              { 'shippingAddress.company': { [Op.iLike]: `%${search}%` } },
-              { 'shippingAddress.city': { [Op.iLike]: `%${search}%` } }
-            ],
-            ...generateFilterQuery(filter)
-          }
-        }
+        where
       })
     }
 
