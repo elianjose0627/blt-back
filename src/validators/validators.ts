@@ -169,7 +169,8 @@ const validateQueryParams = Joi.object({
     lastname: Joi.string().optional(),
     email: Joi.string().email().optional(),
     city: Joi.string().optional(),
-    country: Joi.string().length(2).optional()
+    country: Joi.string().length(2).optional(),
+    company: Joi.string().optional()
   }).optional()
 })
 
