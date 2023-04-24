@@ -8,7 +8,7 @@ function generateFilterQuery (filter: object): object {
   const filterQuery: object = {}
 
   Object.entries(filter).forEach(([key, value]) => {
-    if (value !== undefined || value !== '') {
+    if (value !== undefined && value !== '') {
       filterQuery[`shippingAddress.${key}`] = {
         [Op.iLike]: `%${String(value)}%`
       }
@@ -24,7 +24,7 @@ class OrderService extends BaseService {
     const allowedCompanyRoles = [userRoles.CAMPAIGNMANAGER, userRoles.COMPANYADMINISTRATOR]
 
     let where = generateFilterQuery(filter)
-    if (search !== undefined || search !== '') {
+    if (search !== undefined && search !== '') {
       where = {
         [Op.and]: [
           {
