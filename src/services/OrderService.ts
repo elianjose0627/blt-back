@@ -1,12 +1,45 @@
 import { v1 as uuidv1 } from 'uuid'
+import { Op } from 'sequelize'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 import * as userRoles from '../utils/userRoles'
 
+function generateFilterQuery (filter: object): object {
+  const filterQuery: object = {}
+
+  Object.entries(filter).forEach(([key, value]) => {
+    if (value !== undefined && value !== '') {
+      filterQuery[`shippingAddress.${key}`] = {
+        [Op.iLike]: `%${String(value)}%`
+      }
+    }
+  })
+
+  return filterQuery
+}
+
 class OrderService extends BaseService {
-  async getAll (limit: number, offset: number, user?: any): Promise<any> {
+  async getAll (limit: number, offset: number, user?: any, search: string = '', filter = { firstname: '', lastname: '', email: '', city: '', country: '' }): Promise<any> {
     let records
     const allowedCompanyRoles = [userRoles.CAMPAIGNMANAGER, userRoles.COMPANYADMINISTRATOR]
+
+    let where = generateFilterQuery(filter)
+    if (search !== undefined && search !== '') {
+      where = {
+        [Op.and]: [
+          {
+            [Op.or]: [
+              { 'shippingAddress.firstname': { [Op.iLike]: `%${search}%` } },
+              { 'shippingAddress.lastname': { [Op.iLike]: `%${search}%` } },
+              { 'shippingAddress.email': { [Op.iLike]: `%${search}%` } },
+              { 'shippingAddress.company': { [Op.iLike]: `%${search}%` } },
+              { 'shippingAddress.city': { [Op.iLike]: `%${search}%` } }
+            ]
+          },
+          where
+        ]
+      }
+    }
 
     if (user.role === userRoles.ADMIN) {
       records = await db[this.model].findAndCountAll({
@@ -14,7 +47,8 @@ class OrderService extends BaseService {
         limit,
         offset,
         order: [['createdAt', 'DESC']],
-        attributes: { exclude: [] }
+        attributes: { exclude: [] },
+        where
       })
     } else if (allowedCompanyRoles.includes(user.role)) {
       records = await db[this.model].findAndCountAll({
@@ -23,9 +57,7 @@ class OrderService extends BaseService {
         offset,
         order: [['createdAt', 'DESC']],
         attributes: { exclude: [] },
-        where: {
-          companyId: user.company.id
-        }
+        where
       })
     } else {
       records = await db[this.model].findAndCountAll({
@@ -34,9 +66,7 @@ class OrderService extends BaseService {
         offset,
         order: [['createdAt', 'DESC']],
         attributes: { exclude: [] },
-        where: {
-          'shippingAddress.email': user.email
-        }
+        where
       })
     }
 

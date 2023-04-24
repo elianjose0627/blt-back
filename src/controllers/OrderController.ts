@@ -8,9 +8,9 @@ const orderService = new OrderService('Order')
 
 class OrderController extends BaseController {
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { user: currentUser, query: { limit, page, offset } } = req
+    const { user: currentUser, query: { limit, page, offset, search, filter } } = req
 
-    const records = await orderService.getAll(limit, offset, currentUser)
+    const records = await orderService.getAll(limit, offset, currentUser, search, filter)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),

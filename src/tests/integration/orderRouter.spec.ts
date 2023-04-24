@@ -118,5 +118,82 @@ describe('Order actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'orders')
       expect(res.body.orders).to.be.an('array')
     })
+
+    it('Should return 200 OK when a company admin gets all orders with search params.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/orders')
+        .set('Authorization', `Bearer ${tokenCompanyAdmin}`)
+        .query({
+          limit: 10,
+          page: 1,
+          search: 'Ryan'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders')
+      expect(res.body.orders).to.be.an('array')
+    })
+
+    it('Should return 200 OK when a company admin gets all orders with filter params.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/orders')
+        .set('Authorization', `Bearer ${tokenCompanyAdmin}`)
+        .query({
+          limit: 10,
+          page: 1,
+          'filter[firstname]': 'Ryan',
+          'filter[lastname]': 'Wire',
+          'filter[email]': 'ryan@email.com',
+          'filter[city]': 'Nairobi',
+          'filter[country]': 'KE'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders')
+      expect(res.body.orders).to.be.an('array')
+    })
+
+    it('Should return 200 OK when a company admin gets all orders with search and filter params.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/orders')
+        .set('Authorization', `Bearer ${tokenCompanyAdmin}`)
+        .query({
+          limit: 10,
+          page: 1,
+          search: 'Ryan',
+          'filter[firstname]': 'Ryan',
+          'filter[lastname]': 'Wire',
+          'filter[email]': 'ryan@email.com',
+          'filter[city]': 'Nairobi',
+          'filter[country]': 'KE'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders')
+      expect(res.body.orders).to.be.an('array')
+    })
+
+    it('Should return 422 Unprocessable entity  when a company admin gets all orders with wrong filter params.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/orders')
+        .set('Authorization', `Bearer ${tokenCompanyAdmin}`)
+        .query({
+          limit: 10,
+          page: 1,
+          'filter[firstname1]': 'Ryan',
+          'filter[lastname]': 'Wire',
+          'filter[email]': 'ryan@email.com',
+          'filter[city]': 'Nairobi',
+          'filter[country]': 'KE'
+        })
+
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('A validation error has occured')
+    })
   })
 })

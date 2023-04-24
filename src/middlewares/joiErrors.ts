@@ -11,7 +11,26 @@ const joiErrors = (err: any, req: CustomRequest, res: CustomResponse, next: Cust
 
   logger.error(err)
 
-  const errorArray = err.details.get(Segments.BODY)?.details.map((detail: any) => ({ [detail.context.key]: detail.message.replace(/"/g, '') }))
+  let errorDetails: any = []
+  // capture errors in the request body
+  const bodyErrors = err.details.get(Segments.BODY)?.details
+  if (bodyErrors != null) {
+    errorDetails = [...errorDetails, ...bodyErrors]
+  }
+
+  // capture errors in the query parameters
+  const queryErrors = err.details.get(Segments.QUERY)?.details
+  if (queryErrors != null) {
+    errorDetails = [...errorDetails, ...queryErrors]
+  }
+
+  // capture errors in the URL parameters
+  const paramsErrors = err.details.get(Segments.PARAMS)?.details
+  if (paramsErrors != null) {
+    errorDetails = [...errorDetails, ...paramsErrors]
+  }
+
+  const errorArray = errorDetails.map((detail: any) => ({ [detail.context.key]: detail.message.replace(/"/g, '') }))
 
   return res.status(statusCodes.UNPROCESSABLE_ENTITY).json({
     statusCode: statusCodes.UNPROCESSABLE_ENTITY,

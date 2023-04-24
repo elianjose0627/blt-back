@@ -163,7 +163,14 @@ const validateQueryParams = Joi.object({
   limit: Joi.number().optional(),
   page: Joi.number().optional(),
   offset: Joi.number().optional(),
-  search: Joi.any().optional()
+  search: Joi.any().optional(),
+  filter: Joi.object({
+    firstname: Joi.string().optional(),
+    lastname: Joi.string().optional(),
+    email: Joi.string().email().optional(),
+    city: Joi.string().optional(),
+    country: Joi.string().length(2).optional()
+  }).optional()
 })
 
 const validateNotifications = Joi.object({
