@@ -3,12 +3,6 @@ import BaseService, { generateInclude } from './BaseService'
 import db, { sequelizeInstance } from '../models'
 import compareArrays from '../utils/compareArrays'
 import { IBundleItem } from '../types'
-import { PubSub } from '@google-cloud/pubsub'
-
-// Instantiates a client
-const pubSubClient = new PubSub()
-
-const topicId = String(process.env.PUB_SUB_TOPIC_ID)
 
 class BundleService extends BaseService {
   async insert (data: any): Promise<any> {
@@ -70,63 +64,6 @@ class BundleService extends BaseService {
       return createdBundle
     })
 
-    // Send to pub sub
-    const product = {
-      name: bundle.name,
-      merchantSku: response.id,
-      productGroup: null,
-      originCountry: 'DE',
-      manufacturer: null,
-      note: null,
-      identifier: {
-        mpn: null,
-        ean: null,
-        isbn: null,
-        upc: null,
-        asin: null
-      },
-      specifications: {
-        unNumber: null,
-        hazardIdentifier: null,
-        taric: null,
-        fnsku: null,
-        isBatch: false,
-        isDivisible: false,
-        isBestBefore: false,
-        isSerialNumber: false,
-        isBillOfMaterials: true,
-        billOfMaterialsComponents: bundle?.items?.length > 0 ? bundle.items.map((item: IBundleItem) => ({ jfsku: item.jfsku, quantity: 1 })) : null
-      },
-      dimensions: null,
-      attributes: [
-        {
-          key: 'campaignId',
-          value: campaign.id,
-          attributeType: 'String'
-        }
-      ],
-      netRetailPrice: {
-        amount: bundle.price,
-        currency: 'USD'
-      },
-      bundles: null,
-      condition: 'Default'
-    }
-
-    // Send a message to the topic
-    const message = Buffer.from(JSON.stringify(product))
-    const attributes = { kind: 'post' }
-    try {
-      await pubSubClient
-        .topic(topicId)
-        .publishMessage({
-          data: message,
-          attributes
-        })
-    } catch (error) {
-
-    }
-
     return { response: response.toJSONFor(), status: 201 }
   }
 
@@ -172,30 +109,6 @@ class BundleService extends BaseService {
 
       return updatedBundle
     })
-
-    const product = {
-      name,
-      specifications: {
-        billOfMaterialsComponents: data.items.map((item: IBundleItem) => ({ jfsku: item.jfsku, quantity: 1 }))
-      },
-      netRetailPrice: {
-        amount: price,
-        currency: 'USD'
-      }
-    }
-    // Send a message to the topic
-    const message = Buffer.from(JSON.stringify(product))
-    const attributes = { kind: 'patch', jfsku: record.jfsku }
-    try {
-      await pubSubClient
-        .topic(topicId)
-        .publishMessage({
-          data: message,
-          attributes
-        })
-    } catch (error) {
-
-    }
 
     return updatedRecord.toJSONFor()
   }
