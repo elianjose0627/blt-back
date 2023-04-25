@@ -57,7 +57,10 @@ class OrderService extends BaseService {
         offset,
         order: [['createdAt', 'DESC']],
         attributes: { exclude: [] },
-        where
+        where: {
+          ...where,
+          companyId: user.company.id
+        }
       })
     } else {
       records = await db[this.model].findAndCountAll({
@@ -66,7 +69,10 @@ class OrderService extends BaseService {
         offset,
         order: [['createdAt', 'DESC']],
         attributes: { exclude: [] },
-        where
+        where: {
+          ...where,
+          'shippingAddress.email': user.email
+        }
       })
     }
 
