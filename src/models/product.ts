@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { ICompany, IProduct, NetRetailPrice, ProductType } from '../types'
+import { ICompany, IProduct, IProductPicture, NetRetailPrice, ProductType } from '../types'
 
 const ProductModel = (sequelize: any, DataTypes: any): any => {
   interface ProductAttributes {
@@ -10,6 +10,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     productGroup: string
     type: ProductType
     netRetailPrice: NetRetailPrice
+    pictures: IProductPicture[]
   }
 
   class Product extends Model<ProductAttributes> {
@@ -20,6 +21,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     private readonly productGroup: string
     private readonly type: ProductType
     private readonly netRetailPrice: NetRetailPrice
+    private readonly pictures: IProductPicture[]
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany
@@ -41,6 +43,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         productGroup: this.productGroup,
         type: this.type,
         netRetailPrice: this.netRetailPrice,
+        pictures: this.pictures,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         company: this.company
@@ -82,6 +85,10 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         currency: 'EUR',
         discount: 0
       }
+    },
+    pictures: {
+      type: DataTypes.JSON,
+      defaultValue: []
     }
   }, {
     sequelize,
