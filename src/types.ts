@@ -181,6 +181,14 @@ export interface NetRetailPrice {
   discount: number
 }
 
+export interface IProductPicture {
+  number: number
+  url: string
+  publicUrl: string
+  size: number
+  mimeType: string
+}
+
 export interface IProduct {
   id: string
   jfsku: string
@@ -189,6 +197,7 @@ export interface IProduct {
   productGroup: string
   type: ProductType
   netRetailPrice: NetRetailPrice
+  pictures: IProductPicture[]
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
