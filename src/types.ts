@@ -116,6 +116,7 @@ export interface ICompany {
   updatedAt?: Date
   owner?: IUser
   address?: IAddress
+  secondaryDomains?: ISecondaryDomain[]
 }
 
 export interface IAddress {
@@ -172,6 +173,14 @@ export interface ICampaign {
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
+}
+
+export interface ISecondaryDomain {
+  id: string
+  name: string
+  isVerified: boolean
+  createdAt: Date
+  updatedAt: Date
 }
 
 export type ProductType = 'generic' | 'custom'

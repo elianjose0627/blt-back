@@ -2,6 +2,7 @@ import { v1 as uuidv1 } from 'uuid'
 import db from '../models'
 
 const includeCompany = ['Campaign', 'Address', 'CostCenter', 'Product', 'Order']
+const withoutUser = ['BundleItem', 'Salutation', 'Picture', 'SecondaryDomain']
 
 export const generateInclude = (model: string): any => {
   if (model === 'Company') {
@@ -16,6 +17,11 @@ export const generateInclude = (model: string): any => {
           model: db.Address,
           attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'updatedAt', 'createdAt'],
           as: 'address'
+        },
+        {
+          model: db.SecondaryDomain,
+          attributes: ['id', 'name', 'isVerified', 'updatedAt', 'createdAt'],
+          as: 'secondaryDomains'
         }
       ]
     )
@@ -80,13 +86,7 @@ export const generateInclude = (model: string): any => {
       }
     ])
   }
-  if (model === 'BundleItem') {
-    return ([])
-  }
-  if (model === 'Salutation') {
-    return ([])
-  }
-  if (model === 'Picture') {
+  if (withoutUser.includes(model)) {
     return ([])
   }
   return (

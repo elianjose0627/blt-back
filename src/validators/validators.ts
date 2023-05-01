@@ -309,6 +309,12 @@ const validateSalutation = Joi.object({
   }).required()
 })
 
+const validateSecondaryDomain = Joi.object({
+  secondaryDomain: Joi.object({
+    name: Joi.string().domain()
+  }).required()
+})
+
 const validateCostCenter = Joi.object({
   costCenter: Joi.object({
     center: Joi.number().required()
@@ -472,5 +478,6 @@ export default {
   validateTrackingId,
   validateProduct,
   validateProductAdmin,
-  validateOrder
+  validateOrder,
+  validateSecondaryDomain
 }
