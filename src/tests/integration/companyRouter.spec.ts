@@ -2373,6 +2373,192 @@ describe('Company actions', () => {
     })
   })
 
+  describe('Create a secondary domain', () => {
+    it('Should return 201 Created when a company owner successfully creates a secondary domain.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company14secondarydomain.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/secondary-domains`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          secondaryDomain: {
+            name: 'company14secondarydomain.com'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'secondaryDomain')
+      expect(res.body.secondaryDomain).to.be.an('object')
+      expect(res.body.secondaryDomain).to.include.keys('id', 'name', 'isVerified', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 201 Created when a campaign manager for a company successfully creates a secondary domain.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'happyhogan@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+
+      tokenCampaignManager = resCampaignManager.body.token
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/secondary-domains`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+        .send({
+          secondaryDomain: {
+            name: 'starkindustriesmarvel.com'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'secondaryDomain')
+      expect(res.body.secondaryDomain).to.be.an('object')
+      expect(res.body.secondaryDomain).to.include.keys('id', 'name', 'isVerified', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 403 Forbidden when a non-employee Campaign Manager tries to creates a secondary domain for a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company13secondarydomain.com'
+          }
+        })
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(resCompany.body.company.id)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'happyhogan@starkindustriesmarvel.com',
+            actionType: 'remove'
+          }
+        })
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+
+      tokenCampaignManager = resCampaignManager.body.token
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/secondary-domains`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+        .send({
+          secondaryDomain: {
+            name: 'starkindustriesmarvel.com'
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+    })
+
+    it('Should return 200 Success when a company owner tries to create a secondary domain that exists.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company12secondarydomain.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/secondary-domains`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          secondaryDomain: {
+            name: 'company12secondarydomain.com'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/secondary-domains`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          secondaryDomain: {
+            name: 'company12secondarydomain.com'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'secondaryDomain')
+      expect(res.body.secondaryDomain).to.be.an('object')
+      expect(res.body.secondaryDomain).to.include.keys('id', 'name', 'isVerified', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 201 Created when an admin creates a secondary domain.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company11secondarydomain.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/secondary-domains`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          secondaryDomain: {
+            name: 'company11secondarydomain.com'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'secondaryDomain')
+      expect(res.body.secondaryDomain).to.be.an('object')
+      expect(res.body.secondaryDomain).to.include.keys('id', 'name', 'isVerified', 'createdAt', 'updatedAt')
+    })
+  })
+
   describe('Get all users of a company', () => {
     it('Should return 200 Success when an owner successfully retrieves all users of a company.', async () => {
       const resCompany = await chai
