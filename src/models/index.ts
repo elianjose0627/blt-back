@@ -27,6 +27,7 @@ interface Database {
   CostCenter?: any
   Product?: any
   Order?: any
+  SecondaryDomain?: any
 }
 
 const db: Database = {}

@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { IAddress, ICompany, IUser } from '../types'
+import { IAddress, ICompany, ISecondaryDomain, IUser } from '../types'
 
 const CompanyModel = (sequelize: any, DataTypes: any): any => {
   interface CompanyAttributes {
@@ -30,6 +30,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     private readonly updatedAt: Date
     private readonly owner: IUser
     private readonly address: IAddress
+    private readonly secondaryDomains: ISecondaryDomain[]
 
     static associate (models: any): any {
       Company.belongsTo(models.User, {
@@ -62,6 +63,11 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         as: 'products',
         onDelete: 'CASCADE'
       })
+      Company.hasMany(models.SecondaryDomain, {
+        foreignKey: 'companyId',
+        as: 'secondaryDomains',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): ICompany {
@@ -79,7 +85,8 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         owner: this.owner,
-        address: this.address
+        address: this.address,
+        secondaryDomains: this.secondaryDomains
       }
     }
   };

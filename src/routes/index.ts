@@ -13,6 +13,7 @@ import shipmentRouter from './shipmentRouter'
 import costCenterRouter from './costCenterRouter'
 import productRouter from './productRouter'
 import orderRouter from './orderRouter'
+import secondaryDomainRouter from './secondaryDomainRouter'
 
 const routers = {
   authRouter,
@@ -29,7 +30,8 @@ const routers = {
   shipmentRouter,
   costCenterRouter,
   productRouter,
-  orderRouter
+  orderRouter,
+  secondaryDomainRouter
 }
 
 export default routers
