@@ -70,6 +70,16 @@ export interface ISalutation {
   updatedAt: Date
 }
 
+export interface IShippingMethod {
+  id: string
+  name: string
+  shippingType: number
+  insuranceValue: number
+  isDropShipping: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface ICostCenter {
   id: string
   center: number

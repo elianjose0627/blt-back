@@ -15,9 +15,25 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
+      description: {
+        type: Sequelize.TEXT,
+        allowNull: true
+      },
       merchantSku: {
         allowNull: true,
         type: Sequelize.STRING
+      },
+      price: {
+        type: Sequelize.FLOAT,
+        defaultValue: 0
+      },
+      isLocked: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
+      isBillOfMaterials: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       createdAt: {
         allowNull: false,
@@ -39,6 +55,16 @@ module.exports = {
           model: 'Campaigns',
           key: 'id',
           as: 'campaignId'
+        }
+      },
+      shippingMethodId: {
+        allowNull: true,
+        type: Sequelize.UUID,
+        onDelete: 'CASCADE',
+        references: {
+          model: 'ShippingMethods',
+          key: 'id',
+          as: 'shippingMethodId'
         }
       }
     })
