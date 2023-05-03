@@ -15,9 +15,29 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
+      description: {
+        type: Sequelize.TEXT,
+        allowNull: true
+      },
       merchantSku: {
         allowNull: true,
         type: Sequelize.STRING
+      },
+      price: {
+        type: Sequelize.FLOAT,
+        defaultValue: 0
+      },
+      isLocked: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
+      isBillOfMaterials: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
+      shippingMethodType: {
+        type: Sequelize.INTEGER,
+        allowNull: true
       },
       createdAt: {
         allowNull: false,
