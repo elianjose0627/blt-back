@@ -290,7 +290,8 @@ const validateCampaign = Joi.object({
   campaign: Joi.object({
     name: Joi.string().required().allow('').allow(null).max(64),
     status: Joi.string().required().valid(...['draft', 'submitted']),
-    type: Joi.string().required().valid(...['onboarding', 'birthday', 'christmas'])
+    type: Joi.string().required().valid(...['onboarding', 'birthday', 'christmas']),
+    description: Joi.string().allow(null).allow('').max(1024)
   }).required()
 })
 
@@ -326,7 +327,7 @@ const validateBundle = Joi.object({
     jfsku: Joi.string().allow('').allow(null).max(20),
     merchantSku: Joi.string().allow('').allow(null).max(40),
     name: Joi.string().required().max(128),
-    description: Joi.string().allow(null).allow('').max(128),
+    description: Joi.string().allow(null).allow('').max(1024),
     price: Joi.number().max(1000000).min(0),
     isLocked: Joi.boolean(),
     isBillOfMaterials: Joi.boolean(),
@@ -334,7 +335,8 @@ const validateBundle = Joi.object({
       Joi.object({
         name: Joi.string().required().max(128),
         jfsku: Joi.string().required().max(20),
-        merchantSku: Joi.string().required().max(40)
+        merchantSku: Joi.string().required().max(40),
+        description: Joi.string().allow(null).allow('').max(1024)
       })
     ).min(1)
   }).required()
