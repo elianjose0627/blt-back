@@ -70,6 +70,16 @@ export interface ISalutation {
   updatedAt: Date
 }
 
+export interface IShippingMethod {
+  id: string
+  name: string
+  shippingType: number
+  insuranceValue: number
+  isDropShipping: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface ICostCenter {
   id: string
   center: number
@@ -94,6 +104,7 @@ export interface IBundle {
   price: number
   isLocked: boolean
   isBillOfMaterials: boolean
+  shippingMethodType: number
   createdAt: Date
   updatedAt: Date
   campaign: ICampaign

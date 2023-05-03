@@ -28,6 +28,7 @@ interface Database {
   Product?: any
   Order?: any
   SecondaryDomain?: any
+  ShippingMethod?: any
 }
 
 const db: Database = {}
