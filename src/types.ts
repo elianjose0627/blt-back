@@ -91,6 +91,7 @@ export interface IBundleItem {
   jfsku: string
   merchantSku: string
   name: string
+  description: string
   createdAt: Date
   updatedAt: Date
 }
@@ -181,6 +182,7 @@ export interface ICampaign {
   name: string
   status: CampaignStatus
   type: CampaignType
+  description: string
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
