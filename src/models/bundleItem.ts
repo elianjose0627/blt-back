@@ -7,6 +7,7 @@ const BundleItemModel = (sequelize: any, DataTypes: any): any => {
     jfsku: string
     merchantSku: string
     name: string
+    description: string
   }
 
   class BundleItem extends Model<BundleItemAttributes> {
@@ -14,6 +15,7 @@ const BundleItemModel = (sequelize: any, DataTypes: any): any => {
     private readonly jfsku: string
     private readonly merchantSku: string
     private readonly name: string
+    private readonly description: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
 
@@ -31,6 +33,7 @@ const BundleItemModel = (sequelize: any, DataTypes: any): any => {
         jfsku: this.jfsku,
         merchantSku: this.merchantSku,
         name: this.name,
+        description: this.description,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       }
@@ -54,6 +57,10 @@ const BundleItemModel = (sequelize: any, DataTypes: any): any => {
     name: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true
     }
   }, {
     sequelize,

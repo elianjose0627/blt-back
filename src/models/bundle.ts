@@ -87,7 +87,7 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false
     },
     description: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: true
     },
     price: {

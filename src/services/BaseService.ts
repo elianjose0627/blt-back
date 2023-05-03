@@ -71,12 +71,12 @@ export const generateInclude = (model: string): any => {
     return ([
       {
         model: db.Campaign,
-        attributes: ['id', 'name', 'status', 'type', 'updatedAt', 'createdAt'],
+        attributes: ['id', 'name', 'status', 'type', 'description', 'updatedAt', 'createdAt'],
         as: 'campaign'
       },
       {
         model: db.BundleItem,
-        attributes: ['id', 'name', 'jfsku', 'merchantSku', 'updatedAt', 'createdAt'],
+        attributes: ['id', 'name', 'jfsku', 'merchantSku', 'description', 'updatedAt', 'createdAt'],
         as: 'items'
       },
       {
