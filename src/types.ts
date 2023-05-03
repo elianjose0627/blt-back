@@ -104,6 +104,7 @@ export interface IBundle {
   price: number
   isLocked: boolean
   isBillOfMaterials: boolean
+  shippingMethodType: number
   createdAt: Date
   updatedAt: Date
   campaign: ICampaign

@@ -35,6 +35,10 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: false
       },
+      shippingMethodType: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -55,16 +59,6 @@ module.exports = {
           model: 'Campaigns',
           key: 'id',
           as: 'campaignId'
-        }
-      },
-      shippingMethodId: {
-        allowNull: true,
-        type: Sequelize.UUID,
-        onDelete: 'CASCADE',
-        references: {
-          model: 'ShippingMethods',
-          key: 'id',
-          as: 'shippingMethodId'
         }
       }
     })
