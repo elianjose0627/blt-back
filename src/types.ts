@@ -196,6 +196,14 @@ export interface ISecondaryDomain {
   updatedAt: Date
 }
 
+export interface ILegalText {
+  id: string
+  type: 'privacy' | 'terms'
+  template: object
+  createdAt: Date
+  updatedAt: Date
+}
+
 export type ProductType = 'generic' | 'custom'
 export interface NetRetailPrice {
   amount: number

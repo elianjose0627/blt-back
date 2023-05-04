@@ -445,6 +445,21 @@ const validateOrder = Joi.object({
   })
 })
 
+const validateLegalText = Joi.object({
+  legalText: Joi.object({
+    type: Joi.string().required().valid(...['privacy', 'terms']),
+    template: Joi.object({
+      title: Joi.string().required().max(128),
+      sections: Joi.array().items(
+        Joi.object({
+          title: Joi.string().required(),
+          content: Joi.string().required()
+        }).required()
+      ).min(1).required()
+    }).required()
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -481,5 +496,6 @@ export default {
   validateProduct,
   validateProductAdmin,
   validateOrder,
-  validateSecondaryDomain
+  validateSecondaryDomain,
+  validateLegalText
 }
