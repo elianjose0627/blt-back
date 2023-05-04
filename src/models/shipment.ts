@@ -40,7 +40,7 @@ const ShipmentModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false
     },
     trackingId: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: false
     },
     statusCode: {
