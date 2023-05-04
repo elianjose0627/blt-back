@@ -68,6 +68,11 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         as: 'secondaryDomains',
         onDelete: 'CASCADE'
       })
+      Company.hasMany(models.LegalText, {
+        foreignKey: 'companyId',
+        as: 'legalTexts',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): ICompany {
