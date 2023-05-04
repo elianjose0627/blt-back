@@ -13,6 +13,7 @@ import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import CostCenterController from '../controllers/CostCenterController'
 import ProductController from '../controllers/ProductController'
 import SecondaryDomainController from '../controllers/SecondaryDomainController'
+import LegalTextController from '../controllers/LegalTextController'
 
 const companyRoutes = (): any => {
   const companyRouter = express.Router()
@@ -112,6 +113,15 @@ const companyRoutes = (): any => {
     .patch(celebrate({
       [Segments.BODY]: validator.validateEmailVerification
     }), asyncHandler(CompanyController.checkCompanyMembership), asyncHandler(CompanyController.updateEmailVerification))
+  companyRouter.route('/companies/:id/legal-texts')
+    .post(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin),
+      asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
+        [Segments.BODY]: validator.validateLegalText
+      }, { abortEarly: false }), asyncHandler(LegalTextController.insert))
+    .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin),
+      asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
+        [Segments.QUERY]: validator.validateQueryParams
+      }), asyncHandler(paginate), asyncHandler(LegalTextController.getAllForCompany))
   return companyRouter
 }
 

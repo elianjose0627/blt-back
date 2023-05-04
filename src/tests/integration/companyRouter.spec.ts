@@ -3014,4 +3014,389 @@ describe('Company actions', () => {
       expect(res.body.users).to.be.an('array')
     })
   })
+
+  describe('Create a legal text', () => {
+    it('Should return 201 Created when a company owner successfully creates a legal text.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company14legaltext.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/legal-texts`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          legalText: {
+            type: 'privacy',
+            template: {
+              title: 'Privacy Policy',
+              sections: [
+                {
+                  title: 'Privacy Policy',
+                  content: 'Content'
+                }
+              ]
+            }
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'legalText')
+      expect(res.body.legalText).to.be.an('object')
+      expect(res.body.legalText).to.include.keys('id', 'type', 'template', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 201 Created when a campaign manager for a company successfully creates a legal text.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'happyhogan@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+
+      tokenCampaignManager = resCampaignManager.body.token
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/legal-texts`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+        .send({
+          legalText: {
+            type: 'privacy',
+            template: {
+              title: 'Privacy Policy',
+              sections: [
+                {
+                  title: 'Privacy Policy',
+                  content: 'Content'
+                }
+              ]
+            }
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'legalText')
+      expect(res.body.legalText).to.be.an('object')
+      expect(res.body.legalText).to.include.keys('id', 'type', 'template', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 403 Forbidden when a non-employee Campaign Manager tries to creates a legal text for a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company13legaltext.com'
+          }
+        })
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(resCompany.body.company.id)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'happyhogan@starkindustriesmarvel.com',
+            actionType: 'remove'
+          }
+        })
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+
+      tokenCampaignManager = resCampaignManager.body.token
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/legal-texts`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+        .send({
+          legalText: {
+            type: 'privacy',
+            template: {
+              title: 'Privacy Policy',
+              sections: [
+                {
+                  title: 'Privacy Policy',
+                  content: 'Content'
+                }
+              ]
+            }
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+    })
+
+    it('Should return 201 Created when an admin creates a legal text.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company11legaltext.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/legal-texts`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          legalText: {
+            type: 'privacy',
+            template: {
+              title: 'Privacy Policy',
+              sections: [
+                {
+                  title: 'Privacy Policy',
+                  content: 'Content'
+                }
+              ]
+            }
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'legalText')
+      expect(res.body.legalText).to.be.an('object')
+      expect(res.body.legalText).to.include.keys('id', 'type', 'template', 'createdAt', 'updatedAt')
+    })
+  })
+
+  describe('Get legal texts', () => {
+    it('Should return 200 Success when an owner successfully retrieves all legal texts.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company10legaltexts.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/legal-texts`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          legalText: {
+            type: 'privacy',
+            template: {
+              title: 'Privacy Policy',
+              sections: [
+                {
+                  title: 'Privacy Policy',
+                  content: 'Content'
+                }
+              ]
+            }
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/legal-texts`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'legalTexts')
+      expect(res.body.legalTexts).to.be.an('array')
+    })
+
+    it('Should return 200 Success when an owner successfully retrieves all legal texts with negative pagination params.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .query({
+          limit: -10,
+          page: -1
+        })
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company9legaltexts.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/legal-texts`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'legalTexts')
+      expect(res.body.legalTexts).to.be.an('array')
+    })
+
+    it('Should return 200 Success when an owner successfully retrieves all legal texts with pagination params.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .query({
+          limit: 1,
+          page: 1,
+          search: 1
+        })
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company8legaltexts.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/legal-texts`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'legalTexts')
+      expect(res.body.legalTexts).to.be.an('array')
+    })
+
+    it('Should return 200 Success when a company administrator successfully retrieves all legal texts.', async () => {
+      await deleteTestUser('nickfury@starkindustriesmarvel.com')
+      await createCompanyAdministrator()
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/legal-texts`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'legalTexts')
+      expect(res.body.legalTexts).to.be.an('array')
+    })
+
+    it('Should return 403 Forbidden when a company admin who is not an employee tries to retrieve all legal texts.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company6legaltexts.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustriesmarvel.com',
+            actionType: 'remove'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/legal-texts`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+    })
+
+    it('Should return 200 when an admin retrieves all company legal texts.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company5legaltexts.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/legal-texts`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'legalTexts')
+      expect(res.body.legalTexts).to.be.an('array')
+    })
+  })
 })
