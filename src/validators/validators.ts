@@ -170,7 +170,8 @@ const validateQueryParams = Joi.object({
     email: Joi.string().email().optional(),
     city: Joi.string().optional(),
     country: Joi.string().length(2).optional(),
-    company: Joi.string().optional()
+    company: Joi.string().optional(),
+    type: Joi.string().optional()
   }).optional()
 })
 
@@ -447,7 +448,7 @@ const validateOrder = Joi.object({
 
 const validateLegalText = Joi.object({
   legalText: Joi.object({
-    type: Joi.string().required().valid(...['privacy', 'terms']),
+    type: Joi.string().required().valid(...['privacy', 'terms', 'defaultPrivacy', 'defaultTerms']),
     template: Joi.object({
       title: Joi.string().required().max(128),
       sections: Joi.array().items(

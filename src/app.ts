@@ -47,6 +47,7 @@ app.use(apiPrefix, routers.costCenterRouter())
 app.use(apiPrefix, routers.productRouter())
 app.use(apiPrefix, routers.orderRouter())
 app.use(apiPrefix, routers.secondaryDomainRouter())
+app.use(apiPrefix, routers.legalTextRouter())
 
 // Add validation middleware
 app.use(joiErrors)
