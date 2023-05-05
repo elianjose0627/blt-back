@@ -198,7 +198,7 @@ export interface ISecondaryDomain {
 
 export interface ILegalText {
   id: string
-  type: 'privacy' | 'terms'
+  type: 'privacy' | 'terms' | 'defaultPrivacy' | 'defaultTerms'
   template: object
   createdAt: Date
   updatedAt: Date

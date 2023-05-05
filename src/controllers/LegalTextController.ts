@@ -21,10 +21,29 @@ class LegalTextController extends BaseController {
     })
   }
 
+  async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { query: { limit, page, offset, filter } } = req
+
+    const records = await legalTextService.getAll(limit, offset, filter)
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / limit),
+      perPage: limit,
+      page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      [legalTextService.manyRecords()]: records.rows
+    })
+  }
+
   async getAllForCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { limit, page, offset } = req.query
+    const { query: { limit, page, offset, filter } } = req
     const { id } = req.params
-    const records = await legalTextService.getAllForCompany(limit, offset, id)
+    const records = await legalTextService.getAllForCompany(limit, offset, id, filter)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),
