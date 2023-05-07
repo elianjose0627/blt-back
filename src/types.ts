@@ -18,19 +18,6 @@ export interface StatusCode {
 
 export type Environment = 'development' | 'test' | 'staging' | 'production'
 
-// export type DbConfig = {
-//   [key in 'development' | 'test' | 'staging' | 'production']: {
-//     use_env_variable: string
-//     dialect: 'postgres'
-//     logging?: boolean
-//     dialectOptions?: {
-//       ssl: {
-//         require: boolean
-//         rejectUnauthorized: boolean
-//       }
-//     }
-//   }
-// }
 export interface DbConfig {
   use_env_variable: string
   dialect: string
