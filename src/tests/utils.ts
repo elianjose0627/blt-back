@@ -237,7 +237,7 @@ export const createUserWithExpiredOtp = async (): Promise<any> => {
     password: 'icarussux',
     isVerified: true,
     otp: {
-      createdAt: dayjs.utc().subtract(3, 'minute'),
+      createdAt: dayjs.utc().subtract(30, 'minute'),
       value: 123456
     }
   })

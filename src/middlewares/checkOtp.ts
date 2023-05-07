@@ -25,7 +25,7 @@ const checkOtp = async (req: CustomRequest, res: CustomResponse, next: CustomNex
     })
   }
 
-  const mininumWaitMinutes = process.env.OTP_EXPIRATION ?? 2
+  const mininumWaitMinutes = Number(process.env.OTP_EXPIRATION) ?? 2
   const now = dayjs.utc()
   const createdAt = record.otp.createdAt
   const diff = now.diff(createdAt, 'minute')

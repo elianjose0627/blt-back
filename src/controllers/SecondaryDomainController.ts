@@ -1,5 +1,5 @@
 import BaseController from './BaseController'
-import { CustomRequest, CustomResponse } from '../types'
+import { CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import SecondaryDomainService from '../services/SecondaryDomainService'
 import * as statusCodes from '../constants/statusCodes'
@@ -14,7 +14,7 @@ class SecondaryDomainController extends BaseController {
 
     const { response, status } = await secondaryDomainService.insert({ company, secondaryDomain })
 
-    const statusCode = {
+    const statusCode: StatusCode = {
       200: statusCodes.OK,
       201: statusCodes.CREATED
     }

@@ -1,6 +1,6 @@
 import BaseController from './BaseController'
 import OrderService from '../services/OrderService'
-import { CustomRequest, CustomResponse } from '../types'
+import { CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 
@@ -33,7 +33,7 @@ class OrderController extends BaseController {
 
     const { response, status } = await orderService.insert({ order })
 
-    const statusCode = {
+    const statusCode: StatusCode = {
       200: statusCodes.OK,
       201: statusCodes.CREATED
     }

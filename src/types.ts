@@ -12,6 +12,37 @@ export interface MediaData {
 
 export type Role = typeof userRoles.USER | typeof userRoles.ADMIN | typeof userRoles.EMPLOYEE | typeof userRoles.COMPANYADMINISTRATOR | typeof userRoles.CAMPAIGNMANAGER
 
+export interface StatusCode {
+  [key: string]: number
+}
+
+export type Environment = 'development' | 'test' | 'staging' | 'production'
+
+// export type DbConfig = {
+//   [key in 'development' | 'test' | 'staging' | 'production']: {
+//     use_env_variable: string
+//     dialect: 'postgres'
+//     logging?: boolean
+//     dialectOptions?: {
+//       ssl: {
+//         require: boolean
+//         rejectUnauthorized: boolean
+//       }
+//     }
+//   }
+// }
+export interface DbConfig {
+  use_env_variable: string
+  dialect: string
+  logging?: boolean
+  dialectOptions?: {
+    ssl: {
+      require: boolean
+      rejectUnauthorized: boolean
+    }
+  }
+}
+
 export interface INotifications {
   expoPushToken: Nullable<string>
   isEnabled: boolean

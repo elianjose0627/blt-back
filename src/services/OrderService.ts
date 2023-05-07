@@ -5,7 +5,7 @@ import db from '../models'
 import * as userRoles from '../utils/userRoles'
 
 function generateFilterQuery (filter: object): object {
-  const filterQuery: object = {}
+  const filterQuery: Record<string, unknown> = {}
 
   Object.entries(filter).forEach(([key, value]) => {
     if (value !== undefined && value !== '') {
