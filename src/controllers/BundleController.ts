@@ -1,6 +1,6 @@
 import BaseController from './BaseController'
 import BundleService from '../services/BundleService'
-import { CustomRequest, CustomResponse } from '../types'
+import { CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 
@@ -14,7 +14,7 @@ class BundleController extends BaseController {
 
     const { response, status } = await bundleService.insert({ bundle, campaign })
 
-    const statusCode = {
+    const statusCode: StatusCode = {
       200: statusCodes.OK,
       201: statusCodes.CREATED
     }

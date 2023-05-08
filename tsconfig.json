@@ -7,7 +7,6 @@
     "moduleResolution": "node",
     "strict": true,
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "sourceMap": true,

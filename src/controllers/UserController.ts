@@ -5,7 +5,7 @@ import UserService from '../services/UserService'
 import CompanyService from '../services/CompanyService'
 import AddressService from '../services/AddressService'
 import * as statusCodes from '../constants/statusCodes'
-import { CustomNext, CustomRequest, CustomResponse } from '../types'
+import { CustomNext, CustomRequest, CustomResponse, Nullable, StatusCode } from '../types'
 import * as userRoles from '../utils//userRoles'
 import { sendNotifierEmail } from '../utils/sendMail'
 import { io } from '../utils/socket'
@@ -19,6 +19,10 @@ const appName = String(process.env.APP_NAME)
 const appUrl = String(process.env.APP_URL)
 const mailer = String(process.env.MAILER_EMAIL)
 const sandboxMode = process.env.NODE_ENV === 'test'
+
+interface SelectedCompanyId {
+  [key: string]: Nullable<string>
+}
 
 class UserController extends BaseController {
   async checkOwner (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
@@ -364,7 +368,7 @@ class UserController extends BaseController {
       })
     }
 
-    const selectedCompanyId = {
+    const selectedCompanyId: SelectedCompanyId = {
       add: companyId,
       remove: null
     }
@@ -496,7 +500,7 @@ class UserController extends BaseController {
 
     const { response, status } = await addressService.insert({ user, company: null, address })
 
-    const statusCode = {
+    const statusCode: StatusCode = {
       200: statusCodes.OK,
       201: statusCodes.CREATED
     }

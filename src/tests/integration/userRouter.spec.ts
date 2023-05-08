@@ -672,6 +672,27 @@ describe('A user', () => {
     expect(res.body.errors.message).to.equal('OTP has expired')
   })
 
+  it('should return 403 when the otp has expired and has been set in the env', async () => {
+    process.env.OTP_EXPIRATION = '2'
+    const resLogin = await chai
+      .request(app)
+      .post('/auth/login')
+      .send({ user: { email: 'sersieternal@celestialmarvel.com', password: 'icarussux' } })
+
+    const token = String(resLogin.body.token)
+    const userId = String(resLogin.body.user.id)
+
+    const res = await chai
+      .request(app)
+      .patch(`/api/users/${userId}/verify`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ user: { otp: 123456, email: 'sersieternal@celestialmarvel.com' } })
+
+    expect(res).to.have.status(403)
+    expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+    expect(res.body.errors.message).to.equal('OTP has expired')
+  })
+
   it('should return 204 when a user purges their account', async () => {
     await chai
       .request(app)

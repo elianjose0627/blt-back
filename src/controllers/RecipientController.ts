@@ -1,6 +1,6 @@
 import BaseController from './BaseController'
 import RecipientService from '../services/RecipientService'
-import { CustomNext, CustomRequest, CustomResponse } from '../types'
+import { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
@@ -36,7 +36,7 @@ class RecipientController extends BaseController {
 
     const { response, status } = await recipientService.insert({ campaign, recipient })
 
-    const statusCode = {
+    const statusCode: StatusCode = {
       200: statusCodes.OK,
       201: statusCodes.CREATED
     }

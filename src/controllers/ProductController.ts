@@ -1,7 +1,7 @@
 import BaseController from './BaseController'
 import ProductService from '../services/ProductService'
 import CompanyService from '../services/CompanyService'
-import { CustomNext, CustomRequest, CustomResponse } from '../types'
+import { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
@@ -52,7 +52,7 @@ class ProductController extends BaseController {
 
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 
-    const statusCode = {
+    const statusCode: StatusCode = {
       200: statusCodes.OK,
       201: statusCodes.CREATED
     }

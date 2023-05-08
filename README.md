@@ -1,4 +1,5 @@
 [![codecov](https://codecov.io/gh/big-little-things/endeavour-backend/branch/master/graph/badge.svg?token=WLP34K1QSX)](https://codecov.io/gh/big-little-things/endeavour-backend)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/46feb99593e145e1a14e3d78adfee271)](https://app.codacy.com?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 # endeavour-backend
 A REST API for the big little things backend.
 ## Prerequisites

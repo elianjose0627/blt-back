@@ -4,7 +4,7 @@ import BaseService from './BaseService'
 import db from '../models'
 
 function generateFilterQuery (filter: object): any {
-  const filterQuery: object = {}
+  const filterQuery: Record<string, unknown> = {}
 
   Object.entries(filter).forEach(([key, value]) => {
     if (value !== undefined && value !== '') {
