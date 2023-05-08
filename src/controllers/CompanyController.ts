@@ -5,7 +5,7 @@ import dns from 'dns'
 import BaseController from './BaseController'
 import CompanyService from '../services/CompanyService'
 import UserService from '../services/UserService'
-import { CustomNext, CustomRequest, CustomResponse } from '../types'
+import { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
@@ -276,7 +276,7 @@ class CompanyController extends BaseController {
     const { response, status } = await companyService.insert({ user, company })
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 
-    const statusCode = {
+    const statusCode: StatusCode = {
       200: statusCodes.OK,
       201: statusCodes.CREATED
     }
@@ -419,7 +419,7 @@ class CompanyController extends BaseController {
 
     const { response, status } = await addressService.insert({ user: employee, company: null, address })
 
-    const statusCode = {
+    const statusCode: StatusCode = {
       200: statusCodes.OK,
       201: statusCodes.CREATED
     }
@@ -436,7 +436,7 @@ class CompanyController extends BaseController {
 
     const { response, status } = await addressService.insert({ user: null, company, address })
 
-    const statusCode = {
+    const statusCode: StatusCode = {
       200: statusCodes.OK,
       201: statusCodes.CREATED
     }
