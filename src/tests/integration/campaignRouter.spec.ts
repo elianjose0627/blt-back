@@ -274,13 +274,15 @@ describe('Campaign actions', () => {
           bundle: {
             merchantSku: '39262696145050',
             name: 'Staffbase Bundle 1',
-            items: [
-              {
-                name: 'Interdimensional Goggles',
-                jfsku: '26CJ0114JWR',
-                merchantSku: 'ART2394871'
-              }
-            ]
+            specifications: {
+              billOfMaterialsComponents: [
+                {
+                  name: 'Interdimensional Goggles',
+                  jfsku: '26CJ0114JWR',
+                  merchantSku: 'ART2394871'
+                }
+              ]
+            }
           }
         })
 
@@ -326,18 +328,20 @@ describe('Campaign actions', () => {
           bundle: {
             merchantSku: '39262696145050',
             name: 'Staffbase Bundle Items',
-            items: [
-              {
-                jfsku: '26CJ0114JWR',
-                merchantSku: 'ART2394871',
-                name: 'Interdimensional Goggles'
-              },
-              {
-                jfsku: '26CJ0114JWR',
-                merchantSku: 'ART2394871',
-                name: 'Interdimensional Goggles'
-              }
-            ]
+            specifications: {
+              billOfMaterialsComponents: [
+                {
+                  jfsku: '26CJ0114JWR',
+                  merchantSku: 'ART2394871',
+                  name: 'Interdimensional Goggles'
+                },
+                {
+                  jfsku: '26CJ0114JWR',
+                  merchantSku: 'ART2394871',
+                  name: 'Interdimensional Goggles'
+                }
+              ]
+            }
           }
         })
 
@@ -383,13 +387,15 @@ describe('Campaign actions', () => {
           bundle: {
             merchantSku: 'ART2394871',
             name: 'Interdimensional Goggles',
-            items: [
-              {
-                name: 'Interdimensional Goggles',
-                jfsku: '26CJ0114JWR',
-                merchantSku: 'ART2394871'
-              }
-            ]
+            speicification: {
+              billOfMaterialsComponents: [
+                {
+                  name: 'Interdimensional Goggles',
+                  jfsku: '26CJ0114JWR',
+                  merchantSku: 'ART2394871'
+                }
+              ]
+            }
           }
         })
 
@@ -435,13 +441,15 @@ describe('Campaign actions', () => {
           bundle: {
             merchantSku: '39262696145050',
             name: 'Staffbase Bundle 1',
-            items: [
-              {
-                name: 'Interdimensional Goggles',
-                jfsku: '26CJ0114JWR',
-                merchantSku: 'ART2394871'
-              }
-            ]
+            specifications: {
+              billOfMaterialsComponents: [
+                {
+                  name: 'Interdimensional Goggles',
+                  jfsku: '26CJ0114JWR',
+                  merchantSku: 'ART2394871'
+                }
+              ]
+            }
           }
         })
 
@@ -453,13 +461,15 @@ describe('Campaign actions', () => {
           bundle: {
             merchantSku: '39262696145050',
             name: 'Staffbase Bundle 1',
-            items: [
-              {
-                name: 'Interdimensional Goggles',
-                jfsku: '26CJ0114JWR',
-                merchantSku: 'ART2394871'
-              }
-            ]
+            specifications: {
+              billOfMaterialsComponents: [
+                {
+                  name: 'Interdimensional Goggles',
+                  jfsku: '26CJ0114JWR',
+                  merchantSku: 'ART2394871'
+                }
+              ]
+            }
           }
         })
 
@@ -505,13 +515,15 @@ describe('Campaign actions', () => {
           bundle: {
             merchantSku: '39262696145050',
             name: 'Staffbase Bundle 1',
-            items: [
-              {
-                name: 'Interdimensional Goggles',
-                jfsku: '26CJ0114JWR',
-                merchantSku: 'ART2394871'
-              }
-            ]
+            specifications: {
+              billOfMaterialsComponents: [
+                {
+                  name: 'Interdimensional Goggles',
+                  jfsku: '26CJ0114JWR',
+                  merchantSku: 'ART2394871'
+                }
+              ]
+            }
           }
         })
 

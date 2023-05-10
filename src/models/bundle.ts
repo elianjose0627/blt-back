@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { IBundle, IBundleItem, ICampaign, IPicture } from '../types'
+import { IBundle, ICampaign, IPicture, ISpecifications } from '../types'
 
 const BundleModel = (sequelize: any, DataTypes: any): any => {
   interface BundleAttributes {
@@ -12,6 +12,7 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
     isLocked: boolean
     isBillOfMaterials: boolean
     shippingMethodType: number
+    specifications: ISpecifications
   }
 
   class Bundle extends Model<BundleAttributes> {
@@ -27,18 +28,13 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly campaign: ICampaign
-    private readonly items: IBundleItem[]
+    private readonly specifications: ISpecifications
     private readonly pictures: IPicture[]
 
     static associate (models: any): any {
       Bundle.belongsTo(models.Campaign, {
         foreignKey: 'campaignId',
         as: 'campaign',
-        onDelete: 'CASCADE'
-      })
-      Bundle.hasMany(models.BundleItem, {
-        foreignKey: 'bundleId',
-        as: 'items',
         onDelete: 'CASCADE'
       })
       Bundle.hasMany(models.Picture, {
@@ -62,7 +58,7 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         campaign: this.campaign,
-        items: this.items,
+        specifications: this.specifications,
         pictures: this.pictures
       }
     }
@@ -104,6 +100,10 @@ const BundleModel = (sequelize: any, DataTypes: any): any => {
     },
     shippingMethodType: {
       type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    specifications: {
+      type: DataTypes.JSON,
       allowNull: true
     }
   }, {
