@@ -114,6 +114,22 @@ export interface IBundleItem {
   updatedAt: Date
 }
 
+export interface ISpecifications {
+  isBatch: boolean
+  isDivisible: boolean
+  isBestBefore: boolean
+  isSerialNumber: boolean
+  isBillOfMaterials: boolean
+  billOfMaterialsComponents: BillOfMaterialsComponent[]
+}
+
+export interface BillOfMaterialsComponent {
+  jfsku: string
+  quantity: number
+  merchantSku: string
+  name: string
+}
+
 export interface IBundle {
   id: string
   jfsku: string
@@ -127,7 +143,7 @@ export interface IBundle {
   createdAt: Date
   updatedAt: Date
   campaign: ICampaign
-  items: IBundleItem[]
+  specifications: ISpecifications
   pictures: IPicture[]
 }
 

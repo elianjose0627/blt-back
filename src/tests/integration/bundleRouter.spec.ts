@@ -82,13 +82,15 @@ describe('Bundle actions', () => {
           bundle: {
             merchantSku: '39262696145050',
             name: 'Staffbase Bundle 1',
-            items: [
-              {
-                jfsku: '26CJ0114JWR',
-                merchantSku: 'ART2394871',
-                name: 'Interdimensional Goggles'
-              }
-            ]
+            specifications: {
+              billOfMaterialsComponents: [
+                {
+                  jfsku: '26CJ0114JWR',
+                  merchantSku: 'ART2394871',
+                  name: 'Interdimensional Goggles'
+                }
+              ]
+            }
           }
         })
 
@@ -139,13 +141,15 @@ describe('Bundle actions', () => {
           bundle: {
             merchantSku: '39262696145050',
             name: 'Staffbase Bundle 1',
-            items: [
-              {
-                jfsku: '26CJ0114JWR',
-                merchantSku: 'ART2394871',
-                name: 'Interdimensional Goggles'
-              }
-            ]
+            specifications: {
+              billOfMaterialsComponents: [
+                {
+                  jfsku: '26CJ0114JWR',
+                  merchantSku: 'ART2394871',
+                  name: 'Interdimensional Goggles'
+                }
+              ]
+            }
           }
         })
 
@@ -196,13 +200,15 @@ describe('Bundle actions', () => {
           bundle: {
             merchantSku: '39262696145050',
             name: 'Staffbase Bundle 1',
-            items: [
-              {
-                jfsku: '26CJ0114JWR',
-                merchantSku: 'ART2394871',
-                name: 'Interdimensional Goggles'
-              }
-            ]
+            specifications: {
+              billOfMaterialsComponents: [
+                {
+                  jfsku: '26CJ0114JWR',
+                  merchantSku: 'ART2394871',
+                  name: 'Interdimensional Goggles'
+                }
+              ]
+            }
           }
         })
 
@@ -261,13 +267,15 @@ describe('Bundle actions', () => {
           bundle: {
             merchantSku: '39262696145050',
             name: 'Staffbase Bundle 1',
-            items: [
-              {
-                jfsku: '26CJ0114JWR',
-                merchantSku: 'ART2394871',
-                name: 'Interdimensional Goggles'
-              }
-            ]
+            specifications: {
+              billOfMaterialsComponents: [
+                {
+                  jfsku: '26CJ0114JWR',
+                  merchantSku: 'ART2394871',
+                  name: 'Interdimensional Goggles'
+                }
+              ]
+            }
           }
         })
 
