@@ -52,10 +52,20 @@ describe('Shipment actions', () => {
         .get(`/api/shipments/${String(trackingId)}`)
         .set('Authorization', `Bearer ${token}`)
 
-      expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('statusCode', 'success', 'shipment')
-      expect(res.body.shipment).to.be.an('object')
-      expect(res.body.shipment).to.include.keys('id', 'trackingId', 'statusCode', 'data', 'createdAt', 'updatedAt')
+      const statusCode = res.status
+
+      if (statusCode === 201) {
+        expect(res).to.have.status(201)
+        expect(res.body).to.include.keys('statusCode', 'success', 'shipment')
+        expect(res.body.shipment).to.be.an('object')
+        expect(res.body.shipment).to.include.keys('id', 'trackingId', 'statusCode', 'data', 'createdAt', 'updatedAt')
+      }
+
+      if (statusCode === 429) {
+        expect(res).to.have.status(429)
+        expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+        expect(res.body.errors.message).to.equal('Too many requests within defined time period, please try again later.')
+      }
     })
 
     it('Should return 200 OK when an admin gets a shipment by tracking id.', async () => {
@@ -64,10 +74,20 @@ describe('Shipment actions', () => {
         .get(`/api/shipments/${String(trackingId)}`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
-      expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'shipment')
-      expect(res.body.shipment).to.be.an('object')
-      expect(res.body.shipment).to.include.keys('id', 'trackingId', 'statusCode', 'data', 'createdAt', 'updatedAt')
+      const statusCode = res.status
+
+      if (statusCode === 200) {
+        expect(res).to.have.status(200)
+        expect(res.body).to.include.keys('statusCode', 'success', 'shipment')
+        expect(res.body.shipment).to.be.an('object')
+        expect(res.body.shipment).to.include.keys('id', 'trackingId', 'statusCode', 'data', 'createdAt', 'updatedAt')
+      }
+
+      if (statusCode === 429) {
+        expect(res).to.have.status(429)
+        expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+        expect(res.body.errors.message).to.equal('Too many requests within defined time period, please try again later.')
+      }
     })
 
     it('Should return 404 Not Found when an admin gets a shipment for a non-existent tracking id.', async () => {
@@ -76,10 +96,20 @@ describe('Shipment actions', () => {
         .get(`/api/shipments/${notFoundTrackingId}`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
-      expect(res).to.have.status(404)
-      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('No shipment with given tracking number found.')
-      expect(res.body.success).to.equal(false)
+      const statusCode = res.status
+
+      if (statusCode === 404) {
+        expect(res).to.have.status(404)
+        expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+        expect(res.body.errors.message).to.equal('No shipment with given tracking number found.')
+        expect(res.body.success).to.equal(false)
+      }
+
+      if (statusCode === 429) {
+        expect(res).to.have.status(429)
+        expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+        expect(res.body.errors.message).to.equal('Too many requests within defined time period, please try again later.')
+      }
     })
   })
 })

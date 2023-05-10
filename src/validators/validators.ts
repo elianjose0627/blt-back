@@ -332,14 +332,21 @@ const validateBundle = Joi.object({
     price: Joi.number().max(1000000).min(0),
     isLocked: Joi.boolean(),
     isBillOfMaterials: Joi.boolean(),
-    items: Joi.array().items(
-      Joi.object({
-        name: Joi.string().required().max(128),
-        jfsku: Joi.string().required().max(20),
-        merchantSku: Joi.string().required().max(40),
-        description: Joi.string().allow(null).allow('').max(1024)
-      })
-    ).min(1)
+    specifications: Joi.object({
+      isBatch: Joi.boolean().default(false),
+      isDivisible: Joi.boolean().default(false),
+      isBestBefore: Joi.boolean().default(false),
+      isSerialNumber: Joi.boolean().default(false),
+      isBillOfMaterials: Joi.boolean().default(false),
+      billOfMaterialsComponents: Joi.array().items(
+        Joi.object({
+          name: Joi.string().required().max(128),
+          jfsku: Joi.string().required().max(20),
+          merchantSku: Joi.string().required().max(40),
+          quantity: Joi.number().default(1)
+        })
+      ).min(1).required()
+    }).default(null)
   }).required()
 })
 
