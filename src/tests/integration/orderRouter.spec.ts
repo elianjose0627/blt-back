@@ -6,7 +6,10 @@ import {
   createAdminTestUser,
   verifyUser,
   createCompanyAdministrator,
-  order
+  createCompanyAdministratorWithCompany,
+  order,
+  createPrivacyRule,
+  createCompanyOrder
 } from '../utils'
 
 const { expect } = chai
@@ -15,12 +18,14 @@ chai.use(chaiHttp)
 
 let tokenAdmin: string
 let tokenCompanyAdmin: string
+let tokenCompanyAdminTwo: string
 let token: string
 
 describe('Order actions', () => {
   before(async () => {
     await createAdminTestUser()
     await createCompanyAdministrator()
+    await createCompanyAdministratorWithCompany()
 
     await chai
       .request(app)
@@ -44,9 +49,18 @@ describe('Order actions', () => {
       .post('/auth/login')
       .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
+    const resCompanyAdminTwo = await chai
+      .request(app)
+      .post('/auth/login')
+      .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+
+    await createPrivacyRule(resCompanyAdminTwo.body.user.company.id)
+    await createCompanyOrder(resCompanyAdminTwo.body.user.company.id)
+
     tokenAdmin = resAdmin.body.token
     token = resUser.body.token
     tokenCompanyAdmin = resCompanyAdmin.body.token
+    tokenCompanyAdminTwo = resCompanyAdminTwo.body.token
   })
 
   after(async () => {
@@ -194,6 +208,17 @@ describe('Order actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.success).to.equal(false)
       expect(res.body.errors.message).to.equal('A validation error has occured')
+    })
+
+    it('Should return 200 OK when a company admin gets all orders with a privacy rule set.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/orders')
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders')
+      expect(res.body.orders).to.be.an('array')
     })
   })
 })

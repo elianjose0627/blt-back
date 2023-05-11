@@ -88,6 +88,16 @@ export interface ISalutation {
   updatedAt: Date
 }
 
+export type Module = 'addresses' | 'orders'
+export interface IPrivacyRule {
+  id: string
+  module: Module
+  role: Role
+  isEnabled: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface IShippingMethod {
   id: string
   name: string

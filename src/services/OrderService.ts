@@ -3,6 +3,7 @@ import { Op } from 'sequelize'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 import * as userRoles from '../utils/userRoles'
+import * as appModules from '../utils/appModules'
 
 function generateFilterQuery (filter: object): object {
   const filterQuery: Record<string, unknown> = {}
@@ -76,9 +77,36 @@ class OrderService extends BaseService {
       })
     }
 
+    const companyId = user.company?.id
+    const privacyRule = companyId !== undefined
+      ? await db.PrivacyRule.findOne({
+        where: {
+          companyId,
+          role: user.role,
+          isEnabled: true,
+          module: appModules.ORDERS
+        }
+      })
+      : null
+
+    records = records.rows.map((record: any) => {
+      if (privacyRule !== null) {
+        record.shippingAddress = {
+          lastname: record.shippingAddress.lastname,
+          city: record.shippingAddress.city.replace(/./g, '*'),
+          email: record.shippingAddress.email.replace(/.(?=.*@)/g, '*'),
+          firstname: record.shippingAddress.firstname,
+          street: record.shippingAddress.street.replace(/./g, '*'),
+          zip: record.shippingAddress.zip.replace(/./g, '*'),
+          country: record.shippingAddress.country
+        }
+      }
+      return record.toJSONFor()
+    })
+
     return {
       count: records.count,
-      rows: records.rows.map((record: any) => record.toJSONFor())
+      rows: records
     }
   }
 

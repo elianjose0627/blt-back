@@ -31,6 +31,7 @@ export interface Database {
   SecondaryDomain?: any
   ShippingMethod?: any
   LegalText?: any
+  PrivacyRule?: any
   [key: string]: any
 }
 
