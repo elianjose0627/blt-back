@@ -15,6 +15,7 @@ import productRouter from './productRouter'
 import orderRouter from './orderRouter'
 import secondaryDomainRouter from './secondaryDomainRouter'
 import legalTextRouter from './legalTextRouter'
+import privacyRuleRouter from './privacyRuleRouter'
 
 const routers = {
   authRouter,
@@ -33,7 +34,8 @@ const routers = {
   productRouter,
   orderRouter,
   secondaryDomainRouter,
-  legalTextRouter
+  legalTextRouter,
+  privacyRuleRouter
 }
 
 export default routers

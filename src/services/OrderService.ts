@@ -95,11 +95,11 @@ class OrderService extends BaseService {
       if (privacyRule !== null) {
         record.shippingAddress = {
           lastname: record.shippingAddress.lastname,
-          city: record.shippingAddress.city.replace(/./g, '*'),
+          city: record.shippingAddress.city?.replace(/./g, '*'),
           email: record.shippingAddress.email?.replace(/.(?=.*@)/g, '*'),
           firstname: record.shippingAddress.firstname,
-          street: record.shippingAddress.street.replace(/./g, '*'),
-          zip: record.shippingAddress.zip.replace(/./g, '*'),
+          street: record.shippingAddress.street?.replace(/./g, '*'),
+          zip: record.shippingAddress.zip?.replace(/./g, '*'),
           country: record.shippingAddress.country
         }
       }

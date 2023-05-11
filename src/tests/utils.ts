@@ -621,3 +621,20 @@ export const createCompanyOrderWithMissingEmail = async (companyId: string): Pro
 
   return res
 }
+
+export const createCompanyOrderWithMissingCityStreetZip = async (companyId: string): Promise<any> => {
+  const res = await db.Order.create({
+    ...order,
+    outboundId: 'VZ9N02A3X7',
+    id: uuidv1(),
+    shippingAddress: {
+      lastname: 'Wire',
+      firstname: 'Ryan',
+      email: 'ryanwire@email.com',
+      country: 'KE'
+    },
+    companyId
+  })
+
+  return res
+}
