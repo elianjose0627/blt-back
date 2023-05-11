@@ -107,8 +107,9 @@ describe('Order actions', () => {
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'orders')
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders', 'meta')
       expect(res.body.orders).to.be.an('array')
+      expect(res.body.meta.pageCount).to.be.a('number')
     })
 
     it('Should return 200 OK when an admin gets all orders.', async () => {
@@ -118,8 +119,9 @@ describe('Order actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'orders')
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders', 'meta')
       expect(res.body.orders).to.be.an('array')
+      expect(res.body.meta.pageCount).to.be.a('number')
     })
 
     it('Should return 200 OK when a company admin gets all orders.', async () => {
@@ -129,8 +131,9 @@ describe('Order actions', () => {
         .set('Authorization', `Bearer ${tokenCompanyAdmin}`)
 
       expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'orders')
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders', 'meta')
       expect(res.body.orders).to.be.an('array')
+      expect(res.body.meta.pageCount).to.be.a('number')
     })
 
     it('Should return 200 OK when a company admin gets all orders with search params.', async () => {
@@ -145,8 +148,9 @@ describe('Order actions', () => {
         })
 
       expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'orders')
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders', 'meta')
       expect(res.body.orders).to.be.an('array')
+      expect(res.body.meta.pageCount).to.be.a('number')
     })
 
     it('Should return 200 OK when a company admin gets all orders with filter params.', async () => {
@@ -165,8 +169,9 @@ describe('Order actions', () => {
         })
 
       expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'orders')
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders', 'meta')
       expect(res.body.orders).to.be.an('array')
+      expect(res.body.meta.pageCount).to.be.a('number')
     })
 
     it('Should return 200 OK when a company admin gets all orders with search and filter params.', async () => {
@@ -186,8 +191,9 @@ describe('Order actions', () => {
         })
 
       expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'orders')
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders', 'meta')
       expect(res.body.orders).to.be.an('array')
+      expect(res.body.meta.pageCount).to.be.a('number')
     })
 
     it('Should return 422 Unprocessable entity  when a company admin gets all orders with wrong filter params.', async () => {
@@ -217,8 +223,9 @@ describe('Order actions', () => {
         .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
 
       expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'orders')
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders', 'meta')
       expect(res.body.orders).to.be.an('array')
+      expect(res.body.meta.pageCount).to.be.a('number')
     })
   })
 })

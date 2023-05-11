@@ -89,6 +89,8 @@ class OrderService extends BaseService {
       })
       : null
 
+    const count = records.count
+
     records = records.rows.map((record: any) => {
       if (privacyRule !== null) {
         record.shippingAddress = {
@@ -105,7 +107,7 @@ class OrderService extends BaseService {
     })
 
     return {
-      count: records.count,
+      count,
       rows: records
     }
   }
