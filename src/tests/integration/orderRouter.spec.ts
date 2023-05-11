@@ -9,7 +9,8 @@ import {
   createCompanyAdministratorWithCompany,
   order,
   createPrivacyRule,
-  createCompanyOrder
+  createCompanyOrder,
+  createCompanyOrderWithMissingEmail
 } from '../utils'
 
 const { expect } = chai
@@ -56,6 +57,7 @@ describe('Order actions', () => {
 
     await createPrivacyRule(resCompanyAdminTwo.body.user.company.id)
     await createCompanyOrder(resCompanyAdminTwo.body.user.company.id)
+    await createCompanyOrderWithMissingEmail(resCompanyAdminTwo.body.user.company.id)
 
     tokenAdmin = resAdmin.body.token
     token = resUser.body.token
@@ -217,6 +219,18 @@ describe('Order actions', () => {
     })
 
     it('Should return 200 OK when a company admin gets all orders with a privacy rule set.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/orders')
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders', 'meta')
+      expect(res.body.orders).to.be.an('array')
+      expect(res.body.meta.pageCount).to.be.a('number')
+    })
+
+    it('Should return 200 OK when a company admin gets all orders with a privacy rule set and missing email in shipping.', async () => {
       const res = await chai
         .request(app)
         .get('/api/orders')

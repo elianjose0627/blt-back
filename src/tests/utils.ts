@@ -602,3 +602,22 @@ export const createCompanyOrder = async (companyId: string): Promise<any> => {
 
   return res
 }
+
+export const createCompanyOrderWithMissingEmail = async (companyId: string): Promise<any> => {
+  const res = await db.Order.create({
+    ...order,
+    outboundId: 'VZ9N02A3Y7',
+    id: uuidv1(),
+    shippingAddress: {
+      lastname: 'Wire',
+      city: 'Nairobi',
+      firstname: 'Ryan',
+      street: 'Kiu River Road',
+      zip: '254724374281',
+      country: 'KE'
+    },
+    companyId
+  })
+
+  return res
+}

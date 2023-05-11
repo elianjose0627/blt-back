@@ -96,7 +96,7 @@ class OrderService extends BaseService {
         record.shippingAddress = {
           lastname: record.shippingAddress.lastname,
           city: record.shippingAddress.city.replace(/./g, '*'),
-          email: record.shippingAddress.email.replace(/.(?=.*@)/g, '*'),
+          email: record.shippingAddress.email?.replace(/.(?=.*@)/g, '*'),
           firstname: record.shippingAddress.firstname,
           street: record.shippingAddress.street.replace(/./g, '*'),
           zip: record.shippingAddress.zip.replace(/./g, '*'),
