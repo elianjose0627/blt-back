@@ -1,11 +1,14 @@
 import BaseController from './BaseController'
 import RecipientService from '../services/RecipientService'
-import { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
+import PrivacyRuleService from '../services/PrivacyRuleService'
+import type { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
+import * as appModules from '../utils/appModules'
 
 const recipientService = new RecipientService('Recipient')
+const privacyRuleService = new PrivacyRuleService('PrivacyRule')
 
 class RecipientController extends BaseController {
   checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
@@ -24,6 +27,24 @@ class RecipientController extends BaseController {
         success: false,
         errors: {
           message: 'Only the owner, company administrator, campaign manager or administrator can perform this action'
+        }
+      })
+    }
+  }
+
+  async checkPrivacyRule (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
+    const { user: currentUser, record: { campaign: { companyId } } } = req
+
+    const privacyRule = await privacyRuleService.find(companyId, currentUser.role, appModules.RECIPIENTS)
+
+    if (privacyRule === null) {
+      return next()
+    } else {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: `Disable privacy rule for ${appModules.RECIPIENTS} module and ${String(currentUser.role)} role to be able to perform this action`
         }
       })
     }
