@@ -311,6 +311,16 @@ const validateSalutation = Joi.object({
   }).required()
 })
 
+const validatePrivacyRule = Joi.object({
+  privacyRule: Joi.object({
+    module: Joi.string().required().max(16),
+    role: Joi.string()
+      .valid(...[userRoles.USER, userRoles.ADMIN, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
+      .required(),
+    isEnabled: Joi.boolean()
+  }).required()
+})
+
 const validateSecondaryDomain = Joi.object({
   secondaryDomain: Joi.object({
     name: Joi.string().domain()
@@ -398,6 +408,7 @@ const validateOrder = Joi.object({
     warehouseId: Joi.string().required(),
     status: Joi.string().required(),
     shippingAddress: Joi.object({
+      company: Joi.string(),
       lastname: Joi.string(),
       city: Joi.string().required(),
       email: Joi.string(),
@@ -505,5 +516,6 @@ export default {
   validateProductAdmin,
   validateOrder,
   validateSecondaryDomain,
-  validateLegalText
+  validateLegalText,
+  validatePrivacyRule
 }
