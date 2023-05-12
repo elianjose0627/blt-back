@@ -2,6 +2,7 @@ import { v1 as uuidv1, v4 as uuidv4 } from 'uuid'
 import dayjs from 'dayjs'
 import db from '../models'
 import * as userRoles from '../utils/userRoles'
+import * as appModules from '../utils/appModules'
 
 import utc from 'dayjs/plugin/utc'
 dayjs.extend(utc)
@@ -142,6 +143,48 @@ export const createCompanyAdministrator = async (email = 'nickfury@starkindustri
     })
 
     if (user !== null) {
+      const company = await db.Company.create({
+        id: uuidv1(),
+        name: 'Test Company',
+        userId: user.id,
+        email
+      })
+
+      await user.update({ companyId: company.id })
+      return user
+    }
+  }
+}
+
+export const createCompanyAdministratorWithCompany = async (email = 'sharoncarter@starkindustriesmarvel.com', password = 'thepowerbroker'): Promise<any> => {
+  const user = await db.User.findOne({
+    attributes: ['id', 'email'],
+    where: {
+      email
+    }
+  })
+
+  if (user === null) {
+    const user = await db.User.create({
+      id: uuidv1(),
+      firstName: 'Sharon',
+      lastName: 'Carter',
+      email,
+      role: userRoles.COMPANYADMINISTRATOR,
+      phone: '1111111111',
+      password,
+      isVerified: true
+    })
+
+    if (user !== null) {
+      const company = await db.Company.create({
+        id: uuidv1(),
+        name: 'Test Company',
+        userId: user.id,
+        email
+      })
+
+      await user.update({ companyId: company.id })
       return user
     }
   }
@@ -535,4 +578,63 @@ export const order = {
   shippingFee: 0,
   orderValue: 0,
   attachments: []
+}
+
+export const createPrivacyRule = async (companyId: string): Promise<any> => {
+  const privacyRule = await db.PrivacyRule.create({
+    id: uuidv1(),
+    module: appModules.ORDERS,
+    role: userRoles.COMPANYADMINISTRATOR,
+    isEnabled: true,
+    companyId
+  })
+
+  return privacyRule
+}
+
+export const createCompanyOrder = async (companyId: string): Promise<any> => {
+  const res = await db.Order.create({
+    ...order,
+    outboundId: 'VZ9N02A3Y5',
+    id: uuidv1(),
+    companyId
+  })
+
+  return res
+}
+
+export const createCompanyOrderWithMissingEmail = async (companyId: string): Promise<any> => {
+  const res = await db.Order.create({
+    ...order,
+    outboundId: 'VZ9N02A3Y7',
+    id: uuidv1(),
+    shippingAddress: {
+      lastname: 'Wire',
+      city: 'Nairobi',
+      firstname: 'Ryan',
+      street: 'Kiu River Road',
+      zip: '254724374281',
+      country: 'KE'
+    },
+    companyId
+  })
+
+  return res
+}
+
+export const createCompanyOrderWithMissingCityStreetZip = async (companyId: string): Promise<any> => {
+  const res = await db.Order.create({
+    ...order,
+    outboundId: 'VZ9N02A3X7',
+    id: uuidv1(),
+    shippingAddress: {
+      lastname: 'Wire',
+      firstname: 'Ryan',
+      email: 'ryanwire@email.com',
+      country: 'KE'
+    },
+    companyId
+  })
+
+  return res
 }
