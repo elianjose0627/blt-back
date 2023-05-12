@@ -49,9 +49,9 @@ class RecipientController extends BaseController {
   }
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { limit, page, offset } = req.query
-    const { id } = req.params
-    const records = await this.service.getAll(limit, offset, id)
+    const { user: currentUser, query: { limit, page, offset }, params: { id } } = req
+
+    const records = await recipientService.getAll(limit, offset, id, currentUser)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),

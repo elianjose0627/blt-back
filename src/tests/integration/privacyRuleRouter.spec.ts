@@ -8,6 +8,8 @@ import {
   createPrivacyRule,
   createCompanyAdministratorWithCompany
 } from '../utils'
+import * as userRoles from '../../utils/userRoles'
+import * as appModules from '../../utils/appModules'
 
 const { expect } = chai
 
@@ -43,7 +45,7 @@ describe('Privacy Rule actions', () => {
       .post('/auth/login')
       .send({ user: { email: 'sharoncarter@starkindustriesmarvel.com', password: 'thepowerbroker' } })
 
-    await createPrivacyRule(resCompanyAdminTwo.body.user.company.id)
+    await createPrivacyRule(resCompanyAdminTwo.body.user.company.id, appModules.ORDERS, userRoles.COMPANYADMINISTRATOR)
 
     tokenAdmin = resAdmin.body.token
     token = resUser.body.token
