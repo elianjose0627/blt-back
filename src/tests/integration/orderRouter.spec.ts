@@ -13,6 +13,8 @@ import {
   createCompanyOrderWithMissingEmail,
   createCompanyOrderWithMissingCityStreetZip
 } from '../utils'
+import * as userRoles from '../../utils/userRoles'
+import * as appModules from '../../utils/appModules'
 
 const { expect } = chai
 
@@ -56,7 +58,7 @@ describe('Order actions', () => {
       .post('/auth/login')
       .send({ user: { email: 'sharoncarter@starkindustriesmarvel.com', password: 'thepowerbroker' } })
 
-    await createPrivacyRule(resCompanyAdminTwo.body.user.company.id)
+    await createPrivacyRule(resCompanyAdminTwo.body.user.company.id, appModules.ORDERS, userRoles.COMPANYADMINISTRATOR)
     await createCompanyOrder(resCompanyAdminTwo.body.user.company.id)
     await createCompanyOrderWithMissingEmail(resCompanyAdminTwo.body.user.company.id)
     await createCompanyOrderWithMissingCityStreetZip(resCompanyAdminTwo.body.user.company.id)
