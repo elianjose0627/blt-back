@@ -94,6 +94,7 @@ class OrderService extends BaseService {
     records = records.rows.map((record: any) => {
       if (privacyRule !== null) {
         record.shippingAddress = {
+          company: record.shippingAddress.company,
           lastname: record.shippingAddress.lastname,
           city: record.shippingAddress.city?.replace(/./g, '*'),
           email: record.shippingAddress.email?.replace(/.(?=.*@)/g, '*'),

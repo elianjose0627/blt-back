@@ -408,6 +408,7 @@ const validateOrder = Joi.object({
     warehouseId: Joi.string().required(),
     status: Joi.string().required(),
     shippingAddress: Joi.object({
+      company: Joi.string(),
       lastname: Joi.string(),
       city: Joi.string().required(),
       email: Joi.string(),
