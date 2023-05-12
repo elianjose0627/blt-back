@@ -2,9 +2,9 @@ import { v1 as uuidv1, v4 as uuidv4 } from 'uuid'
 import dayjs from 'dayjs'
 import db from '../models'
 import * as userRoles from '../utils/userRoles'
-import * as appModules from '../utils/appModules'
 
 import utc from 'dayjs/plugin/utc'
+import type { Module, Role } from '../types'
 dayjs.extend(utc)
 
 export const deleteTestUser = async (email: string): Promise<any> => {
@@ -580,11 +580,11 @@ export const order = {
   attachments: []
 }
 
-export const createPrivacyRule = async (companyId: string): Promise<any> => {
+export const createPrivacyRule = async (companyId: string, module: Module, role: Role): Promise<any> => {
   const privacyRule = await db.PrivacyRule.create({
     id: uuidv1(),
-    module: appModules.ORDERS,
-    role: userRoles.COMPANYADMINISTRATOR,
+    module,
+    role,
     isEnabled: true,
     companyId
   })

@@ -1,5 +1,6 @@
-import { Request, Response, NextFunction } from 'express'
-import * as userRoles from './utils/userRoles'
+import type { Request, Response, NextFunction } from 'express'
+import type * as userRoles from './utils/userRoles'
+import type * as appModules from './utils/appModules'
 
 export type Nullable<T> = T | null
 
@@ -88,7 +89,7 @@ export interface ISalutation {
   updatedAt: Date
 }
 
-export type Module = 'addresses' | 'orders'
+export type Module = typeof appModules.ADDRESSES | typeof appModules.ORDERS | typeof appModules.RECIPIENTS
 export interface IPrivacyRule {
   id: string
   module: Module

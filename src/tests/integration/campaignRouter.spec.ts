@@ -1,7 +1,13 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import app from '../../app'
-import { deleteTestUser, createAdminTestUser, verifyUser, verifyCompanyDomain } from '../utils'
+import {
+  deleteTestUser, createAdminTestUser,
+  verifyUser, verifyCompanyDomain, createPrivacyRule,
+  createCompanyAdministratorWithCompany
+} from '../utils'
+import * as userRoles from '../../utils/userRoles'
+import * as appModules from '../../utils/appModules'
 
 const { expect } = chai
 
@@ -9,10 +15,13 @@ chai.use(chaiHttp)
 
 let tokenAdmin: string
 let token: string
+let tokenCompanyAdminTwo: string
+let companyTwoId: string
 
 describe('Campaign actions', () => {
   before(async () => {
     await createAdminTestUser()
+    await createCompanyAdministratorWithCompany()
 
     await chai
       .request(app)
@@ -30,8 +39,15 @@ describe('Campaign actions', () => {
       .post('/auth/login')
       .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
 
+    const resCompanyAdminTwo = await chai
+      .request(app)
+      .post('/auth/login')
+      .send({ user: { email: 'sharoncarter@starkindustriesmarvel.com', password: 'thepowerbroker' } })
+
     tokenAdmin = resAdmin.body.token
     token = res1.body.token
+    tokenCompanyAdminTwo = resCompanyAdminTwo.body.token
+    companyTwoId = resCompanyAdminTwo.body.user.company.id
   })
 
   after(async () => {
@@ -197,6 +213,91 @@ describe('Campaign actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'recipients')
       expect(res.body.recipients).to.be.an('array')
+    })
+
+    it('Should return 200 Success when a company admin successfully retrieves all recipients with a privacy rule.', async () => {
+      await verifyCompanyDomain(companyTwoId)
+      await createPrivacyRule(companyTwoId, appModules.RECIPIENTS, userRoles.COMPANYADMINISTRATOR)
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyTwoId)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Privacy',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/recipients`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .send({
+          recipient: {
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'johndoe@doe.com',
+            country: 'Kenya',
+            city: 'Nairobi'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${String(resCampaign.body.campaign.id)}/recipients`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'recipients')
+      expect(res.body.recipients).to.be.an('array')
+      expect(res.body.recipients).to.have.lengthOf.above(0)
+    })
+
+    it('Should return 200 Success when a company admin successfully retrieves all recipients with a privacy rule with street, zip and address addition set.', async () => {
+      await verifyCompanyDomain(companyTwoId)
+      await createPrivacyRule(companyTwoId, appModules.RECIPIENTS, userRoles.COMPANYADMINISTRATOR)
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyTwoId)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Privacy',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/recipients`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .send({
+          recipient: {
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'johndoe@doe.com',
+            country: 'Kenya',
+            city: 'Nairobi',
+            street: 'Doe Avenue',
+            zip: '1111',
+            addressAddition: 'HSE 1'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${String(resCampaign.body.campaign.id)}/recipients`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'recipients')
+      expect(res.body.recipients).to.be.an('array')
+      expect(res.body.recipients).to.have.lengthOf.above(0)
     })
 
     it('Should return 403 Forbidden when an non-owner tries to retrieves all campaign recipients.', async () => {
