@@ -15,9 +15,10 @@ const RecipientRoutes = (): any => {
   }, { abortEarly: false }), asyncHandler(RecipientController.checkRecord))
   recipientRouter.route('/recipients/:id')
     .get(asyncHandler(RecipientController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin), asyncHandler(RecipientController.get))
-    .put(asyncHandler(RecipientController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin), celebrate({
-      [Segments.BODY]: validator.validateUpdatedRecipient
-    }), asyncHandler(RecipientController.update))
+    .put(asyncHandler(RecipientController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin),
+      asyncHandler(RecipientController.checkPrivacyRule), celebrate({
+        [Segments.BODY]: validator.validateUpdatedRecipient
+      }), asyncHandler(RecipientController.update))
     .delete(asyncHandler(RecipientController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin), asyncHandler(RecipientController.delete))
   return recipientRouter
 }

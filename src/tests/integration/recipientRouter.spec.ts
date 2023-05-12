@@ -3,8 +3,11 @@ import chaiHttp from 'chai-http'
 import app from '../../app'
 import {
   deleteTestUser, createAdminTestUser,
-  createCompanyAdministrator, createCampaignManager, createVerifiedCompany, verifyUser, verifyCompanyDomain
+  createCompanyAdministrator, createCampaignManager,
+  createVerifiedCompany, verifyUser, verifyCompanyDomain, createPrivacyRule
 } from '../utils'
+import * as userRoles from '../../utils/userRoles'
+import * as appModules from '../../utils/appModules'
 
 const { expect } = chai
 
@@ -430,6 +433,122 @@ describe('Recipient actions', () => {
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+    })
+  })
+
+  describe('Update a recipient by id', () => {
+    it('Should return 200 OK when a company owner successfully updates a recipient.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Miss Marvel Company',
+            email: 'khamalakhan@themarvels.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const resRecipient = await chai
+        .request(app)
+        .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/recipients`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          recipient: {
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'johndoe@doe.com',
+            country: 'Kenya',
+            city: 'Nairobi'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .put(`/api/recipients/${String(resRecipient.body.recipient.id)}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          recipient: {
+            street: 'Kiu River Road'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'recipient')
+      expect(res.body.recipient).to.be.an('object')
+      expect(res.body.recipient).to.include.keys('id', 'companyName', 'firstName', 'lastName', 'email', 'phone', 'country', 'city', 'street', 'zip', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 403 Forbidden when an admin tries to update a recipient with a privacy rule set.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Photon Company',
+            email: 'photon@themarvels.com'
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(companyId)
+      await createPrivacyRule(companyId, appModules.RECIPIENTS, userRoles.ADMIN)
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const resRecipient = await chai
+        .request(app)
+        .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/recipients`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          recipient: {
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'johndoe@doe.com',
+            country: 'Kenya',
+            city: 'Nairobi'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .put(`/api/recipients/${String(resRecipient.body.recipient.id)}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          recipient: {
+            street: 'Kiu River Road'
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal(`Disable privacy rule for ${appModules.RECIPIENTS} module and ${userRoles.ADMIN} role to be able to perform this action`)
     })
   })
 })
