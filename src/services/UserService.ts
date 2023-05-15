@@ -303,37 +303,34 @@ class UserService extends BaseService {
     }
   }
 
-  async searchUsers (limit: any, offset: any, email: string): Promise<any> {
-    const users = await db[this.model].findAndCountAll({
-      attributes: { exclude: ['password', 'otp'] },
-      include,
-      where: {
-        [Op.or]: [
-          { email: { [Op.iLike]: `%${email}%` } }
+  async getAll (limit: number, offset: number, email?: string): Promise<any> {
+    let users
+    if (email !== undefined) {
+      users = await db[this.model].findAndCountAll({
+        include,
+        where: {
+          [Op.or]: [
+            { email: { [Op.iLike]: `%${email}%` } }
+          ]
+        },
+        limit,
+        offset,
+        order: [
+          ['createdAt', 'DESC']
         ]
-      },
-      limit,
-      offset,
-      order: [
-        ['createdAt', 'DESC']
-      ]
-    })
-
-    return users
-  }
-
-  async getAll (limit: number, offset: number): Promise<any> {
-    const records = await db[this.model].findAndCountAll({
-      limit,
-      offset,
-      order: [['createdAt', 'DESC']],
-      attributes: { exclude: [] },
-      include
-    })
+      })
+    } else {
+      users = await db[this.model].findAndCountAll({
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        include
+      })
+    }
 
     return {
-      count: records.count,
-      rows: records.rows.map((record: any) => record.toJSONFor())
+      count: users.count,
+      rows: users.rows.map((record: any) => record.toJSONFor())
     }
   }
 }

@@ -446,13 +446,7 @@ class UserController extends BaseController {
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { limit, page, offset, email } = req.query
-    let records: any
-
-    if (email !== undefined) {
-      records = await userService.searchUsers(limit, offset, email)
-    } else {
-      records = await userService.getAll(limit, offset)
-    }
+    const records = await userService.getAll(limit, offset, email)
 
     const meta = {
       total: records.count,
