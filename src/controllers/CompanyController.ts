@@ -11,6 +11,7 @@ import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
 import AddressService from '../services/AddressService'
 import { sendNotifierEmail } from '../utils/sendMail'
+import { encryptUUID } from '../utils/encryption'
 
 dayjs.extend(utc)
 
@@ -542,6 +543,17 @@ class CompanyController extends BaseController {
         }
       })
     }
+  }
+
+  async getInviteLink (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { params: { id } } = req
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      company: {
+        inviteLink: `${String(process.env.APP_URL)}/register?companyId=${encryptUUID(id)}`
+      }
+    })
   }
 }
 

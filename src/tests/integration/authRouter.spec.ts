@@ -9,9 +9,11 @@ import {
   deleteTestUser, createBlockedUser,
   createLockedOutUser30mins, createUserWithOtp,
   createLockedOutUser1min,
-  createAdminTestUser
+  createAdminTestUser,
+  verifyCompanyDomain
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
+import { encryptUUID } from '../../utils/encryption'
 
 const { expect } = chai
 
@@ -71,11 +73,18 @@ describe('Auth Actions', () => {
 
     const companyId = resCompany.body.company.id
 
+    await verifyCompanyDomain(companyId)
+
+    const resInviteLink = await chai
+      .request(app)
+      .get(`/api/companies/${String(companyId)}/invite-link`)
+      .set('Authorization', `Bearer ${tokenAdmin}`)
+
     const res = await chai
       .request(app)
       .post('/auth/signup')
       .query({
-        companyId
+        companyId: resInviteLink.body.company.inviteLink.split('=')[1]
       })
       .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoon@guardiansofthegalaxy.com', phone: '254720123456', password: 'friend' } })
 
@@ -85,8 +94,8 @@ describe('Auth Actions', () => {
     expect(res.body.user.role).to.equal(userRoles.EMPLOYEE)
   })
 
-  it('should return 404 Not Found if a user triees to sign up using company id link with a company that does not exists', async () => {
-    const companyId = uuidv1()
+  it('should return 404 Not Found if a user tries to sign up using company id link with a company that does not exists', async () => {
+    const companyId = encryptUUID(uuidv1())
 
     const res = await chai
       .request(app)
@@ -100,6 +109,40 @@ describe('Auth Actions', () => {
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')
     expect(res.body.success).to.equal(false)
     expect(res.body.errors.message).to.equal('Company not found')
+  })
+
+  it('should return 422 Unprocessable entity if a user tries to sign up using an invalid invite link', async () => {
+    const companyId = '269cf2ba92f35af3c1c9c96e25d1ae84f01e9b39872707e8190bfa0et634182728d04c362f7e46abf8810051b479ef9a'
+
+    const res = await chai
+      .request(app)
+      .post('/auth/signup')
+      .query({
+        companyId
+      })
+      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoon1@guardiansofthegalaxy.com', phone: '254720123456', password: 'friend' } })
+
+    expect(res).to.have.status(422)
+    expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+    expect(res.body.success).to.equal(false)
+    expect(res.body.errors.message).to.equal('Invalid invitation link')
+  })
+
+  it('should return 422 Unprocessable entity if a user tries to sign up using an invalid invite link that on decryption is not a guid', async () => {
+    const companyId = encryptUUID('123456780123401234012340123456789012')
+
+    const res = await chai
+      .request(app)
+      .post('/auth/signup')
+      .query({
+        companyId
+      })
+      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoon1@guardiansofthegalaxy.com', phone: '254720123456', password: 'friend' } })
+
+    expect(res).to.have.status(422)
+    expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+    expect(res.body.success).to.equal(false)
+    expect(res.body.errors.message).to.equal('Invalid invitation link')
   })
 
   it('should return 422 when a user tries to sign up with an empty username', async () => {
