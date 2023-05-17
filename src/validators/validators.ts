@@ -480,7 +480,7 @@ const validateLegalText = Joi.object({
 })
 
 const validateRegistrationQueryParams = Joi.object({
-  companyId: Joi.string().uuid()
+  companyId: Joi.string().length(96)
 })
 
 export default {

@@ -122,6 +122,9 @@ const companyRoutes = (): any => {
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(LegalTextController.getAllForCompany))
+  companyRouter.route('/companies/:id/invite-link')
+    .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin),
+      asyncHandler(CompanyController.checkCompanyDomainVerification), asyncHandler(CompanyController.getInviteLink))
   return companyRouter
 }
 
