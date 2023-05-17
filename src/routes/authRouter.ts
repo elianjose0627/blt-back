@@ -11,7 +11,8 @@ const authRoutes = (): any => {
 
   authRouter.route('/signup')
     .post(celebrate({
-      [Segments.BODY]: validator.validateCreatedUser
+      [Segments.BODY]: validator.validateCreatedUser,
+      [Segments.QUERY]: validator.validateRegistrationQueryParams
     }, { abortEarly: false }), asyncHandler(UserController.insert))
 
   authRouter.route('/login')

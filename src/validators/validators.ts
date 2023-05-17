@@ -479,6 +479,10 @@ const validateLegalText = Joi.object({
   }).required()
 })
 
+const validateRegistrationQueryParams = Joi.object({
+  companyId: Joi.string().uuid()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -517,5 +521,6 @@ export default {
   validateOrder,
   validateSecondaryDomain,
   validateLegalText,
-  validatePrivacyRule
+  validatePrivacyRule,
+  validateRegistrationQueryParams
 }
