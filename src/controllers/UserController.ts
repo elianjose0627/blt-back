@@ -58,11 +58,11 @@ class UserController extends BaseController {
   }
 
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { body: { user }, user: currentUser } = req
+    const { body: { user }, user: currentUser, query: { companyId } } = req
 
     // Used != to capture value that is undefined
-    if (user?.companyId != null) {
-      const company = await companyService.findById(user.companyId)
+    if ((user.companyId ?? companyId) != null) {
+      const company = await companyService.findById(user.companyId ?? companyId)
       if (company === null) {
         return res.status(statusCodes.NOT_FOUND).send({
           statusCode: statusCodes.NOT_FOUND,
@@ -74,7 +74,7 @@ class UserController extends BaseController {
       }
     }
 
-    const record = await userService.insert({ user, currentUser })
+    const record = await userService.insert({ user, currentUser, companyId })
 
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 
@@ -446,13 +446,7 @@ class UserController extends BaseController {
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { limit, page, offset, email } = req.query
-    let records: any
-
-    if (email !== undefined) {
-      records = await userService.searchUsers(limit, offset, email)
-    } else {
-      records = await userService.getAll(limit, offset)
-    }
+    const records = await userService.getAll(limit, offset, email)
 
     const meta = {
       total: records.count,
