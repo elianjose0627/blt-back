@@ -32,6 +32,7 @@ export interface Database {
   ShippingMethod?: any
   LegalText?: any
   PrivacyRule?: any
+  AccessPermission?: any
   [key: string]: any
 }
 

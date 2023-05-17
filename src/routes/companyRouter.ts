@@ -14,11 +14,13 @@ import CostCenterController from '../controllers/CostCenterController'
 import ProductController from '../controllers/ProductController'
 import SecondaryDomainController from '../controllers/SecondaryDomainController'
 import LegalTextController from '../controllers/LegalTextController'
+import AccessPermissionController from '../controllers/AccessPermissionController'
+import checkPermissions from '../middlewares/checkPermissions'
 
 const companyRoutes = (): any => {
   const companyRouter = express.Router()
 
-  companyRouter.use('/companies', checkAuth, checkUserIsVerifiedStatus)
+  companyRouter.use('/companies', checkAuth, checkUserIsVerifiedStatus, CompanyController.setModule)
   companyRouter.route('/companies')
     .post(celebrate({
       [Segments.BODY]: validator.validateCreatedCompany
@@ -125,6 +127,15 @@ const companyRoutes = (): any => {
   companyRouter.route('/companies/:id/invite-link')
     .get(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin),
       asyncHandler(CompanyController.checkCompanyDomainVerification), asyncHandler(CompanyController.getInviteLink))
+  companyRouter.route('/companies/:id/access-permissions')
+    .post(asyncHandler(CompanyController.checkOwnerOrCompanyAdministratorOrAdmin),
+      asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
+        [Segments.BODY]: validator.validateAccessPermission
+      }, { abortEarly: false }), asyncHandler(AccessPermissionController.insert))
+    .get(asyncHandler(checkPermissions),
+      asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
+        [Segments.QUERY]: validator.validateQueryParams
+      }), asyncHandler(paginate), asyncHandler(AccessPermissionController.getAllForCompany))
   return companyRouter
 }
 

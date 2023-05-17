@@ -3,6 +3,8 @@ import { Joi } from 'celebrate'
 import * as countryList from '../utils/countries'
 import * as userRoles from '../utils/userRoles'
 import * as currencies from '../utils/currencies'
+import * as appModules from '../utils/appModules'
+import * as permissions from '../utils/permissions'
 
 const imageMimeTypes = ['image/bmp', 'image/jpeg', 'image/x-png', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
 
@@ -313,9 +315,9 @@ const validateSalutation = Joi.object({
 
 const validatePrivacyRule = Joi.object({
   privacyRule: Joi.object({
-    module: Joi.string().required().max(16),
+    module: Joi.string().required().valid(...appModules.MODULES),
     role: Joi.string()
-      .valid(...[userRoles.USER, userRoles.ADMIN, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
+      .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
       .required(),
     isEnabled: Joi.boolean()
   }).required()
@@ -479,6 +481,27 @@ const validateLegalText = Joi.object({
   }).required()
 })
 
+const commonAccessPermissionSchema = {
+  name: Joi.string().required().max(128),
+  module: Joi.string().required().valid(...appModules.MODULES),
+  role: Joi.string()
+    .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
+    .required(),
+  permission: Joi.string().required().valid(...[permissions.READ, permissions.READWRITE]),
+  isEnabled: Joi.boolean().default(true)
+}
+
+const validateAccessPermission = Joi.object({
+  accessPermission: Joi.object(commonAccessPermissionSchema).required()
+})
+
+const validateAccessPermissionAdmin = Joi.object({
+  accessPermission: Joi.object({
+    ...commonAccessPermissionSchema,
+    companyId: Joi.string().required().uuid()
+  }).required()
+})
+
 const validateRegistrationQueryParams = Joi.object({
   companyId: Joi.string().length(96)
 })
@@ -522,5 +545,7 @@ export default {
   validateSecondaryDomain,
   validateLegalText,
   validatePrivacyRule,
+  validateAccessPermission,
+  validateAccessPermissionAdmin,
   validateRegistrationQueryParams
 }

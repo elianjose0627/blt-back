@@ -1,5 +1,5 @@
 import * as statusCodes from '../constants/statusCodes'
-import { CustomNext, CustomRequest, CustomResponse } from '../types'
+import { CustomNext, CustomRequest, CustomResponse, Module } from '../types'
 import { io } from '../utils/socket'
 
 class BaseController {
@@ -7,6 +7,7 @@ class BaseController {
 
   constructor (service: any) {
     this.service = service
+    this.setModule = this.setModule.bind(this)
     this.checkRecord = this.checkRecord.bind(this)
     this.getAll = this.getAll.bind(this)
     this.get = this.get.bind(this)
@@ -18,6 +19,16 @@ class BaseController {
 
   recordName (): any {
     return this.service.singleRecord()
+  }
+
+  moduleName (): Module {
+    return this.service.manyRecords()
+  }
+
+  async setModule (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
+    req.module = this.moduleName()
+
+    return next()
   }
 
   async checkRecord (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
