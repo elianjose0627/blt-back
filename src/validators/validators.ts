@@ -315,7 +315,7 @@ const validateSalutation = Joi.object({
 
 const validatePrivacyRule = Joi.object({
   privacyRule: Joi.object({
-    module: Joi.string().required().valid(...appModules.MODULES),
+    module: Joi.string().required().valid(...appModules.MODULES_ARRAY),
     role: Joi.string()
       .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
       .required(),
@@ -483,7 +483,7 @@ const validateLegalText = Joi.object({
 
 const commonAccessPermissionSchema = {
   name: Joi.string().required().max(128),
-  module: Joi.string().required().valid(...appModules.MODULES),
+  module: Joi.string().required().valid(...appModules.MODULES_ARRAY),
   role: Joi.string()
     .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
     .required(),

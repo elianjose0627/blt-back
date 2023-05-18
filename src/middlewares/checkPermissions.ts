@@ -7,7 +7,7 @@ import * as appModules from '../utils/appModules'
 const checkPermissions = (req: CustomRequest, res: CustomResponse, next: CustomNext): any => {
   const { user: currentUser, module, method } = req
 
-  const { role, company: { accessPermissions } } = currentUser
+  const { role, company } = currentUser
 
   const allowedCompanyAdminModules = [
     appModules.ACCESSPERMISSIONS, appModules.COMPANIES
@@ -21,35 +21,39 @@ const checkPermissions = (req: CustomRequest, res: CustomResponse, next: CustomN
     return next()
   }
 
-  const accessPermission: IAccessPermission = accessPermissions
-    .find((accessPermission: IAccessPermission) => accessPermission.module === module && accessPermission.role === role)
+  if (company !== null) {
+    const { accessPermissions } = company
+    const accessPermission: IAccessPermission = accessPermissions
+      .find((accessPermission: IAccessPermission) => accessPermission.module === module && accessPermission.role === role)
 
-  if (accessPermission === undefined) {
-    return res.status(statusCodes.FORBIDDEN).send({
-      statusCode: statusCodes.FORBIDDEN,
-      success: false,
-      errors: {
-        message: 'You do not have the necessary permissions to perform this action'
-      }
-    })
-  }
+    if (accessPermission === undefined) {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'You do not have the necessary permissions to perform this action'
+        }
+      })
+    }
 
-  const allowed = {
-    [permissions.READ]: ['GET'],
-    [permissions.READWRITE]: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
-  }
+    const allowed = {
+      [permissions.READ]: ['GET'],
+      [permissions.READWRITE]: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
+    }
 
-  if (allowed[accessPermission.permission].includes(method)) {
-    return next()
-  } else {
-    return res.status(statusCodes.FORBIDDEN).send({
-      statusCode: statusCodes.FORBIDDEN,
-      success: false,
-      errors: {
-        message: 'You do not have the necessary permissions to perform this action'
-      }
-    })
+    if (allowed[accessPermission.permission].includes(method)) {
+      return next()
+    } else {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'You do not have the necessary permissions to perform this action'
+        }
+      })
+    }
   }
+  return next()
 }
 
 export default checkPermissions

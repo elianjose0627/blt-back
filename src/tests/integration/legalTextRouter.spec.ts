@@ -92,7 +92,7 @@ describe('Legal Text actions', () => {
       expect(res.body.legalTexts).to.be.an('array')
     })
 
-    it('Should return 200 OK when an admin gets all orders.', async () => {
+    it('Should return 200 OK when an admin gets all legal texts.', async () => {
       const res = await chai
         .request(app)
         .get('/api/legal-texts')
@@ -103,7 +103,7 @@ describe('Legal Text actions', () => {
       expect(res.body.legalTexts).to.be.an('array')
     })
 
-    it('Should return 200 OK when a company admin gets all orders.', async () => {
+    it('Should return 200 OK when a company admin gets all legal texts.', async () => {
       const res = await chai
         .request(app)
         .get('/api/legal-texts')

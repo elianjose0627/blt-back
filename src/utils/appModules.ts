@@ -15,7 +15,7 @@ export const SECONDARYDOMAINS = 'secondaryDomains'
 export const SHIPMENTS = 'shipments'
 export const USERS = 'users'
 
-export const MODULES = [
+export const MODULES_ARRAY = [
   'accessPermissions',
   'addresses',
   'bundles',
