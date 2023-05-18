@@ -1,5 +1,6 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
+import { v4 as uuidv4 } from 'uuid'
 import app from '../../app'
 import {
   deleteTestUser,
@@ -8,7 +9,9 @@ import {
   createVerifiedCompany,
   createUnVerifiedCompanyWithExpiredDomainCode,
   verifyUser,
-  verifyCompanyDomain
+  verifyCompanyDomain,
+  createVerifiedUser,
+  createVerifiedAdminUser
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 
@@ -108,6 +111,36 @@ describe('Company actions', () => {
         })
 
       expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('id', 'customerId', 'suffix', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 200 OK when an admin creates the same company for an admin.', async () => {
+      const adminUser = await createVerifiedAdminUser()
+      await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: adminUser.email
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: adminUser.email
+          }
+        })
+
+      expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'company')
       expect(res.body.company).to.be.an('object')
       expect(res.body.company).to.include.keys('id', 'customerId', 'suffix', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
@@ -262,6 +295,26 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
 
       expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('id', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 200 OK when an admin creates a company with an existing user role.', async () => {
+      const resUser = await createVerifiedUser()
+
+      const res = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Quill',
+            email: resUser.email
+          }
+        })
+
+      expect(res).to.have.status(201)
       expect(res.body).to.include.keys('statusCode', 'success', 'company')
       expect(res.body.company).to.be.an('object')
       expect(res.body.company).to.include.keys('id', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
@@ -697,6 +750,33 @@ describe('Company actions', () => {
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('Only the owner or your company administrator can perform this action')
+    })
+
+    it('Should return 404 Not Found when a company owner updates the data of an non-existent user.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Starlink Company',
+            email: 'starsnoexist@company.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      await verifyCompanyDomain(String(companyId))
+
+      const res = await chai
+        .request(app)
+        .put(`/api/companies/${String(companyId)}/users/${String(uuidv4())}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ user: { firstName: 'Crystalia' } })
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('User not found')
     })
   })
 
@@ -1236,6 +1316,35 @@ describe('Company actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'addresses', 'meta')
       expect(res.body.addresses).to.be.an('array')
+    })
+
+    it('Should return 403 Forbidden when a company owner tries to create an address with an unverified company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company17unverified.com'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/addresses`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          address: {
+            country: 'Kenya',
+            city: 'Nairobi'
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('Kindly verify your company domain')
     })
   })
 

@@ -290,6 +290,42 @@ export const createUserWithExpiredOtp = async (): Promise<any> => {
   }
 }
 
+export const createVerifiedUser = async (): Promise<any> => {
+  const user = await db.User.create({
+    id: uuidv1(),
+    firstName: 'Mantis',
+    lastName: 'Ego',
+    email: 'mantis@aguardiansofthegalaxy.com',
+    phone: '2222222222',
+    password: 'quill',
+    isVerified: true,
+    isActive: true,
+    role: userRoles.USER
+  })
+
+  if (user !== null) {
+    return user
+  }
+}
+
+export const createVerifiedAdminUser = async (): Promise<any> => {
+  const user = await db.User.create({
+    id: uuidv1(),
+    firstName: 'Drax',
+    lastName: 'Drax',
+    email: 'drax@aguardiansofthegalaxy.com',
+    phone: '2222222222',
+    password: 'peterquill',
+    isVerified: true,
+    isActive: true,
+    role: userRoles.ADMIN
+  })
+
+  if (user !== null) {
+    return user
+  }
+}
+
 export const createVerifiedCompany = async (userId: string, isDomainVerified = true): Promise<any> => {
   const company = await db.Company.create({
     id: uuidv1(),

@@ -34,7 +34,7 @@ class CompanyController extends BaseController {
     const allowedRoles = [userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER]
 
     const isOwnerOrAdmin = currentUser.id === company?.owner?.id || currentUser.role === userRoles.ADMIN
-    const isEmployee = currentUser?.companyId === company?.id
+    const isEmployee = currentUser.companyId === company.id
 
     if (isOwnerOrAdmin || (isEmployee && allowedRoles.includes(currentUser?.role))) {
       return next()
