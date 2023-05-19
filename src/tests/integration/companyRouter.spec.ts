@@ -1466,7 +1466,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or administrator can perform this action')
     })
 
     it('Should return 200 Success when a company owner tries to create a campaign that exists.', async () => {
@@ -1701,7 +1701,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or administrator can perform this action')
     })
 
     it('Should return 200 when an admin retrieves all company campaigns.', async () => {
@@ -1841,7 +1841,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or administrator can perform this action')
     })
 
     it('Should return 200 Success when a company owner tries to create a cost center that exists.', async () => {
@@ -2081,7 +2081,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or administrator can perform this action')
     })
 
     it('Should return 200 when an admin retrieves all company cost centers.', async () => {
@@ -2233,7 +2233,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or administrator can perform this action')
     })
 
     it('Should return 200 Success when a company owner tries to create a product that exists.', async () => {
@@ -2490,7 +2490,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or administrator can perform this action')
     })
 
     it('Should return 200 when an admin retrieves all company products.', async () => {
@@ -2630,7 +2630,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or administrator can perform this action')
     })
 
     it('Should return 200 Success when a company owner tries to create a secondary domain that exists.', async () => {
@@ -3299,7 +3299,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or administrator can perform this action')
     })
 
     it('Should return 201 Created when an admin creates a legal text.', async () => {
@@ -3517,7 +3517,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or administrator can perform this action')
     })
 
     it('Should return 200 when an admin retrieves all company legal texts.', async () => {
