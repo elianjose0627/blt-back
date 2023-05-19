@@ -11,9 +11,9 @@ import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 const salutationRoutes = (): any => {
   const salutationRouter = express.Router()
 
-  salutationRouter.use('/salutations', checkAuth, checkUserIsVerifiedStatus)
+  salutationRouter.use('/salutations', checkAuth, checkUserIsVerifiedStatus, SalutationController.setModule)
   salutationRouter.route('/salutations')
-    .post(celebrate({
+    .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateSalutation
     }, { abortEarly: false }), asyncHandler(SalutationController.insert))
     .get(celebrate({
