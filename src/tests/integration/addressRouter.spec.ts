@@ -206,7 +206,7 @@ describe('Address actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner or company administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner can perform this action')
     })
 
     it('Should return 403 Forbidden when a user who is a company employee tries to update an address.', async () => {
@@ -268,7 +268,7 @@ describe('Address actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner or company administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner can perform this action')
     })
 
     it('Should return 403 Forbidden when a user who is neither a company employee nor an owner  tries to update an address.', async () => {
@@ -330,7 +330,7 @@ describe('Address actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner or company administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner can perform this action')
     })
   })
 })

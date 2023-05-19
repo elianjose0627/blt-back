@@ -1,7 +1,7 @@
 import { v1 as uuidv1 } from 'uuid'
 import db from '../models'
 
-const includeCompany = ['Campaign', 'Address', 'CostCenter', 'Product', 'Order']
+const includeCompany = ['Campaign', 'Address', 'CostCenter', 'Product', 'Order', 'AccessPermission']
 const withoutUser = ['BundleItem', 'Salutation', 'Picture', 'SecondaryDomain', 'LegalText']
 
 export const generateInclude = (model: string): any => {

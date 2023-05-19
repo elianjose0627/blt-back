@@ -10,7 +10,7 @@ import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 const pictureRoutes = (): any => {
   const pictureRouter = express.Router()
 
-  pictureRouter.use('/pictures', checkAuth, checkUserIsVerifiedStatus)
+  pictureRouter.use('/pictures', checkAuth, checkUserIsVerifiedStatus, PictureController.setModule)
   pictureRouter.use('/pictures/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(PictureController.checkRecord))

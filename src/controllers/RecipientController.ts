@@ -11,22 +11,20 @@ const recipientService = new RecipientService('Recipient')
 const privacyRuleService = new PrivacyRuleService('PrivacyRule')
 
 class RecipientController extends BaseController {
-  checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+  checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: { campaign: { companyId, company: { owner } } } } = req
-
-    const allowedRoles = [userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER]
 
     const isOwnerOrAdmin = currentUser.id === owner.id || currentUser.role === userRoles.ADMIN
     const isEmployee = currentUser?.companyId === companyId
 
-    if (isOwnerOrAdmin || (isEmployee && allowedRoles.includes(currentUser?.role))) {
+    if (isOwnerOrAdmin || (isEmployee)) {
       return next()
     } else {
       return res.status(statusCodes.FORBIDDEN).send({
         statusCode: statusCodes.FORBIDDEN,
         success: false,
         errors: {
-          message: 'Only the owner, company administrator, campaign manager or administrator can perform this action'
+          message: 'Only the owner or administrator can perform this action'
         }
       })
     }
