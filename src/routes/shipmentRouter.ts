@@ -8,7 +8,7 @@ import validator from '../validators/validators'
 const shipmentRoutes = (): any => {
   const shipmentRouter = express.Router()
 
-  shipmentRouter.use('/shipments', checkAuth)
+  shipmentRouter.use('/shipments', checkAuth, ShipmentController.setModule)
   shipmentRouter.use('/shipments/:trackingId', celebrate({
     [Segments.PARAMS]: validator.validateTrackingId
   }, { abortEarly: false }))
