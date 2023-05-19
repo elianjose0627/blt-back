@@ -11,7 +11,7 @@ const checkPermissions = (req: CustomRequest, res: CustomResponse, next: CustomN
 
   const allowedCompanyAdminModules = [
     appModules.ACCESSPERMISSIONS, appModules.COMPANIES, appModules.CAMPAIGNS,
-    appModules.RECIPIENTS, appModules.BUNDLES
+    appModules.RECIPIENTS, appModules.BUNDLES, appModules.COSTCENTERS
   ]
 
   const allowedCampaignManagerModules = [
