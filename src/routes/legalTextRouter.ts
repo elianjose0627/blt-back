@@ -20,7 +20,8 @@ const legalTextRoutes = (): any => {
     }), asyncHandler(LegalTextController.insert))
   legalTextRouter.use('/legal-texts/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
-  }, { abortEarly: false }), asyncHandler(checkAuth), asyncHandler(checkUserIsVerifiedStatus), asyncHandler(LegalTextController.checkRecord))
+  }, { abortEarly: false }), asyncHandler(checkAuth), asyncHandler(checkUserIsVerifiedStatus),
+  asyncHandler(LegalTextController.checkRecord), LegalTextController.setModule)
   legalTextRouter.route('/legal-texts/:id')
     .get(asyncHandler(LegalTextController.get))
     .put(asyncHandler(checkAdmin), celebrate({
