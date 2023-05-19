@@ -28,43 +28,20 @@ const sandboxMode = process.env.NODE_ENV === 'test'
 const mininumWaitDaysForDomainVerificationCode = 7
 
 class CompanyController extends BaseController {
-  checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+  checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: company } = req
-
-    const allowedRoles = [userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER]
 
     const isOwnerOrAdmin = currentUser.id === company?.owner?.id || currentUser.role === userRoles.ADMIN
     const isEmployee = currentUser?.companyId === company?.id
 
-    if (isOwnerOrAdmin || (isEmployee && allowedRoles.includes(currentUser?.role))) {
+    if (isOwnerOrAdmin || (isEmployee)) {
       return next()
     } else {
       return res.status(statusCodes.FORBIDDEN).send({
         statusCode: statusCodes.FORBIDDEN,
         success: false,
         errors: {
-          message: 'Only the owner, company administrator, campaign manager or administrator can perform this action'
-        }
-      })
-    }
-  }
-
-  checkOwnerOrCompanyAdministratorOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
-    const { user: currentUser, record: company } = req
-
-    const allowedRoles = [userRoles.COMPANYADMINISTRATOR]
-
-    const isOwnerOrAdmin = currentUser.id === company?.owner?.id || currentUser.role === userRoles.ADMIN
-    const isEmployee = currentUser?.companyId === company?.id
-
-    if (isOwnerOrAdmin || (isEmployee && allowedRoles.includes(currentUser?.role))) {
-      return next()
-    } else {
-      return res.status(statusCodes.FORBIDDEN).send({
-        statusCode: statusCodes.FORBIDDEN,
-        success: false,
-        errors: {
-          message: 'Only the owner, company administrator or administrator can perform this action'
+          message: 'Only the owner or administrator can perform this action'
         }
       })
     }

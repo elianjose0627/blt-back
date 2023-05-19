@@ -6,7 +6,9 @@ import {
   deleteTestUser,
   createAdminTestUser,
   verifyUser,
-  verifyCompanyDomain
+  verifyCompanyDomain,
+  createCompanyAdministratorWithCompany,
+  createCampaignManager
 } from '../utils'
 
 const { expect } = chai
@@ -15,10 +17,14 @@ chai.use(chaiHttp)
 
 let tokenAdmin: string
 let token: string
+let tokenCompanyAdminTwo: string
+let tokenCampaignManager: string
 
 describe('Product actions', () => {
   before(async () => {
     await createAdminTestUser()
+    await createCompanyAdministratorWithCompany('minerva@kreeproducts.kr', 'thedoctor')
+    await createCampaignManager('ronan@kreeproducts.kr', 'theaccuser')
 
     await chai
       .request(app)
@@ -37,8 +43,20 @@ describe('Product actions', () => {
       .post('/auth/login')
       .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
 
+    const resCompanyAdminTwo = await chai
+      .request(app)
+      .post('/auth/login')
+      .send({ user: { email: 'minerva@kreeproducts.kr', password: 'thedoctor' } })
+
+    const resCampaignManager = await chai
+      .request(app)
+      .post('/auth/login')
+      .send({ user: { email: 'ronan@kreeproducts.kr', password: 'theaccuser' } })
+
     tokenAdmin = resAdmin.body.token
     token = resUser.body.token
+    tokenCompanyAdminTwo = resCompanyAdminTwo.body.token
+    tokenCampaignManager = resCampaignManager.body.token
   })
 
   after(async () => {
@@ -247,6 +265,130 @@ describe('Product actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'product')
       expect(res.body.product).to.be.an('object')
       expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 200 OK when a company admin gets a product by id.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Cost Center Company 1',
+            email: 'ivers2@kreeproducts.kr',
+            domain: 'kreeproducts.kr'
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(companyId)
+
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            companyId,
+            name: 'Soda Water',
+            jfsku: '1231',
+            merchantSku: '1231',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      const productId = resProduct.body.product.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'minerva@kreeproducts.kr',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdmin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'minerva@kreeproducts.kr', password: 'thedoctor' } })
+
+      tokenCompanyAdminTwo = resCompanyAdmin.body.token
+
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${String(productId)}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 403 Forbidden when a campaign manager gets a product by id.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Cost Center Company 1',
+            email: 'ivers21@kreeproducts.kr',
+            domain: 'kreeproducts.kr'
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(companyId)
+
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            companyId,
+            name: 'Soda Water',
+            jfsku: '1231',
+            merchantSku: '1231',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      const productId = resProduct.body.product.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'ronan@kreeproducts.kr',
+            actionType: 'add'
+          }
+        })
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ronan@kreeproducts.kr', password: 'theaccuser' } })
+
+      tokenCampaignManager = resCampaignManager.body.token
+
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${String(productId)}`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
     })
 
     it('Should return 200 OK when an administrator gets a product by id.', async () => {

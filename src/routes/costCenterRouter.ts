@@ -5,20 +5,23 @@ import CostCenterController from '../controllers/CostCenterController'
 import asyncHandler from '../middlewares/asyncHandler'
 import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
+import checkPermissions from '../middlewares/checkPermissions'
 
 const costCenterRoutes = (): any => {
   const costCenterRouter = express.Router()
 
-  costCenterRouter.use('/cost-centers', checkAuth, checkUserIsVerifiedStatus)
+  costCenterRouter.use('/cost-centers', checkAuth, checkUserIsVerifiedStatus, CostCenterController.setModule)
   costCenterRouter.use('/cost-centers/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(CostCenterController.checkRecord))
   costCenterRouter.route('/cost-centers/:id')
     .get(asyncHandler(CostCenterController.get))
-    .put(asyncHandler(CostCenterController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin), celebrate({
-      [Segments.BODY]: validator.validateCostCenter
-    }), asyncHandler(CostCenterController.update))
-    .delete(asyncHandler(CostCenterController.checkOwnerOrCompanyAdministratorOrCampaignManagerOrAdmin), asyncHandler(CostCenterController.delete))
+    .put(asyncHandler(CostCenterController.checkOwnerAdmin),
+      asyncHandler(checkPermissions), celebrate({
+        [Segments.BODY]: validator.validateCostCenter
+      }), asyncHandler(CostCenterController.update))
+    .delete(asyncHandler(CostCenterController.checkOwnerAdmin),
+      asyncHandler(checkPermissions), asyncHandler(CostCenterController.delete))
   return costCenterRouter
 }
 
