@@ -9,11 +9,12 @@ import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
 import checkAdmin from '../middlewares/checkAdmin'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
+import checkPermissions from '../middlewares/checkPermissions'
 
 const CampaignRoutes = (): any => {
   const campaignRouter = express.Router()
 
-  campaignRouter.use('/campaigns', checkAuth, checkUserIsVerifiedStatus)
+  campaignRouter.use('/campaigns', checkAuth, checkUserIsVerifiedStatus, CampaignController.setModule)
   campaignRouter.route('/campaigns')
     .get(asyncHandler(checkAdmin), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
@@ -22,25 +23,34 @@ const CampaignRoutes = (): any => {
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(CampaignController.checkRecord))
   campaignRouter.route('/campaigns/:id')
-    .get(asyncHandler(CampaignController.checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager), asyncHandler(CampaignController.get))
-    .put(asyncHandler(CampaignController.checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager), celebrate({
-      [Segments.BODY]: validator.validateCampaign
-    }), asyncHandler(CampaignController.update))
-    .delete(asyncHandler(CampaignController.checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager), asyncHandler(CampaignController.delete))
+    .get(asyncHandler(CampaignController.checkOwnerOrAdmin),
+      asyncHandler(checkPermissions), asyncHandler(CampaignController.get))
+    .put(asyncHandler(CampaignController.checkOwnerOrAdmin), asyncHandler(checkPermissions),
+      celebrate({
+        [Segments.BODY]: validator.validateCampaign
+      }), asyncHandler(CampaignController.update))
+    .delete(asyncHandler(CampaignController.checkOwnerOrAdmin), asyncHandler(checkPermissions),
+      asyncHandler(CampaignController.delete))
   campaignRouter.route('/campaigns/:id/recipients')
-    .post(asyncHandler(CampaignController.checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager), celebrate({
-      [Segments.BODY]: validator.validateCreatedRecipient
-    }, { abortEarly: false }), asyncHandler(RecipientController.insert))
-    .get(asyncHandler(CampaignController.checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager), celebrate({
-      [Segments.QUERY]: validator.validateQueryParams
-    }), asyncHandler(paginate), asyncHandler(RecipientController.getAll))
+    .post(RecipientController.setModule, asyncHandler(CampaignController.checkOwnerOrAdmin),
+      asyncHandler(checkPermissions),
+      celebrate({
+        [Segments.BODY]: validator.validateCreatedRecipient
+      }, { abortEarly: false }), asyncHandler(RecipientController.insert))
+    .get(RecipientController.setModule, asyncHandler(CampaignController.checkOwnerOrAdmin),
+      asyncHandler(checkPermissions),
+      celebrate({
+        [Segments.QUERY]: validator.validateQueryParams
+      }), asyncHandler(paginate), asyncHandler(RecipientController.getAll))
   campaignRouter.route('/campaigns/:id/bundles')
-    .post(asyncHandler(checkAdmin), celebrate({
+    .post(BundleController.setModule, asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateBundle
     }, { abortEarly: false }), asyncHandler(BundleController.insert))
-    .get(asyncHandler(CampaignController.checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager), celebrate({
-      [Segments.QUERY]: validator.validateQueryParams
-    }), asyncHandler(paginate), asyncHandler(BundleController.getAll))
+    .get(BundleController.setModule, asyncHandler(CampaignController.checkOwnerOrAdmin),
+      asyncHandler(checkPermissions),
+      celebrate({
+        [Segments.QUERY]: validator.validateQueryParams
+      }), asyncHandler(paginate), asyncHandler(BundleController.getAll))
   return campaignRouter
 }
 

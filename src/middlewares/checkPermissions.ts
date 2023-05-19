@@ -10,11 +10,12 @@ const checkPermissions = (req: CustomRequest, res: CustomResponse, next: CustomN
   const { role, company } = currentUser
 
   const allowedCompanyAdminModules = [
-    appModules.ACCESSPERMISSIONS, appModules.COMPANIES, appModules.CAMPAIGNS
+    appModules.ACCESSPERMISSIONS, appModules.COMPANIES, appModules.CAMPAIGNS,
+    appModules.RECIPIENTS, appModules.BUNDLES
   ]
 
   const allowedCampaignManagerModules = [
-    appModules.CAMPAIGNS
+    appModules.CAMPAIGNS, appModules.RECIPIENTS, appModules.BUNDLES
   ]
 
   if (role === userRoles.ADMIN) {
