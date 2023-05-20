@@ -107,8 +107,9 @@ typeof appModules.CAMPAIGNS | typeof appModules.COMPANIES |
 typeof appModules.COSTCENTERS | typeof appModules.LEGALTEXTS |
 typeof appModules.ORDERS | typeof appModules.PICTURES |
 typeof appModules.PICTURES | typeof appModules.PRIVACYRULES |
-typeof appModules.RECIPIENTS | typeof appModules.SALUTATIONS |
-typeof appModules.SECONDARYDOMAINS | typeof appModules.SHIPMENTS | typeof appModules.USERS
+typeof appModules.PRODUCTS | typeof appModules.RECIPIENTS |
+typeof appModules.SALUTATIONS | typeof appModules.SECONDARYDOMAINS |
+typeof appModules.SHIPMENTS | typeof appModules.USERS
 
 export type Permission = typeof permissions.READ | typeof permissions.READWRITE
 export interface IPrivacyRule {
