@@ -59,11 +59,13 @@ const companyRoutes = (): any => {
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(CampaignController.getAllForCompany))
   companyRouter.route('/companies/:id/cost-centers')
-    .post(asyncHandler(CompanyController.checkOwnerOrAdmin),
+    .post(CostCenterController.setModule, asyncHandler(CompanyController.checkOwnerOrAdmin),
+      asyncHandler(checkPermissions),
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.BODY]: validator.validateCostCenter
       }, { abortEarly: false }), asyncHandler(CostCenterController.insert))
-    .get(asyncHandler(CompanyController.checkOwnerOrAdmin),
+    .get(CostCenterController.setModule, asyncHandler(CompanyController.checkOwnerOrAdmin),
+      asyncHandler(checkPermissions),
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(CostCenterController.getAllForCompany))
@@ -131,12 +133,12 @@ const companyRoutes = (): any => {
     .get(asyncHandler(CompanyController.checkOwnerOrAdmin),
       asyncHandler(CompanyController.checkCompanyDomainVerification), asyncHandler(CompanyController.getInviteLink))
   companyRouter.route('/companies/:id/access-permissions')
-    .post(asyncHandler(CompanyController.checkOwnerOrAdmin),
+    .post(AccessPermissionController.setModule, asyncHandler(CompanyController.checkOwnerOrAdmin),
       asyncHandler(checkPermissions),
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.BODY]: validator.validateAccessPermission
       }, { abortEarly: false }), asyncHandler(AccessPermissionController.insert))
-    .get(asyncHandler(CompanyController.checkOwnerOrAdmin), asyncHandler(checkPermissions),
+    .get(AccessPermissionController.setModule, asyncHandler(CompanyController.checkOwnerOrAdmin), asyncHandler(checkPermissions),
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(AccessPermissionController.getAllForCompany))

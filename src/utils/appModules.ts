@@ -33,3 +33,14 @@ export const MODULES_ARRAY = [
   'shipments',
   'users'
 ]
+
+export const allowedCompanyModules = [
+  { name: 'Access Permissions', value: ACCESSPERMISSIONS },
+  { name: 'Companies', value: COMPANIES },
+  { name: 'Campaigns', value: CAMPAIGNS },
+  { name: 'Recipients', value: RECIPIENTS },
+  { name: 'Bundles', value: BUNDLES },
+  { name: 'Cost Centers', value: COSTCENTERS },
+  { name: 'Inventory Products', value: PRODUCTS },
+  { name: 'Addresses', value: ADDRESSES }
+]

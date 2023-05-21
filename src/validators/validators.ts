@@ -5,6 +5,7 @@ import * as userRoles from '../utils/userRoles'
 import * as currencies from '../utils/currencies'
 import * as appModules from '../utils/appModules'
 import * as permissions from '../utils/permissions'
+import { allowedCompanyModules } from '../utils/appModules'
 
 const imageMimeTypes = ['image/bmp', 'image/jpeg', 'image/x-png', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
 
@@ -483,7 +484,7 @@ const validateLegalText = Joi.object({
 
 const commonAccessPermissionSchema = {
   name: Joi.string().required().max(128),
-  module: Joi.string().required().valid(...appModules.MODULES_ARRAY),
+  module: Joi.string().required().valid(...allowedCompanyModules.map(allowedCompanyModule => allowedCompanyModule.value)),
   role: Joi.string()
     .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
     .required(),
