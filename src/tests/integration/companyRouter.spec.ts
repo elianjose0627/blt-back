@@ -1760,7 +1760,7 @@ describe('Company actions', () => {
       expect(res.body.costCenter).to.include.keys('id', 'center', 'createdAt', 'updatedAt')
     })
 
-    it('Should return 201 Created when a campaign manager for a company successfully creates a cost center.', async () => {
+    it('Should return 403 Forbidden when a campaign manager for a company tries to create a cost center.', async () => {
       const resCompany = await createVerifiedCompany(userId)
 
       const companyId = resCompany.id
@@ -1793,10 +1793,9 @@ describe('Company actions', () => {
           }
         })
 
-      expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('statusCode', 'success', 'costCenter')
-      expect(res.body.costCenter).to.be.an('object')
-      expect(res.body.costCenter).to.include.keys('id', 'center', 'createdAt', 'updatedAt')
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
     })
 
     it('Should return 403 Forbidden when a non-employee Campaign Manager tries to creates a cost center for a company.', async () => {
@@ -3753,8 +3752,8 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           accessPermission: {
-            name: 'Order Permission',
-            module: 'orders',
+            name: 'Cost Center Permission',
+            module: 'costCenters',
             role: 'CampaignManager',
             permission: 'readwrite'
           }
