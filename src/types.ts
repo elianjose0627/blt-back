@@ -411,6 +411,7 @@ export interface CustomRequest extends Request {
   joiError?: boolean
   module?: Module
   isOwnerOrAdmin?: boolean
+  isOwner?: boolean
 }
 
 export interface TokenUser {
