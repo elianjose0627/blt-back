@@ -19,12 +19,14 @@ chai.use(chaiHttp)
 let tokenAdmin: string
 let token: string
 let tokenCampaignManager: string
+let tokenCampaignManager2: string
 let userId: string
 
 describe('Access Permissions actions', () => {
   before(async () => {
     await createAdminTestUser()
     await createCampaignManager('ronanac@kree.kr', 'theaccuser')
+    await createCampaignManager('ronanac2@kreeaccesspermissioncampaignmanager.kr', 'theaccuser')
 
     await chai
       .request(app)
@@ -43,8 +45,14 @@ describe('Access Permissions actions', () => {
       .post('/auth/login')
       .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
 
+    const resCampaignManager2 = await chai
+      .request(app)
+      .post('/auth/login')
+      .send({ user: { email: 'ronanac2@kreeaccesspermissioncampaignmanager.kr', password: 'theaccuser' } })
+
     tokenAdmin = resAdmin.body.token
     token = resUser.body.token
+    tokenCampaignManager2 = resCampaignManager2.body.token
     userId = resUser.body.user.id
   })
 
@@ -145,6 +153,107 @@ describe('Access Permissions actions', () => {
         .request(app)
         .get(`/api/access-permissions/${String(accessPermissionId)}`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'accessPermission')
+      expect(res.body.accessPermission).to.be.an('object')
+      expect(res.body.accessPermission).to.include.keys('id', 'name', 'module', 'role', 'permission', 'isEnabled', 'createdAt', 'updatedAt', 'company')
+    })
+
+    it('Should return 200 OK when an owner with company not set with a role of user gets an access permission by id.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Access Permission Company',
+            email: 'ivers@kreeaccesspermissionnoneadmin.kr'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      const resAccessPermission = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/access-permissions`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          accessPermission: {
+            name: 'Cost Center Permission',
+            module: 'costCenters',
+            role: 'CampaignManager',
+            permission: 'readwrite'
+          }
+        })
+
+      const accessPermissionId = resAccessPermission.body.accessPermission.id
+
+      const res = await chai
+        .request(app)
+        .get(`/api/access-permissions/${String(accessPermissionId)}`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'accessPermission')
+      expect(res.body.accessPermission).to.be.an('object')
+      expect(res.body.accessPermission).to.include.keys('id', 'name', 'module', 'role', 'permission', 'isEnabled', 'createdAt', 'updatedAt', 'company')
+    })
+
+    it('Should return 200 OK when a campaign manager who is an owner gets an access permission by id.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenCampaignManager2}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Access Permission Company',
+            email: 'ivers@kreeaccesspermissioncampaignmanager.kr',
+            domain: 'kreeaccesspermissioncampaignmanager.kr'
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(companyId)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'ronanac2@kreeaccesspermissioncampaignmanager.kr',
+            actionType: 'add'
+          }
+        })
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ronanac2@kreeaccesspermissioncampaignmanager.kr', password: 'theaccuser' } })
+
+      tokenCampaignManager2 = resCampaignManager.body.token
+
+      const resAccessPermission = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/access-permissions`)
+        .set('Authorization', `Bearer ${tokenCampaignManager2}`)
+        .send({
+          accessPermission: {
+            name: 'Cost Center Permission',
+            module: 'costCenters',
+            role: 'CampaignManager',
+            permission: 'readwrite'
+          }
+        })
+
+      const accessPermissionId = resAccessPermission.body.accessPermission.id
+
+      const res = await chai
+        .request(app)
+        .get(`/api/access-permissions/${String(accessPermissionId)}`)
+        .set('Authorization', `Bearer ${tokenCampaignManager2}`)
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'accessPermission')
