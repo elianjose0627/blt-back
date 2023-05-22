@@ -5,21 +5,21 @@ import * as permissions from '../utils/permissions'
 import * as appModules from '../utils/appModules'
 
 const checkPermissions = (req: CustomRequest, res: CustomResponse, next: CustomNext): any => {
-  const { user: currentUser, module, method } = req
+  const { user: currentUser, module, method, isOwnerOrAdmin } = req
 
   const { role, company } = currentUser
 
   const allowedCompanyAdminModules = [
     appModules.ACCESSPERMISSIONS, appModules.COMPANIES, appModules.CAMPAIGNS,
     appModules.RECIPIENTS, appModules.BUNDLES, appModules.COSTCENTERS,
-    appModules.PRODUCTS, appModules.ADDRESSES
+    appModules.PRODUCTS, appModules.ADDRESSES, appModules.ORDERS
   ]
 
   const allowedCampaignManagerModules = [
     appModules.CAMPAIGNS, appModules.RECIPIENTS, appModules.BUNDLES
   ]
 
-  if (role === userRoles.ADMIN) {
+  if (role === userRoles.ADMIN || isOwnerOrAdmin === true) {
     return next()
   }
 
