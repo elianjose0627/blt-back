@@ -42,5 +42,6 @@ export const allowedCompanyModules = [
   { name: 'Bundles', value: BUNDLES },
   { name: 'Cost Centers', value: COSTCENTERS },
   { name: 'Inventory Products', value: PRODUCTS },
-  { name: 'Addresses', value: ADDRESSES }
+  { name: 'Addresses', value: ADDRESSES },
+  { name: 'Orders', value: ORDERS }
 ]
