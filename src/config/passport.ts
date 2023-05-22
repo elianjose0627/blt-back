@@ -28,6 +28,15 @@ const passportAuth = (passport: PassportStatic): any => {
             model: db.User,
             attributes: ['id', 'firstName', 'lastName', 'email'],
             as: 'owner'
+          },
+          {
+            model: db.AccessPermission,
+            attributes: { exclude: ['companyId', 'deletedAt'] },
+            as: 'accessPermissions',
+            where: {
+              isEnabled: true
+            },
+            required: false
           }
         ]
       },

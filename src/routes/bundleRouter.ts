@@ -11,7 +11,7 @@ import PictureController from '../controllers/PictureController'
 const bundleRoutes = (): any => {
   const bundleRouter = express.Router()
 
-  bundleRouter.use('/bundles', checkAuth, checkUserIsVerifiedStatus)
+  bundleRouter.use('/bundles', checkAuth, checkUserIsVerifiedStatus, BundleController.setModule)
   bundleRouter.use('/bundles/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(BundleController.checkRecord))

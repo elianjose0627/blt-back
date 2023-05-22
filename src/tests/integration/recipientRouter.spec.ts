@@ -310,7 +310,7 @@ describe('Recipient actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or administrator can perform this action')
     })
 
     it('Should return 403 Forbidden when a user who is not an employee tries to get a recipient.', async () => {
@@ -382,7 +382,7 @@ describe('Recipient actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or administrator can perform this action')
     })
 
     it('Should return 403 Forbidden when a company non owner tries to get a recipient.', async () => {
@@ -432,7 +432,7 @@ describe('Recipient actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, company administrator, campaign manager or administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or administrator can perform this action')
     })
   })
 

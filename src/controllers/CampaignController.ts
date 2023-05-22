@@ -8,22 +8,20 @@ import * as userRoles from '../utils/userRoles'
 const campaignService = new CampaignService('Campaign')
 
 class CampaignController extends BaseController {
-  checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+  checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: { companyId, company: { owner } } } = req
-
-    const allowedRoles = [userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER]
 
     const isOwnerOrAdmin = currentUser?.id === owner?.id || currentUser.role === userRoles.ADMIN
     const isEmployee = currentUser?.companyId === companyId
 
-    if (isOwnerOrAdmin || (isEmployee && allowedRoles.includes(currentUser?.role))) {
+    if (isOwnerOrAdmin || (isEmployee)) {
       return next()
     } else {
       return res.status(statusCodes.FORBIDDEN).send({
         statusCode: statusCodes.FORBIDDEN,
         success: false,
         errors: {
-          message: 'Only the owner, admin, company administrator or campaign manager can perform this action'
+          message: 'Only the owner or admin can perform this action'
         }
       })
     }

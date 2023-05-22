@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express'
 import type * as userRoles from './utils/userRoles'
 import type * as appModules from './utils/appModules'
+import type * as permissions from './utils/permissions'
 
 export type Nullable<T> = T | null
 
@@ -89,7 +90,28 @@ export interface ISalutation {
   updatedAt: Date
 }
 
-export type Module = typeof appModules.ADDRESSES | typeof appModules.ORDERS | typeof appModules.RECIPIENTS
+export interface IAccessPermission {
+  id: string
+  name: string
+  role: Role
+  module: Module
+  permission: Permission
+  isEnabled: boolean
+  createdAt: Date
+  updatedAt: Date
+  company?: ICompany
+}
+
+export type Module = typeof appModules.ACCESSPERMISSIONS | typeof appModules.ADDRESSES | typeof appModules.BUNDLES |
+typeof appModules.CAMPAIGNS | typeof appModules.COMPANIES |
+typeof appModules.COSTCENTERS | typeof appModules.LEGALTEXTS |
+typeof appModules.ORDERS | typeof appModules.PICTURES |
+typeof appModules.PICTURES | typeof appModules.PRIVACYRULES |
+typeof appModules.PRODUCTS | typeof appModules.RECIPIENTS |
+typeof appModules.SALUTATIONS | typeof appModules.SECONDARYDOMAINS |
+typeof appModules.SHIPMENTS | typeof appModules.USERS
+
+export type Permission = typeof permissions.READ | typeof permissions.READWRITE
 export interface IPrivacyRule {
   id: string
   module: Module
@@ -387,6 +409,7 @@ export interface CustomRequest extends Request {
   query: any
   company?: any
   joiError?: boolean
+  module?: Module
 }
 
 export interface TokenUser {

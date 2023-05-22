@@ -1,5 +1,7 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import Joi from 'joi'
+
 import BaseController from './BaseController'
 import UserService from '../services/UserService'
 import CompanyService from '../services/CompanyService'
@@ -9,6 +11,7 @@ import { CustomNext, CustomRequest, CustomResponse, Nullable, StatusCode } from 
 import * as userRoles from '../utils//userRoles'
 import { sendNotifierEmail } from '../utils/sendMail'
 import { io } from '../utils/socket'
+import { decryptUUID } from '../utils/encryption'
 
 dayjs.extend(utc)
 const userService = new UserService('User')
@@ -58,11 +61,40 @@ class UserController extends BaseController {
   }
 
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { body: { user }, user: currentUser } = req
+    const { body: { user }, user: currentUser, query: { companyId } } = req
+    let decryptedCompanyId
+
+    try {
+      if (companyId !== undefined) {
+        decryptedCompanyId = decryptUUID(companyId)
+      }
+    } catch (error) {
+      return res.status(statusCodes.UNPROCESSABLE_ENTITY).send({
+        statusCode: statusCodes.UNPROCESSABLE_ENTITY,
+        success: false,
+        errors: {
+          message: 'Invalid invitation link'
+        }
+      })
+    }
+
+    const uuidSchema = Joi.string().uuid().message('Invalid invitation link')
+
+    const { error } = uuidSchema.validate(decryptedCompanyId)
+
+    if (error != null) {
+      return res.status(statusCodes.UNPROCESSABLE_ENTITY).send({
+        statusCode: statusCodes.UNPROCESSABLE_ENTITY,
+        success: false,
+        errors: {
+          message: error.message
+        }
+      })
+    }
 
     // Used != to capture value that is undefined
-    if (user?.companyId != null) {
-      const company = await companyService.findById(user.companyId)
+    if ((user.companyId ?? decryptedCompanyId) != null) {
+      const company = await companyService.findById(user.companyId ?? decryptedCompanyId)
       if (company === null) {
         return res.status(statusCodes.NOT_FOUND).send({
           statusCode: statusCodes.NOT_FOUND,
@@ -74,7 +106,7 @@ class UserController extends BaseController {
       }
     }
 
-    const record = await userService.insert({ user, currentUser })
+    const record = await userService.insert({ user, currentUser, companyId: decryptedCompanyId })
 
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 
@@ -446,13 +478,7 @@ class UserController extends BaseController {
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { limit, page, offset, email } = req.query
-    let records: any
-
-    if (email !== undefined) {
-      records = await userService.searchUsers(limit, offset, email)
-    } else {
-      records = await userService.getAll(limit, offset)
-    }
+    const records = await userService.getAll(limit, offset, email)
 
     const meta = {
       total: records.count,

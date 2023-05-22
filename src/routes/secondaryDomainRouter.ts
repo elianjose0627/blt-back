@@ -10,7 +10,7 @@ import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 const secondaryDomainRoutes = (): any => {
   const secondaryDomainRouter = express.Router()
 
-  secondaryDomainRouter.use('/secondary-domains', checkAuth, checkUserIsVerifiedStatus)
+  secondaryDomainRouter.use('/secondary-domains', checkAuth, checkUserIsVerifiedStatus, SecondaryDomainController.setModule)
   secondaryDomainRouter.use('/secondary-domains/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(SecondaryDomainController.checkRecord))

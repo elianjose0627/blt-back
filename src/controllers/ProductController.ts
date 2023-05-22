@@ -10,15 +10,13 @@ const productService = new ProductService('Product')
 const companyService = new CompanyService('Company')
 
 class ProductController extends BaseController {
-  checkOwnerOrAdminOrCompanyAdministratorOrCampaignManager (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+  checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: { companyId, company } } = req
 
-    const allowedRoles = [userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER]
+    const isOwnerOrAdmin = currentUser.id === company?.owner?.id || currentUser.role === userRoles.ADMIN
+    const isEmployee = Boolean(companyId) && currentUser?.companyId === companyId
 
-    const isOwnerOrAdmin = currentUser?.id === company?.owner?.id || currentUser.role === userRoles.ADMIN
-    const isEmployee = currentUser?.companyId === companyId
-
-    if (isOwnerOrAdmin || (isEmployee && allowedRoles.includes(currentUser?.role))) {
+    if (isOwnerOrAdmin || (isEmployee)) {
       return next()
     } else {
       return res.status(statusCodes.FORBIDDEN).send({

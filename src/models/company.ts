@@ -73,6 +73,16 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         as: 'legalTexts',
         onDelete: 'CASCADE'
       })
+      Company.hasMany(models.PrivacyRule, {
+        foreignKey: 'companyId',
+        as: 'privacyRules',
+        onDelete: 'CASCADE'
+      })
+      Company.hasMany(models.AccessPermission, {
+        foreignKey: 'companyId',
+        as: 'accessPermissions',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): ICompany {

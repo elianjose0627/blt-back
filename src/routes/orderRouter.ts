@@ -11,7 +11,7 @@ import checkAdmin from '../middlewares/checkAdmin'
 const orderRoutes = (): any => {
   const orderRouter = express.Router()
 
-  orderRouter.use('/orders', checkAuth, checkUserIsVerifiedStatus)
+  orderRouter.use('/orders', checkAuth, checkUserIsVerifiedStatus, OrderController.setModule)
   orderRouter.route('/orders')
     .get(celebrate({
       [Segments.QUERY]: validator.validateQueryParams

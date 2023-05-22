@@ -11,7 +11,7 @@ import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 const privacyRuleRoutes = (): any => {
   const privacyRuleRouter = express.Router()
 
-  privacyRuleRouter.use('/privacy-rules', checkAuth, checkUserIsVerifiedStatus)
+  privacyRuleRouter.use('/privacy-rules', checkAuth, checkUserIsVerifiedStatus, PrivacyRuleController.setModule)
   privacyRuleRouter.route('/privacy-rules')
     .get(celebrate({
       [Segments.QUERY]: validator.validateQueryParams

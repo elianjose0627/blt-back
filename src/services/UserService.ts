@@ -58,8 +58,14 @@ class UserService extends BaseService {
   }
 
   async insert (data: any): Promise<any> {
-    const { user, currentUser, isTemporary } = data
-    const record = await db[this.model].create({ ...user, id: uuidv1() })
+    const { user, currentUser, isTemporary, companyId } = data
+    let record
+
+    if (companyId !== undefined) {
+      record = await db[this.model].create({ ...user, id: uuidv1(), role: userRoles.EMPLOYEE, companyId })
+    } else {
+      record = await db[this.model].create({ ...user, id: uuidv1() })
+    }
 
     const { email, firstName, role } = record
 
@@ -303,37 +309,34 @@ class UserService extends BaseService {
     }
   }
 
-  async searchUsers (limit: any, offset: any, email: string): Promise<any> {
-    const users = await db[this.model].findAndCountAll({
-      attributes: { exclude: ['password', 'otp'] },
-      include,
-      where: {
-        [Op.or]: [
-          { email: { [Op.iLike]: `%${email}%` } }
+  async getAll (limit: number, offset: number, email?: string): Promise<any> {
+    let users
+    if (email !== undefined) {
+      users = await db[this.model].findAndCountAll({
+        include,
+        where: {
+          [Op.or]: [
+            { email: { [Op.iLike]: `%${email}%` } }
+          ]
+        },
+        limit,
+        offset,
+        order: [
+          ['createdAt', 'DESC']
         ]
-      },
-      limit,
-      offset,
-      order: [
-        ['createdAt', 'DESC']
-      ]
-    })
-
-    return users
-  }
-
-  async getAll (limit: number, offset: number): Promise<any> {
-    const records = await db[this.model].findAndCountAll({
-      limit,
-      offset,
-      order: [['createdAt', 'DESC']],
-      attributes: { exclude: [] },
-      include
-    })
+      })
+    } else {
+      users = await db[this.model].findAndCountAll({
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        include
+      })
+    }
 
     return {
-      count: records.count,
-      rows: records.rows.map((record: any) => record.toJSONFor())
+      count: users.count,
+      rows: users.rows.map((record: any) => record.toJSONFor())
     }
   }
 }
