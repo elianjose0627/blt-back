@@ -1,14 +1,36 @@
 import BaseController from './BaseController'
 import AccessPermissionService from '../services/AccessPermissionService'
-import { CustomRequest, CustomResponse, StatusCode } from '../types'
+import CompanyService from '../services/CompanyService'
+import { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
-import CompanyService from '../services/CompanyService'
+import * as userRoles from '../utils/userRoles'
 
 const accessPermissionService = new AccessPermissionService('AccessPermission')
 const companyService = new CompanyService('Company')
 
 class AccessPermissionController extends BaseController {
+  checkOwnerAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { user: currentUser, record: accessPermission } = req
+
+    const company = accessPermission.company
+
+    const isOwnerOrAdmin = currentUser.id === company?.owner.id || currentUser.role === userRoles.ADMIN
+    const isEmployee = currentUser?.companyId === company.id
+
+    if (isOwnerOrAdmin || (isEmployee)) {
+      return next()
+    } else {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'Only the owner or admin can perform this action'
+        }
+      })
+    }
+  }
+
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { body: { accessPermission }, record: initialCompany } = req
 
