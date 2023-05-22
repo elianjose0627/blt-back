@@ -22,7 +22,7 @@ const accessPermissionRoutes = (): any => {
     }), asyncHandler(paginate), asyncHandler(AccessPermissionController.getAll))
   accessPermissionRouter.use('/access-permissions/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
-  }, { abortEarly: false }), asyncHandler(AccessPermissionController.checkRecord), asyncHandler(checkPermissions))
+  }, { abortEarly: false }), asyncHandler(AccessPermissionController.checkRecord))
   accessPermissionRouter.route('/access-permissions/:id')
     .get(asyncHandler(AccessPermissionController.checkOwnerOrAdmin), asyncHandler(checkPermissions),
       asyncHandler(AccessPermissionController.get))
