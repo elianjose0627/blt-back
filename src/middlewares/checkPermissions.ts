@@ -5,7 +5,7 @@ import * as permissions from '../utils/permissions'
 import * as appModules from '../utils/appModules'
 
 const checkPermissions = (req: CustomRequest, res: CustomResponse, next: CustomNext): any => {
-  const { user: currentUser, module, method, isOwnerOrAdmin } = req
+  const { user: currentUser, module, method, isOwnerOrAdmin, isOwner } = req
 
   const { role, company } = currentUser
 
@@ -19,7 +19,7 @@ const checkPermissions = (req: CustomRequest, res: CustomResponse, next: CustomN
     appModules.CAMPAIGNS, appModules.RECIPIENTS, appModules.BUNDLES
   ]
 
-  if (role === userRoles.ADMIN || isOwnerOrAdmin === true) {
+  if (role === userRoles.ADMIN || isOwnerOrAdmin === true || isOwner === true) {
     return next()
   }
 

@@ -206,7 +206,7 @@ describe('Cost Centers actions', () => {
       expect(res.body.costCenter.center).to.equal(11)
     })
 
-    it('Should return 200 OK when a campaign manager updates a cost center by id.', async () => {
+    it('Should return 403 Forbidden when a campaign manager without access permissions tries to update a cost center by id.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')

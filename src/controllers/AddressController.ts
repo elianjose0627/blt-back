@@ -13,6 +13,7 @@ class AddressController extends BaseController {
     const isEmployee = Boolean(currentUser?.companyId) && currentUser?.companyId === address?.company?.id
 
     if (isOwner || (isEmployee)) {
+      req.isOwner = true
       return next()
     } else {
       return res.status(statusCodes.FORBIDDEN).send({

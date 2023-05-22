@@ -18,6 +18,7 @@ class RecipientController extends BaseController {
     const isEmployee = currentUser?.companyId === companyId
 
     if (isOwnerOrAdmin || (isEmployee)) {
+      req.isOwnerOrAdmin = isOwnerOrAdmin
       return next()
     } else {
       return res.status(statusCodes.FORBIDDEN).send({

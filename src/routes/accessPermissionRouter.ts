@@ -22,13 +22,16 @@ const accessPermissionRoutes = (): any => {
     }), asyncHandler(paginate), asyncHandler(AccessPermissionController.getAll))
   accessPermissionRouter.use('/access-permissions/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
-  }, { abortEarly: false }), asyncHandler(AccessPermissionController.checkRecord), asyncHandler(checkPermissions))
+  }, { abortEarly: false }), asyncHandler(AccessPermissionController.checkRecord))
   accessPermissionRouter.route('/access-permissions/:id')
-    .get(asyncHandler(AccessPermissionController.get))
-    .put(celebrate({
-      [Segments.BODY]: validator.validateAccessPermission
-    }), asyncHandler(AccessPermissionController.update))
-    .delete(asyncHandler(AccessPermissionController.delete))
+    .get(asyncHandler(AccessPermissionController.checkOwnerOrAdmin), asyncHandler(checkPermissions),
+      asyncHandler(AccessPermissionController.get))
+    .put(asyncHandler(AccessPermissionController.checkOwnerOrAdmin), asyncHandler(checkPermissions),
+      celebrate({
+        [Segments.BODY]: validator.validateAccessPermission
+      }), asyncHandler(AccessPermissionController.update))
+    .delete(asyncHandler(AccessPermissionController.checkOwnerOrAdmin), asyncHandler(checkPermissions),
+      asyncHandler(AccessPermissionController.delete))
   return accessPermissionRouter
 }
 
