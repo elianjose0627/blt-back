@@ -17,6 +17,7 @@ class CostCenterController extends BaseController {
     const isEmployee = currentUser?.companyId === company?.id
 
     if (isOwnerOrAdmin || (isEmployee)) {
+      req.isOwnerOrAdmin = isOwnerOrAdmin
       return next()
     } else {
       return res.status(statusCodes.FORBIDDEN).send({

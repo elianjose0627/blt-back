@@ -10,7 +10,7 @@ const accessPermissionService = new AccessPermissionService('AccessPermission')
 const companyService = new CompanyService('Company')
 
 class AccessPermissionController extends BaseController {
-  checkOwnerAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+  checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: accessPermission } = req
 
     const company = accessPermission.company
@@ -19,6 +19,7 @@ class AccessPermissionController extends BaseController {
     const isEmployee = currentUser?.companyId === company.id
 
     if (isOwnerOrAdmin || (isEmployee)) {
+      req.isOwnerOrAdmin = isOwnerOrAdmin
       return next()
     } else {
       return res.status(statusCodes.FORBIDDEN).send({

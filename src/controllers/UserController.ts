@@ -32,6 +32,7 @@ class UserController extends BaseController {
     const { user: currentUser, params: { id } } = req
 
     if (currentUser.id === id) {
+      req.isOwner = true
       return next()
     } else {
       return res.status(statusCodes.FORBIDDEN).send({
@@ -46,8 +47,10 @@ class UserController extends BaseController {
 
   async checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
     const { user: currentUser, params: { id } } = req
+    const isOwnerOrAdmin = currentUser.id === id || currentUser.role === userRoles.ADMIN
 
-    if (currentUser.id === id || currentUser.role === userRoles.ADMIN) {
+    if (isOwnerOrAdmin) {
+      req.isOwnerOrAdmin = isOwnerOrAdmin
       return next()
     } else {
       return res.status(statusCodes.FORBIDDEN).send({
