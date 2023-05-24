@@ -65,13 +65,8 @@ class ProductController extends BaseController {
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { limit, page, offset, search } = req.query
-    let records
+    const records = await productService.getAll(limit, offset, search)
 
-    if (search !== undefined) {
-      records = await productService.searchProducts(limit, offset, search)
-    } else {
-      records = await productService.getAll(limit, offset)
-    }
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),
@@ -90,13 +85,8 @@ class ProductController extends BaseController {
   async getAllForCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { limit, page, offset, search } = req.query
     const { id } = req.params
-    let records
+    const records = await productService.getAllForCompany(limit, offset, id, search)
 
-    if (search !== undefined) {
-      records = await productService.searchCompanyProducts(limit, offset, id, search)
-    } else {
-      records = await productService.getAllForCompany(limit, offset, id)
-    }
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),

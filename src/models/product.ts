@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { ICompany, IProduct, IProductPicture, NetRetailPrice, ProductType } from '../types'
+import { ICompany, IProduct, IProductPicture, IStock, NetRetailPrice, ProductType } from '../types'
 
 const ProductModel = (sequelize: any, DataTypes: any): any => {
   interface ProductAttributes {
@@ -25,11 +25,17 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany
+    private readonly stock: IStock
 
     static associate (models: any): any {
       Product.belongsTo(models.Company, {
         foreignKey: 'companyId',
         as: 'company',
+        onDelete: 'CASCADE'
+      })
+      Product.hasOne(models.Stock, {
+        foreignKey: 'productId',
+        as: 'stock',
         onDelete: 'CASCADE'
       })
     }
@@ -46,7 +52,8 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         pictures: this.pictures,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
-        company: this.company
+        company: this.company,
+        stock: this.stock
       }
     }
   };
