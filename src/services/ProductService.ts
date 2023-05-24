@@ -30,15 +30,39 @@ class ProductService extends BaseService {
     return { response: response.toJSONFor(company), status: 201 }
   }
 
-  async getAllForCompany (limit: number, offset: number, companyId: string): Promise<any> {
+  async getAllForCompany (limit: number, offset: number, companyId: string, search: string = ''): Promise<any> {
+    const where: any = {
+      companyId
+    }
+    const order = [['createdAt', 'DESC']]
+    const attributes: any = { exclude: [] }
+    const include: any[] = [
+      {
+        model: db.Stock,
+        attributes: { exclude: ['deletedAt', 'productId'] },
+        as: 'stock'
+      }
+    ]
+
+    if (search !== '') {
+      where[Op.and] = [
+        {
+          [Op.or]: [
+            { name: { [Op.iLike]: `%${search}%` } },
+            { jfsku: { [Op.iLike]: `%${search}%` } },
+            { merchantSku: { [Op.iLike]: `%${search}%` } }
+          ]
+        }
+      ]
+    }
+
     const records = await db[this.model].findAndCountAll({
+      attributes,
+      include,
+      where,
       limit,
       offset,
-      order: [['createdAt', 'DESC']],
-      attributes: { exclude: [] },
-      where: {
-        companyId
-      }
+      order
     })
 
     return {
@@ -47,68 +71,44 @@ class ProductService extends BaseService {
     }
   }
 
-  async getAll (limit: number, offset: number): Promise<any> {
-    const records = await db[this.model].findAndCountAll({
-      limit,
-      offset,
-      order: [['createdAt', 'DESC']],
-      attributes: { exclude: [] },
-      include: [{
+  async getAll (limit: number, offset: number, search: string = ''): Promise<any> {
+    const where: any = {}
+    const order = [['createdAt', 'DESC']]
+    const attributes: any = { exclude: [] }
+    const include: any[] = [
+      {
         model: db.Company,
         attributes: ['id', 'name', 'email', 'phone', 'vat', 'domain'],
         as: 'company'
-      }]
+      },
+      {
+        model: db.Stock,
+        attributes: { exclude: ['deletedAt', 'productId'] },
+        as: 'stock'
+      }
+    ]
+
+    if (search !== '') {
+      where[Op.or] = [
+        { name: { [Op.iLike]: `%${search}%` } },
+        { jfsku: { [Op.iLike]: `%${search}%` } },
+        { merchantSku: { [Op.iLike]: `%${search}%` } }
+      ]
+    }
+
+    const records = await db[this.model].findAndCountAll({
+      attributes,
+      include,
+      where,
+      limit,
+      offset,
+      order
     })
 
     return {
       count: records.count,
       rows: records.rows.map((record: any) => record.toJSONFor())
     }
-  }
-
-  async searchCompanyProducts (limit: any, offset: any, companyId: string, searchString: string): Promise<any> {
-    const products = await db[this.model].findAndCountAll({
-      attributes: { exclude: ['companyId', 'deletedAt'] },
-      where: {
-        [Op.and]: [
-          { companyId },
-          {
-            [Op.or]: [
-              { name: { [Op.iLike]: `%${searchString}%` } },
-              { jfsku: { [Op.iLike]: `%${searchString}%` } },
-              { merchantSku: { [Op.iLike]: `%${searchString}%` } }
-            ]
-          }
-        ]
-      },
-      limit,
-      offset,
-      order: [
-        ['createdAt', 'DESC']
-      ]
-    })
-
-    return products
-  }
-
-  async searchProducts (limit: any, offset: any, searchString: string): Promise<any> {
-    const products = await db[this.model].findAndCountAll({
-      attributes: { exclude: ['companyId', 'deletedAt'] },
-      where: {
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${searchString}%` } },
-          { jfsku: { [Op.iLike]: `%${searchString}%` } },
-          { merchantSku: { [Op.iLike]: `%${searchString}%` } }
-        ]
-      },
-      limit,
-      offset,
-      order: [
-        ['createdAt', 'DESC']
-      ]
-    })
-
-    return products
   }
 }
 

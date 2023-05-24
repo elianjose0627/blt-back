@@ -1,5 +1,4 @@
 import { Model } from 'sequelize'
-import { IBundleItem } from '../types'
 
 const BundleItemModel = (sequelize: any, DataTypes: any): any => {
   interface BundleItemAttributes {
@@ -11,32 +10,12 @@ const BundleItemModel = (sequelize: any, DataTypes: any): any => {
   }
 
   class BundleItem extends Model<BundleItemAttributes> {
-    private readonly id: string
-    private readonly jfsku: string
-    private readonly merchantSku: string
-    private readonly name: string
-    private readonly description: string
-    private readonly createdAt: Date
-    private readonly updatedAt: Date
-
     static associate (models: any): any {
       BundleItem.belongsTo(models.Bundle, {
         foreignKey: 'bundleId',
         as: 'bundle',
         onDelete: 'CASCADE'
       })
-    }
-
-    toJSONFor (): IBundleItem {
-      return {
-        id: this.id,
-        jfsku: this.jfsku,
-        merchantSku: this.merchantSku,
-        name: this.name,
-        description: this.description,
-        createdAt: this.createdAt,
-        updatedAt: this.updatedAt
-      }
     }
   };
 
