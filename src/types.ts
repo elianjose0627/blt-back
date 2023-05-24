@@ -286,6 +286,18 @@ export interface IProductPicture {
   mimeType: string
 }
 
+export interface IStock {
+  id: string
+  jfsku: string
+  stockLevel: number
+  stockLevelAnnounced: number
+  stockLevelReserved: number
+  stockLevelBlocked: number
+  fulfillerTimestamp: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface IProduct {
   id: string
   jfsku: string
@@ -295,9 +307,10 @@ export interface IProduct {
   type: ProductType
   netRetailPrice: NetRetailPrice
   pictures: IProductPicture[]
-  createdAt?: Date
-  updatedAt?: Date
+  createdAt: Date
+  updatedAt: Date
   company?: ICompany
+  stock?: IStock
 }
 
 export interface ShippingAddress {
