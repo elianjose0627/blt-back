@@ -9,7 +9,8 @@ module.exports = {
       },
       jfsku: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true
       },
       stockLevel: {
         type: Sequelize.DOUBLE,
@@ -49,6 +50,7 @@ module.exports = {
       },
       productId: {
         allowNull: true,
+        unique: true,
         type: Sequelize.UUID,
         onDelete: 'CASCADE',
         references: {
