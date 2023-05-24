@@ -1,5 +1,4 @@
 import { Model } from 'sequelize'
-import { IShippingMethod } from '../types'
 
 const ShippingMethodModel = (sequelize: any, DataTypes: any): any => {
   interface ShippingMethodAttributes {
@@ -11,28 +10,8 @@ const ShippingMethodModel = (sequelize: any, DataTypes: any): any => {
   }
 
   class ShippingMethod extends Model<ShippingMethodAttributes> {
-    private readonly id: string
-    private readonly name: string
-    private readonly shippingType: number
-    private readonly isDropShipping: boolean
-    private readonly insuranceValue: number
-    private readonly createdAt: Date
-    private readonly updatedAt: Date
-
     static associate (models: any): any {
 
-    }
-
-    toJSONFor (): IShippingMethod {
-      return {
-        id: this.id,
-        name: this.name,
-        shippingType: this.shippingType,
-        isDropShipping: this.isDropShipping,
-        insuranceValue: this.insuranceValue,
-        createdAt: this.createdAt,
-        updatedAt: this.updatedAt
-      }
     }
   };
 
