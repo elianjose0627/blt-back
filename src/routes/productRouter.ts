@@ -32,6 +32,9 @@ const ProductRoutes = (): Router => {
       }), asyncHandler(ProductController.update))
     .delete(asyncHandler(ProductController.checkOwnerOrAdmin),
       asyncHandler(checkPermissions), asyncHandler(ProductController.delete))
+  productRouter.route('/products/:id/stocks')
+    .get(asyncHandler(ProductController.checkOwnerOrAdmin),
+      asyncHandler(checkPermissions), asyncHandler(ProductController.getProductStock))
   return productRouter
 }
 

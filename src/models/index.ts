@@ -33,7 +33,6 @@ export interface Database {
   LegalText?: any
   PrivacyRule?: any
   AccessPermission?: any
-  Stock?: any
   [key: string]: any
 }
 

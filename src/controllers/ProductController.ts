@@ -101,6 +101,17 @@ class ProductController extends BaseController {
       [productService.manyRecords()]: records.rows
     })
   }
+
+  async getProductStock (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record: product } = req
+    const stock = await productService.getProductStock(product)
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      stock
+    })
+  }
 }
 
 export default new ProductController(productService)
