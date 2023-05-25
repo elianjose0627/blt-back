@@ -28,6 +28,7 @@ steps:
     - 'DHL_API_KEY=${_DHL_API_KEY}'
     - 'FIREBASE_STORAGE_ENVIRONMENT=${_FIREBASE_STORAGE_ENVIRONMENT}'
     - 'COMPANY_INVITE_SECRET_KEY=${_COMPANY_INVITE_SECRET_KEY}'
+    - 'JTL_API_URL=${_JTL_API_URL}'
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'migrate']
 - name: 'gcr.io/cloud-builders/npm'
