@@ -17,6 +17,7 @@ import secondaryDomainRouter from './secondaryDomainRouter'
 import legalTextRouter from './legalTextRouter'
 import privacyRuleRouter from './privacyRuleRouter'
 import accessPermissionsRouter from './accessPermissionRouter'
+import healthcheckRouter from './healthCheckRouter'
 
 const routers = {
   authRouter,
@@ -37,7 +38,8 @@ const routers = {
   secondaryDomainRouter,
   legalTextRouter,
   privacyRuleRouter,
-  accessPermissionsRouter
+  accessPermissionsRouter,
+  healthcheckRouter
 }
 
 export default routers
