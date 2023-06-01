@@ -50,6 +50,7 @@ app.use(apiPrefix, routers.secondaryDomainRouter())
 app.use(apiPrefix, routers.legalTextRouter())
 app.use(apiPrefix, routers.privacyRuleRouter())
 app.use(apiPrefix, routers.accessPermissionsRouter())
+app.use(apiPrefix, routers.healthcheckRouter())
 
 // Add validation middleware
 app.use(joiErrors)
