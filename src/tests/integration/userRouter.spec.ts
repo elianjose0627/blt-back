@@ -173,11 +173,11 @@ describe('A user', () => {
     })
   })
 
-  describe('Search a user by email', () => {
+  describe('Search for a user by email', () => {
     it('Should return 200 Success, on successfully retrieving users.', async () => {
       const res = await chai
         .request(app)
-        .get('/api/users?email=ironman@starkindustriesmarvel.com')
+        .get('/api/users?search=ironman@starkindustriesmarvel.com')
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(200)

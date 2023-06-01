@@ -309,14 +309,16 @@ class UserService extends BaseService {
     }
   }
 
-  async getAll (limit: number, offset: number, email?: string): Promise<any> {
+  async getAll (limit: number, offset: number, search?: string): Promise<any> {
     let users
-    if (email !== undefined) {
+    if (search !== undefined) {
       users = await db[this.model].findAndCountAll({
         include,
         where: {
           [Op.or]: [
-            { email: { [Op.iLike]: `%${email}%` } }
+            { email: { [Op.iLike]: `%${search}%` } },
+            { firstName: { [Op.iLike]: `%${search}%` } },
+            { lastName: { [Op.iLike]: `%${search}%` } }
           ]
         },
         limit,
