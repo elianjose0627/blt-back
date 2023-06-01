@@ -155,13 +155,6 @@ const validateTrackingId = Joi.object().keys({
   trackingId: Joi.string()
 })
 
-const validateUsersQueryParams = Joi.object({
-  limit: Joi.number().optional(),
-  page: Joi.number().optional(),
-  offset: Joi.number().optional(),
-  email: Joi.string().optional().email().lowercase().max(128)
-})
-
 const validateQueryParams = Joi.object({
   limit: Joi.number().optional(),
   page: Joi.number().optional(),
@@ -518,7 +511,6 @@ export default {
   validateOtp,
   validateUserPhoto,
   validatePasswordReset,
-  validateUsersQueryParams,
   validateNotifications,
   validateCreatedCompany,
   validateQueryParams,

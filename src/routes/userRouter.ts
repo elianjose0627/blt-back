@@ -14,7 +14,7 @@ const userRoutes = (): any => {
   userRouter.use('/users', checkAuth, UserController.setModule)
   userRouter.route('/users')
     .get(asyncHandler(checkAdmin), celebrate({
-      [Segments.QUERY]: validator.validateUsersQueryParams
+      [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(UserController.getAll))
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateCreatedUserByAdmin
