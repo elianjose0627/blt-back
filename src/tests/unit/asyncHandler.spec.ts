@@ -32,18 +32,22 @@ describe('asyncHandler', () => {
 
   it('should throw an error and return status code of 400', async () => {
     const throwError = (): void => {
-      throw new Error('Request failed with status code 400')
+      const error: any = new Error('Request failed with status code 400')
+      error.response = { status: 400 }
+      throw error
     }
-    const request = {
+    const mockRequest = {
       headers: {
         authorization: ''
       }
     }
-    const req = mockReq(request)
+
+    const req = mockReq(mockRequest)
     const res = mockRes()
     const next = sinon.spy()
 
     const response = asyncHandler(throwError)
+
     await response(req, res, next)
     expect(res.status).to.have.been.calledWith(400)
   })
