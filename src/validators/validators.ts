@@ -167,6 +167,7 @@ const validateQueryParams = Joi.object({
     city: Joi.string().optional(),
     country: Joi.string().length(2).optional(),
     company: Joi.string().optional(),
+    companyId: Joi.string().uuid(),
     type: Joi.string().optional()
   }).optional()
 })

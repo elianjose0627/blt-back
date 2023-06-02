@@ -1,7 +1,21 @@
 import { v1 as uuidv1 } from 'uuid'
+import { Op } from 'sequelize'
 import BaseService from './BaseService'
 import db from '../models'
 
+function generateFilterQuery (filter: object): object {
+  const filterQuery: Record<string, unknown> = {}
+
+  Object.entries(filter).forEach(([key, value]) => {
+    if (value !== undefined && value !== '') {
+      filterQuery[key] = {
+        [Op.eq]: value
+      }
+    }
+  })
+
+  return filterQuery
+}
 class AccessPermissionService extends BaseService {
   async insert (data: any): Promise<any> {
     const { accessPermission, company } = data
@@ -30,12 +44,14 @@ class AccessPermissionService extends BaseService {
     return { response: response.toJSONFor(), status: 201 }
   }
 
-  async getAll (limit: number, offset: number): Promise<any> {
+  async getAll (limit: number, offset: number, search: string = '', filter = { companyId: '' }): Promise<any> {
+    const where = generateFilterQuery(filter)
     const records = await db[this.model].findAndCountAll({
       limit,
       offset,
-      order: [['createdAt', 'DESC']],
+      order: [['companyId', 'DESC'], ['createdAt', 'DESC']],
       attributes: { exclude: [] },
+      where,
       include: [
         {
           model: db.Company,
