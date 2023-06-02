@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { IAddress, ICompany, ISecondaryDomain, IUser } from '../types'
+import { IAccessPermission, IAddress, ICompany, ISecondaryDomain, IUser } from '../types'
 
 const CompanyModel = (sequelize: any, DataTypes: any): any => {
   interface CompanyAttributes {
@@ -31,6 +31,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     private readonly owner: IUser
     private readonly address: IAddress
     private readonly secondaryDomains: ISecondaryDomain[]
+    private readonly accessPermissions: IAccessPermission[]
 
     static associate (models: any): any {
       Company.belongsTo(models.User, {
@@ -101,7 +102,8 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         updatedAt: this.updatedAt,
         owner: this.owner,
         address: this.address,
-        secondaryDomains: this.secondaryDomains
+        secondaryDomains: this.secondaryDomains,
+        accessPermissions: this.accessPermissions
       }
     }
   };

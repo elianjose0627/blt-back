@@ -49,8 +49,8 @@ class BaseController {
   }
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { limit, page, offset } = req.query
-    const records = await this.service.getAll(limit, offset)
+    const { limit, page, offset, search, filter } = req.query
+    const records = await this.service.getAll(limit, offset, search, filter)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),
