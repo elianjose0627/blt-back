@@ -30,7 +30,8 @@ class CompanyService extends BaseService {
         offset,
         order: [['createdAt', 'DESC']],
         attributes: { exclude: [] },
-        include
+        include,
+        distinct: true
       })
     } else {
       records = await db[this.model].findAndCountAll({
@@ -41,7 +42,8 @@ class CompanyService extends BaseService {
         where: {
           userId: user.id
         },
-        include
+        include,
+        distinct: true
       })
     }
 
