@@ -11,12 +11,26 @@ class CompanyService extends BaseService {
   async getAll (limit: number, offset: number, user?: any): Promise<any> {
     let records
 
+    const include = [
+      {
+        model: db.SecondaryDomain,
+        attributes: { exclude: ['companyId', 'deletedAt'] },
+        as: 'secondaryDomains'
+      },
+      {
+        model: db.AccessPermission,
+        attributes: { exclude: ['companyId', 'deletedAt'] },
+        as: 'accessPermissions'
+      }
+    ]
+
     if (user.role === userRoles.ADMIN) {
       records = await db[this.model].findAndCountAll({
         limit,
         offset,
         order: [['createdAt', 'DESC']],
-        attributes: { exclude: [] }
+        attributes: { exclude: [] },
+        include
       })
     } else {
       records = await db[this.model].findAndCountAll({
@@ -26,7 +40,8 @@ class CompanyService extends BaseService {
         attributes: { exclude: [] },
         where: {
           userId: user.id
-        }
+        },
+        include
       })
     }
 

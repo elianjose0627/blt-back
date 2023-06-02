@@ -196,6 +196,7 @@ export interface ICompany {
   owner?: IUser
   address?: IAddress
   secondaryDomains?: ISecondaryDomain[]
+  accessPermissions?: IAccessPermission[]
 }
 
 export interface IAddress {

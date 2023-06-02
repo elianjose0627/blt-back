@@ -117,6 +117,39 @@ describe('Access Permissions actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'accessPermissions')
       expect(res.body.accessPermissions).to.be.an('array')
     })
+
+    it('Should return 200 OK when an admin gets all access permissions for a company', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+      await chai
+        .request(app)
+        .post('/api/access-permissions')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          accessPermission: {
+            name: 'Company Permission',
+            module: 'companies',
+            role: 'CampaignManager',
+            permission: 'read',
+            companyId
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/access-permissions')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .query({
+          limit: 10,
+          page: 1,
+          'filter[companyId]': companyId
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'accessPermissions')
+      expect(res.body.accessPermissions).to.be.an('array').lengthOf.greaterThan(0)
+    })
   })
 
   describe('Get, Edit, Delete, Update access permissions', () => {
