@@ -2,22 +2,19 @@ import * as statusCodes from '../constants/statusCodes'
 import { CustomNext, CustomRequest, CustomResponse, IAccessPermission } from '../types'
 import * as userRoles from '../utils/userRoles'
 import * as permissions from '../utils/permissions'
-import * as appModules from '../utils/appModules'
 
 const checkPermissions = (req: CustomRequest, res: CustomResponse, next: CustomNext): any => {
-  const { user: currentUser, module, method, isOwnerOrAdmin, isOwner } = req
+  const { user: currentUser, module, method, isOwnerOrAdmin, isOwner, accessPermissions = [] } = req
 
   const { role, company } = currentUser
 
-  const allowedCompanyAdminModules = [
-    appModules.ACCESSPERMISSIONS, appModules.COMPANIES, appModules.CAMPAIGNS,
-    appModules.RECIPIENTS, appModules.BUNDLES, appModules.COSTCENTERS,
-    appModules.PRODUCTS, appModules.ADDRESSES, appModules.ORDERS
-  ]
+  const allowedCompanyAdminModules = accessPermissions
+    .filter((accessPermission: IAccessPermission) => accessPermission.role === userRoles.COMPANYADMINISTRATOR)
+    .map((accessPermission: IAccessPermission) => accessPermission.module)
 
-  const allowedCampaignManagerModules = [
-    appModules.CAMPAIGNS, appModules.RECIPIENTS, appModules.BUNDLES
-  ]
+  const allowedCampaignManagerModules = accessPermissions
+    .filter((accessPermission: IAccessPermission) => accessPermission.role === userRoles.CAMPAIGNMANAGER)
+    .map((accessPermission: IAccessPermission) => accessPermission.module)
 
   if (role === userRoles.ADMIN || isOwnerOrAdmin === true || isOwner === true) {
     return next()

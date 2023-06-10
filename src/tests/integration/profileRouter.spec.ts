@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import app from '../../app'
-import { deleteTestUser, createAdminTestUser } from '../utils'
+import { deleteTestUser, createAdminTestUser, createCompanyAdministrator } from '../utils'
 
 const { expect } = chai
 
@@ -11,10 +11,12 @@ let tokenAdmin: string
 let userIdAdmin: string
 let token: string
 let userId: string
+let tokenCompanyAdministrator: string
 
 describe('Profile actions', () => {
   before(async () => {
     await createAdminTestUser()
+    await createCompanyAdministrator()
 
     await chai
       .request(app)
@@ -31,8 +33,14 @@ describe('Profile actions', () => {
       .post('/auth/login')
       .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
 
+    const resCompanyAdministrator = await chai
+      .request(app)
+      .post('/auth/login')
+      .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+
     tokenAdmin = resAdmin.body.token
     token = res1.body.token
+    tokenCompanyAdministrator = resCompanyAdministrator.body.token
     userId = res1.body.user.id
   })
 
@@ -51,6 +59,19 @@ describe('Profile actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'user')
       expect(res.body.user).to.be.an('object')
       expect(res.body.user).to.not.have.any.keys('password', 'otp', 'isDeleted')
+    })
+
+    it('Should return 200 Success, on successfully retrieving profile of logged in user.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/profiles/me')
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.user).to.not.have.any.keys('password', 'otp', 'isDeleted')
+      expect(res.body.user.company).to.include.keys('owner', 'address', 'accessPermissions', 'defaultAccessPermissions')
     })
   })
 
