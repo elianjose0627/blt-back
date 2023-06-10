@@ -499,11 +499,22 @@ class UserController extends BaseController {
   }
 
   async getMyProfile (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { user } = req
+    const { user, accessPermissions } = req
+    const formattedUser = user.toJSONFor()
+    const company = formattedUser.company === null
+      ? null
+      : {
+          ...formattedUser.company.toJSONFor(),
+          defaultAccessPermissions: accessPermissions
+        }
+
     return res.status(statusCodes.OK).send({
       statusCode: statusCodes.OK,
       success: true,
-      user: user.toJSONFor()
+      user: {
+        ...formattedUser,
+        company
+      }
     })
   }
 

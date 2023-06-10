@@ -62,8 +62,8 @@ export interface IUser {
   notifications: INotifications
   loginTime: LoginTime
   logoutTime?: Nullable<Date>
-  company: ICompany | null
-  address: IAddress | null
+  company: Partial<ICompany> | null
+  address: Partial<IAddress> | null
 }
 
 export interface IToken {
@@ -426,6 +426,7 @@ export interface CustomRequest extends Request {
   module?: Module
   isOwnerOrAdmin?: boolean
   isOwner?: boolean
+  accessPermissions?: IAccessPermission[]
 }
 
 export interface TokenUser {

@@ -1,6 +1,7 @@
 import * as statusCodes from '../constants/statusCodes'
 import { CustomNext, CustomRequest, CustomResponse, Module } from '../types'
 import { io } from '../utils/socket'
+import db from '../models'
 
 class BaseController {
   service: any
@@ -26,6 +27,18 @@ class BaseController {
   }
 
   async setModule (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
+    const permissions = await db.AccessPermission.findAll({
+      attributes: {
+        exclude: ['deletedAt', 'companyId']
+      },
+      where: {
+        companyId: null,
+        isEnabled: true
+      }
+    })
+
+    req.accessPermissions = permissions
+
     req.module = this.moduleName()
 
     return next()
