@@ -1017,6 +1017,81 @@ describe('Campaign actions', () => {
       expect(res.body.orders).to.have.lengthOf.above(0)
     })
 
+    it('Should return 200 Success when an owner successfully retrieves all orders of a campaign with search and filter.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Marvel',
+            email: 'test2444@companymarvelorders.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/bundles`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          bundle: {
+            jfsku: 'VZ9N01SJN9E',
+            merchantSku: '1552',
+            name: 'Zeppelin Box - Apriil 2023',
+            specifications: {
+              billOfMaterialsComponents: [
+                {
+                  name: 'Interdimensional Goggles',
+                  jfsku: '26CJ0114JWR',
+                  merchantSku: 'ART2394871'
+                },
+                {
+                  name: 'Zeppelin Box - Apriil 2023',
+                  jfsku: 'VZ9N01SJN9E',
+                  merchantSku: '1552'
+                }
+              ]
+            }
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${campaignId}/orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .query({
+          limit: 10,
+          page: 1,
+          search: 'Ryan',
+          'filter[firstname]': 'Ryan',
+          'filter[lastname]': 'Wire',
+          'filter[email]': 'ryan@email.com',
+          'filter[city]': 'Nairobi',
+          'filter[country]': 'KE'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders')
+      expect(res.body.orders).to.be.an('array')
+    })
+
     it('Should return 200 Success when a campaign manager successfully retrieves all orders of a campaign.', async () => {
       const resCompany = await chai
         .request(app)
@@ -1251,6 +1326,74 @@ describe('Campaign actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'orders')
       expect(res.body.orders).to.be.an('array')
+    })
+  })
+
+  describe('Campaign Orders Bundle Actions', () => {
+    it('Should return 200 Success when an owner successfully retrieves all orders of a campaign  bundle.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Marvel',
+            email: 'test2@companymarvelcampaignbundleorders.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/bundles`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          bundle: {
+            jfsku: 'VZ9N01SJN9E',
+            merchantSku: '1552',
+            name: 'Zeppelin Box - Apriil 2023',
+            specifications: {
+              billOfMaterialsComponents: [
+                {
+                  name: 'Interdimensional Goggles',
+                  jfsku: '26CJ0114JWR',
+                  merchantSku: 'ART2394871'
+                },
+                {
+                  name: 'Zeppelin Box - Apriil 2023',
+                  jfsku: 'VZ9N01SJN9E',
+                  merchantSku: '1552'
+                }
+              ]
+            }
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${campaignId}/orders/VZ9N01SJN9E`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders')
+      expect(res.body.orders).to.be.an('array')
+      expect(res.body.orders).to.have.lengthOf.above(0)
     })
   })
 })

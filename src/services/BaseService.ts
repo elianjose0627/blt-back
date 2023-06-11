@@ -1,4 +1,5 @@
 import { v1 as uuidv1 } from 'uuid'
+import { Op } from 'sequelize'
 import db from '../models'
 
 const includeCompany = ['Campaign', 'Address', 'CostCenter', 'Product', 'Order', 'AccessPermission']
@@ -100,6 +101,20 @@ export const generateInclude = (model: string): any => {
       }
     ]
   )
+}
+
+export function generateShippingAddressFilterQuery (filter: object): object {
+  const filterQuery: Record<string, unknown> = {}
+
+  Object.entries(filter).forEach(([key, value]) => {
+    if (value !== undefined && value !== '') {
+      filterQuery[`shippingAddress.${key}`] = {
+        [Op.iLike]: `%${String(value)}%`
+      }
+    }
+  })
+
+  return filterQuery
 }
 
 class BaseService {
