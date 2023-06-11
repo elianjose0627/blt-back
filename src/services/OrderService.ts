@@ -1,30 +1,16 @@
 import { v1 as uuidv1 } from 'uuid'
 import { Op } from 'sequelize'
-import BaseService, { generateInclude } from './BaseService'
+import BaseService, { generateShippingAddressFilterQuery, generateInclude } from './BaseService'
 import db from '../models'
 import * as userRoles from '../utils/userRoles'
 import * as appModules from '../utils/appModules'
-
-function generateFilterQuery (filter: object): object {
-  const filterQuery: Record<string, unknown> = {}
-
-  Object.entries(filter).forEach(([key, value]) => {
-    if (value !== undefined && value !== '') {
-      filterQuery[`shippingAddress.${key}`] = {
-        [Op.iLike]: `%${String(value)}%`
-      }
-    }
-  })
-
-  return filterQuery
-}
 
 class OrderService extends BaseService {
   async getAll (limit: number, offset: number, user?: any, search: string = '', filter = { firstname: '', lastname: '', email: '', city: '', country: '' }): Promise<any> {
     let records
     const allowedCompanyRoles = [userRoles.CAMPAIGNMANAGER, userRoles.COMPANYADMINISTRATOR]
 
-    let where = generateFilterQuery(filter)
+    let where = generateShippingAddressFilterQuery(filter)
     if (search !== undefined && search !== '') {
       where = {
         [Op.and]: [
