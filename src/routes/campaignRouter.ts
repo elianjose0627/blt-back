@@ -51,6 +51,12 @@ const CampaignRoutes = (): any => {
       celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(BundleController.getAll))
+  campaignRouter.route('/campaigns/:id/orders')
+    .get(BundleController.setModule, asyncHandler(CampaignController.checkOwnerOrAdmin),
+      asyncHandler(checkPermissions),
+      celebrate({
+        [Segments.QUERY]: validator.validateQueryParams
+      }), asyncHandler(paginate), asyncHandler(CampaignController.getAllCampaignOrders))
   return campaignRouter
 }
 

@@ -1,3 +1,11 @@
+const dayjs = require('dayjs')
+const utc = require('dayjs/plugin/utc')
+dayjs.extend(utc)
+
+const now = dayjs.utc().format()
+const createdAt = now
+const updatedAt = now
+
 module.exports = {
   up: async (queryInterface) => queryInterface.bulkInsert('AccessPermissions', [
     {
@@ -7,8 +15,8 @@ module.exports = {
       role: 'CompanyAdministrator',
       permission: 'readwrite',
       isEnabled: 'TRUE',
-      createdAt: '2023-04-13 10:44:33.078+00',
-      updatedAt: '2023-04-13 10:44:33.078+00',
+      createdAt,
+      updatedAt,
       deletedAt: null,
       companyId: null
     },
@@ -19,8 +27,8 @@ module.exports = {
       role: 'CompanyAdministrator',
       permission: 'readwrite',
       isEnabled: 'TRUE',
-      createdAt: '2023-04-13 10:44:33.078+00',
-      updatedAt: '2023-04-13 10:44:33.078+00',
+      createdAt,
+      updatedAt,
       deletedAt: null,
       companyId: null
     },
@@ -31,8 +39,8 @@ module.exports = {
       role: 'CompanyAdministrator',
       permission: 'readwrite',
       isEnabled: 'TRUE',
-      createdAt: '2023-04-13 10:44:33.078+00',
-      updatedAt: '2023-04-13 10:44:33.078+00',
+      createdAt,
+      updatedAt,
       deletedAt: null,
       companyId: null
     },
@@ -43,8 +51,8 @@ module.exports = {
       role: 'CompanyAdministrator',
       permission: 'readwrite',
       isEnabled: 'TRUE',
-      createdAt: '2023-04-13 10:44:33.078+00',
-      updatedAt: '2023-04-13 10:44:33.078+00',
+      createdAt,
+      updatedAt,
       deletedAt: null,
       companyId: null
     },
@@ -55,8 +63,8 @@ module.exports = {
       role: 'CompanyAdministrator',
       permission: 'readwrite',
       isEnabled: 'TRUE',
-      createdAt: '2023-04-13 10:44:33.078+00',
-      updatedAt: '2023-04-13 10:44:33.078+00',
+      createdAt,
+      updatedAt,
       deletedAt: null,
       companyId: null
     },
@@ -67,8 +75,8 @@ module.exports = {
       role: 'CompanyAdministrator',
       permission: 'readwrite',
       isEnabled: 'TRUE',
-      createdAt: '2023-04-13 10:44:33.078+00',
-      updatedAt: '2023-04-13 10:44:33.078+00',
+      createdAt,
+      updatedAt,
       deletedAt: null,
       companyId: null
     },
@@ -79,8 +87,8 @@ module.exports = {
       role: 'CompanyAdministrator',
       permission: 'readwrite',
       isEnabled: 'TRUE',
-      createdAt: '2023-04-13 10:44:33.078+00',
-      updatedAt: '2023-04-13 10:44:33.078+00',
+      createdAt,
+      updatedAt,
       deletedAt: null,
       companyId: null
     },
@@ -91,8 +99,8 @@ module.exports = {
       role: 'CompanyAdministrator',
       permission: 'readwrite',
       isEnabled: 'TRUE',
-      createdAt: '2023-04-13 10:44:33.078+00',
-      updatedAt: '2023-04-13 10:44:33.078+00',
+      createdAt,
+      updatedAt,
       deletedAt: null,
       companyId: null
     },
@@ -103,8 +111,8 @@ module.exports = {
       role: 'CompanyAdministrator',
       permission: 'readwrite',
       isEnabled: 'TRUE',
-      createdAt: '2023-04-13 10:44:33.078+00',
-      updatedAt: '2023-04-13 10:44:33.078+00',
+      createdAt,
+      updatedAt,
       deletedAt: null,
       companyId: null
     },
@@ -115,8 +123,8 @@ module.exports = {
       role: 'CampaignManager',
       permission: 'readwrite',
       isEnabled: 'TRUE',
-      createdAt: '2023-04-13 10:44:33.078+00',
-      updatedAt: '2023-04-13 10:44:33.078+00',
+      createdAt,
+      updatedAt,
       deletedAt: null,
       companyId: null
     },
@@ -127,8 +135,8 @@ module.exports = {
       role: 'CampaignManager',
       permission: 'readwrite',
       isEnabled: 'TRUE',
-      createdAt: '2023-04-13 10:44:33.078+00',
-      updatedAt: '2023-04-13 10:44:33.078+00',
+      createdAt,
+      updatedAt,
       deletedAt: null,
       companyId: null
     },
@@ -139,8 +147,8 @@ module.exports = {
       role: 'CampaignManager',
       permission: 'readwrite',
       isEnabled: 'TRUE',
-      createdAt: '2023-04-13 10:44:33.078+00',
-      updatedAt: '2023-04-13 10:44:33.078+00',
+      createdAt,
+      updatedAt,
       deletedAt: null,
       companyId: null
     }

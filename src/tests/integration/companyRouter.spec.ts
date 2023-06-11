@@ -1561,6 +1561,18 @@ describe('Company actions', () => {
       const companyId = String(resCompany.body.company.id)
       await verifyCompanyDomain(String(companyId))
 
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/campaigns`)
