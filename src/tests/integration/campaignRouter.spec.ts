@@ -5,7 +5,8 @@ import {
   deleteTestUser, createAdminTestUser,
   verifyUser, verifyCompanyDomain, createPrivacyRule,
   createCompanyAdministratorWithCompany,
-  createCampaignManager
+  createCampaignManager,
+  orderTwo
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 import * as appModules from '../../utils/appModules'
@@ -938,6 +939,318 @@ describe('Campaign actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'bundles')
       expect(res.body.bundles).to.be.an('array')
       expect(res.body.bundles).to.have.lengthOf.above(0)
+    })
+  })
+
+  describe('Campaign Orders Actions', () => {
+    it('Should return 200 Success when an owner successfully retrieves all orders of a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Marvel',
+            email: 'test2@companymarvelorders.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/bundles`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          bundle: {
+            jfsku: 'VZ9N01SJN9E',
+            merchantSku: '1552',
+            name: 'Zeppelin Box - Apriil 2023',
+            specifications: {
+              billOfMaterialsComponents: [
+                {
+                  name: 'Interdimensional Goggles',
+                  jfsku: '26CJ0114JWR',
+                  merchantSku: 'ART2394871'
+                },
+                {
+                  name: 'Zeppelin Box - Apriil 2023',
+                  jfsku: 'VZ9N01SJN9E',
+                  merchantSku: '1552'
+                }
+              ]
+            }
+          }
+        })
+
+      await chai
+        .request(app)
+        .post('/api/orders')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          order: orderTwo
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${campaignId}/orders`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders')
+      expect(res.body.orders).to.be.an('array')
+      expect(res.body.orders).to.have.lengthOf.above(0)
+    })
+
+    it('Should return 200 Success when a campaign manager successfully retrieves all orders of a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Marvel',
+            email: 'test125orders@kree.kr',
+            domain: 'kree.kr'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'ronan@kree.kr',
+            actionType: 'add'
+          }
+        })
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ronan@kree.kr', password: 'theaccuser' } })
+
+      tokenCampaignManager = resCampaignManager.body.token
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/bundles`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          bundle: {
+            jfsku: 'VZ9N01ZHS3P',
+            merchantSku: '39262696145050',
+            name: 'Staffbase Bundle 1',
+            specifications: {
+              billOfMaterialsComponents: [
+                {
+                  name: 'Interdimensional Goggles',
+                  jfsku: '26CJ0114JWR',
+                  merchantSku: 'ART2394871'
+                }
+              ]
+            }
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${campaignId}/orders`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders')
+      expect(res.body.orders).to.be.an('array')
+    })
+
+    it('Should return 200 Success when a company admin successfully retrieves all orders of a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Marvel',
+            email: 'test231orders@starkindustriesmarvel2.com',
+            domain: 'starkindustriesmarvel2.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'sharoncarter@starkindustriesmarvel2.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdmin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'sharoncarter@starkindustriesmarvel2.com', password: 'thepowerbroker' } })
+
+      tokenCompanyAdminTwo = resCompanyAdmin.body.token
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/bundles`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          bundle: {
+            jfsku: 'VZ9N01ZHS3P',
+            merchantSku: '39262696145050',
+            name: 'Staffbase Bundle 1',
+            specifications: {
+              billOfMaterialsComponents: [
+                {
+                  name: 'Interdimensional Goggles',
+                  jfsku: '26CJ0114JWR',
+                  merchantSku: 'ART2394871'
+                }
+              ]
+            }
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${campaignId}/orders`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders')
+      expect(res.body.orders).to.be.an('array')
+    })
+
+    it('Should return 200 Success when a company admin successfully retrieves all orders of a campaign for custom bundle.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Marvel',
+            email: 'test231orders2@starkindustriesmarvel2.com',
+            domain: 'starkindustriesmarvel2.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'sharoncarter@starkindustriesmarvel2.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdmin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'sharoncarter@starkindustriesmarvel2.com', password: 'thepowerbroker' } })
+
+      tokenCompanyAdminTwo = resCompanyAdmin.body.token
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/bundles`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          bundle: {
+            merchantSku: '39262696145050',
+            name: 'Staffbase Bundle 1',
+            specifications: {
+              billOfMaterialsComponents: [
+                {
+                  name: 'Interdimensional Goggles',
+                  jfsku: '26CJ0114JWR',
+                  merchantSku: 'ART2394871'
+                }
+              ]
+            }
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${campaignId}/orders`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'orders')
+      expect(res.body.orders).to.be.an('array')
     })
   })
 })
