@@ -112,6 +112,30 @@ class ProductController extends BaseController {
       stock
     })
   }
+
+  async updateProductCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record, body: { product: { companyId } } } = req
+
+    if (companyId !== null) {
+      const company = await companyService.findById(companyId)
+      if (company === null) {
+        return res.status(statusCodes.NOT_FOUND).send({
+          statusCode: statusCodes.NOT_FOUND,
+          success: false,
+          errors: {
+            message: 'Company not found'
+          }
+        })
+      }
+    }
+    const updatedRecord = await productService.update(record, { companyId })
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      product: updatedRecord
+    })
+  }
 }
 
 export default new ProductController(productService)

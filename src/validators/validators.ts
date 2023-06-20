@@ -397,6 +397,12 @@ const validateProductAdmin = Joi.object({
   }).required()
 })
 
+const validateProductCompany = Joi.object({
+  product: Joi.object({
+    companyId: Joi.string().uuid().allow(null).default(null)
+  }).required()
+})
+
 const validateOrder = Joi.object({
   order: Joi.object({
     outboundId: Joi.string().required(),
@@ -535,6 +541,7 @@ export default {
   validateTrackingId,
   validateProduct,
   validateProductAdmin,
+  validateProductCompany,
   validateOrder,
   validateSecondaryDomain,
   validateLegalText,
