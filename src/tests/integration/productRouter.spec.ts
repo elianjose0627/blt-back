@@ -556,4 +556,117 @@ describe('Product actions', () => {
       expect(res.body.errors.message).to.equal('Only the owner, admin, company administrator or campaign manager can perform this action')
     })
   })
+
+  describe('Update the company of a product', () => {
+    it('Should return 200 OK when an administrator updates the company of a product by id.', async () => {
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: '1231',
+            merchantSku: '1231',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      const productId = resProduct.body.product.id
+
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company1237products1237.com'
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/products/${String(productId)}/company`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            companyId
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 200 OK when an administrator updates the company of a product by id with null.', async () => {
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: '1231',
+            merchantSku: '1231',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      const productId = resProduct.body.product.id
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/products/${String(productId)}/company`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            companyId: null
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 404 Not Found when an admin user tries to create a product on behalf of a company that does not exist.', async () => {
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: '12371',
+            merchantSku: '12371',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      const productId = resProduct.body.product.id
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/products/${String(productId)}/company`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            companyId: uuidv1()
+          }
+        })
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Company not found')
+    })
+  })
 })
