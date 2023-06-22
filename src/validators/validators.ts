@@ -339,6 +339,7 @@ const validateBundle = Joi.object({
     price: Joi.number().max(1000000).min(0),
     isLocked: Joi.boolean(),
     isBillOfMaterials: Joi.boolean(),
+    shippingMethodType: Joi.number().allow(null).default(null),
     specifications: Joi.object({
       isBatch: Joi.boolean().default(false),
       isDivisible: Joi.boolean().default(false),
