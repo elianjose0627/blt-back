@@ -339,6 +339,7 @@ const validateBundle = Joi.object({
     price: Joi.number().max(1000000).min(0),
     isLocked: Joi.boolean(),
     isBillOfMaterials: Joi.boolean(),
+    shippingMethodType: Joi.number().allow(null).default(null),
     specifications: Joi.object({
       isBatch: Joi.boolean().default(false),
       isDivisible: Joi.boolean().default(false),
@@ -394,6 +395,12 @@ const validateProductAdmin = Joi.object({
       currency: Joi.string().required().valid(...currencies.currencies),
       discount: Joi.number()
     })
+  }).required()
+})
+
+const validateProductCompany = Joi.object({
+  product: Joi.object({
+    companyId: Joi.string().uuid().allow(null).default(null)
   }).required()
 })
 
@@ -501,6 +508,15 @@ const validateRegistrationQueryParams = Joi.object({
   companyId: Joi.string().length(96)
 })
 
+const validateShippingMethod = Joi.object({
+  shippingMethod: Joi.object({
+    name: Joi.string().required().max(128),
+    shippingType: Joi.number().required(),
+    isDropShipping: Joi.boolean().required(),
+    insuranceValue: Joi.number().allow(null)
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -535,11 +551,13 @@ export default {
   validateTrackingId,
   validateProduct,
   validateProductAdmin,
+  validateProductCompany,
   validateOrder,
   validateSecondaryDomain,
   validateLegalText,
   validatePrivacyRule,
   validateAccessPermission,
   validateAccessPermissionAdmin,
-  validateRegistrationQueryParams
+  validateRegistrationQueryParams,
+  validateShippingMethod
 }

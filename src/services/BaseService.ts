@@ -3,7 +3,7 @@ import { Op } from 'sequelize'
 import db from '../models'
 
 const includeCompany = ['Campaign', 'Address', 'CostCenter', 'Product', 'Order', 'AccessPermission']
-const withoutUser = ['BundleItem', 'Salutation', 'Picture', 'SecondaryDomain', 'LegalText']
+const withoutUser = ['BundleItem', 'Salutation', 'Picture', 'SecondaryDomain', 'LegalText', 'ShippingMethod']
 
 export const generateInclude = (model: string): any => {
   if (model === 'Company') {
