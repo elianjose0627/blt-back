@@ -507,6 +507,15 @@ const validateRegistrationQueryParams = Joi.object({
   companyId: Joi.string().length(96)
 })
 
+const validateShippingMethod = Joi.object({
+  shippingMethod: Joi.object({
+    name: Joi.string().required().max(128),
+    shippingType: Joi.number().required(),
+    isDropShipping: Joi.boolean().required(),
+    insuranceValue: Joi.number().allow(null)
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -548,5 +557,6 @@ export default {
   validatePrivacyRule,
   validateAccessPermission,
   validateAccessPermissionAdmin,
-  validateRegistrationQueryParams
+  validateRegistrationQueryParams,
+  validateShippingMethod
 }
