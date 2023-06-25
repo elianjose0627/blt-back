@@ -51,6 +51,8 @@ app.use(apiPrefix, routers.legalTextRouter())
 app.use(apiPrefix, routers.privacyRuleRouter())
 app.use(apiPrefix, routers.accessPermissionsRouter())
 app.use(apiPrefix, routers.healthcheckRouter())
+app.use(apiPrefix, routers.shippingMethodRouter())
+app.use(apiPrefix, routers.webhookRouter())
 
 // Add validation middleware
 app.use(joiErrors)
