@@ -545,3 +545,17 @@ export interface TrackingData {
   shipments: Shipment[]
   possibleAdditionalShipmentsUrl: string[]
 }
+
+export interface SlackEvent {
+  email: string
+  timestamp: number
+  'smtp-id': string
+  event: string
+  category: string[]
+  sg_event_id: string
+  sg_message_id: string
+  useragent: string
+  ip: string
+  url: string
+  asm_group_id: number
+}

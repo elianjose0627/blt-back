@@ -19,6 +19,7 @@ import privacyRuleRouter from './privacyRuleRouter'
 import accessPermissionsRouter from './accessPermissionRouter'
 import healthcheckRouter from './healthCheckRouter'
 import shippingMethodRouter from './shippingMethodRouter'
+import webhookRouter from './webhookRouter'
 
 const routers = {
   authRouter,
@@ -41,7 +42,8 @@ const routers = {
   privacyRuleRouter,
   accessPermissionsRouter,
   healthcheckRouter,
-  shippingMethodRouter
+  shippingMethodRouter,
+  webhookRouter
 }
 
 export default routers

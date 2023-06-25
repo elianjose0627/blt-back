@@ -29,6 +29,8 @@ steps:
     - 'FIREBASE_STORAGE_ENVIRONMENT=${_FIREBASE_STORAGE_ENVIRONMENT}'
     - 'COMPANY_INVITE_SECRET_KEY=${_COMPANY_INVITE_SECRET_KEY}'
     - 'JTL_API_URL=${_JTL_API_URL}'
+    - 'SLACK_WEBHOOK_SERVICE_URL=${_SLACK_WEBHOOK_SERVICE_URL}'
+    - 'SLACK_CHANNEL_WEBHOOK_PATH=${_SLACK_CHANNEL_WEBHOOK_PATH}'
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'migrate']
 - name: 'gcr.io/cloud-builders/npm'
