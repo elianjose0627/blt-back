@@ -1371,14 +1371,16 @@ describe('Company actions', () => {
           campaign: {
             name: 'Onboarding',
             type: 'onboarding',
-            status: 'draft'
+            status: 'draft',
+            quota: 100,
+            correctionQuota: 10
           }
         })
 
       expect(res).to.have.status(201)
       expect(res.body).to.include.keys('statusCode', 'success', 'campaign')
       expect(res.body.campaign).to.be.an('object')
-      expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'type', 'createdAt', 'updatedAt')
+      expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'description', 'quota', 'correctionQuota', 'type', 'createdAt', 'updatedAt')
     })
 
     it('Should return 201 Created when a campaign manager for a company successfully creates a campaign.', async () => {
@@ -1419,7 +1421,7 @@ describe('Company actions', () => {
       expect(res).to.have.status(201)
       expect(res.body).to.include.keys('statusCode', 'success', 'campaign')
       expect(res.body.campaign).to.be.an('object')
-      expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'type', 'createdAt', 'updatedAt')
+      expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'type', 'description', 'quota', 'correctionQuota', 'createdAt', 'updatedAt')
     })
 
     it('Should return 403 Forbidden when a non-employee Campaign Manager tries to creates a campaign for a company.', async () => {

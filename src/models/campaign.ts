@@ -8,6 +8,8 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     status: CampaignStatus
     type: CampaignType
     description: string
+    quota: number
+    correctionQuota: number
   }
 
   class Campaign extends Model<CampaignAttributes> {
@@ -16,6 +18,8 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     private readonly status: CampaignStatus
     private readonly type: CampaignType
     private readonly description: string
+    private readonly quota: number
+    private readonly correctionQuota: number
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany
@@ -45,6 +49,8 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
         status: this.status,
         type: this.type,
         description: this.description,
+        quota: this.quota,
+        correctionQuota: this.correctionQuota,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         company: this.company
@@ -73,6 +79,14 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     description: {
       type: DataTypes.TEXT,
       allowNull: true
+    },
+    quota: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
+    correctionQuota: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
     }
   }, {
     sequelize,

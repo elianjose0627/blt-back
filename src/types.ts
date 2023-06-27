@@ -251,6 +251,8 @@ export interface ICampaign {
   status: CampaignStatus
   type: CampaignType
   description: string
+  quota: number
+  correctionQuota: number
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
