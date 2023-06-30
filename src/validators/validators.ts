@@ -289,7 +289,9 @@ const validateCampaign = Joi.object({
     name: Joi.string().required().allow('').allow(null).max(64),
     status: Joi.string().required().valid(...['draft', 'submitted']),
     type: Joi.string().required().valid(...['onboarding', 'birthday', 'christmas']),
-    description: Joi.string().allow(null).allow('').max(1024)
+    description: Joi.string().allow(null).allow('').max(1024),
+    quota: Joi.number(),
+    correctionQuota: Joi.number()
   }).required()
 })
 
