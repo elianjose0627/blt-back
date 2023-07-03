@@ -31,6 +31,7 @@ steps:
     - 'JTL_API_URL=${_JTL_API_URL}'
     - 'SLACK_WEBHOOK_SERVICE_URL=${_SLACK_WEBHOOK_SERVICE_URL}'
     - 'SLACK_CHANNEL_WEBHOOK_PATH=${_SLACK_CHANNEL_WEBHOOK_PATH}'
+    - 'SENDGRID_WEBHOOK_PUBLIC_KEY=${_SENDGRID_WEBHOOK_PUBLIC_KEY}'
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'migrate']
 - name: 'gcr.io/cloud-builders/npm'
