@@ -560,4 +560,5 @@ export interface SlackEvent {
   ip: string
   url: string
   asm_group_id: number
+  reason: string
 }

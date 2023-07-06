@@ -11,7 +11,8 @@ import {
   createPrivacyRule,
   createCompanyOrder,
   createCompanyOrderWithMissingEmail,
-  createCompanyOrderWithMissingCityStreetZip
+  createCompanyOrderWithMissingCityStreetZip,
+  createCompanyOrderWithMinimalShippingAddress
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 import * as appModules from '../../utils/appModules'
@@ -62,6 +63,7 @@ describe('Order actions', () => {
     await createCompanyOrder(resCompanyAdminTwo.body.user.company.id)
     await createCompanyOrderWithMissingEmail(resCompanyAdminTwo.body.user.company.id)
     await createCompanyOrderWithMissingCityStreetZip(resCompanyAdminTwo.body.user.company.id)
+    await createCompanyOrderWithMinimalShippingAddress(resCompanyAdminTwo.body.user.company.id)
 
     tokenAdmin = resAdmin.body.token
     token = resUser.body.token

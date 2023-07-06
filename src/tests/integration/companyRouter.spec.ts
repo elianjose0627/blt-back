@@ -11,9 +11,11 @@ import {
   verifyUser,
   verifyCompanyDomain,
   createVerifiedUser,
-  createVerifiedAdminUser
+  createVerifiedAdminUser,
+  createPrivacyRule
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
+import * as appModules from '../../utils/appModules'
 
 const { expect } = chai
 
@@ -3119,6 +3121,101 @@ describe('Company actions', () => {
         .request(app)
         .get(`/api/companies/${companyId}/users`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'users')
+      expect(res.body.users).to.be.an('array')
+    })
+
+    it('Should return 200 Success when a company administrator successfully retrieves all users for a company with privacy rules.', async () => {
+      await deleteTestUser('nickfury@starkindustriesmarvel.com')
+      await createCompanyAdministrator()
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await createPrivacyRule(companyId, appModules.ADDRESSES, userRoles.COMPANYADMINISTRATOR)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resNewUser = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Maria', lastName: 'Hill', email: 'mariahill@starkindustriesmarvel.com', password: 'himymmymih' } })
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: resNewUser.body.user.email,
+            actionType: 'add'
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/users/${String(resNewUser.body.user.id)}/address`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          address: {
+            country: 'Kenya',
+            city: 'Nairobi',
+            street: 'Q River',
+            zip: '12345',
+            phone: '123456789',
+            addressAddition: 'Apt 2B'
+          }
+        })
+
+      const resNewUser2 = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Mara', lastName: 'Hull', email: 'marahull@starkindustriesmarvel.com', password: 'himymmymih2' } })
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: resNewUser2.body.user.email,
+            actionType: 'add'
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/users/${String(resNewUser2.body.user.id)}/address`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          address: {
+            country: 'Kenya',
+            city: 'Nairobi'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'users')
