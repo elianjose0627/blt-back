@@ -271,8 +271,8 @@ class CompanyController extends BaseController {
   }
 
   async getAllUsers (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { query: { limit, page, offset }, params: { id: companyId } } = req
-    const records = await companyService.getAllUsers(limit, offset, companyId)
+    const { query: { limit, page, offset }, params: { id: companyId }, user } = req
+    const records = await companyService.getAllUsers(limit, offset, companyId, user)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),

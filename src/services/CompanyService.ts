@@ -2,6 +2,7 @@ import { v1 as uuidv1 } from 'uuid'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 import * as userRoles from '../utils/userRoles'
+import * as appModules from '../utils/appModules'
 
 class CompanyService extends BaseService {
   manyRecords (): string {
@@ -78,7 +79,7 @@ class CompanyService extends BaseService {
     return { response: response.toJSONFor(user), status: 201 }
   }
 
-  async getAllUsers (limit: number, offset: number, companyId: string): Promise<any> {
+  async getAllUsers (limit: number, offset: number, companyId: string, user: any): Promise<any> {
     const records = await db.User.findAndCountAll({
       limit,
       offset,
@@ -97,9 +98,28 @@ class CompanyService extends BaseService {
       ]
     })
 
+    const privacyRule = await db.PrivacyRule.findOne({
+      where: {
+        companyId,
+        role: user.role,
+        isEnabled: true,
+        module: appModules.ADDRESSES
+      }
+    })
+
     return {
       count: records.count,
       rows: records.rows.map((record: any) => {
+        if (privacyRule !== null && record.address !== null) {
+          record.address = {
+            phone: record.address.phone?.replace(/./g, '*'),
+            addressAddition: record.address.addressAddition?.replace(/./g, '*'),
+            city: record.address.city.replace(/./g, '*'),
+            street: record.address.street?.replace(/./g, '*'),
+            zip: record.address.zip?.replace(/./g, '*'),
+            country: record.address.country.replace(/./g, '*')
+          }
+        }
         const item = record.toJSONFor()
         delete item.isGhost
         return item
