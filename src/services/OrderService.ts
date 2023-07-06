@@ -87,7 +87,7 @@ class OrderService extends BaseService {
           firstname: record.shippingAddress.firstname,
           street: record.shippingAddress.street?.replace(/./g, '*'),
           zip: record.shippingAddress.zip?.replace(/./g, '*'),
-          country: record.shippingAddress.country
+          country: record.shippingAddress.country?.replace(/./g, '*')
         }
       }
       return record.toJSONFor()
