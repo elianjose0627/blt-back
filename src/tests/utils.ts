@@ -47,14 +47,14 @@ export const createAdminTestUser = async (email = 'ivers@kree.kr', password = 't
   }
 }
 
-export const createTestUser = async (): Promise<any> => {
+export const createTestUser = async (email = 'drstrange@starkindustriesmarvel.com', password = 'thesanctum'): Promise<any> => {
   const user = await db.User.create({
     id: uuidv1(),
     firstName: 'Steven',
     lastName: 'Strange',
-    email: 'drstrange@starkindustriesmarvel.com',
+    email,
     phone: '2222222222',
-    password: 'thesanctum',
+    password,
     isVerified: true
   })
 

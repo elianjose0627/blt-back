@@ -12,7 +12,8 @@ import {
   verifyCompanyDomain,
   createVerifiedUser,
   createVerifiedAdminUser,
-  createPrivacyRule
+  createPrivacyRule,
+  createTestUser
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 import * as appModules from '../../utils/appModules'
@@ -300,6 +301,39 @@ describe('Company actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'company')
       expect(res.body.company).to.be.an('object')
       expect(res.body.company).to.include.keys('id', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 403 Forbidden when a user tries to get a company by id.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Forbid',
+            email: 'test@companyforbid.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const user = await createTestUser('nebula@gotg.com', 'thanossux')
+
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: user.email, password: 'thanossux' } })
+
+      const tokenUser = resUser.body.token
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}`)
+        .set('Authorization', `Bearer ${String(tokenUser)}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner or administrator can perform this action')
     })
 
     it('Should return 200 OK when an admin creates a company with an existing user role.', async () => {
@@ -2099,7 +2133,7 @@ describe('Company actions', () => {
       expect(res.body.errors.message).to.equal('Only the owner or administrator can perform this action')
     })
 
-    it('Should return 200 when an admin retrieves all company cost centers.', async () => {
+    it('Should return 200 when an admin retrieves all company cost centers for a verified company.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -2112,6 +2146,29 @@ describe('Company actions', () => {
         })
       const companyId = String(resCompany.body.company.id)
       await verifyCompanyDomain(String(companyId))
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/cost-centers`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'costCenters')
+      expect(res.body.costCenters).to.be.an('array')
+    })
+
+    it('Should return 200 when an admin retrieves all company cost centers for an unverified company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'sabasaba@company5costcenters.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
 
       const res = await chai
         .request(app)
