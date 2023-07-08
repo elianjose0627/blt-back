@@ -32,7 +32,7 @@ class CompanyController extends BaseController {
     const { user: currentUser, record: company } = req
 
     const isOwnerOrAdmin = currentUser.id === company?.owner?.id || currentUser.role === userRoles.ADMIN
-    const isEmployee = currentUser?.companyId === company?.id
+    const isEmployee = currentUser?.companyId === company.id
 
     if (isOwnerOrAdmin || (isEmployee)) {
       req.isOwnerOrAdmin = isOwnerOrAdmin
@@ -133,9 +133,9 @@ class CompanyController extends BaseController {
   }
 
   async checkCompanyDomainVerification (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
-    const { record: { isDomainVerified } } = req
+    const { record: { isDomainVerified }, user } = req
 
-    if (isDomainVerified === true) {
+    if (isDomainVerified === true || user.role === userRoles.ADMIN) {
       return next()
     }
 
