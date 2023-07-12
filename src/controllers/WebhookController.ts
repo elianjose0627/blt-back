@@ -37,7 +37,7 @@ class WebhookController extends BaseController {
     }
 
     events.forEach(async (event: SlackEvent) => {
-      await SlackService.postToSlackChannel({ text: `${String(event.email)} - ${String(event.event)} - ${String(event.reason)}` })
+      await SlackService.postToSlackChannel({ text: `Email: ${String(event.email)} - Event: ${String(event.event)} - Reason: ${event.reason ?? ''}` })
     })
 
     return res.status(statusCodes.OK).send({
