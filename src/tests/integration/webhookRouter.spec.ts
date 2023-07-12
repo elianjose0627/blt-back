@@ -39,7 +39,7 @@ describe('Webhook actions', () => {
       expect(res).to.have.status(403)
     })
 
-    it('Should return 200 OK when a user posts a webhook events', async () => {
+    it('Should return 200 OK when a user posts multiple webhook events', async () => {
       process.env.SENDGRID_WEBHOOK_PUBLIC_KEY = 'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEQ4LIFtWztlsF7skFqOncjD1lun4H5w8XOhyOArHW9RcIx/FfEzx6cikC/yPfUvwaX/JScE7Fc9CJD2afQ9Ok3Q=='
       const res = await chai
         .request(app)
