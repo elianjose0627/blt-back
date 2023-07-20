@@ -252,7 +252,9 @@ export interface ICampaign {
   type: CampaignType
   description: string
   quota: number
+  usedQuota: number
   correctionQuota: number
+  lastQuotaResetDate: Nullable<Date>
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
