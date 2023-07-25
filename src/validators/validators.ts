@@ -292,7 +292,8 @@ const validateCampaign = Joi.object({
     description: Joi.string().allow(null).allow('').max(1024),
     quota: Joi.number(),
     correctionQuota: Joi.number(),
-    lastQuotaResetDate: Joi.date().allow(null)
+    lastQuotaResetDate: Joi.date().allow(null),
+    isQuotaEnabled: Joi.boolean()
   }).required()
 })
 
