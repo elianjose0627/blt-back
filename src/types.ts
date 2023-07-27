@@ -243,7 +243,7 @@ export interface IPicture {
 }
 
 export type CampaignStatus = 'draft' | 'submitted'
-export type CampaignType = 'onboarding' | 'birthday' | 'christmas'
+export type CampaignType = 'onboarding' | 'birthday' | 'christmas' | 'marketing'
 
 export interface ICampaign {
   id: string
