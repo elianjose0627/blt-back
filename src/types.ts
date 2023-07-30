@@ -243,7 +243,7 @@ export interface IPicture {
 }
 
 export type CampaignStatus = 'draft' | 'submitted'
-export type CampaignType = 'onboarding' | 'birthday' | 'christmas'
+export type CampaignType = 'onboarding' | 'birthday' | 'christmas' | 'marketing'
 
 export interface ICampaign {
   id: string
@@ -255,6 +255,7 @@ export interface ICampaign {
   usedQuota: number
   correctionQuota: number
   lastQuotaResetDate: Nullable<Date>
+  isQuotaEnabled: boolean
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
