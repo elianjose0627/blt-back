@@ -20,6 +20,7 @@ import accessPermissionsRouter from './accessPermissionRouter'
 import healthcheckRouter from './healthCheckRouter'
 import shippingMethodRouter from './shippingMethodRouter'
 import webhookRouter from './webhookRouter'
+import pendingOrderRouter from './pendingOrderRouter'
 
 const routers = {
   authRouter,
@@ -43,7 +44,8 @@ const routers = {
   accessPermissionsRouter,
   healthcheckRouter,
   shippingMethodRouter,
-  webhookRouter
+  webhookRouter,
+  pendingOrderRouter
 }
 
 export default routers

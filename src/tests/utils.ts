@@ -894,3 +894,210 @@ export const createCompanyOrderWithMissingCityStreetZip = async (companyId: stri
 
   return res
 }
+
+export const pendingOrders = [
+  {
+    costCenter: '',
+    platform: 0,
+    language: 0,
+    currency: 'EUR',
+    orderNo: '0',
+    inetorderno: 0,
+    shippingId: 21,
+    shipped: '2023-07-28 10:35:11.0000000',
+    deliverydate: '2023-07-31 10:35:11.0000000',
+    note: '',
+    description: ' +',
+    paymentType: 0,
+    paymentTarget: 0,
+    discount: 0.00,
+    orderStatus: 0,
+    orderLineRequests: [
+      {
+        itemName: 'Welcome Box - Techstarter',
+        articleNumber: '1498',
+        itemNetSale: 0.00,
+        itemVAT: 0.00,
+        quantity: 1,
+        type: 0,
+        discount: 0.00,
+        netPurchasePrice: 0.00
+      }
+    ],
+    shippingAddressRequests: [
+      {
+        salutation: 'Mr',
+        firstName: 'Felix',
+        lastName: 'Ixkes',
+        title: '',
+        company: '',
+        companyAddition: '',
+        street: 'Flügelstraße 6',
+        addressAddition: '',
+        zipCode: '40227',
+        place: 'Düsseldorf',
+        phone: '',
+        state: '',
+        country: 'Germany',
+        iso: '',
+        telephone: '',
+        mobile: '',
+        fax: '',
+        email: 'christoph@biglittlethings.de'
+      }
+    ]
+  },
+  {
+    costCenter: '',
+    platform: 0,
+    language: 0,
+    currency: 'EUR',
+    orderNo: '0',
+    inetorderno: 0,
+    shippingId: 21,
+    shipped: '2023-07-28 10:35:11.0000000',
+    deliverydate: '2023-07-31 10:35:11.0000000',
+    note: '',
+    description: ' +',
+    paymentType: 0,
+    paymentTarget: 0,
+    discount: 0.00,
+    orderStatus: 0,
+    orderLineRequests: [
+      {
+        itemName: 'Welcome Box - Techstarter',
+        articleNumber: '1498',
+        itemNetSale: 0.00,
+        itemVAT: 0.00,
+        quantity: 1,
+        type: 0,
+        discount: 0.00,
+        netPurchasePrice: 0.00
+      }
+    ],
+    shippingAddressRequests: [
+      {
+        salutation: 'Mr',
+        firstName: 'Ryan',
+        lastName: 'Wire',
+        title: '',
+        company: '',
+        companyAddition: '',
+        street: 'Kiu River',
+        addressAddition: '',
+        zipCode: '40227',
+        place: 'Nairobi',
+        phone: '',
+        state: '',
+        country: 'Kenya',
+        iso: '',
+        telephone: '',
+        mobile: '',
+        fax: '',
+        email: 'ryan@biglittlethings.de'
+      }
+    ]
+  },
+  {
+    costCenter: '',
+    platform: 0,
+    language: 0,
+    currency: 'EUR',
+    orderNo: '0',
+    inetorderno: 0,
+    shippingId: 21,
+    shipped: '2023-07-28 10:35:11.0000000',
+    deliverydate: '2023-07-31 10:35:11.0000000',
+    note: '',
+    description: ' +',
+    paymentType: 0,
+    paymentTarget: 0,
+    discount: 0.00,
+    orderStatus: 0,
+    orderLineRequests: [
+      {
+        itemName: 'Welcome Box - Techstarter',
+        articleNumber: '1498',
+        itemNetSale: 0.00,
+        itemVAT: 0.00,
+        quantity: 1,
+        type: 0,
+        discount: 0.00,
+        netPurchasePrice: 0.00
+      }
+    ],
+    shippingAddressRequests: [
+      {
+        salutation: 'Mr',
+        firstName: 'Hannes',
+        lastName: 'Brelloch',
+        title: '',
+        company: '',
+        companyAddition: '',
+        street: 'Flügelstraße 6',
+        addressAddition: '',
+        zipCode: '40227',
+        place: 'Düsseldorf',
+        phone: '',
+        state: '',
+        country: 'Germany',
+        iso: '',
+        telephone: '',
+        mobile: '',
+        fax: '',
+        email: 'hannes@biglittlethings.de'
+      }
+    ]
+  },
+  {
+    costCenter: '',
+    platform: 0,
+    language: 0,
+    currency: 'EUR',
+    orderNo: '0',
+    inetorderno: 0,
+    shippingId: 21,
+    shipped: '2023-07-28 10:35:11.0000000',
+    deliverydate: '2023-07-31 10:35:11.0000000',
+    note: '',
+    description: ' +',
+    paymentType: 0,
+    paymentTarget: 0,
+    discount: 0.00,
+    orderStatus: 0,
+    orderLineRequests: [
+      {
+        itemName: 'Welcome Box - Techstarter',
+        articleNumber: '1498',
+        itemNetSale: 0.00,
+        itemVAT: 0.00,
+        quantity: 1,
+        type: 0,
+        discount: 0.00,
+        netPurchasePrice: 0.00
+      }
+    ],
+    shippingAddressRequests: [
+      {
+        salutation: 'Mr',
+        firstName: 'Paul',
+        lastName: 'Muia',
+        title: '',
+        company: '',
+        companyAddition: '',
+        street: 'Manyanja Road',
+        addressAddition: '',
+        zipCode: '40227',
+        place: 'Nairobi',
+        phone: '',
+        state: '',
+        country: 'Kenya',
+        iso: '',
+        telephone: '',
+        mobile: '',
+        fax: '',
+        email: 'paul@biglittlethings.de'
+      }
+    ]
+  }
+]

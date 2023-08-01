@@ -1,7 +1,7 @@
 import { Model } from 'sequelize'
 import { Attribute, ICompany, IOrder, Item, SenderAddress, ShippingAddress } from '../types'
 
-const SalutationModel = (sequelize: any, DataTypes: any): any => {
+const OrderModel = (sequelize: any, DataTypes: any): any => {
   interface OrderAttributes {
     id: string
     outboundId: string
@@ -173,4 +173,4 @@ const SalutationModel = (sequelize: any, DataTypes: any): any => {
   return Order
 }
 
-module.exports = SalutationModel
+module.exports = OrderModel

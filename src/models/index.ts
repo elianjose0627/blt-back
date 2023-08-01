@@ -33,6 +33,7 @@ export interface Database {
   LegalText?: any
   PrivacyRule?: any
   AccessPermission?: any
+  PendingOrder?: any
   [key: string]: any
 }
 
