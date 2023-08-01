@@ -522,6 +522,88 @@ const validateShippingMethod = Joi.object({
   }).required()
 })
 
+const commonPendingOrderSchema = {
+  platform: Joi.number(),
+  language: Joi.number(),
+  currency: Joi.string(),
+  orderNo: Joi.string(),
+  inetorderno: Joi.number(),
+  shippingId: Joi.number(),
+  shipped: Joi.date(),
+  deliverydate: Joi.date(),
+  note: Joi.string().allow(''),
+  description: Joi.string().allow(''),
+  costCenter: Joi.string().allow('').allow(null),
+  paymentType: Joi.number(),
+  paymentTarget: Joi.number(),
+  discount: Joi.number(),
+  orderStatus: Joi.number(),
+  orderLineRequests: Joi.array().items(
+    Joi.object({
+      itemName: Joi.string(),
+      articleNumber: Joi.string(),
+      itemNetSale: Joi.number(),
+      itemVAT: Joi.number(),
+      quantity: Joi.number(),
+      type: Joi.number(),
+      discount: Joi.number(),
+      netPurchasePrice: Joi.number()
+    })
+  ).min(1).required(),
+  shippingAddressRequests: Joi.array().items(
+    Joi.object({
+      salutation: Joi.string().allow(''),
+      firstName: Joi.string(),
+      lastName: Joi.string(),
+      title: Joi.string().allow(''),
+      company: Joi.string().allow(''),
+      companyAddition: Joi.string().allow(''),
+      street: Joi.string(),
+      addressAddition: Joi.string().allow(''),
+      zipCode: Joi.string(),
+      place: Joi.string(),
+      phone: Joi.string().allow(''),
+      state: Joi.string().allow(''),
+      country: Joi.string(),
+      iso: Joi.string().allow(''),
+      telephone: Joi.string().allow(''),
+      mobile: Joi.string().allow(''),
+      fax: Joi.string().allow(''),
+      email: Joi.string()
+    })
+  ).min(1).required(),
+  paymentInformationRequests: Joi.array().items(
+    Joi.object({
+      bankName: Joi.string(),
+      blz: Joi.string(),
+      accountno: Joi.string(),
+      cardno: Joi.string(),
+      validity: Joi.date(),
+      cvv: Joi.string(),
+      cardType: Joi.string(),
+      owner: Joi.string(),
+      iban: Joi.string(),
+      bic: Joi.string()
+    })
+  )
+}
+const validatePendingOrder = Joi.object({
+  pendingOrders: Joi.array().items(
+    Joi.object({ ...commonPendingOrderSchema })
+  ).min(1).required()
+})
+
+const validatePendingOrderAdmin = Joi.object({
+  pendingOrders: Joi.array().items(
+    Joi.object({
+      ...commonPendingOrderSchema,
+      customerId: Joi.number().optional().allow('').allow(null),
+      campaignId: Joi.string().uuid(),
+      companyId: Joi.string().uuid()
+    })
+  ).min(1).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -564,5 +646,7 @@ export default {
   validateAccessPermission,
   validateAccessPermissionAdmin,
   validateRegistrationQueryParams,
-  validateShippingMethod
+  validateShippingMethod,
+  validatePendingOrder,
+  validatePendingOrderAdmin
 }
