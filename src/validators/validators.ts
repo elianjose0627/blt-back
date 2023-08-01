@@ -160,6 +160,7 @@ const validateQueryParams = Joi.object({
   page: Joi.number().optional(),
   offset: Joi.number().optional(),
   search: Joi.any().optional(),
+  pageToken: Joi.any().optional(),
   filter: Joi.object({
     firstname: Joi.string().optional(),
     lastname: Joi.string().optional(),

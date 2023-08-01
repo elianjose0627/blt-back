@@ -1,6 +1,7 @@
 import { v1 as uuidv1 } from 'uuid'
 import { initializeApp, cert } from 'firebase-admin/app'
 import { getStorage } from 'firebase-admin/storage'
+import path from 'path'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 
@@ -57,6 +58,41 @@ class PictureService extends BaseService {
     } catch (error) {}
 
     return response
+  }
+
+  async getCardsFromFirebase (limit: number, pageToken?: string): Promise<any> {
+    const queryOptions = {
+      prefix: 'cards/', // Filter files with the specified folderName as the prefix
+      maxResults: limit + 1, // Limit the number of results to the page size
+      pageToken // Use the provided page token to start from a specific point
+    }
+    const [files, nextPage]: any = await bucket.getFiles(queryOptions)
+
+    const downloadUrls: Array<{ id: string, url: string, name: string }> = []
+
+    const options: any = {
+      version: 'v4', // Use version 4 of signed URLs
+      action: 'read', // Allow read access to the files
+      expires: Date.now() + 60 * 60 * 1000 // URL expires in 60 minutes (adjust as needed)
+    }
+
+    for (const file of files) {
+      if (file.name.match(/\.(jpg|jpeg|png|gif|bmp)$/i) != null) {
+        const [downloadUrl] = await file.getSignedUrl(options)
+        // const [metadata] = await file.getMetadata()
+        const filename = path.basename(file.name)
+        downloadUrls.push({ id: uuidv1(), url: downloadUrl, name: filename })
+      }
+    }
+
+    const nextPageToken = nextPage?.pageToken ?? undefined
+
+    const [allFiles] = await bucket.getFiles({
+      prefix: 'cards/'
+    })
+    const count = allFiles.length - 1
+
+    return { rows: downloadUrls, count, nextPage: nextPageToken }
   }
 }
 
