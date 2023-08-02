@@ -8,7 +8,7 @@ import * as userRoles from '../utils/userRoles'
 const campaignService = new CampaignService('Campaign')
 
 class CampaignController extends BaseController {
-  checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+  checkOwnerOrAdminOrEmployee (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: { companyId, company: { owner } } } = req
 
     const isOwnerOrAdmin = currentUser?.id === owner?.id || currentUser.role === userRoles.ADMIN
