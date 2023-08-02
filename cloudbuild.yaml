@@ -4,6 +4,7 @@ steps:
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'create-env']
   env:
+    - 'ENVIRONMENT=${_ENVIRONMENT}'
     - 'DATABASE_URL=${_DATABASE_URL}'
     - 'DATABASE_URL_TEST=${_DATABASE_URL_TEST}'
     - 'NODE_ENV=${_NODE_ENV}'
