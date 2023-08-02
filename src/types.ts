@@ -647,6 +647,7 @@ export interface IPendingOrder {
   shippingAddressRequests: ShippingAddressRequest[]
   paymentInformationRequests: PaymentInformationRequest[]
   isPosted: boolean
+  created: Date
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany

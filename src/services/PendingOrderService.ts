@@ -1,6 +1,10 @@
 import { v1 as uuidv1 } from 'uuid'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+
+dayjs.extend(utc)
 
 class PendingOrderService extends BaseService {
   async getAll (limit: number, offset: number, search: string = '', filter = { firstname: '', lastname: '', email: '', city: '', country: '' }): Promise<any> {
@@ -25,6 +29,7 @@ class PendingOrderService extends BaseService {
       campaignId: campaign.id,
       customerId: campaign.company.customerId,
       companyId: campaign.company.id,
+      created: dayjs.utc().format(),
       createdBy: currentUser.email,
       updatedBy: currentUser.email
     }))

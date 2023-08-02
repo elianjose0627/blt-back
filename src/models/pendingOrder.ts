@@ -29,6 +29,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     shippingAddressRequests: ShippingAddressRequest[]
     paymentInformationRequests: PaymentInformationRequest[]
     isPosted: boolean
+    created: Date
   }
 
   class PendingOrder extends Model<PendingOrderAttributes> {
@@ -58,6 +59,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly shippingAddressRequests: ShippingAddressRequest[]
     private readonly paymentInformationRequests: PaymentInformationRequest[]
     private readonly isPosted: boolean
+    private readonly created: Date
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany
@@ -108,6 +110,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
         shippingAddressRequests: this.shippingAddressRequests,
         paymentInformationRequests: this.paymentInformationRequests,
         isPosted: this.isPosted,
+        created: this.createdAt,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         company: this.company
@@ -220,6 +223,10 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     isPosted: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
+    },
+    created: {
+      allowNull: false,
+      type: DataTypes.DATE
     }
   }, {
     sequelize,
