@@ -39,8 +39,9 @@ class PendingOrderService extends BaseService {
     const response = await db.PendingOrder.bulkCreate(bulkInsertData, { returning: true })
 
     const topicId = 'pending-orders'
-    const message = Buffer.from(JSON.stringify({ message: 'Trigger postPendingOrders' }))
-    const attributes = { kind: 'post' }
+    const environment = String(process.env.ENVIRONMENT)
+    const message = Buffer.from(JSON.stringify({ message: `Trigger postPendingOrders for ${environment}` }))
+    const attributes = { environment }
 
     const pubSubClient = new PubSub()
 
