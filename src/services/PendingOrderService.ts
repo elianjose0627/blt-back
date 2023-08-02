@@ -1,8 +1,10 @@
 import { v1 as uuidv1 } from 'uuid'
+import utc from 'dayjs/plugin/utc'
+import { PubSub } from '@google-cloud/pubsub'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
+import logger from '../utils/logger'
 
 dayjs.extend(utc)
 
@@ -35,6 +37,24 @@ class PendingOrderService extends BaseService {
     }))
 
     const response = await db.PendingOrder.bulkCreate(bulkInsertData, { returning: true })
+
+    const topicId = 'pending-orders'
+    const message = Buffer.from(JSON.stringify({ message: 'Trigger postPendingOrders' }))
+    const attributes = { kind: 'post' }
+
+    const pubSubClient = new PubSub()
+
+    try {
+      const messageId = await pubSubClient
+        .topic(topicId)
+        .publishMessage({
+          data: message,
+          attributes
+        })
+      logger.info(`Message ${messageId} published.`)
+    } catch (error: any) {
+      logger.error(error.message)
+    }
 
     return { response: response.map((response: any) => response.toJSONFor()), status: 201 }
   }
