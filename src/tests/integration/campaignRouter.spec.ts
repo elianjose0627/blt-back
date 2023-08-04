@@ -9,6 +9,8 @@ import {
   orderTwo,
   pendingOrders
 } from '../utils'
+import bulkPendingOrders from '../bulkPendingOrders.json'
+import humongousPendingOrders from '../humongousPendingOrders.json'
 import * as userRoles from '../../utils/userRoles'
 import * as appModules from '../../utils/appModules'
 
@@ -1399,7 +1401,7 @@ describe('Campaign actions', () => {
   })
 
   describe('Campaign Pending Orders Actions', () => {
-    it('Should return 200 Success when an owner successfully creates bulk orders for a campaign.', async () => {
+    it('Should return 201 Created when an owner successfully creates bulk orders for a campaign.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -1441,6 +1443,92 @@ describe('Campaign actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
       expect(res.body.pendingOrders).to.be.an('array')
       expect(res.body.pendingOrders).to.have.lengthOf.above(0)
+    })
+
+    it('Should return 201 Created when an owner successfully creates 1000 bulk orders for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Humongous',
+            email: 'test@companymarvelsecretinvasionhumongous.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders: bulkPendingOrders
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+      expect(res.body.pendingOrders).to.have.lengthOf.above(999)
+    })
+    it('Should return 413 Payload Too Large when an owner tries to create bulk orders for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Bulk',
+            email: 'test@companymarvelsecretinvasionbulk.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders: humongousPendingOrders
+        })
+
+      expect(res).to.have.status(413)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Payload too large. Please limit the size of your request')
     })
 
     it('Should return 400 Bad Request when an owner tries to create bulk orders for a campaign belonging to a company with no customer id.', async () => {

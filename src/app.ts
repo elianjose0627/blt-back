@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express'
+import express, { NextFunction, Request, Response } from 'express'
 import cors from 'cors'
 import logger from 'morgan'
 import passport from 'passport'
@@ -16,6 +16,7 @@ passportAuth(passport)
 
 const apiPrefix = '/api'
 const authPrefix = '/auth'
+const limit = process.env.JSON_PAYLOAD_LIMIT
 
 // Set up the express app
 const app = express()
@@ -27,8 +28,8 @@ app.use(cors())
 app.use(logger('dev'))
 
 // Parse incoming requests data
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+app.use(express.json({ limit }))
+app.use(express.urlencoded({ extended: false, limit, parameterLimit: 2000000 }))
 
 // Add routes to the app
 app.use(apiPrefix, routers.userRouter())
@@ -74,6 +75,18 @@ app.get('/favicon.ico', (req: Request, res: Response) => {
   }
   const fileName = 'favicon.ico'
   res.status(statusCodes.OK).sendFile(fileName, options)
+})
+
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  if (err.status === statusCodes.PAYLOAD_TOO_LARGE) {
+    res.status(statusCodes.PAYLOAD_TOO_LARGE).send({
+      statusCode: statusCodes.PAYLOAD_TOO_LARGE,
+      success: false,
+      errors: {
+        message: 'Payload too large. Please limit the size of your request'
+      }
+    })
+  }
 })
 
 // Return 404 for nonexistent routes
