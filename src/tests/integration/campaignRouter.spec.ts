@@ -6,7 +6,8 @@ import {
   verifyUser, verifyCompanyDomain, createPrivacyRule,
   createCompanyAdministratorWithCompany,
   createCampaignManager,
-  orderTwo
+  orderTwo,
+  pendingOrders
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 import * as appModules from '../../utils/appModules'
@@ -1394,6 +1395,204 @@ describe('Campaign actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'orders')
       expect(res.body.orders).to.be.an('array')
       expect(res.body.orders).to.have.lengthOf.above(0)
+    })
+  })
+
+  describe('Campaign Pending Orders Actions', () => {
+    it('Should return 200 Success when an owner successfully creates bulk orders for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion',
+            email: 'test@companymarvelsecretinvasion.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+      expect(res.body.pendingOrders).to.have.lengthOf.above(0)
+    })
+
+    it('Should return 400 Bad Request when an owner tries to create bulk orders for a campaign belonging to a company with no customer id.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion 2',
+            email: 'test2@companymarvelsecretinvasion.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(400)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal(`Contact admin to set the company customer id for ${String(resCompany.body.company.name)} - ${String(resCompany.body.company.id)}`)
+    })
+
+    it('Should return 403 Forbidden when a non-employee user without permissions tries to create bulk orders for a campaign belonging to a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion 3',
+            email: 'test3@companymarvelsecretinvasion.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion 3',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner or admin can perform this action')
+    })
+
+    it('Should return 403 Forbidden when a employee user without permissions tries to create bulk orders for a campaign belonging to a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion 3',
+            email: 'test4@companymarvelsecretinvasion.com',
+            domain: 'companymarvelsecretinvasion.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resNewUser = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Talos', lastName: 'Skrull', email: 'talos@companymarvelsecretinvasion.com', password: 'furyneedsme' } })
+
+      await verifyUser(resNewUser.body.user.email)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: resNewUser.body.user.email,
+            actionType: 'add'
+          }
+        })
+
+      const resEmployee = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'talos@companymarvelsecretinvasion.com', password: 'furyneedsme' } })
+
+      const tokenEmployee = resEmployee.body.token
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion 3',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${String(tokenEmployee)}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
     })
   })
 })

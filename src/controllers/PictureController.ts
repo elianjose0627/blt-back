@@ -25,6 +25,26 @@ class PictureController extends BaseController {
       picture: response
     })
   }
+
+  async getCardsFromFirebase (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { query: { limit, page, pageToken } } = req
+    const records = await pictureService.getCardsFromFirebase(limit, pageToken)
+
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / limit),
+      perPage: limit,
+      nextPage: records.nextPage,
+      page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      cards: records.rows
+    })
+  }
 }
 
 export default new PictureController(pictureService)

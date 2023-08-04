@@ -6,11 +6,16 @@ import asyncHandler from '../middlewares/asyncHandler'
 import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
+import paginate from '../middlewares/pagination'
 
 const pictureRoutes = (): any => {
   const pictureRouter = express.Router()
 
   pictureRouter.use('/pictures', checkAuth, checkUserIsVerifiedStatus, PictureController.setModule)
+  pictureRouter.route('/pictures/cards')
+    .get(celebrate({
+      [Segments.QUERY]: validator.validateQueryParams
+    }), asyncHandler(paginate), asyncHandler(PictureController.getCardsFromFirebase))
   pictureRouter.use('/pictures/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(PictureController.checkRecord))

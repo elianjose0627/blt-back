@@ -2,7 +2,7 @@ import { v1 as uuidv1 } from 'uuid'
 import { Op } from 'sequelize'
 import db from '../models'
 
-const includeCompany = ['Campaign', 'Address', 'CostCenter', 'Product', 'Order', 'AccessPermission']
+const includeCompany = ['Campaign', 'Address', 'CostCenter', 'Product', 'Order', 'AccessPermission', 'PendingOrder']
 const withoutUser = ['BundleItem', 'Salutation', 'Picture', 'SecondaryDomain', 'LegalText', 'ShippingMethod']
 
 export const generateInclude = (model: string): any => {

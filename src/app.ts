@@ -53,6 +53,7 @@ app.use(apiPrefix, routers.accessPermissionsRouter())
 app.use(apiPrefix, routers.healthcheckRouter())
 app.use(apiPrefix, routers.shippingMethodRouter())
 app.use(apiPrefix, routers.webhookRouter())
+app.use(apiPrefix, routers.pendingOrderRouter())
 
 // Add validation middleware
 app.use(joiErrors)

@@ -565,3 +565,90 @@ export interface SlackEvent {
   asm_group_id: number
   reason: string
 }
+
+export interface PaymentInformationRequest {
+  orderId: number
+  bankName: string
+  blz: string
+  accountno: string
+  cardno: string
+  validity: Date
+  cvv: string
+  cardType: string
+  owner: string
+  iban: string
+  bic: string
+  createdBy: string
+  updatedBy: string
+}
+
+export interface ShippingAddressRequest {
+  orderId: number
+  salutation: string
+  firstName: string
+  lastName: string
+  title: string
+  company: string
+  companyAddition: string
+  street: string
+  addressAddition: string
+  zipCode: string
+  place: string
+  phone: string
+  state: string
+  country: string
+  iso: string
+  telephone: string
+  mobile: string
+  fax: string
+  email: string
+  createdBy: string
+  updatedBy: string
+}
+
+export interface OrderLineRequest {
+  orderId: number
+  itemName: string
+  articleNumber: string
+  itemNetSale: number
+  itemVAT: number
+  quantity: number
+  type: number
+  discount: number
+  netPurchasePrice: number
+  createdBy: string
+  updatedBy: string
+}
+
+export interface IPendingOrder {
+  id: string
+  customerId: string
+  userId: string
+  campaignId: string
+  companyId: string
+  platform: number
+  language: number
+  currency: string
+  orderNo: string
+  inetorderno: number
+  shippingId: number
+  shipped: Date
+  deliverydate: Date
+  note: string
+  description: string
+  costCenter: string
+  paymentType: number
+  paymentTarget: number
+  discount: number
+  orderStatus: number
+  createdBy: string
+  updatedBy: string
+  orderLineRequests: OrderLineRequest[]
+  shippingAddressRequests: ShippingAddressRequest[]
+  paymentInformationRequests: PaymentInformationRequest[]
+  isPosted: boolean
+  created: Date
+  createdAt?: Date
+  updatedAt?: Date
+  company?: ICompany
+}
