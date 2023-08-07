@@ -1407,9 +1407,7 @@ describe('Company actions', () => {
           campaign: {
             name: 'Onboarding',
             type: 'onboarding',
-            status: 'draft',
-            quota: 100,
-            correctionQuota: 10
+            status: 'draft'
           }
         })
 
@@ -1417,6 +1415,39 @@ describe('Company actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'campaign')
       expect(res.body.campaign).to.be.an('object')
       expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'description', 'quota', 'correctionQuota', 'type', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 422 Unprocessable Entity when a company owner who is not an admin tries to create a campaign with quota, correctionQuota set.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company14test.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding',
+            type: 'onboarding',
+            status: 'draft',
+            quota: 100,
+            correctionQuota: 10
+          }
+        })
+
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('A validation error has occured')
     })
 
     it('Should return 201 Created when a campaign manager for a company successfully creates a campaign.', async () => {
@@ -1551,7 +1582,7 @@ describe('Company actions', () => {
       expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'type', 'createdAt', 'updatedAt')
     })
 
-    it('Should return 201 Created when an admin creates a campaign.', async () => {
+    it('Should return 201 Created when an admin creates a campaign with quota, correctionQuota, isQuotaEnable and isNoteEnabled set.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -1573,7 +1604,11 @@ describe('Company actions', () => {
           campaign: {
             name: 'Onboarding',
             type: 'onboarding',
-            status: 'draft'
+            status: 'draft',
+            quota: 100,
+            correctionQuota: 10,
+            isQuotaEnabled: true,
+            isNoteEnabled: true
           }
         })
 

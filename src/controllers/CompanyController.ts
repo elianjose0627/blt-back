@@ -28,7 +28,7 @@ const sandboxMode = process.env.NODE_ENV === 'test'
 const mininumWaitDaysForDomainVerificationCode = 7
 
 class CompanyController extends BaseController {
-  checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+  checkOwnerOrAdminOrEmployee (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: company } = req
 
     const isOwnerOrAdmin = currentUser.id === company?.owner?.id || currentUser.role === userRoles.ADMIN

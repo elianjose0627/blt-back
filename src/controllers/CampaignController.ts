@@ -1,9 +1,11 @@
+import { Segments, celebrate } from 'celebrate'
 import BaseController from './BaseController'
 import CampaignService from '../services/CampaignService'
 import { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
+import validator from '../validators/validators'
 
 const campaignService = new CampaignService('Campaign')
 
@@ -25,6 +27,21 @@ class CampaignController extends BaseController {
           message: 'Only the owner or admin can perform this action'
         }
       })
+    }
+  }
+
+  checkValidation (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { user: currentUser } = req
+    const { role } = currentUser
+
+    if (role === userRoles.ADMIN) {
+      celebrate({
+        [Segments.BODY]: validator.validateCampaignAdmin
+      }, { abortEarly: false })(req, res, next)
+    } else {
+      celebrate({
+        [Segments.BODY]: validator.validateCampaign
+      }, { abortEarly: false })(req, res, next)
     }
   }
 
