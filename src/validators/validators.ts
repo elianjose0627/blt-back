@@ -285,16 +285,27 @@ const validateUpdatedRecipient = Joi.object({
   }).required()
 })
 
+const commonCampaignSchema = {
+  name: Joi.string().required().allow('').allow(null).max(64),
+  status: Joi.string().required().valid(...['draft', 'submitted']),
+  type: Joi.string().required().valid(...['onboarding', 'birthday', 'christmas', 'marketing']),
+  description: Joi.string().allow(null).allow('').max(1024)
+}
+
 const validateCampaign = Joi.object({
   campaign: Joi.object({
-    name: Joi.string().required().allow('').allow(null).max(64),
-    status: Joi.string().required().valid(...['draft', 'submitted']),
-    type: Joi.string().required().valid(...['onboarding', 'birthday', 'christmas', 'marketing']),
-    description: Joi.string().allow(null).allow('').max(1024),
+    ...commonCampaignSchema
+  }).required()
+})
+
+const validateCampaignAdmin = Joi.object({
+  campaign: Joi.object({
+    ...commonCampaignSchema,
     quota: Joi.number(),
     correctionQuota: Joi.number(),
     lastQuotaResetDate: Joi.date().allow(null),
-    isQuotaEnabled: Joi.boolean()
+    isQuotaEnabled: Joi.boolean(),
+    isNoteEnabled: Joi.boolean()
   }).required()
 })
 
@@ -624,6 +635,7 @@ export default {
   validateCreatedRecipient,
   validateUpdatedRecipient,
   validateCampaign,
+  validateCampaignAdmin,
   validateJoinCompany,
   validateUserCompanyRole,
   validateSalutation,
