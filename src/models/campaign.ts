@@ -13,6 +13,7 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     correctionQuota: number
     lastQuotaResetDate: Date
     isQuotaEnabled: boolean
+    isNoteEnabled: boolean
   }
 
   class Campaign extends Model<CampaignAttributes> {
@@ -26,6 +27,7 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     private readonly correctionQuota: number
     private readonly lastQuotaResetDate: Date
     private readonly isQuotaEnabled: boolean
+    private readonly isNoteEnabled: boolean
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany
@@ -60,6 +62,7 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
         correctionQuota: this.correctionQuota,
         lastQuotaResetDate: this.lastQuotaResetDate,
         isQuotaEnabled: this.isQuotaEnabled,
+        isNoteEnabled: this.isNoteEnabled,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         company: this.company
@@ -106,6 +109,10 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
       allowNull: true
     },
     isQuotaEnabled: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    isNoteEnabled: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     }
