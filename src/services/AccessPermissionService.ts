@@ -49,7 +49,7 @@ class AccessPermissionService extends BaseService {
     const records = await db[this.model].findAndCountAll({
       limit,
       offset,
-      order: [['companyId', 'DESC'], ['createdAt', 'DESC']],
+      order: [['companyId', 'DESC'], ['role', 'ASC'], ['createdAt', 'DESC']],
       attributes: { exclude: [] },
       where,
       include: [
