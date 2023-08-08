@@ -135,9 +135,9 @@ const companyRoutes = (): any => {
   companyRouter.route('/companies/:id/access-permissions')
     .post(AccessPermissionController.setModule, asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions),
-      asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
-        [Segments.BODY]: validator.validateAccessPermission
-      }, { abortEarly: false }), asyncHandler(AccessPermissionController.insert))
+      asyncHandler(CompanyController.checkCompanyDomainVerification),
+      AccessPermissionController.checkAllowedModules,
+      asyncHandler(AccessPermissionController.insert))
     .get(AccessPermissionController.setModule, asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.QUERY]: validator.validateQueryParams

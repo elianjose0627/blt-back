@@ -104,6 +104,29 @@ describe('Access Permissions actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('Company not found')
     })
+
+    it('Should return 422 Unprocessable Entity when an admin tries to create an access permission for a default role.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+      const res = await chai
+        .request(app)
+        .post('/api/access-permissions')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          accessPermission: {
+            name: 'Campaign Manager Permission',
+            module: 'campaigns',
+            role: 'CampaignManager',
+            permission: 'read',
+            companyId
+          }
+        })
+
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('A validation error has occured')
+    })
   })
 
   describe('Get all access permissions', () => {

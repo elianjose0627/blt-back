@@ -1,14 +1,39 @@
+import { Joi, Segments, celebrate } from 'celebrate'
 import BaseController from './BaseController'
 import AccessPermissionService from '../services/AccessPermissionService'
 import CompanyService from '../services/CompanyService'
-import { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
+import { CustomNext, CustomRequest, CustomResponse, IAccessPermission, Role, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
+import * as permissions from '../utils/permissions'
+import { allowedCompanyModules } from '../utils/appModules'
 
 const accessPermissionService = new AccessPermissionService('AccessPermission')
 const companyService = new CompanyService('Company')
 
+const generateAccessPermissionSchema = (accessPermissions: IAccessPermission[], role: Role): any => {
+  const allowedCampaignManagerModules = accessPermissions
+    .filter((accessPermission: IAccessPermission) => accessPermission.role === userRoles.CAMPAIGNMANAGER)
+    .map((accessPermission: IAccessPermission) => accessPermission.module)
+
+  return {
+    name: Joi.string().required().max(128),
+    module: Joi.when('role', {
+      is: role,
+      then: Joi.string().required()
+        .valid(...allowedCompanyModules
+          .filter(module => !allowedCampaignManagerModules.includes(module.value))
+          .map(allowedCompanyModule => allowedCompanyModule.value)),
+      otherwise: Joi.string().required().valid(...allowedCompanyModules.map(allowedCompanyModule => allowedCompanyModule.value))
+    }),
+    role: Joi.string()
+      .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.CAMPAIGNMANAGER])
+      .required(),
+    permission: Joi.string().required().valid(...[permissions.READ, permissions.READWRITE]),
+    isEnabled: Joi.boolean().default(true)
+  }
+}
 class AccessPermissionController extends BaseController {
   checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: accessPermission } = req
@@ -30,6 +55,37 @@ class AccessPermissionController extends BaseController {
         }
       })
     }
+  }
+
+  checkAllowedModules (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { accessPermissions = [] } = req
+
+    const commonAccessPermissionSchema = generateAccessPermissionSchema(accessPermissions, userRoles.CAMPAIGNMANAGER)
+
+    const validateAccessPermission = Joi.object({
+      accessPermission: Joi.object(commonAccessPermissionSchema).required()
+    })
+
+    celebrate({
+      [Segments.BODY]: validateAccessPermission
+    }, { abortEarly: false })(req, res, next)
+  }
+
+  checkAllowedModulesAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { accessPermissions = [] } = req
+
+    const commonAccessPermissionSchema = generateAccessPermissionSchema(accessPermissions, userRoles.CAMPAIGNMANAGER)
+
+    const validateAccessPermissionAdmin = Joi.object({
+      accessPermission: Joi.object({
+        ...commonAccessPermissionSchema,
+        companyId: Joi.string().required().uuid()
+      }).required()
+    })
+
+    celebrate({
+      [Segments.BODY]: validateAccessPermissionAdmin
+    }, { abortEarly: false })(req, res, next)
   }
 
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {

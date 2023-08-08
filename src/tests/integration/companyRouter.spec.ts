@@ -3967,5 +3967,37 @@ describe('Company actions', () => {
       expect(res.body.accessPermission).to.be.an('object')
       expect(res.body.accessPermission).to.include.keys('id', 'name', 'role', 'module', 'permission', 'isEnabled', 'createdAt', 'updatedAt')
     })
+
+    it('Should return 422 Unprocessable Entity when an admin tries to create an access permission for a default role.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company11accesspermission121.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/access-permissions`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          accessPermission: {
+            name: 'Campaign Permission',
+            module: 'campaigns',
+            role: 'CampaignManager',
+            permission: 'readwrite'
+          }
+        })
+
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('A validation error has occured')
+    })
   })
 })
