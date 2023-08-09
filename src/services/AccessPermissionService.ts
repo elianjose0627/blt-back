@@ -25,7 +25,6 @@ class AccessPermissionService extends BaseService {
 
     response = await db[this.model].findOne({
       where: {
-        name: accessPermission.name,
         module: accessPermission.module,
         role: accessPermission.role,
         companyId
