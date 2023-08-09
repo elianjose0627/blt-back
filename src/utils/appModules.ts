@@ -1,3 +1,5 @@
+import { Module } from '../types'
+
 export const ACCESSPERMISSIONS = 'accessPermissions'
 export const ADDRESSES = 'addresses'
 export const BUNDLES = 'bundles'
@@ -34,7 +36,7 @@ export const MODULES_ARRAY = [
   'users'
 ]
 
-export const allowedCompanyModules = [
+export const allowedCompanyModules: Array<{ name: string, value: Module }> = [
   { name: 'Access Permissions', value: ACCESSPERMISSIONS },
   { name: 'Companies', value: COMPANIES },
   { name: 'Campaigns', value: CAMPAIGNS },
