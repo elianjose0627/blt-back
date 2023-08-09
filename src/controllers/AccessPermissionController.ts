@@ -21,17 +21,21 @@ const generateAccessPermissionSchema = (accessPermissions: IAccessPermission[], 
     name: Joi.string().required().max(128),
     module: Joi.when('role', {
       is: role,
-      then: Joi.string().required()
-        .valid(...allowedCompanyModules
-          .filter(module => !allowedCampaignManagerModules.includes(module.value))
-          .map(allowedCompanyModule => allowedCompanyModule.value)),
-      otherwise: Joi.string().required().valid(...allowedCompanyModules.map(allowedCompanyModule => allowedCompanyModule.value))
+      then: Joi.when('override', {
+        is: true,
+        then: Joi.string().required().valid(...allowedCompanyModules.map(allowedCompanyModule => allowedCompanyModule.value)),
+        otherwise: Joi.string().required()
+          .valid(...allowedCompanyModules
+            .filter(module => !allowedCampaignManagerModules.includes(module.value))
+            .map(allowedCompanyModule => allowedCompanyModule.value))
+      })
     }),
     role: Joi.string()
       .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.CAMPAIGNMANAGER])
       .required(),
     permission: Joi.string().required().valid(...[permissions.READ, permissions.READWRITE]),
-    isEnabled: Joi.boolean().default(true)
+    isEnabled: Joi.boolean().default(true),
+    override: Joi.boolean().default(false)
   }
 }
 class AccessPermissionController extends BaseController {
