@@ -411,6 +411,7 @@ export interface IOrder {
   priority: number
   currency: string
   externalNote: string
+  internalNote: string
   salesChannel: string
   desiredDeliveryDate: string
   shippingMethodId: string
