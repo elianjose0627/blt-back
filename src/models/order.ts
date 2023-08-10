@@ -16,6 +16,7 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
     priority: number
     currency: string
     externalNote: string
+    internalNote: string
     salesChannel: string
     desiredDeliveryDate: string
     shippingMethodId: string
@@ -38,6 +39,7 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly priority: number
     private readonly currency: string
     private readonly externalNote: string
+    private readonly internalNote: string
     private readonly salesChannel: string
     private readonly desiredDeliveryDate: string
     private readonly shippingMethodId: string
@@ -71,6 +73,7 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
         priority: this.priority,
         currency: this.currency,
         externalNote: this.externalNote,
+        internalNote: this.internalNote,
         salesChannel: this.salesChannel,
         desiredDeliveryDate: this.desiredDeliveryDate,
         shippingMethodId: this.shippingMethodId,
@@ -135,6 +138,10 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
       allowNull: true
     },
     externalNote: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    internalNote: {
       type: DataTypes.TEXT,
       allowNull: true
     },
