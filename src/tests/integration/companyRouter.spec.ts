@@ -1660,10 +1660,6 @@ describe('Company actions', () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .query({
-          limit: -10,
-          page: -1
-        })
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
@@ -1678,6 +1674,10 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/campaigns`)
+        .query({
+          limit: -10,
+          page: -1
+        })
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
@@ -1689,10 +1689,6 @@ describe('Company actions', () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .query({
-          limit: 1,
-          page: 1
-        })
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
@@ -1706,6 +1702,10 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/campaigns`)
+        .query({
+          limit: 1,
+          page: 1
+        })
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
@@ -2038,10 +2038,6 @@ describe('Company actions', () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .query({
-          limit: -10,
-          page: -1
-        })
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
@@ -2056,6 +2052,10 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/cost-centers`)
+        .query({
+          limit: -10,
+          page: -1
+        })
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
@@ -2067,11 +2067,6 @@ describe('Company actions', () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .query({
-          limit: 1,
-          page: 1,
-          search: 1
-        })
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
@@ -2085,6 +2080,11 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/cost-centers`)
+        .query({
+          limit: 1,
+          page: 1,
+          search: 1
+        })
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
@@ -2469,11 +2469,6 @@ describe('Company actions', () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .query({
-          limit: -10,
-          page: -1,
-          search: '123'
-        })
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
@@ -2488,6 +2483,11 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/products`)
+        .query({
+          limit: -10,
+          page: -1,
+          search: '123'
+        })
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
@@ -2499,11 +2499,6 @@ describe('Company actions', () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .query({
-          limit: 1,
-          page: 1,
-          search: 1
-        })
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
@@ -2517,6 +2512,11 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/products`)
+        .query({
+          limit: 1,
+          page: 1,
+          search: 1
+        })
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
@@ -3592,10 +3592,6 @@ describe('Company actions', () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .query({
-          limit: -10,
-          page: -1
-        })
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
@@ -3610,6 +3606,10 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/legal-texts`)
+        .query({
+          limit: -10,
+          page: -1
+        })
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
@@ -3621,11 +3621,6 @@ describe('Company actions', () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .query({
-          limit: 1,
-          page: 1,
-          search: 1
-        })
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
@@ -3639,6 +3634,11 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/legal-texts`)
+        .query({
+          limit: 1,
+          page: 1,
+          search: 1
+        })
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
