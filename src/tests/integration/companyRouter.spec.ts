@@ -2251,7 +2251,50 @@ describe('Company actions', () => {
       expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
     })
 
-    it('Should return 201 Created when a campaign manager for a company successfully creates a product.', async () => {
+    it('Should return 201 Created when a company admin for a company successfully creates a product.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/products`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: '1234',
+            merchantSku: '1234',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 403 Forbidden when a campaign manager for a company tries to create a product without permissions.', async () => {
       const resCompany = await createVerifiedCompany(userId)
 
       const companyId = resCompany.id
@@ -2288,10 +2331,9 @@ describe('Company actions', () => {
           }
         })
 
-      expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('statusCode', 'success', 'product')
-      expect(res.body.product).to.be.an('object')
-      expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
     })
 
     it('Should return 403 Forbidden when a non-employee Campaign Manager tries to creates a product for a company.', async () => {
@@ -2667,6 +2709,45 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
+            email: 'nickfury@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/secondary-domains`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .send({
+          secondaryDomain: {
+            name: 'starkindustriesmarvel.com'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'secondaryDomain')
+      expect(res.body.secondaryDomain).to.be.an('object')
+      expect(res.body.secondaryDomain).to.include.keys('id', 'name', 'isVerified', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 403 Forbidden when a campaign manager for a company tries to create a secondary domain.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
             email: 'happyhogan@starkindustriesmarvel.com',
             actionType: 'add'
           }
@@ -2689,10 +2770,9 @@ describe('Company actions', () => {
           }
         })
 
-      expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('statusCode', 'success', 'secondaryDomain')
-      expect(res.body.secondaryDomain).to.be.an('object')
-      expect(res.body.secondaryDomain).to.include.keys('id', 'name', 'isVerified', 'createdAt', 'updatedAt')
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
     })
 
     it('Should return 403 Forbidden when a non-employee Campaign Manager tries to creates a secondary domain for a company.', async () => {
@@ -3402,7 +3482,7 @@ describe('Company actions', () => {
       expect(res.body.legalText).to.include.keys('id', 'type', 'template', 'createdAt', 'updatedAt')
     })
 
-    it('Should return 201 Created when a campaign manager for a company successfully creates a legal text.', async () => {
+    it('Should return 201 Created when a company admin for a company successfully creates a legal text.', async () => {
       const resCompany = await createVerifiedCompany(userId)
 
       const companyId = resCompany.id
@@ -3413,22 +3493,22 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'happyhogan@starkindustriesmarvel.com',
+            email: 'nickfury@starkindustriesmarvel.com',
             actionType: 'add'
           }
         })
 
-      const resCampaignManager = await chai
+      const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
-      tokenCampaignManager = resCampaignManager.body.token
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
       const res = await chai
         .request(app)
         .post(`/api/companies/${String(companyId)}/legal-texts`)
-        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
         .send({
           legalText: {
             type: 'privacy',
