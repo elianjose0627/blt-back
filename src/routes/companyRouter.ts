@@ -39,11 +39,11 @@ const companyRoutes = (): any => {
     }), asyncHandler(CompanyController.checkCompanyDomainAndEmailDomain), asyncHandler(CompanyController.update))
     .delete(asyncHandler(checkAdmin), asyncHandler(CompanyController.delete))
   companyRouter.route('/companies/:id/addresses')
-    .post(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
+    .post(AddressController.setModule, asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.BODY]: validator.validateCreatedAddress
       }, { abortEarly: false }), asyncHandler(CompanyController.createAddress))
-    .get(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
+    .get(AddressController.setModule, asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(AddressController.getAllForCompany))
@@ -70,21 +70,24 @@ const companyRoutes = (): any => {
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(CostCenterController.getAllForCompany))
   companyRouter.route('/companies/:id/products')
-    .post(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
+    .post(ProductController.setModule, asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.BODY]: validator.validateProduct
       }, { abortEarly: false }), asyncHandler(ProductController.insert))
-    .get(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
+    .get(ProductController.setModule, asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(ProductController.getAllForCompany))
   companyRouter.route('/companies/:id/secondary-domains')
-    .post(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
+    .post(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.BODY]: validator.validateSecondaryDomain
       }, { abortEarly: false }), asyncHandler(SecondaryDomainController.insert))
   companyRouter.route('/companies/:id/request-domain-verification')
-    .get(asyncHandler(CompanyController.checkCompanyDomain), asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
+    .get(asyncHandler(CompanyController.checkCompanyDomain), asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
       asyncHandler(CompanyController.getDomainVerificationCode))
   companyRouter.route('/companies/:id/verify-domain')
     .get(asyncHandler(CompanyController.checkCompanyDomain), asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
@@ -96,7 +99,7 @@ const companyRoutes = (): any => {
     }, { abortEarly: false }),
     asyncHandler(CompanyController.update))
   companyRouter.route('/companies/:id/users')
-    .patch(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), celebrate({
+    .patch(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions), celebrate({
       [Segments.BODY]: validator.validateJoinCompany
     }, { abortEarly: false }), asyncHandler(UserController.addOrRemoveUserFromCompany))
     .get(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions), celebrate({
@@ -122,6 +125,7 @@ const companyRoutes = (): any => {
     }), asyncHandler(CompanyController.checkCompanyMembership), asyncHandler(CompanyController.updateEmailVerification))
   companyRouter.route('/companies/:id/legal-texts')
     .post(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.BODY]: validator.validateLegalText
       }, { abortEarly: false }), asyncHandler(LegalTextController.insert))
@@ -131,6 +135,7 @@ const companyRoutes = (): any => {
       }), asyncHandler(paginate), asyncHandler(LegalTextController.getAllForCompany))
   companyRouter.route('/companies/:id/invite-link')
     .get(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
       asyncHandler(CompanyController.checkCompanyDomainVerification), asyncHandler(CompanyController.getInviteLink))
   companyRouter.route('/companies/:id/access-permissions')
     .post(AccessPermissionController.setModule, asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
@@ -138,7 +143,8 @@ const companyRoutes = (): any => {
       asyncHandler(CompanyController.checkCompanyDomainVerification),
       AccessPermissionController.checkAllowedModules,
       asyncHandler(AccessPermissionController.insert))
-    .get(AccessPermissionController.setModule, asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
+    .get(AccessPermissionController.setModule, asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(AccessPermissionController.getAllForCompany))
