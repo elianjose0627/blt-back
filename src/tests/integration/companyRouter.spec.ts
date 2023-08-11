@@ -1407,9 +1407,7 @@ describe('Company actions', () => {
           campaign: {
             name: 'Onboarding',
             type: 'onboarding',
-            status: 'draft',
-            quota: 100,
-            correctionQuota: 10
+            status: 'draft'
           }
         })
 
@@ -1417,6 +1415,39 @@ describe('Company actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'campaign')
       expect(res.body.campaign).to.be.an('object')
       expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'description', 'quota', 'correctionQuota', 'type', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 422 Unprocessable Entity when a company owner who is not an admin tries to create a campaign with quota, correctionQuota set.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company14test.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding',
+            type: 'onboarding',
+            status: 'draft',
+            quota: 100,
+            correctionQuota: 10
+          }
+        })
+
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('A validation error has occured')
     })
 
     it('Should return 201 Created when a campaign manager for a company successfully creates a campaign.', async () => {
@@ -1551,7 +1582,7 @@ describe('Company actions', () => {
       expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'type', 'createdAt', 'updatedAt')
     })
 
-    it('Should return 201 Created when an admin creates a campaign.', async () => {
+    it('Should return 201 Created when an admin creates a campaign with quota, correctionQuota, isQuotaEnable and isNoteEnabled set.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -1573,7 +1604,11 @@ describe('Company actions', () => {
           campaign: {
             name: 'Onboarding',
             type: 'onboarding',
-            status: 'draft'
+            status: 'draft',
+            quota: 100,
+            correctionQuota: 10,
+            isQuotaEnabled: true,
+            isNoteEnabled: true
           }
         })
 
@@ -1625,10 +1660,6 @@ describe('Company actions', () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .query({
-          limit: -10,
-          page: -1
-        })
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
@@ -1643,6 +1674,10 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/campaigns`)
+        .query({
+          limit: -10,
+          page: -1
+        })
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
@@ -1654,10 +1689,6 @@ describe('Company actions', () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .query({
-          limit: 1,
-          page: 1
-        })
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
@@ -1671,6 +1702,10 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/campaigns`)
+        .query({
+          limit: 1,
+          page: 1
+        })
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
@@ -2003,10 +2038,6 @@ describe('Company actions', () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .query({
-          limit: -10,
-          page: -1
-        })
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
@@ -2021,6 +2052,10 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/cost-centers`)
+        .query({
+          limit: -10,
+          page: -1
+        })
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
@@ -2032,11 +2067,6 @@ describe('Company actions', () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .query({
-          limit: 1,
-          page: 1,
-          search: 1
-        })
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
@@ -2050,6 +2080,11 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/cost-centers`)
+        .query({
+          limit: 1,
+          page: 1,
+          search: 1
+        })
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
@@ -2216,7 +2251,50 @@ describe('Company actions', () => {
       expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
     })
 
-    it('Should return 201 Created when a campaign manager for a company successfully creates a product.', async () => {
+    it('Should return 201 Created when a company admin for a company successfully creates a product.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/products`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: '1234',
+            merchantSku: '1234',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 403 Forbidden when a campaign manager for a company tries to create a product without permissions.', async () => {
       const resCompany = await createVerifiedCompany(userId)
 
       const companyId = resCompany.id
@@ -2253,10 +2331,9 @@ describe('Company actions', () => {
           }
         })
 
-      expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('statusCode', 'success', 'product')
-      expect(res.body.product).to.be.an('object')
-      expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
     })
 
     it('Should return 403 Forbidden when a non-employee Campaign Manager tries to creates a product for a company.', async () => {
@@ -2434,11 +2511,6 @@ describe('Company actions', () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .query({
-          limit: -10,
-          page: -1,
-          search: '123'
-        })
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
@@ -2453,6 +2525,11 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/products`)
+        .query({
+          limit: -10,
+          page: -1,
+          search: '123'
+        })
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
@@ -2464,11 +2541,6 @@ describe('Company actions', () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .query({
-          limit: 1,
-          page: 1,
-          search: 1
-        })
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
@@ -2482,6 +2554,11 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/products`)
+        .query({
+          limit: 1,
+          page: 1,
+          search: 1
+        })
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
@@ -2632,6 +2709,45 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
+            email: 'nickfury@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/secondary-domains`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .send({
+          secondaryDomain: {
+            name: 'starkindustriesmarvel.com'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'secondaryDomain')
+      expect(res.body.secondaryDomain).to.be.an('object')
+      expect(res.body.secondaryDomain).to.include.keys('id', 'name', 'isVerified', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 403 Forbidden when a campaign manager for a company tries to create a secondary domain.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
             email: 'happyhogan@starkindustriesmarvel.com',
             actionType: 'add'
           }
@@ -2654,10 +2770,9 @@ describe('Company actions', () => {
           }
         })
 
-      expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('statusCode', 'success', 'secondaryDomain')
-      expect(res.body.secondaryDomain).to.be.an('object')
-      expect(res.body.secondaryDomain).to.include.keys('id', 'name', 'isVerified', 'createdAt', 'updatedAt')
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
     })
 
     it('Should return 403 Forbidden when a non-employee Campaign Manager tries to creates a secondary domain for a company.', async () => {
@@ -3367,7 +3482,7 @@ describe('Company actions', () => {
       expect(res.body.legalText).to.include.keys('id', 'type', 'template', 'createdAt', 'updatedAt')
     })
 
-    it('Should return 201 Created when a campaign manager for a company successfully creates a legal text.', async () => {
+    it('Should return 201 Created when a company admin for a company successfully creates a legal text.', async () => {
       const resCompany = await createVerifiedCompany(userId)
 
       const companyId = resCompany.id
@@ -3378,22 +3493,22 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           user: {
-            email: 'happyhogan@starkindustriesmarvel.com',
+            email: 'nickfury@starkindustriesmarvel.com',
             actionType: 'add'
           }
         })
 
-      const resCampaignManager = await chai
+      const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
 
-      tokenCampaignManager = resCampaignManager.body.token
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
       const res = await chai
         .request(app)
         .post(`/api/companies/${String(companyId)}/legal-texts`)
-        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
         .send({
           legalText: {
             type: 'privacy',
@@ -3557,10 +3672,6 @@ describe('Company actions', () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .query({
-          limit: -10,
-          page: -1
-        })
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
@@ -3575,6 +3686,10 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/legal-texts`)
+        .query({
+          limit: -10,
+          page: -1
+        })
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
@@ -3586,11 +3701,6 @@ describe('Company actions', () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .query({
-          limit: 1,
-          page: 1,
-          search: 1
-        })
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
@@ -3604,6 +3714,11 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/legal-texts`)
+        .query({
+          limit: 1,
+          page: 1,
+          search: 1
+        })
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
@@ -3931,6 +4046,126 @@ describe('Company actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'accessPermission')
       expect(res.body.accessPermission).to.be.an('object')
       expect(res.body.accessPermission).to.include.keys('id', 'name', 'role', 'module', 'permission', 'isEnabled', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 422 Unprocessable Entity when an admin tries to create an access permission for a default role.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company11accesspermission121.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/access-permissions`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          accessPermission: {
+            name: 'Campaign Permission',
+            module: 'campaigns',
+            role: 'CampaignManager',
+            permission: 'readwrite'
+          }
+        })
+
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('A validation error has occured')
+    })
+
+    it('Should return 201 Created when an admin successfully creates an access permission for a default role with the override option.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Override',
+            email: 'test@company11accesspermissionoverride.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/access-permissions`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          accessPermission: {
+            name: 'Campaign Permission',
+            module: 'campaigns',
+            role: 'CampaignManager',
+            permission: 'readwrite',
+            override: true
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'accessPermission')
+      expect(res.body.accessPermission).to.be.an('object')
+      expect(res.body.accessPermission).to.include.keys('id', 'name', 'role', 'module', 'permission', 'isEnabled', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 403 Forbidden when a campaign manager tries to create a campaign for an overridden permission for campaigns that is now read only.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/access-permissions`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          accessPermission: {
+            name: 'Campaign Permission',
+            module: 'campaigns',
+            role: 'CampaignManager',
+            permission: 'read',
+            override: true
+          }
+        })
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'happyhogan@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+
+      tokenCampaignManager = resCampaignManager.body.token
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+        .send({
+          campaign: {
+            name: 'Onboarding',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
     })
   })
 })

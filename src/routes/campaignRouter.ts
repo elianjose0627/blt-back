@@ -27,9 +27,7 @@ const CampaignRoutes = (): any => {
     .get(asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions), asyncHandler(CampaignController.get))
     .put(asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
-      celebrate({
-        [Segments.BODY]: validator.validateCampaign
-      }), asyncHandler(CampaignController.update))
+      CampaignController.checkValidation, asyncHandler(CampaignController.update))
     .delete(asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
       asyncHandler(CampaignController.delete))
   campaignRouter.route('/campaigns/:id/recipients')

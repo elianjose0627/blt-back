@@ -25,7 +25,6 @@ class AccessPermissionService extends BaseService {
 
     response = await db[this.model].findOne({
       where: {
-        name: accessPermission.name,
         module: accessPermission.module,
         role: accessPermission.role,
         companyId
@@ -49,7 +48,7 @@ class AccessPermissionService extends BaseService {
     const records = await db[this.model].findAndCountAll({
       limit,
       offset,
-      order: [['companyId', 'DESC'], ['createdAt', 'DESC']],
+      order: [['companyId', 'DESC'], ['role', 'ASC'], ['createdAt', 'DESC']],
       attributes: { exclude: [] },
       where,
       include: [
@@ -71,11 +70,21 @@ class AccessPermissionService extends BaseService {
     const records = await db[this.model].findAndCountAll({
       limit,
       offset,
-      order: [['createdAt', 'DESC']],
+      order: [['companyId', 'DESC'], ['role', 'ASC'], ['createdAt', 'DESC']],
       attributes: { exclude: [] },
       where: {
-        companyId
-      }
+        [Op.or]: [
+          { companyId },
+          { companyId: null }
+        ]
+      },
+      include: [
+        {
+          model: db.Company,
+          attributes: ['name'],
+          as: 'company'
+        }
+      ]
     })
 
     return {

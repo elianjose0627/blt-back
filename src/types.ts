@@ -256,6 +256,7 @@ export interface ICampaign {
   correctionQuota: number
   lastQuotaResetDate: Nullable<Date>
   isQuotaEnabled: boolean
+  isNoteEnabled: boolean
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
@@ -410,6 +411,7 @@ export interface IOrder {
   priority: number
   currency: string
   externalNote: string
+  internalNote: string
   salesChannel: string
   desiredDeliveryDate: string
   shippingMethodId: string

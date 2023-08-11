@@ -4,8 +4,6 @@ import * as countryList from '../utils/countries'
 import * as userRoles from '../utils/userRoles'
 import * as currencies from '../utils/currencies'
 import * as appModules from '../utils/appModules'
-import * as permissions from '../utils/permissions'
-import { allowedCompanyModules } from '../utils/appModules'
 
 const imageMimeTypes = ['image/bmp', 'image/jpeg', 'image/x-png', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
 
@@ -285,16 +283,27 @@ const validateUpdatedRecipient = Joi.object({
   }).required()
 })
 
+const commonCampaignSchema = {
+  name: Joi.string().required().allow('').allow(null).max(64),
+  status: Joi.string().required().valid(...['draft', 'submitted']),
+  type: Joi.string().required().valid(...['onboarding', 'birthday', 'christmas', 'marketing']),
+  description: Joi.string().allow(null).allow('').max(1024)
+}
+
 const validateCampaign = Joi.object({
   campaign: Joi.object({
-    name: Joi.string().required().allow('').allow(null).max(64),
-    status: Joi.string().required().valid(...['draft', 'submitted']),
-    type: Joi.string().required().valid(...['onboarding', 'birthday', 'christmas', 'marketing']),
-    description: Joi.string().allow(null).allow('').max(1024),
+    ...commonCampaignSchema
+  }).required()
+})
+
+const validateCampaignAdmin = Joi.object({
+  campaign: Joi.object({
+    ...commonCampaignSchema,
     quota: Joi.number(),
     correctionQuota: Joi.number(),
     lastQuotaResetDate: Joi.date().allow(null),
-    isQuotaEnabled: Joi.boolean()
+    isQuotaEnabled: Joi.boolean(),
+    isNoteEnabled: Joi.boolean()
   }).required()
 })
 
@@ -488,27 +497,6 @@ const validateLegalText = Joi.object({
   }).required()
 })
 
-const commonAccessPermissionSchema = {
-  name: Joi.string().required().max(128),
-  module: Joi.string().required().valid(...allowedCompanyModules.map(allowedCompanyModule => allowedCompanyModule.value)),
-  role: Joi.string()
-    .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
-    .required(),
-  permission: Joi.string().required().valid(...[permissions.READ, permissions.READWRITE]),
-  isEnabled: Joi.boolean().default(true)
-}
-
-const validateAccessPermission = Joi.object({
-  accessPermission: Joi.object(commonAccessPermissionSchema).required()
-})
-
-const validateAccessPermissionAdmin = Joi.object({
-  accessPermission: Joi.object({
-    ...commonAccessPermissionSchema,
-    companyId: Joi.string().required().uuid()
-  }).required()
-})
-
 const validateRegistrationQueryParams = Joi.object({
   companyId: Joi.string().length(96)
 })
@@ -624,6 +612,7 @@ export default {
   validateCreatedRecipient,
   validateUpdatedRecipient,
   validateCampaign,
+  validateCampaignAdmin,
   validateJoinCompany,
   validateUserCompanyRole,
   validateSalutation,
@@ -643,8 +632,6 @@ export default {
   validateSecondaryDomain,
   validateLegalText,
   validatePrivacyRule,
-  validateAccessPermission,
-  validateAccessPermissionAdmin,
   validateRegistrationQueryParams,
   validateShippingMethod,
   validatePendingOrder,

@@ -14,9 +14,7 @@ const accessPermissionRoutes = (): any => {
 
   accessPermissionRouter.use('/access-permissions', checkAuth, checkUserIsVerifiedStatus, AccessPermissionController.setModule)
   accessPermissionRouter.route('/access-permissions')
-    .post(asyncHandler(checkAdmin), celebrate({
-      [Segments.BODY]: validator.validateAccessPermissionAdmin
-    }, { abortEarly: false }), asyncHandler(AccessPermissionController.insert))
+    .post(asyncHandler(checkAdmin), AccessPermissionController.checkAllowedModulesAdmin, asyncHandler(AccessPermissionController.insert))
     .get(asyncHandler(checkAdmin), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(AccessPermissionController.getAll))
@@ -27,9 +25,7 @@ const accessPermissionRoutes = (): any => {
     .get(asyncHandler(AccessPermissionController.checkOwnerOrAdmin), asyncHandler(checkPermissions),
       asyncHandler(AccessPermissionController.get))
     .put(asyncHandler(AccessPermissionController.checkOwnerOrAdmin), asyncHandler(checkPermissions),
-      celebrate({
-        [Segments.BODY]: validator.validateAccessPermission
-      }), asyncHandler(AccessPermissionController.update))
+      AccessPermissionController.checkAllowedModules, asyncHandler(AccessPermissionController.update))
     .delete(asyncHandler(AccessPermissionController.checkOwnerOrAdmin), asyncHandler(checkPermissions),
       asyncHandler(AccessPermissionController.delete))
   return accessPermissionRouter
