@@ -592,6 +592,15 @@ const validatePendingOrderAdmin = Joi.object({
   ).min(1).required()
 })
 
+const validateCardTemplate = Joi.object({
+  cardTemplate: Joi.object({
+    name: Joi.string().max(128).allow('').allow(null).required(),
+    description: Joi.string().max(128).allow('').allow(null).required(),
+    front: Joi.string().allow('').max(5000).allow(null).required(),
+    back: Joi.string().allow('').max(5000).allow(null).required()
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -635,5 +644,6 @@ export default {
   validateRegistrationQueryParams,
   validateShippingMethod,
   validatePendingOrder,
-  validatePendingOrderAdmin
+  validatePendingOrderAdmin,
+  validateCardTemplate
 }
