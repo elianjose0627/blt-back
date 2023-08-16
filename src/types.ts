@@ -260,6 +260,7 @@ export interface ICampaign {
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
+  cardTemplates?: ICardTemplate[]
 }
 
 export interface ISecondaryDomain {
@@ -653,4 +654,15 @@ export interface IPendingOrder {
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
+}
+
+export interface ICardTemplate {
+  id: string
+  name: string
+  description: string
+  isDraft: boolean
+  front: string
+  back: string
+  createdAt: Date
+  updatedAt: Date
 }

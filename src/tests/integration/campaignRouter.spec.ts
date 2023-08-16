@@ -1488,6 +1488,7 @@ describe('Campaign actions', () => {
       expect(res.body.pendingOrders).to.be.an('array')
       expect(res.body.pendingOrders).to.have.lengthOf.above(999)
     })
+
     it('Should return 413 Payload Too Large when an owner tries to create bulk orders for a campaign.', async () => {
       const resCompany = await chai
         .request(app)
@@ -1681,6 +1682,170 @@ describe('Campaign actions', () => {
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
+    })
+  })
+
+  describe('Campaign Card Templates Actions', () => {
+    it('Should return 201 Created when an owner successfully creates a card template for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Card Template',
+            email: 'test@companymarvelsecretinvasioncardtemplate.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Card Template',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/card-templates`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          cardTemplate: {
+            name: null,
+            description: null,
+            front: null,
+            back: null
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'cardTemplate')
+      expect(res.body.cardTemplate).to.be.an('object')
+    })
+
+    it('Should return 200 OK when an owner successfully creates a card template for a campaign twice.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Card Template 2',
+            email: 'test@companymarvelsecretinvasioncardtemplate2.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Card Template',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/card-templates`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          cardTemplate: {
+            name: null,
+            description: null,
+            front: null,
+            back: null
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/card-templates`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          cardTemplate: {
+            name: null,
+            description: null,
+            front: null,
+            back: null
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'cardTemplate')
+      expect(res.body.cardTemplate).to.be.an('object')
+    })
+
+    it('Should return 200 OK when an owner successfully retrieves all card templates for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Card Template 3',
+            email: 'test@companymarvelsecretinvasioncardtemplate3.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Card Template',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/card-templates`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          cardTemplate: {
+            name: null,
+            description: null,
+            front: null,
+            back: null
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${campaignId}/card-templates`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'cardTemplates')
+      expect(res.body.cardTemplates).to.be.an('array')
     })
   })
 })

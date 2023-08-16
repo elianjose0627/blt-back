@@ -34,6 +34,7 @@ export interface Database {
   PrivacyRule?: any
   AccessPermission?: any
   PendingOrder?: any
+  CardTemplate?: any
   [key: string]: any
 }
 

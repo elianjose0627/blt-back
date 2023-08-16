@@ -11,6 +11,7 @@ import paginate from '../middlewares/pagination'
 import checkAdmin from '../middlewares/checkAdmin'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import checkPermissions from '../middlewares/checkPermissions'
+import CardTemplateController from '../controllers/CardTemplateController'
 
 const CampaignRoutes = (): any => {
   const campaignRouter = express.Router()
@@ -67,6 +68,17 @@ const CampaignRoutes = (): any => {
       celebrate({
         [Segments.BODY]: validator.validatePendingOrder
       }), asyncHandler(PendingOrderController.insert))
+  campaignRouter.route('/campaigns/:id/card-templates')
+    .post(asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
+      celebrate({
+        [Segments.BODY]: validator.validateCardTemplate
+      }), asyncHandler(CardTemplateController.insert))
+    .get(asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
+      celebrate({
+        [Segments.QUERY]: validator.validateQueryParams
+      }), asyncHandler(paginate), asyncHandler(CardTemplateController.getAllCampaignCardTemplates))
   return campaignRouter
 }
 

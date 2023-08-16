@@ -2,8 +2,21 @@ import { v1 as uuidv1 } from 'uuid'
 import { Op } from 'sequelize'
 import db from '../models'
 
-const includeCompany = ['Campaign', 'Address', 'CostCenter', 'Product', 'Order', 'AccessPermission', 'PendingOrder']
+const includeCompany = ['Address', 'CostCenter', 'Product', 'Order', 'AccessPermission', 'PendingOrder']
 const withoutUser = ['BundleItem', 'Salutation', 'Picture', 'SecondaryDomain', 'LegalText', 'ShippingMethod']
+
+const includeCompanyAndOwner = {
+  model: db.Company,
+  attributes: ['id', 'customerId', 'name', 'email', 'phone', 'vat', 'domain'],
+  as: 'company',
+  include: [
+    {
+      model: db.User,
+      attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'updatedAt', 'createdAt'],
+      as: 'owner'
+    }
+  ]
+}
 
 export const generateInclude = (model: string): any => {
   if (model === 'Company') {
@@ -30,40 +43,31 @@ export const generateInclude = (model: string): any => {
   if (includeCompany.includes(model)) {
     return (
       [
+        includeCompanyAndOwner
+      ]
+    )
+  }
+
+  if (model === 'Campaign') {
+    return (
+      [
+        includeCompanyAndOwner,
         {
-          model: db.Company,
-          attributes: ['id', 'customerId', 'name', 'email', 'phone', 'vat', 'domain'],
-          as: 'company',
-          include: [
-            {
-              model: db.User,
-              attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'updatedAt', 'createdAt'],
-              as: 'owner'
-            }
-          ]
+          model: db.CardTemplate,
+          attributes: { exclude: ['deletedAt'] },
+          as: 'cardTemplates'
         }
       ]
     )
   }
 
-  if (model === 'Recipient') {
+  if (model === 'Recipient' || model === 'CardTemplate') {
     return ([
       {
         model: db.Campaign,
         as: 'campaign',
         include: [
-          {
-            model: db.Company,
-            attributes: ['id', 'customerId', 'name', 'email', 'phone', 'vat', 'domain'],
-            as: 'company',
-            include: [
-              {
-                model: db.User,
-                attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'updatedAt', 'createdAt'],
-                as: 'owner'
-              }
-            ]
-          }
+          includeCompanyAndOwner
         ]
       }
     ])
