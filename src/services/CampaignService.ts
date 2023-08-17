@@ -54,11 +54,13 @@ class CampaignService extends BaseService {
       offset,
       order: [['createdAt', 'DESC']],
       attributes: { exclude: [] },
-      include: [{
-        model: db.Company,
-        attributes: ['id', 'name', 'email', 'phone', 'vat', 'domain'],
-        as: 'company'
-      }]
+      include: [
+        {
+          model: db.Company,
+          attributes: ['id', 'name', 'email', 'phone', 'vat', 'domain'],
+          as: 'company'
+        }
+      ]
     })
 
     return {
