@@ -67,7 +67,7 @@ class PictureService extends BaseService {
   }
 
   async getCardsFromFirebase (limit: number, pageToken?: string, companyId?: string): Promise<any> {
-    const prefix = companyId != null ? `cards/${companyId}` : 'cards'
+    const prefix = companyId != null ? `cards/companies/${companyId}` : 'cards/general'
     const queryOptions = {
       prefix, // Filter files with the specified folderName as the prefix
       maxResults: limit, // Limit the number of results to the page size
