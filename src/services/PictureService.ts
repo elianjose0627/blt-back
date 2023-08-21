@@ -98,7 +98,7 @@ class PictureService extends BaseService {
     const [allFiles] = await bucket.getFiles({
       prefix
     })
-    const count = allFiles.length - 1
+    const count = Math.max(allFiles.length - 1, 0)
 
     return { rows: downloadUrls, count, nextPage: nextPageToken }
   }
