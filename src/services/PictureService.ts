@@ -66,9 +66,10 @@ class PictureService extends BaseService {
     return response
   }
 
-  async getCardsFromFirebase (limit: number, pageToken?: string): Promise<any> {
+  async getCardsFromFirebase (limit: number, pageToken?: string, companyId?: string): Promise<any> {
+    const prefix = companyId != null ? `cards/${companyId}` : 'cards'
     const queryOptions = {
-      prefix: 'cards/', // Filter files with the specified folderName as the prefix
+      prefix, // Filter files with the specified folderName as the prefix
       maxResults: limit, // Limit the number of results to the page size
       pageToken // Use the provided page token to start from a specific point
     }
@@ -95,7 +96,7 @@ class PictureService extends BaseService {
     const nextPageToken = nextPage?.pageToken ?? undefined
 
     const [allFiles] = await bucket.getFiles({
-      prefix: 'cards/'
+      prefix
     })
     const count = allFiles.length - 1
 
