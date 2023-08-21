@@ -102,6 +102,20 @@ describe('Picture actions', () => {
       expect(res.body.cards).to.be.an('array')
     })
 
+    it('Should return 200 OK when a user gets cards filtered by company from firebase.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/pictures/cards')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .query({
+          'filter[companyId]': 'd2c45740-f4c9-11ed-a7f1-f1608468d9ae'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'meta', 'cards')
+      expect(res.body.cards).to.be.an('array')
+    })
+
     it('Should return 200 OK when a user gets all cards from firebase with pagination.', async () => {
       const res = await chai
         .request(app)
