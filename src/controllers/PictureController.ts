@@ -27,8 +27,9 @@ class PictureController extends BaseController {
   }
 
   async getCardsFromFirebase (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { query: { limit, page, pageToken } } = req
-    const records = await pictureService.getCardsFromFirebase(limit, pageToken)
+    const { query: { limit, page, pageToken, filter = { companyId: null } } } = req
+
+    const records = await pictureService.getCardsFromFirebase(limit, pageToken, filter.companyId)
 
     const meta = {
       total: records.count,

@@ -112,7 +112,7 @@ class ProductService extends BaseService {
         Accept: 'application/json',
         'Content-Type': 'application/json'
       },
-      timeout: 10000
+      timeout: 30000
     })
 
     const token = await db.Token.findOne()

@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { CampaignStatus, CampaignType, ICampaign, ICompany } from '../types'
+import { CampaignStatus, CampaignType, ICampaign, ICardTemplate, ICompany } from '../types'
 
 const CampaignModel = (sequelize: any, DataTypes: any): any => {
   interface CampaignAttributes {
@@ -31,6 +31,7 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany
+    private readonly cardTemplates: ICardTemplate[]
 
     static associate (models: any): any {
       Campaign.belongsTo(models.Company, {
@@ -46,6 +47,11 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
       Campaign.hasMany(models.Bundle, {
         foreignKey: 'campaignId',
         as: 'bundles',
+        onDelete: 'CASCADE'
+      })
+      Campaign.hasMany(models.CardTemplate, {
+        foreignKey: 'campaignId',
+        as: 'cardTemplates',
         onDelete: 'CASCADE'
       })
     }
@@ -65,7 +71,8 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
         isNoteEnabled: this.isNoteEnabled,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
-        company: this.company
+        company: this.company,
+        cardTemplates: this.cardTemplates
       }
     }
   };

@@ -17,6 +17,12 @@ initializeApp({
 const storageBucket = process.env.STORAGE_BUCKET
 const bucket = getStorage().bucket(storageBucket)
 
+const createPersistentDownloadUrl = (bucket: string, pathToFile: string, downloadToken: string): string => {
+  return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(
+    pathToFile
+  )}?alt=media&token=${downloadToken}`
+}
+
 class PictureService extends BaseService {
   async insert (data: any): Promise<any> {
     const { bundle, picture } = data
@@ -60,15 +66,16 @@ class PictureService extends BaseService {
     return response
   }
 
-  async getCardsFromFirebase (limit: number, pageToken?: string): Promise<any> {
+  async getCardsFromFirebase (limit: number, pageToken?: string, companyId?: string): Promise<any> {
+    const prefix = companyId != null ? `cards/${companyId}` : 'cards'
     const queryOptions = {
-      prefix: 'cards/', // Filter files with the specified folderName as the prefix
-      maxResults: limit + 1, // Limit the number of results to the page size
+      prefix, // Filter files with the specified folderName as the prefix
+      maxResults: limit, // Limit the number of results to the page size
       pageToken // Use the provided page token to start from a specific point
     }
     const [files, nextPage]: any = await bucket.getFiles(queryOptions)
 
-    const downloadUrls: Array<{ id: string, url: string, name: string }> = []
+    const downloadUrls: Array<{ id: string, url: string, name: string, signedUrl: string }> = []
 
     const options: any = {
       version: 'v4', // Use version 4 of signed URLs
@@ -78,17 +85,18 @@ class PictureService extends BaseService {
 
     for (const file of files) {
       if (file.name.match(/\.(jpg|jpeg|png|gif|bmp)$/i) != null) {
-        const [downloadUrl] = await file.getSignedUrl(options)
-        // const [metadata] = await file.getMetadata()
+        const [signedUrl] = await file.getSignedUrl(options)
+        const [metadata] = await file.getMetadata()
+        const downloadUrl = createPersistentDownloadUrl(metadata.bucket, metadata.name, metadata.metadata.firebaseStorageDownloadTokens)
         const filename = path.basename(file.name)
-        downloadUrls.push({ id: uuidv1(), url: downloadUrl, name: filename })
+        downloadUrls.push({ id: uuidv1(), url: downloadUrl, name: filename, signedUrl })
       }
     }
 
     const nextPageToken = nextPage?.pageToken ?? undefined
 
     const [allFiles] = await bucket.getFiles({
-      prefix: 'cards/'
+      prefix
     })
     const count = allFiles.length - 1
 
