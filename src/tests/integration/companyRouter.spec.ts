@@ -2294,7 +2294,7 @@ describe('Company actions', () => {
       expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
     })
 
-    it('Should return 403 Forbidden when a campaign manager for a company tries to create a product without permissions.', async () => {
+    it('Should return 201 Created when a campaign manager for a company creates a product.', async () => {
       const resCompany = await createVerifiedCompany(userId)
 
       const companyId = resCompany.id
@@ -2331,9 +2331,10 @@ describe('Company actions', () => {
           }
         })
 
-      expect(res).to.have.status(403)
-      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
     })
 
     it('Should return 403 Forbidden when a non-employee Campaign Manager tries to creates a product for a company.', async () => {
