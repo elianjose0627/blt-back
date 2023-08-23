@@ -9,6 +9,8 @@ const CardTemplateModel = (sequelize: any, DataTypes: any): any => {
     isDraft: boolean
     front: string
     back: string
+    frontOrientation: string
+    backOrientation: string
   }
 
   class CardTemplate extends Model<CardTemplateAttributes> {
@@ -17,6 +19,8 @@ const CardTemplateModel = (sequelize: any, DataTypes: any): any => {
     private readonly description: string
     private readonly front: string
     private readonly back: string
+    private readonly frontOrientation: string
+    private readonly backOrientation: string
     private readonly isDraft: boolean
     private readonly createdAt: Date
     private readonly updatedAt: Date
@@ -36,6 +40,8 @@ const CardTemplateModel = (sequelize: any, DataTypes: any): any => {
         description: this.description,
         front: this.front,
         back: this.back,
+        frontOrientation: this.frontOrientation,
+        backOrientation: this.backOrientation,
         isDraft: this.isDraft,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
@@ -67,6 +73,14 @@ const CardTemplateModel = (sequelize: any, DataTypes: any): any => {
     },
     back: {
       type: DataTypes.TEXT,
+      allowNull: true
+    },
+    frontOrientation: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    backOrientation: {
+      type: DataTypes.STRING,
       allowNull: true
     }
   }, {

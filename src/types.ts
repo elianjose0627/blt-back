@@ -663,6 +663,8 @@ export interface ICardTemplate {
   isDraft: boolean
   front: string
   back: string
+  frontOrientation: string
+  backOrientation: string
   createdAt: Date
   updatedAt: Date
 }

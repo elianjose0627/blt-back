@@ -597,7 +597,9 @@ const validateCardTemplate = Joi.object({
     name: Joi.string().max(128).allow('').allow(null).required(),
     description: Joi.string().max(128).allow('').allow(null).required(),
     front: Joi.string().allow('').max(5000).allow(null).required(),
-    back: Joi.string().allow('').max(5000).allow(null).required()
+    back: Joi.string().allow('').max(5000).allow(null).required(),
+    frontOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape']),
+    backOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape'])
   }).required()
 })
 
