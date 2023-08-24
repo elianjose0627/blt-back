@@ -27,6 +27,14 @@ module.exports = {
         allowNull: true,
         type: Sequelize.TEXT
       },
+      frontOrientation: {
+        allowNull: true,
+        type: Sequelize.STRING
+      },
+      backOrientation: {
+        allowNull: true,
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

@@ -151,6 +151,30 @@ module.exports = {
       updatedAt,
       deletedAt: null,
       companyId: null
+    },
+    {
+      id: 'B21D41AD-F225-49AC-AA10-015BDECCB1EF',
+      name: 'Campaign Manager Read Write Orders',
+      module: 'orders',
+      role: 'CampaignManager',
+      permission: 'readwrite',
+      isEnabled: 'TRUE',
+      createdAt,
+      updatedAt,
+      deletedAt: null,
+      companyId: null
+    },
+    {
+      id: '13CA0BD7-7D10-4841-A699-DFF4FC38B328',
+      name: 'Campaign Manager Read Write Products',
+      module: 'products',
+      role: 'CampaignManager',
+      permission: 'readwrite',
+      isEnabled: 'TRUE',
+      createdAt,
+      updatedAt,
+      deletedAt: null,
+      companyId: null
     }
   ], {}),
   down: async (queryInterface) => {

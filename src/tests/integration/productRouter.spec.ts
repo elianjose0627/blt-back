@@ -329,7 +329,7 @@ describe('Product actions', () => {
       expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
     })
 
-    it('Should return 403 Forbidden when a campaign manager gets a product by id.', async () => {
+    it('Should return 200 OK when a campaign manager gets a product by id.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -385,10 +385,11 @@ describe('Product actions', () => {
         .get(`/api/products/${String(productId)}`)
         .set('Authorization', `Bearer ${tokenCampaignManager}`)
 
-      expect(res).to.have.status(403)
-      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.success).to.equal(false)
-      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.success).to.equal(true)
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
     })
 
     it('Should return 200 OK when an administrator gets a product by id.', async () => {
