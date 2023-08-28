@@ -646,6 +646,7 @@ export interface IPendingOrder {
   orderStatus: number
   createdBy: string
   updatedBy: string
+  createdByFullName: string
   orderLineRequests: OrderLineRequest[]
   shippingAddressRequests: ShippingAddressRequest[]
   paymentInformationRequests: PaymentInformationRequest[]

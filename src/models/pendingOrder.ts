@@ -25,6 +25,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     orderStatus: number
     createdBy: string
     updatedBy: string
+    createdByFullName: string
     orderLineRequests: OrderLineRequest[]
     shippingAddressRequests: ShippingAddressRequest[]
     paymentInformationRequests: PaymentInformationRequest[]
@@ -55,6 +56,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly orderStatus: number
     private readonly createdBy: string
     private readonly updatedBy: string
+    private readonly createdByFullName: string
     private readonly orderLineRequests: OrderLineRequest[]
     private readonly shippingAddressRequests: ShippingAddressRequest[]
     private readonly paymentInformationRequests: PaymentInformationRequest[]
@@ -106,6 +108,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
         orderStatus: this.orderStatus,
         createdBy: this.createdBy,
         updatedBy: this.updatedBy,
+        createdByFullName: this.createdByFullName,
         orderLineRequests: this.orderLineRequests,
         shippingAddressRequests: this.shippingAddressRequests,
         paymentInformationRequests: this.paymentInformationRequests,
@@ -205,6 +208,10 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
       allowNull: true
     },
     updatedBy: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    createdByFullName: {
       type: DataTypes.STRING,
       allowNull: true
     },
