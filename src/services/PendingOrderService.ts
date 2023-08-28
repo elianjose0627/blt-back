@@ -33,7 +33,8 @@ class PendingOrderService extends BaseService {
       companyId: campaign.company.id,
       created: dayjs.utc().format(),
       createdBy: currentUser.email,
-      updatedBy: currentUser.email
+      updatedBy: currentUser.email,
+      createdByFullName: `${String(currentUser.firstName)} ${String(currentUser.lastName)}`
     }))
 
     const response = await db.PendingOrder.bulkCreate(bulkInsertData, { returning: true })
