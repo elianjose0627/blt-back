@@ -605,13 +605,13 @@ const validateCardTemplate = Joi.object({
 
 const validateCardSetting = Joi.object({
   cardSetting: Joi.object({
-    isEnabled: Joi.boolean().default(true),
-    isFrontSelectable: Joi.boolean().default(true),
-    isRotationEnabled: Joi.boolean().default(true),
-    isBackEditable: Joi.boolean().default(true),
-    isAutoProcessingEnabled: Joi.boolean().default(false),
-    defaultBack: Joi.string().allow('').max(5000).allow(null).required(),
-    defaultFront: Joi.string().allow('').max(5000).allow(null).required(),
+    isEnabled: Joi.boolean().allow(null),
+    isFrontSelectable: Joi.boolean().allow(null),
+    isRotationEnabled: Joi.boolean().allow(null),
+    isBackEditable: Joi.boolean().allow(null),
+    isAutoProcessingEnabled: Joi.boolean().allow(null),
+    defaultBack: Joi.string().allow('').max(5000).allow(null),
+    defaultFront: Joi.string().allow('').max(5000).allow(null),
     exportOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape']),
     exportSides: Joi.string().allow('').allow(null).valid('both', 'front', 'back'),
     supplierEmail: Joi.string().email().allow(null)
