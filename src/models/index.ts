@@ -35,6 +35,7 @@ export interface Database {
   AccessPermission?: any
   PendingOrder?: any
   CardTemplate?: any
+  CardSetting?: any
   [key: string]: any
 }
 
