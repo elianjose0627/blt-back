@@ -1848,4 +1848,186 @@ describe('Campaign actions', () => {
       expect(res.body.cardTemplates).to.be.an('array')
     })
   })
+
+  describe('Campaign Card Settings Actions', () => {
+    it('Should return 201 Created when an admin successfully creates a card setting for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Card Setting',
+            email: 'test@companymarvelsecretinvasioncardsetting.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Card Setting',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/card-settings`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          cardSetting: {
+            isEnabled: true,
+            isFrontSelectable: true,
+            isRotationEnabled: true,
+            isBackEditable: true,
+            defaultBack: '',
+            defaultFront: '',
+            exportOrientation: 'portrait',
+            exportSides: 'both',
+            supplierEmail: 'ryan@biglittlethings.de'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'cardSetting')
+      expect(res.body.cardSetting).to.be.an('object')
+    })
+
+    it('Should return 200 OK when an admin successfully creates a card setting for a campaign twice.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Card Setting 2',
+            email: 'test@companymarvelsecretinvasioncardsetting2.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Card Setting',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/card-settings`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          cardSetting: {
+            isEnabled: true,
+            isFrontSelectable: true,
+            isRotationEnabled: true,
+            isBackEditable: true,
+            isAutoProcessingEnabled: false,
+            defaultBack: '',
+            defaultFront: '',
+            exportOrientation: 'portrait',
+            exportSides: 'both',
+            supplierEmail: 'ryan@biglittlethings.de'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/card-settings`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          cardSetting: {
+            isEnabled: true,
+            isFrontSelectable: true,
+            isRotationEnabled: true,
+            isBackEditable: true,
+            isAutoProcessingEnabled: false,
+            defaultBack: '',
+            defaultFront: '',
+            exportOrientation: 'portrait',
+            exportSides: 'both',
+            supplierEmail: 'ryan@biglittlethings.de'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'cardSetting')
+      expect(res.body.cardSetting).to.be.an('object')
+    })
+
+    it('Should return 403 Forbidden when a non-admin tries to create a card setting for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Card Setting User',
+            email: 'test@companymarvelsecretinvasioncardsettinguser.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Card Setting',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/card-settings`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          cardSetting: {
+            isEnabled: true,
+            isFrontSelectable: true,
+            isRotationEnabled: true,
+            isBackEditable: true,
+            isAutoProcessingEnabled: false,
+            defaultBack: '',
+            defaultFront: '',
+            exportOrientation: 'portrait',
+            exportSides: 'both',
+            supplierEmail: 'ryan@biglittlethings.de'
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only an admin can perform this action')
+    })
+  })
 })

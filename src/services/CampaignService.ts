@@ -59,6 +59,11 @@ class CampaignService extends BaseService {
           model: db.Company,
           attributes: ['id', 'name', 'email', 'phone', 'vat', 'domain'],
           as: 'company'
+        },
+        {
+          model: db.CardSetting,
+          attributes: { exclude: ['deletedAt', 'campaignId'] },
+          as: 'cardSetting'
         }
       ]
     })
