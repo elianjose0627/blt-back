@@ -22,6 +22,7 @@ import shippingMethodRouter from './shippingMethodRouter'
 import webhookRouter from './webhookRouter'
 import pendingOrderRouter from './pendingOrderRouter'
 import cardTemplateRouter from './cardTemplateRouter'
+import greetingCardRouter from './greetingCardRouter'
 
 const routers = {
   authRouter,
@@ -47,7 +48,8 @@ const routers = {
   shippingMethodRouter,
   webhookRouter,
   pendingOrderRouter,
-  cardTemplateRouter
+  cardTemplateRouter,
+  greetingCardRouter
 }
 
 export default routers

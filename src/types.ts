@@ -687,3 +687,16 @@ export interface ICardSetting {
   createdAt: Date
   updatedAt: Date
 }
+
+export interface IGreetingCard {
+  id: string
+  articleNumber: string
+  articleName: string
+  url: string
+  totalStock: number
+  inventory: number
+  availableStock: number
+  jtlfpid: string
+  createdAt: Date
+  updatedAt: Date
+}
