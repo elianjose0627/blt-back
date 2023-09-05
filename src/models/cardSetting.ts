@@ -14,6 +14,7 @@ const CardSettingModel = (sequelize: any, DataTypes: any): any => {
     exportOrientation: 'portrait' | 'landscape'
     exportSides: 'both' | 'front' | 'back'
     supplierEmail: string
+    articleId: string
   }
 
   class CardSetting extends Model<CardSettingAttributes> {
@@ -28,6 +29,7 @@ const CardSettingModel = (sequelize: any, DataTypes: any): any => {
     private readonly exportOrientation: 'portrait' | 'landscape'
     private readonly exportSides: 'both' | 'front' | 'back'
     private readonly supplierEmail: string
+    private readonly articleId: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
 
@@ -52,6 +54,7 @@ const CardSettingModel = (sequelize: any, DataTypes: any): any => {
         exportOrientation: this.exportOrientation,
         exportSides: this.exportSides,
         supplierEmail: this.supplierEmail,
+        articleId: this.articleId,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       }
@@ -101,6 +104,10 @@ const CardSettingModel = (sequelize: any, DataTypes: any): any => {
       allowNull: true
     },
     supplierEmail: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    articleId: {
       type: DataTypes.STRING,
       allowNull: true
     }

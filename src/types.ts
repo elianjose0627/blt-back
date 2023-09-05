@@ -683,6 +683,7 @@ export interface ICardSetting {
   exportOrientation: 'portrait' | 'landscape'
   exportSides: 'both' | 'front' | 'back'
   supplierEmail: string
+  articleId: string
   createdAt: Date
   updatedAt: Date
 }

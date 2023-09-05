@@ -614,7 +614,8 @@ const validateCardSetting = Joi.object({
     defaultFront: Joi.string().allow('').max(5000).allow(null),
     exportOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape']),
     exportSides: Joi.string().allow('').allow(null).valid('both', 'front', 'back'),
-    supplierEmail: Joi.string().email().allow(null)
+    supplierEmail: Joi.string().email().allow(null),
+    articleId: Joi.string().allow('').allow(null)
   }).required()
 })
 
