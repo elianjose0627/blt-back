@@ -36,6 +36,7 @@ export interface Database {
   PendingOrder?: any
   CardTemplate?: any
   CardSetting?: any
+  GreetingCard?: any
   [key: string]: any
 }
 

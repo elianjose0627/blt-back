@@ -619,6 +619,19 @@ const validateCardSetting = Joi.object({
   }).required()
 })
 
+const validateGreetingCard = Joi.object({
+  greetingCard: Joi.object({
+    articleNumber: Joi.string().required(),
+    articleName: Joi.string().required(),
+    url: Joi.string().uri().required(),
+    totalStock: Joi.number(),
+    inventory: Joi.number(),
+    availableStock: Joi.number(),
+    jtlfpid: Joi.string().required(),
+    companyId: Joi.string().uuid().allow(null).default(null)
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -664,5 +677,6 @@ export default {
   validatePendingOrder,
   validatePendingOrderAdmin,
   validateCardTemplate,
-  validateCardSetting
+  validateCardSetting,
+  validateGreetingCard
 }
