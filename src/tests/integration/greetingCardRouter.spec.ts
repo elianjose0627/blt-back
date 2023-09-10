@@ -381,4 +381,61 @@ describe('Greeting card actions', () => {
       expect(res.body.errors.message).to.equal('Only an admin can perform this action')
     })
   })
+
+  describe('Print Greeting Card Actions', () => {
+    it('Should return 200 OK when an admin successfully triggers a greeting card email for a campaign.', async () => {
+      const res = await chai
+        .request(app)
+        .post('/api/greeting-cards/print')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          print: {
+            htmlText: "<h1>Hello, [firstname] [salutation]!</h1><p>This is some HTML content on the second page. Hello python my old friend. You have been a saviour, That's gotta be weird. I told you</p><p>Regards,<br/>[lastname]</p>",
+            imageUrl: 'https://firebasestorage.googleapis.com/v0/b/endeavor-b285f.appspot.com/o/cards%2Fgeneral%2FMotiv%203%20Hamburg.jpg?alt=media&token=REDACTED',
+            placeholders: {
+              salutation: 'Mr',
+              firstname: 'Ryan',
+              lastname: 'Wire'
+            },
+            frontOrientation: 'landscape',
+            backOrientation: 'landscape',
+            email: {
+              to: 'ryanwiretest@gmail.com',
+              from: 'support@biglittlethings.de',
+              subject: 'PDF Attachment',
+              text: 'Attached is the PDF file.'
+            },
+            exportSides: 'both'
+          }
+        })
+
+      expect(res).to.have.status(200)
+    })
+
+    it('Should return 200 OK when an admin successfully triggers a portrait greeting card email for a campaign.', async () => {
+      const res = await chai
+        .request(app)
+        .post('/api/greeting-cards/print')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          print: {
+            htmlText: "<h1>Hello, [firstname] [salutation]!</h1><p>This is some HTML content on the second page. Hello python my old friend. You have been a saviour, That's gotta be weird. I told you</p><p>Regards,<br/>[lastname]</p>",
+            imageUrl: 'https://firebasestorage.googleapis.com/v0/b/endeavor-b285f.appspot.com/o/cards%2Fgeneral%2FMotiv%203%20Hamburg.jpg?alt=media&token=REDACTED',
+            placeholders: {
+              salutation: 'Mr',
+              firstname: 'Ryan',
+              lastname: 'Wire'
+            },
+            email: {
+              to: 'ryanwiretest@gmail.com',
+              from: 'support@biglittlethings.de',
+              subject: 'PDF Attachment',
+              text: 'Attached is the PDF file.'
+            }
+          }
+        })
+
+      expect(res).to.have.status(200)
+    })
+  })
 })
