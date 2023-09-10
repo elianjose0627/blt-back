@@ -2,7 +2,6 @@ import Jspdf from 'jspdf'
 import puppeteer from 'puppeteer'
 import axios from 'axios'
 import sgMail from '@sendgrid/mail'
-import { PDFDocument } from 'pdf-lib'
 import BaseController from './BaseController'
 import GreetingCardService from '../services/GreetingCardService'
 import { CustomRequest, CustomResponse, StatusCode } from '../types'
@@ -64,7 +63,6 @@ class GreetingCardController extends BaseController {
     const compressPdf = true
     const width = frontOrientation === 'landscape' ? 842 : 595
     const height = frontOrientation === 'landscape' ? 595 : 842
-    const pdfFileName = 'greeting-card.pdf'
 
     const response = await axios.get(imageUrl, { responseType: 'arraybuffer' })
 
@@ -99,23 +97,6 @@ class GreetingCardController extends BaseController {
     const pdfBase64Front = pdfBufferFront.toString('base64')
     const pdfBase64Back = pdfBufferBack.toString('base64')
 
-    const mergedPdf = await PDFDocument.create()
-
-    const pdfFront = await PDFDocument.load(pdfBufferFront)
-    const pdfBack = await PDFDocument.load(pdfBufferBack)
-
-    const copiedPagesFront = await mergedPdf.copyPages(pdfFront, pdfFront.getPageIndices())
-    copiedPagesFront.forEach((page) => mergedPdf.addPage(page))
-
-    const copiedPagesBack = await mergedPdf.copyPages(pdfBack, pdfBack.getPageIndices())
-    copiedPagesBack.forEach((page) => mergedPdf.addPage(page))
-
-    const mergedPdfFile = await mergedPdf.save()
-
-    // Send the combined PDF as a download
-    res.setHeader('Content-Type', 'application/pdf')
-    res.setHeader('Content-Disposition', `attachment; filename=${pdfFileName}`)
-
     const frontSide = {
       filename: 'front.pdf',
       content: pdfBase64Front, // Read the PDF file
@@ -144,7 +125,13 @@ class GreetingCardController extends BaseController {
     }
     await sgMail.send(msg)
 
-    res.send(Buffer.from(mergedPdfFile))
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      greetingCard: {
+        message: 'Greeting card email sent successfully'
+      }
+    })
   }
 }
 
