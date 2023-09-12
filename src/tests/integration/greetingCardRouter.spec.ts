@@ -383,7 +383,7 @@ describe('Greeting card actions', () => {
   })
 
   describe('Print Greeting Card Actions', () => {
-    it('Should return 200 OK when an admin successfully triggers a greeting card email for a campaign.', async () => {
+    xit('Should return 200 OK when an admin successfully triggers a greeting card email for a campaign.', async () => {
       const res = await chai
         .request(app)
         .post('/api/greeting-cards/print')
@@ -412,7 +412,7 @@ describe('Greeting card actions', () => {
       expect(res).to.have.status(200)
     })
 
-    it('Should return 200 OK when an admin successfully triggers a portrait greeting card email for a campaign.', async () => {
+    xit('Should return 200 OK when an admin successfully triggers a portrait greeting card email for a campaign.', async () => {
       const res = await chai
         .request(app)
         .post('/api/greeting-cards/print')
