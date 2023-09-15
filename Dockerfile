@@ -22,9 +22,7 @@ RUN yarn install --production
 # Copy local codebase into the container image
 COPY . ./
 
-RUN npm uninstall puppeteer
-
-RUN npm i puppeteer@19.4.1
+RUN npm uninstall puppeteer && npm i puppeteer@19.4.1
 
 # Start the api server
 CMD [ "npm", "start" ]

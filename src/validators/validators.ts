@@ -634,12 +634,12 @@ const validateGreetingCard = Joi.object({
 
 const validateGreetingCardPrint = Joi.object({
   print: Joi.object({
-    htmlText: Joi.string(),
+    htmlText: Joi.string().allow('').allow(null),
     imageUrl: Joi.string().uri(),
     placeholders: Joi.object({
-      salutation: Joi.string(),
-      firstname: Joi.string(),
-      lastname: Joi.string()
+      salutation: Joi.string().allow('').allow(null),
+      firstname: Joi.string().allow('').allow(null),
+      lastname: Joi.string().allow('').allow(null)
     }),
     frontOrientation: Joi.string().valid(...['portrait', 'landscape']),
     backOrientation: Joi.string().valid(...['portrait', 'landscape']),
