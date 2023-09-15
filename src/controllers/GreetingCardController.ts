@@ -9,6 +9,7 @@ import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 
 sgMail.setApiKey(String(process.env.SENDGRID_API_KEY))
+const greetingCardServiceUrl = 'https://endeavor-b285f.ew.r.appspot.com/styles/index.css'
 
 const greetingCardService = new GreetingCardService('GreetingCard')
 
@@ -61,37 +62,41 @@ class GreetingCardController extends BaseController {
     } = req
 
     const compressPdf = true
-    const width = frontOrientation === 'landscape' ? 842 : 595
-    const height = frontOrientation === 'landscape' ? 595 : 842
 
     const response = await axios.get(imageUrl, { responseType: 'arraybuffer' })
 
-    const replacedHtmlText = htmlText.replace(/\[(\w+)\]/g, (placeholder: string) =>
+    const replacedHtmlText: string = htmlText.replace(/\[(\w+)\]/g, (placeholder: string) =>
       placeholders[placeholder.substring(1, placeholder.length - 1)]
     )
 
     const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--disable-gpu', '--no-sandbox'],
+      headless: 'new',
+      args: ['--disable-gpu', '--no-sandbox', '--disable-web-security'],
       executablePath: 'google-chrome'
     })
     const page = await browser.newPage()
-    await page.setContent(replacedHtmlText, { waitUntil: 'domcontentloaded' })
+    const styleSheet = `<link href=${greetingCardServiceUrl} rel='stylesheet' crossorigin='anonymous'>`
+    await page.setContent(styleSheet)
+    await page.setContent(`<div class="ql-editor">${replacedHtmlText}</div>` + styleSheet, { waitUntil: 'domcontentloaded' })
+    await page.waitForFunction('document.fonts.ready')
     await page.emulateMediaType('screen')
 
     const pdfBufferBack = await page.pdf({
       format: 'A4',
       landscape: backOrientation === 'landscape',
-      scale: 1.29,
+      scale: 1,
       printBackground: true
     })
 
     await browser.close()
 
-    const doc = new Jspdf(frontOrientation, 'px', [width, height], compressPdf)
+    const doc = new Jspdf(frontOrientation, 'px', 'a4', compressPdf)
+
+    const width = doc.internal.pageSize.getWidth()
+    const height = doc.internal.pageSize.getHeight()
 
     // Add the image to the PDF
-    doc.addImage(Buffer.from(response.data), 'JPEG', 0, 0, width, height)
+    doc.addImage(response.data, 'JPEG', 0, 0, width, height, undefined, undefined)
 
     const pdfBufferFront = Buffer.from(doc.output('arraybuffer'))
     // Save the PDF as a file
