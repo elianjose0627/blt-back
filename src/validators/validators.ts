@@ -632,27 +632,6 @@ const validateGreetingCard = Joi.object({
   }).required()
 })
 
-const validateGreetingCardPrint = Joi.object({
-  print: Joi.object({
-    htmlText: Joi.string().allow('').allow(null),
-    imageUrl: Joi.string().uri(),
-    placeholders: Joi.object({
-      salutation: Joi.string().allow('').allow(null),
-      firstname: Joi.string().allow('').allow(null),
-      lastname: Joi.string().allow('').allow(null)
-    }),
-    frontOrientation: Joi.string().valid(...['portrait', 'landscape']),
-    backOrientation: Joi.string().valid(...['portrait', 'landscape']),
-    email: Joi.object({
-      to: Joi.string().email().required(),
-      from: Joi.string().email().required(),
-      subject: Joi.string().required(),
-      text: Joi.string().required()
-    }).required(),
-    exportSides: Joi.string().valid(...['front', 'back', 'both'])
-  })
-})
-
 export default {
   validateCreatedUser,
   validateLogin,
@@ -699,6 +678,5 @@ export default {
   validatePendingOrderAdmin,
   validateCardTemplate,
   validateCardSetting,
-  validateGreetingCard,
-  validateGreetingCardPrint
+  validateGreetingCard
 }

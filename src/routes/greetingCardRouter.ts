@@ -19,10 +19,6 @@ const greetingCardRoutes = (): any => {
     .get(celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(GreetingCardController.getAll))
-  greetingCardRouter.route('/greeting-cards/print')
-    .post(celebrate({
-      [Segments.BODY]: validator.validateGreetingCardPrint
-    }), asyncHandler(GreetingCardController.printCard))
   greetingCardRouter.use('/greeting-cards/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(GreetingCardController.checkRecord))
