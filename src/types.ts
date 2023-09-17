@@ -652,6 +652,8 @@ export interface IPendingOrder {
   shippingAddressRequests: ShippingAddressRequest[]
   paymentInformationRequests: PaymentInformationRequest[]
   isPosted: boolean
+  postedOrderId: Nullable<string>
+  isGreetingCardSent: boolean
   created: Date
   createdAt?: Date
   updatedAt?: Date
