@@ -3,7 +3,7 @@ import { Op } from 'sequelize'
 import db from '../models'
 
 const includeCompany = ['Address', 'CostCenter', 'Product', 'Order', 'AccessPermission', 'PendingOrder']
-const withoutUser = ['BundleItem', 'Salutation', 'Picture', 'SecondaryDomain', 'LegalText', 'ShippingMethod']
+const withoutUser = ['BundleItem', 'Salutation', 'Picture', 'SecondaryDomain', 'LegalText', 'ShippingMethod', 'GreetingCard']
 
 const includeCompanyAndOwner = {
   model: db.Company,
@@ -54,8 +54,13 @@ export const generateInclude = (model: string): any => {
         includeCompanyAndOwner,
         {
           model: db.CardTemplate,
-          attributes: { exclude: ['deletedAt'] },
+          attributes: { exclude: ['deletedAt', 'campaignId'] },
           as: 'cardTemplates'
+        },
+        {
+          model: db.CardSetting,
+          attributes: { exclude: ['deletedAt', 'campaignId'] },
+          as: 'cardSetting'
         }
       ]
     )
@@ -114,6 +119,20 @@ export function generateShippingAddressFilterQuery (filter: object): object {
     if (value !== undefined && value !== '') {
       filterQuery[`shippingAddress.${key}`] = {
         [Op.iLike]: `%${String(value)}%`
+      }
+    }
+  })
+
+  return filterQuery
+}
+
+export function generateFilterQuery (filter: object): object {
+  const filterQuery: Record<string, unknown> = {}
+
+  Object.entries(filter).forEach(([key, value]) => {
+    if (value !== undefined && value !== '') {
+      filterQuery[key] = {
+        [Op.eq]: value
       }
     }
   })

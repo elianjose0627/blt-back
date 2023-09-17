@@ -261,6 +261,7 @@ export interface ICampaign {
   updatedAt?: Date
   company?: ICompany
   cardTemplates?: ICardTemplate[]
+  cardSetting?: ICardSetting
 }
 
 export interface ISecondaryDomain {
@@ -651,6 +652,8 @@ export interface IPendingOrder {
   shippingAddressRequests: ShippingAddressRequest[]
   paymentInformationRequests: PaymentInformationRequest[]
   isPosted: boolean
+  postedOrderId: Nullable<string>
+  isGreetingCardSent: boolean
   created: Date
   createdAt?: Date
   updatedAt?: Date
@@ -666,6 +669,36 @@ export interface ICardTemplate {
   back: string
   frontOrientation: string
   backOrientation: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ICardSetting {
+  id: string
+  isEnabled: boolean
+  isFrontSelectable: boolean
+  isRotationEnabled: boolean
+  isBackEditable: boolean
+  isAutoProcessingEnabled: boolean
+  defaultBack: string
+  defaultFront: string
+  exportOrientation: 'portrait' | 'landscape'
+  exportSides: 'both' | 'front' | 'back'
+  supplierEmail: string
+  articleId: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface IGreetingCard {
+  id: string
+  articleNumber: string
+  articleName: string
+  url: string
+  totalStock: number
+  inventory: number
+  availableStock: number
+  jtlfpid: string
   createdAt: Date
   updatedAt: Date
 }

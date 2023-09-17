@@ -603,6 +603,35 @@ const validateCardTemplate = Joi.object({
   }).required()
 })
 
+const validateCardSetting = Joi.object({
+  cardSetting: Joi.object({
+    isEnabled: Joi.boolean().allow(null),
+    isFrontSelectable: Joi.boolean().allow(null),
+    isRotationEnabled: Joi.boolean().allow(null),
+    isBackEditable: Joi.boolean().allow(null),
+    isAutoProcessingEnabled: Joi.boolean().allow(null),
+    defaultBack: Joi.string().allow('').max(5000).allow(null),
+    defaultFront: Joi.string().allow('').max(5000).allow(null),
+    exportOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape']),
+    exportSides: Joi.string().allow('').allow(null).valid('both', 'front', 'back'),
+    supplierEmail: Joi.string().email().allow(null),
+    articleId: Joi.string().allow('').allow(null)
+  }).required()
+})
+
+const validateGreetingCard = Joi.object({
+  greetingCard: Joi.object({
+    articleNumber: Joi.string().required(),
+    articleName: Joi.string().required(),
+    url: Joi.string().uri().required(),
+    totalStock: Joi.number(),
+    inventory: Joi.number(),
+    availableStock: Joi.number(),
+    jtlfpid: Joi.string().required(),
+    companyId: Joi.string().uuid().allow(null).default(null)
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -647,5 +676,7 @@ export default {
   validateShippingMethod,
   validatePendingOrder,
   validatePendingOrderAdmin,
-  validateCardTemplate
+  validateCardTemplate,
+  validateCardSetting,
+  validateGreetingCard
 }

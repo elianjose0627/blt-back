@@ -35,6 +35,8 @@ export interface Database {
   AccessPermission?: any
   PendingOrder?: any
   CardTemplate?: any
+  CardSetting?: any
+  GreetingCard?: any
   [key: string]: any
 }
 

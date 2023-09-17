@@ -25,6 +25,9 @@
       ".js",
       ".ts"
     ],
+    "include": [
+      "src/"
+    ],
     "exclude": [
       "**/*.d.ts",
       "**/*.spec.ts",

@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { IPendingOrder, OrderLineRequest, ShippingAddressRequest, PaymentInformationRequest, ICompany } from '../types'
+import { IPendingOrder, OrderLineRequest, ShippingAddressRequest, PaymentInformationRequest, ICompany, Nullable } from '../types'
 
 const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
   interface PendingOrderAttributes {
@@ -30,6 +30,8 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     shippingAddressRequests: ShippingAddressRequest[]
     paymentInformationRequests: PaymentInformationRequest[]
     isPosted: boolean
+    postedOrderId: Nullable<string>
+    isGreetingCardSent: boolean
     created: Date
   }
 
@@ -61,6 +63,8 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly shippingAddressRequests: ShippingAddressRequest[]
     private readonly paymentInformationRequests: PaymentInformationRequest[]
     private readonly isPosted: boolean
+    private readonly postedOrderId: Nullable<string>
+    private readonly isGreetingCardSent: boolean
     private readonly created: Date
     private readonly createdAt: Date
     private readonly updatedAt: Date
@@ -113,6 +117,8 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
         shippingAddressRequests: this.shippingAddressRequests,
         paymentInformationRequests: this.paymentInformationRequests,
         isPosted: this.isPosted,
+        postedOrderId: this.postedOrderId,
+        isGreetingCardSent: this.isGreetingCardSent,
         created: this.created,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
@@ -228,6 +234,14 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
       allowNull: true
     },
     isPosted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    postedOrderId: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    isGreetingCardSent: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
