@@ -3,6 +3,7 @@ import { Op, Sequelize } from 'sequelize'
 import BaseService, { generateShippingAddressFilterQuery, generateInclude } from './BaseService'
 import db from '../models'
 import { IBundle } from '../types'
+import triggerPubSub from '../utils/triggerPubSub'
 
 class CampaignService extends BaseService {
   async insert (data: any): Promise<any> {
@@ -72,6 +73,18 @@ class CampaignService extends BaseService {
       count: records.count,
       rows: records.rows.map((record: any) => record.toJSONFor())
     }
+  }
+
+  async update (record: any, data: any): Promise<any> {
+    const updatedRecord = await record.update(data)
+
+    const topicId = 'quota'
+    const campaignId = record.id
+    const attributes = { campaignId }
+
+    await triggerPubSub(topicId, 'updateCorrectionQuota', attributes)
+
+    return updatedRecord.toJSONFor()
   }
 
   async getAllCampaignOrders (limit: number, offset: number, campaignId: string, search: string, filter = { firstname: '', lastname: '', email: '', city: '', country: '' }, jfsku = ''): Promise<any> {
