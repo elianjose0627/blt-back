@@ -420,6 +420,9 @@ export interface IOrder {
   shippingType: string
   shippingFee: number
   orderValue: number
+  createdByFullName: Nullable<string>
+  shipped: Nullable<Date>
+  deliveryDate: Nullable<Date>
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
