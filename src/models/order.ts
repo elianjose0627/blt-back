@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { Attribute, ICompany, IOrder, Item, SenderAddress, ShippingAddress } from '../types'
+import { Attribute, ICompany, IOrder, Item, Nullable, SenderAddress, ShippingAddress } from '../types'
 
 const OrderModel = (sequelize: any, DataTypes: any): any => {
   interface OrderAttributes {
@@ -23,6 +23,9 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
     shippingType: string
     shippingFee: number
     orderValue: number
+    createdByFullName: Nullable<string>
+    shipped: Nullable<Date>
+    deliveryDate: Nullable<Date>
   }
 
   class Order extends Model<OrderAttributes> {
@@ -46,6 +49,9 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly shippingType: string
     private readonly shippingFee: number
     private readonly orderValue: number
+    private readonly createdByFullName: Nullable<string>
+    private readonly shipped: Nullable<Date>
+    private readonly deliveryDate: Nullable<Date>
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany
@@ -80,6 +86,9 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
         shippingType: this.shippingType,
         shippingFee: this.shippingFee,
         orderValue: this.orderValue,
+        createdByFullName: this.createdByFullName,
+        shipped: this.shipped,
+        deliveryDate: this.deliveryDate,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         company: this.company
@@ -170,6 +179,18 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
       type: DataTypes.DOUBLE,
       allowNull: false,
       defaultValue: 0
+    },
+    createdByFullName: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    shipped: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    deliveryDate: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   }, {
     sequelize,
