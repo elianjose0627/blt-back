@@ -373,6 +373,7 @@ export interface ModificationInfo {
   createdAt: string
   updatedAt: string
   state: string
+  changesInRange?: object[]
 }
 
 export interface Outbound {
@@ -423,6 +424,7 @@ export interface IOrder {
   createdByFullName: Nullable<string>
   shipped: Nullable<Date>
   deliveryDate: Nullable<Date>
+  modificationInfo: Nullable<ModificationInfo>
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
