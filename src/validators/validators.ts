@@ -478,7 +478,8 @@ const validateOrder = Joi.object({
     shippingType: Joi.string(),
     shippingFee: Joi.number(),
     orderValue: Joi.number(),
-    attachments: Joi.any()
+    attachments: Joi.any(),
+    modificationInfo: Joi.any()
   })
 })
 
