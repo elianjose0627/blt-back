@@ -4,6 +4,9 @@ import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 import dayjs from 'dayjs'
 import triggerPubSub from '../utils/triggerPubSub'
+import * as userRoles from '../utils/userRoles'
+import * as statusCodes from '../constants/statusCodes'
+import { IPendingOrder } from '../types'
 
 dayjs.extend(utc)
 
@@ -45,6 +48,63 @@ class PendingOrderService extends BaseService {
     await triggerPubSub(topicId, 'postPendingOrders', attributes)
 
     return { response: response.map((response: any) => response.toJSONFor()), status: 201 }
+  }
+
+  async duplicate (data: any): Promise<any> {
+    const { postedOrderIds, currentUser } = data
+    const { role } = currentUser
+    const allowedRoles = [userRoles.ADMIN, userRoles.CAMPAIGNMANAGER, userRoles.COMPANYADMINISTRATOR]
+    const foundPendingOrders = await db.PendingOrder.findAndCountAll({
+      where: {
+        postedOrderId: postedOrderIds
+      },
+      attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'postedOrderId', 'isPosted', 'isGreetingCardSent'] },
+      raw: true
+    })
+
+    if (!allowedRoles.includes(role)) {
+      return {
+        message: 'Only admin, company admin or campaign manager can perform this action',
+        statusCode: statusCodes.FORBIDDEN
+      }
+    }
+
+    if (foundPendingOrders.count === 0) {
+      return {
+        message: 'Pending orders not found',
+        statusCode: statusCodes.NOT_FOUND
+      }
+    }
+
+    const isEmployee = foundPendingOrders.rows.every((foundPendingOrder: IPendingOrder) => foundPendingOrder.companyId === currentUser.companyId)
+    if (role !== userRoles.ADMIN && isEmployee === false) {
+      return {
+        message: 'All orders must belong to the same company as the user',
+        statusCode: statusCodes.FORBIDDEN
+      }
+    }
+
+    const bulkInsertData = foundPendingOrders.rows.map((pendingOrder: any) => ({
+      ...pendingOrder,
+      id: uuidv1(),
+      shipped: dayjs.utc().add(3, 'days').format(),
+      deliverydate: dayjs.utc().add(3, 'days').format(),
+      userId: currentUser.id,
+      created: dayjs.utc().format(),
+      createdBy: currentUser.email,
+      updatedBy: currentUser.email,
+      createdByFullName: `${String(currentUser.firstName)} ${String(currentUser.lastName)}`
+    }))
+
+    const topicId = 'pending-orders'
+    const environment = String(process.env.ENVIRONMENT)
+    const attributes = { environment }
+
+    await triggerPubSub(topicId, 'postPendingOrders', attributes)
+
+    const response = await db.PendingOrder.bulkCreate(bulkInsertData, { returning: true })
+
+    return response
   }
 }
 
