@@ -11,11 +11,15 @@ import checkAdmin from '../middlewares/checkAdmin'
 const pendingOrderRoutes = (): any => {
   const pendingOrderRouter = express.Router()
 
-  pendingOrderRouter.use('/pending-orders', checkAuth, checkUserIsVerifiedStatus, checkAdmin)
+  pendingOrderRouter.use('/pending-orders', checkAuth, checkUserIsVerifiedStatus)
   pendingOrderRouter.route('/pending-orders')
-    .get(celebrate({
+    .get(asyncHandler(checkAdmin), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(PendingOrderController.getAll))
+  pendingOrderRouter.route('/pending-orders/duplicate')
+    .post(celebrate({
+      [Segments.BODY]: validator.validatePostedOrderIds
+    }), asyncHandler(PendingOrderController.duplicate))
 
   return pendingOrderRouter
 }

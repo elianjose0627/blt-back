@@ -895,6 +895,20 @@ export const createCompanyOrderWithMissingCityStreetZip = async (companyId: stri
   return res
 }
 
+export const updatePendingOrderWithPostedOrderId = async (id: string, postedOrderId: string): Promise<any> => {
+  const pendingOrder = await db.PendingOrder.findOne({
+    where: {
+      id
+    }
+  })
+
+  if (pendingOrder !== null) {
+    await pendingOrder.update({
+      postedOrderId
+    })
+  }
+}
+
 export const pendingOrders = [
   {
     costCenter: '',
