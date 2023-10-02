@@ -633,6 +633,10 @@ const validateGreetingCard = Joi.object({
   }).required()
 })
 
+const validatePostedOrderIds = Joi.object().keys({
+  postedOrderIds: Joi.array().items(Joi.string().min(17)).min(1).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -679,5 +683,6 @@ export default {
   validatePendingOrderAdmin,
   validateCardTemplate,
   validateCardSetting,
-  validateGreetingCard
+  validateGreetingCard,
+  validatePostedOrderIds
 }

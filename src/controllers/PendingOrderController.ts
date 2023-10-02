@@ -58,6 +58,28 @@ class PendingOrderController extends BaseController {
       [this.service.manyRecords()]: response
     })
   }
+
+  async duplicate (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { body: { postedOrderIds }, user: currentUser } = req
+
+    const response = await pendingOrderService.duplicate({ postedOrderIds, currentUser })
+
+    if (response.message !== undefined) {
+      return res.status(response.statusCode).send({
+        statusCode: response.statusCode,
+        success: false,
+        errors: {
+          message: response.message
+        }
+      })
+    }
+
+    return res.status(statusCodes.CREATED).send({
+      statusCode: statusCodes.CREATED,
+      success: true,
+      pendingOrders: response
+    })
+  }
 }
 
 export default new PendingOrderController(pendingOrderService)
