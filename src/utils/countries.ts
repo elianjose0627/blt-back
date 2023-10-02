@@ -236,7 +236,7 @@ export const countries = [
   'United Arab Emirates',
   'UK',
   'United States Minor Outlying Islands',
-  'USA',
+  'United States',
   'Uruguay',
   'Uzbekistan',
   'Vatican',
