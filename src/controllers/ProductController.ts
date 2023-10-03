@@ -115,7 +115,7 @@ class ProductController extends BaseController {
 
   async getProductOutbounds (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { record: product, query: { limit, page, offset } } = req
-    const records = await productService.getProductOutbounds(offset, product)
+    const records = await productService.getProductOutbounds(limit, offset, product)
 
     const meta = {
       total: records.count,

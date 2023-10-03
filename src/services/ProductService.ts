@@ -124,9 +124,10 @@ class ProductService extends BaseService {
     return data
   }
 
-  async getProductOutbounds (offset: number, product: IProduct): Promise<any> {
+  async getProductOutbounds (limit: number, offset: number, product: IProduct): Promise<any> {
     const records = await db.Order.findAndCountAll({
       attributes: { exclude: ['attributes', 'deletedAt'] },
+      limit,
       offset,
       order,
       where: {
