@@ -670,4 +670,32 @@ describe('Product actions', () => {
       expect(res.body.errors.message).to.equal('Company not found')
     })
   })
+  describe('Get outbounds of a product', () => {
+    it('Should return 200 OK when an admin gets outbounds of a product', async () => {
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: 'J12371',
+            merchantSku: '12371',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      const productId = resProduct.body.product.id
+
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${String(productId)}/outbounds`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'outbounds')
+      expect(res.body.outbounds).to.be.an('array')
+    })
+  })
 })
