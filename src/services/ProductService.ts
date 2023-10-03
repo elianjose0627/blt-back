@@ -5,6 +5,18 @@ import db from '../models'
 import axios from 'axios'
 import { IProduct } from '../types'
 
+const baseURL = process.env.JTL_API_URL as string
+
+const apiClient: any = axios.create({
+  baseURL: `${baseURL}/api/v1/merchant`,
+  withCredentials: false,
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  },
+  timeout: 30000
+})
+
 const order = [['createdAt', 'DESC']]
 
 class ProductService extends BaseService {
@@ -103,18 +115,6 @@ class ProductService extends BaseService {
   }
 
   async getProductStock (product: IProduct): Promise<any> {
-    const baseURL = process.env.JTL_API_URL as string
-
-    const apiClient: any = axios.create({
-      baseURL: `${baseURL}/api/v1/merchant`,
-      withCredentials: false,
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      },
-      timeout: 30000
-    })
-
     const token = await db.Token.findOne()
     const { accessToken } = token
     apiClient.defaults.headers.common.Authorization = `Bearer ${String(accessToken)}`
@@ -138,6 +138,25 @@ class ProductService extends BaseService {
     })
 
     return records
+  }
+
+  async getProductInbounds (limit: number, offset: number, product: IProduct): Promise<any> {
+    const token = await db.Token.findOne()
+    const { accessToken } = token
+    apiClient.defaults.headers.common.Authorization = `Bearer ${String(accessToken)}`
+
+    const config = {
+      params: {
+        $top: limit,
+        $skip: offset,
+        $orderBy: 'modificationInfo/createdAt desc',
+        $filter: `items/any(a:contains(a/jfsku, '${String(product.jfsku)}'))`
+      }
+    }
+
+    const { data } = await apiClient.get('/inbounds', config)
+
+    return data
   }
 }
 
