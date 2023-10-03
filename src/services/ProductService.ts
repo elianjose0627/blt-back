@@ -5,6 +5,8 @@ import db from '../models'
 import axios from 'axios'
 import { IProduct } from '../types'
 
+const order = [['createdAt', 'DESC']]
+
 class ProductService extends BaseService {
   async insert (data: any): Promise<any> {
     const { company, product } = data
@@ -36,7 +38,6 @@ class ProductService extends BaseService {
     const where: any = {
       companyId
     }
-    const order = [['createdAt', 'DESC']]
     const attributes: any = { exclude: [] }
     const include: any[] = []
 
@@ -69,7 +70,6 @@ class ProductService extends BaseService {
 
   async getAll (limit: number, offset: number, search: string = ''): Promise<any> {
     const where: any = {}
-    const order = [['createdAt', 'DESC']]
     const attributes: any = { exclude: [] }
     const include: any[] = [
       {
@@ -122,6 +122,21 @@ class ProductService extends BaseService {
     const { data } = await apiClient.get(`/stocks/${String(product.jfsku)}`)
 
     return data
+  }
+
+  async getProductOutbounds (offset: number, product: IProduct): Promise<any> {
+    const records = await db.Order.findAndCountAll({
+      attributes: { exclude: ['attributes', 'deletedAt'] },
+      offset,
+      order,
+      where: {
+        items: {
+          [Op.contains]: [{ jfsku: product.jfsku }]
+        }
+      }
+    })
+
+    return records
   }
 }
 

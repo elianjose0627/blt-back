@@ -113,6 +113,25 @@ class ProductController extends BaseController {
     })
   }
 
+  async getProductOutbounds (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record: product, query: { limit, page, offset } } = req
+    const records = await productService.getProductOutbounds(offset, product)
+
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / limit),
+      perPage: limit,
+      page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      outbounds: records.rows
+    })
+  }
+
   async updateProductCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { record, body: { product: { companyId } } } = req
 

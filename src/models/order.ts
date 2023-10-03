@@ -130,7 +130,7 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false
     },
     items: {
-      type: DataTypes.JSON,
+      type: DataTypes.JSONB,
       allowNull: true
     },
     senderAddress: {
