@@ -5,6 +5,20 @@ import db from '../models'
 import axios from 'axios'
 import { IProduct } from '../types'
 
+const baseURL = process.env.JTL_API_URL as string
+
+const apiClient: any = axios.create({
+  baseURL: `${baseURL}/api/v1/merchant`,
+  withCredentials: false,
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  },
+  timeout: 30000
+})
+
+const order = [['createdAt', 'DESC']]
+
 class ProductService extends BaseService {
   async insert (data: any): Promise<any> {
     const { company, product } = data
@@ -36,7 +50,6 @@ class ProductService extends BaseService {
     const where: any = {
       companyId
     }
-    const order = [['createdAt', 'DESC']]
     const attributes: any = { exclude: [] }
     const include: any[] = []
 
@@ -69,7 +82,6 @@ class ProductService extends BaseService {
 
   async getAll (limit: number, offset: number, search: string = ''): Promise<any> {
     const where: any = {}
-    const order = [['createdAt', 'DESC']]
     const attributes: any = { exclude: [] }
     const include: any[] = [
       {
@@ -103,23 +115,46 @@ class ProductService extends BaseService {
   }
 
   async getProductStock (product: IProduct): Promise<any> {
-    const baseURL = process.env.JTL_API_URL as string
-
-    const apiClient: any = axios.create({
-      baseURL: `${baseURL}/api/v1/merchant`,
-      withCredentials: false,
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      },
-      timeout: 30000
-    })
-
     const token = await db.Token.findOne()
     const { accessToken } = token
     apiClient.defaults.headers.common.Authorization = `Bearer ${String(accessToken)}`
 
     const { data } = await apiClient.get(`/stocks/${String(product.jfsku)}`)
+
+    return data
+  }
+
+  async getProductOutbounds (limit: number, offset: number, product: IProduct): Promise<any> {
+    const records = await db.Order.findAndCountAll({
+      attributes: { exclude: ['attributes', 'deletedAt'] },
+      limit,
+      offset,
+      order,
+      where: {
+        items: {
+          [Op.contains]: [{ jfsku: product.jfsku }]
+        }
+      }
+    })
+
+    return records
+  }
+
+  async getProductInbounds (limit: number, offset: number, product: IProduct): Promise<any> {
+    const token = await db.Token.findOne()
+    const { accessToken } = token
+    apiClient.defaults.headers.common.Authorization = `Bearer ${String(accessToken)}`
+
+    const config = {
+      params: {
+        $top: limit,
+        $skip: offset,
+        $orderBy: 'modificationInfo/createdAt desc',
+        $filter: `items/any(a:contains(a/jfsku, '${String(product.jfsku)}'))`
+      }
+    }
+
+    const { data } = await apiClient.get('/inbounds', config)
 
     return data
   }
