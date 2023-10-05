@@ -90,7 +90,9 @@ describe('Picture actions', () => {
 
       expect(res).to.have.status(204)
     })
+  })
 
+  describe('Get greeting cards', () => {
     it('Should return 200 OK when a user gets all cards from firebase.', async () => {
       const res = await chai
         .request(app)
@@ -122,7 +124,7 @@ describe('Picture actions', () => {
         .get('/api/pictures/cards')
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .query({
-          limit: 1000
+          limit: 1
         })
 
       expect(res).to.have.status(200)

@@ -17,10 +17,25 @@ initializeApp({
 const storageBucket = process.env.STORAGE_BUCKET
 const bucket = getStorage().bucket(storageBucket)
 
-const createPersistentDownloadUrl = (bucket: string, pathToFile: string, downloadToken: string): string => {
-  return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(
+const createPersistentDownloadUrl = (bucketName: string, pathToFile: string, downloadToken: string): string => {
+  return `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(
     pathToFile
   )}?alt=media&token=${downloadToken}`
+}
+
+const createThumbnailUrl = async (bucketName: string, pathToFile: string, prefix: string): Promise<string> => {
+  const filenameExt = path.basename(pathToFile)
+  const ext = filenameExt.slice((filenameExt.lastIndexOf('.') - 1 >>> 0) + 2)
+  const filename = filenameExt.split('.').slice(0, -1).join('.')
+
+  let thumbnailPathToFile = `cards/companies/thumbnails/${filename}_595x842.${ext}`
+  if (prefix === 'cards/general/') {
+    thumbnailPathToFile = `cards/thumbnails/${filename}_595x842.${ext}`
+  }
+
+  return `https://storage.googleapis.com/${bucketName}/${encodeURIComponent(
+    thumbnailPathToFile
+  )}`
 }
 
 class PictureService extends BaseService {
@@ -67,7 +82,7 @@ class PictureService extends BaseService {
   }
 
   async getCardsFromFirebase (limit: number, pageToken?: string, companyId?: string): Promise<any> {
-    const prefix = companyId != null ? `cards/companies/${companyId}` : 'cards/general'
+    const prefix = companyId != null ? `cards/companies/${companyId}/` : 'cards/general/'
     const queryOptions = {
       prefix, // Filter files with the specified folderName as the prefix
       maxResults: limit, // Limit the number of results to the page size
@@ -75,7 +90,7 @@ class PictureService extends BaseService {
     }
     const [files, nextPage]: any = await bucket.getFiles(queryOptions)
 
-    const downloadUrls: Array<{ id: string, url: string, name: string, signedUrl: string }> = []
+    const downloadUrls: Array<{ id: string, url: string, name: string, signedUrl: string, thumbnailUrl: string }> = []
 
     const options: any = {
       version: 'v4', // Use version 4 of signed URLs
@@ -88,8 +103,10 @@ class PictureService extends BaseService {
         const [signedUrl] = await file.getSignedUrl(options)
         const [metadata] = await file.getMetadata()
         const downloadUrl = createPersistentDownloadUrl(metadata.bucket, metadata.name, metadata.metadata.firebaseStorageDownloadTokens)
+
+        const thumbnailUrl = await createThumbnailUrl(metadata.bucket, metadata.name, prefix)
         const filename = path.basename(file.name)
-        downloadUrls.push({ id: uuidv1(), url: downloadUrl, name: filename, signedUrl })
+        downloadUrls.push({ id: uuidv1(), url: downloadUrl, name: filename, signedUrl, thumbnailUrl })
       }
     }
 
