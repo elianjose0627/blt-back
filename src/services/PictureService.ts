@@ -24,20 +24,18 @@ const createPersistentDownloadUrl = (bucketName: string, pathToFile: string, dow
 }
 
 const createThumbnailUrl = async (bucketName: string, pathToFile: string, prefix: string): Promise<string> => {
-  const filename = pathToFile.split(prefix)[1]
-  const ext = filename.slice((filename.lastIndexOf('.') - 1 >>> 0) + 2)
-  const fileName = filename.split('.').slice(0, -1).join('.')
+  const filenameExt = path.basename(pathToFile)
+  const ext = filenameExt.slice((filenameExt.lastIndexOf('.') - 1 >>> 0) + 2)
+  const filename = filenameExt.split('.').slice(0, -1).join('.')
 
-  let thumbnailPathToFile = `cards/companies/thumbnails/${fileName}_595x842.${ext}`
+  let thumbnailPathToFile = `cards/companies/thumbnails/${filename}_595x842.${ext}`
   if (prefix === 'cards/general/') {
-    thumbnailPathToFile = `cards/thumbnails/${fileName}_595x842.${ext}`
+    thumbnailPathToFile = `cards/thumbnails/${filename}_595x842.${ext}`
   }
-  const file = bucket.file(`${thumbnailPathToFile}`)
-  const [metadata] = await file.getMetadata()
 
-  return `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(
+  return `https://storage.googleapis.com/${bucketName}/${encodeURIComponent(
     thumbnailPathToFile
-  )}?alt=media&token=${String(metadata.metadata.firebaseStorageDownloadTokens)}`
+  )}`
 }
 
 class PictureService extends BaseService {
