@@ -87,8 +87,8 @@ class PendingOrderService extends BaseService {
     const bulkInsertData = foundPendingOrders.rows.map((pendingOrder: any) => ({
       ...pendingOrder,
       id: uuidv1(),
-      shipped: dayjs.utc().add(3, 'days').format(),
-      deliverydate: dayjs.utc().add(3, 'days').format(),
+      shipped: dayjs.utc().add(3, 'days').add(1, 'hour').format(),
+      deliverydate: dayjs.utc().add(3, 'days').add(1, 'hour').format(),
       userId: currentUser.id,
       created: dayjs.utc().format(),
       createdBy: currentUser.email,
