@@ -26,6 +26,7 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
     createdByFullName: Nullable<string>
     shipped: Nullable<Date>
     deliveryDate: Nullable<Date>
+    createdAtByUser: Nullable<Date>
     modificationInfo: Nullable<ModificationInfo>
   }
 
@@ -53,6 +54,7 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly createdByFullName: Nullable<string>
     private readonly shipped: Nullable<Date>
     private readonly deliveryDate: Nullable<Date>
+    private readonly createdAtByUser: Nullable<Date>
     private readonly modificationInfo: Nullable<ModificationInfo>
     private readonly createdAt: Date
     private readonly updatedAt: Date
@@ -91,6 +93,7 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
         createdByFullName: this.createdByFullName,
         shipped: this.shipped,
         deliveryDate: this.deliveryDate,
+        createdAtByUser: this.createdAtByUser,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         modificationInfo: this.modificationInfo,
@@ -192,6 +195,10 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
       allowNull: true
     },
     deliveryDate: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    createdAtByUser: {
       type: DataTypes.DATE,
       allowNull: true
     },
