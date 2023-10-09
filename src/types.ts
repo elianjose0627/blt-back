@@ -424,6 +424,7 @@ export interface IOrder {
   createdByFullName: Nullable<string>
   shipped: Nullable<Date>
   deliveryDate: Nullable<Date>
+  createdAtByUser: Nullable<Date>
   modificationInfo: Nullable<ModificationInfo>
   createdAt?: Date
   updatedAt?: Date
