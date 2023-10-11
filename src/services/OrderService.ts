@@ -20,7 +20,8 @@ class OrderService extends BaseService {
               { 'shippingAddress.lastname': { [Op.iLike]: `%${search}%` } },
               { 'shippingAddress.email': { [Op.iLike]: `%${search}%` } },
               { 'shippingAddress.company': { [Op.iLike]: `%${search}%` } },
-              { 'shippingAddress.city': { [Op.iLike]: `%${search}%` } }
+              { 'shippingAddress.city': { [Op.iLike]: `%${search}%` } },
+              { outboundId: { [Op.iLike]: `%${search}%` } }
             ]
           },
           where
