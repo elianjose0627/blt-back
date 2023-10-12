@@ -10,7 +10,24 @@ const productService = new ProductService('Product')
 const companyService = new CompanyService('Company')
 
 class ProductController extends BaseController {
-  checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+  async checkRecord (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
+    const { params: { id } } = req
+    const record = await productService.get(id)
+
+    if (record === null) {
+      return res.status(statusCodes.NOT_FOUND).send({
+        statusCode: statusCodes.NOT_FOUND,
+        success: false,
+        errors: {
+          message: 'Product not found'
+        }
+      })
+    }
+    req.record = record
+    return next()
+  }
+
+  checkOwnerOrAdminOrEmployee (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: { companyId, company } } = req
 
     const isOwnerOrAdmin = currentUser.id === company?.owner?.id || currentUser.role === userRoles.ADMIN
@@ -24,7 +41,7 @@ class ProductController extends BaseController {
         statusCode: statusCodes.FORBIDDEN,
         success: false,
         errors: {
-          message: 'Only the owner, admin, company administrator or campaign manager can perform this action'
+          message: 'Only the owner, admin or employee can perform this action'
         }
       })
     }
@@ -60,6 +77,17 @@ class ProductController extends BaseController {
       statusCode: statusCode[status],
       success: true,
       [this.service.singleRecord()]: response
+    })
+  }
+
+  async get (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { id } = req.params
+    const record = await productService.get(id)
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      [this.recordName()]: record.toJSONFor()
     })
   }
 
