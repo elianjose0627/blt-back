@@ -153,6 +153,10 @@ const validateTrackingId = Joi.object().keys({
   trackingId: Joi.string()
 })
 
+const validateProductId = Joi.object().keys({
+  id: Joi.alternatives().try(Joi.string().uuid(), Joi.string().length(11))
+})
+
 const validateQueryParams = Joi.object({
   limit: Joi.number().optional(),
   page: Joi.number().optional(),
@@ -684,5 +688,6 @@ export default {
   validateCardTemplate,
   validateCardSetting,
   validateGreetingCard,
-  validatePostedOrderIds
+  validatePostedOrderIds,
+  validateProductId
 }

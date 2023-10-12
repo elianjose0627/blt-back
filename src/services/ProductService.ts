@@ -1,5 +1,6 @@
 import { v1 as uuidv1 } from 'uuid'
 import { Op } from 'sequelize'
+import { Joi } from 'celebrate'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 import axios from 'axios'
@@ -157,6 +158,19 @@ class ProductService extends BaseService {
     const { data } = await apiClient.get('/inbounds', config)
 
     return data
+  }
+
+  async get (id: string): Promise<any> {
+    const { error } = Joi.string().guid().validate(id)
+
+    const where = error === undefined ? { id } : { jfsku: id }
+
+    const product = await db.Product.findOne({
+      include: generateInclude(this.model),
+      where
+    })
+
+    return product
   }
 }
 

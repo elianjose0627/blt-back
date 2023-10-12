@@ -420,6 +420,34 @@ describe('Product actions', () => {
       expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
     })
 
+    it('Should return 200 OK when an owner gets a product by id that is a jfsku.', async () => {
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: 'VZ9N0169YEV',
+            merchantSku: '1231',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      const productId = resProduct.body.product.jfsku
+
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${String(productId)}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt')
+    })
+
     it('Should return 422 Unprocessable entity when an administrator gets a product using an invalid id.', async () => {
       const res = await chai
         .request(app)
@@ -502,7 +530,7 @@ describe('Product actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, admin, company administrator or campaign manager can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner, admin or employee can perform this action')
     })
 
     it('Should return 200 OK when an administrator deletes a product by id.', async () => {
@@ -554,7 +582,7 @@ describe('Product actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner, admin, company administrator or campaign manager can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner, admin or employee can perform this action')
     })
   })
 
