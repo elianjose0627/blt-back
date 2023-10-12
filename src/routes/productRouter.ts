@@ -21,27 +21,27 @@ const ProductRoutes = (): Router => {
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(ProductController.getAll))
   productRouter.use('/products/:id', celebrate({
-    [Segments.PARAMS]: validator.validateUUID
+    [Segments.PARAMS]: validator.validateProductId
   }, { abortEarly: false }), asyncHandler(ProductController.checkRecord))
   productRouter.route('/products/:id')
-    .get(asyncHandler(ProductController.checkOwnerOrAdmin),
+    .get(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions), asyncHandler(ProductController.get))
-    .put(asyncHandler(ProductController.checkOwnerOrAdmin),
+    .put(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions), celebrate({
         [Segments.BODY]: validator.validateProduct
       }), asyncHandler(ProductController.update))
-    .delete(asyncHandler(ProductController.checkOwnerOrAdmin),
+    .delete(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions), asyncHandler(ProductController.delete))
   productRouter.route('/products/:id/stocks')
-    .get(asyncHandler(ProductController.checkOwnerOrAdmin),
+    .get(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions), asyncHandler(ProductController.getProductStock))
   productRouter.route('/products/:id/outbounds')
-    .get(asyncHandler(ProductController.checkOwnerOrAdmin),
+    .get(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions), celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(ProductController.getProductOutbounds))
   productRouter.route('/products/:id/inbounds')
-    .get(asyncHandler(ProductController.checkOwnerOrAdmin),
+    .get(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions), celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(ProductController.getProductInbounds))
