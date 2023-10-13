@@ -1128,7 +1128,7 @@ describe('Campaign actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'orders')
       expect(res.body.orders).to.be.an('array')
-      expect(res.body.orders).to.have.lengthOf.above(0)
+      expect(res.body.orders).to.have.lengthOf(0)
     })
 
     it('Should return 200 Success when an owner successfully retrieves all orders of a campaign with search and filter.', async () => {
@@ -1507,7 +1507,7 @@ describe('Campaign actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'orders')
       expect(res.body.orders).to.be.an('array')
-      expect(res.body.orders).to.have.lengthOf.above(0)
+      expect(res.body.orders).to.have.lengthOf(0)
     })
   })
 

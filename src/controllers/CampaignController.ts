@@ -84,9 +84,9 @@ class CampaignController extends BaseController {
   }
 
   async getAllCampaignOrders (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { query: { limit, page, offset, search, filter }, params: { id: campaignId, jfsku } } = req
+    const { query: { limit, page, offset, search, filter }, params: { id: campaignId, jfsku }, user } = req
 
-    const records = await campaignService.getAllCampaignOrders(limit, offset, campaignId, search, filter, jfsku)
+    const records = await campaignService.getAllCampaignOrders(limit, offset, campaignId, user, search, filter, jfsku)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),

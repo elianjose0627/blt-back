@@ -4,6 +4,8 @@ import BaseService, { generateShippingAddressFilterQuery, generateInclude } from
 import db from '../models'
 import { IBundle } from '../types'
 import triggerPubSub from '../utils/triggerPubSub'
+import * as userRoles from '../utils/userRoles'
+import * as appModules from '../utils/appModules'
 
 class CampaignService extends BaseService {
   async insert (data: any): Promise<any> {
@@ -87,7 +89,8 @@ class CampaignService extends BaseService {
     return updatedRecord.toJSONFor()
   }
 
-  async getAllCampaignOrders (limit: number, offset: number, campaignId: string, search: string, filter = { firstname: '', lastname: '', email: '', city: '', country: '' }, jfsku = ''): Promise<any> {
+  // to be fixed
+  async getAllCampaignOrders (limit: number, offset: number, campaignId: string, user: any, search: string, filter = { firstname: '', lastname: '', email: '', city: '', country: '' }, jfsku = ''): Promise<any> {
     let query = ''
     const bundles = await db.Bundle.findAll({
       attributes: ['jfsku'],
@@ -130,22 +133,85 @@ class CampaignService extends BaseService {
     } else {
       query = jfskus.map((jfsku: string) => `items::JSONB @> '[{ "jfsku": "${jfsku}" }]'`).join(' OR ') as string
     }
-    const records = await db.Order.findAndCountAll({
-      limit,
-      offset,
-      order: [['createdAt', 'DESC']],
-      attributes: { exclude: [] },
-      where: {
-        [Op.and]: [
-          Sequelize.literal(`(${query})`),
-          where
-        ]
+    let records
+    const allowedCompanyRoles = [userRoles.CAMPAIGNMANAGER, userRoles.COMPANYADMINISTRATOR]
+
+    if (user.role === userRoles.ADMIN) {
+      records = await db.Order.findAndCountAll({
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude: [] },
+        where: {
+          [Op.and]: [
+            Sequelize.literal(`(${query})`),
+            where
+          ]
+        }
+      })
+    } else if (allowedCompanyRoles.includes(user.role)) {
+      records = await db.Order.findAndCountAll({
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude: [] },
+        where: {
+          [Op.and]: [
+            Sequelize.literal(`(${query})`),
+            where
+          ],
+          companyId: user.company.id
+        }
+      })
+    } else {
+      records = await db.Order.findAndCountAll({
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude: [] },
+        where: {
+          [Op.and]: [
+            Sequelize.literal(`(${query})`),
+            where
+          ],
+          'shippingAddress.email': user.email
+        }
+      })
+    }
+
+    const companyId = user.company?.id
+    const privacyRule = companyId !== undefined
+      ? await db.PrivacyRule.findOne({
+        where: {
+          companyId,
+          role: user.role,
+          isEnabled: true,
+          module: appModules.ORDERS
+        }
+      })
+      : null
+
+    const count = records.count
+
+    records = records.rows.map((record: any) => {
+      if (privacyRule !== null) {
+        record.shippingAddress = {
+          company: record.shippingAddress.company,
+          lastname: record.shippingAddress.lastname,
+          city: record.shippingAddress.city?.replace(/./g, '*'),
+          email: record.shippingAddress.email?.replace(/.(?=.*@)/g, '*'),
+          firstname: record.shippingAddress.firstname,
+          street: record.shippingAddress.street?.replace(/./g, '*'),
+          zip: record.shippingAddress.zip?.replace(/./g, '*'),
+          country: record.shippingAddress.country?.replace(/./g, '*')
+        }
       }
+      return record.toJSONFor()
     })
 
     return {
-      count: records.count,
-      rows: records.rows.map((record: any) => record.toJSONFor())
+      count,
+      rows: records
     }
   }
 }
