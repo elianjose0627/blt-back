@@ -1,5 +1,5 @@
 import BaseController from './BaseController'
-import { CustomRequest, CustomResponse, StatusCode } from '../types'
+import type { CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import SecondaryDomainService from '../services/SecondaryDomainService'
 import * as statusCodes from '../constants/statusCodes'

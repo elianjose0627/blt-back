@@ -1,4 +1,4 @@
-import { CustomNext, CustomRequest, CustomResponse } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse } from '../types'
 
 const paginate = (req: CustomRequest, res: CustomResponse, next: CustomNext): any => {
   let { limit, page }: { limit: number, page: number} = req.query

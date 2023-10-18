@@ -1,5 +1,5 @@
 import * as statusCodes from '../constants/statusCodes'
-import { CustomNext, CustomRequest, CustomResponse } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse } from '../types'
 import logger from '../utils/logger'
 
 const errorMessages = [

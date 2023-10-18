@@ -1,5 +1,5 @@
 import sgMail from '@sendgrid/mail'
-import { EmailMessage } from '../types'
+import type { EmailMessage } from '../types'
 
 sgMail.setApiKey(String(process.env.SENDGRID_API_KEY))
 

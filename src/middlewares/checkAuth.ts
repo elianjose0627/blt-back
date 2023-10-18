@@ -1,6 +1,6 @@
 import passport from 'passport'
 import * as statusCodes from '../constants/statusCodes'
-import { CustomNext, CustomRequest, CustomResponse } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse } from '../types'
 
 const checkAuth = (req: CustomRequest, res: CustomResponse, next: CustomNext): any => {
   passport.authenticate('jwt', { session: false }, function (err, user, info) {

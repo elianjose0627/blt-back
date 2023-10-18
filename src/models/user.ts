@@ -1,7 +1,7 @@
 import { Model } from 'sequelize'
 import bcrypt from 'bcrypt'
 import capitalize from '../utils/capitalize'
-import { LoginTime, MediaData, INotifications, Nullable, Role, IUser, ICompany, IAddress } from '../types'
+import type { LoginTime, MediaData, INotifications, Nullable, Role, IUser, ICompany, IAddress } from '../types'
 import * as userRoles from '../utils/userRoles'
 
 const UserModel = (sequelize: any, DataTypes: any): any => {

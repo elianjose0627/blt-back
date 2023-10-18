@@ -1,6 +1,6 @@
 import BaseController from './BaseController'
 import ShipmentService from '../services/ShipmentService'
-import { CustomRequest, CustomResponse, TrackingData } from '../types'
+import type { CustomRequest, CustomResponse, TrackingData } from '../types'
 import * as statusCodes from '../constants/statusCodes'
 import DHLService from '../services/DHLService'
 

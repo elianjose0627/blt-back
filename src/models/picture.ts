@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { IPicture } from '../types'
+import type { IPicture } from '../types'
 
 const PictureModel = (sequelize: any, DataTypes: any): any => {
   interface PictureAttributes {

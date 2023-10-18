@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { IBundle, ICampaign, IPicture, ISpecifications } from '../types'
+import type { IBundle, ICampaign, IPicture, ISpecifications } from '../types'
 
 const BundleModel = (sequelize: any, DataTypes: any): any => {
   interface BundleAttributes {

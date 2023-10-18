@@ -1,6 +1,6 @@
 import BaseController from './BaseController'
 import AddressService from '../services/AddressService'
-import { CustomNext, CustomRequest, CustomResponse } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse } from '../types'
 import * as statusCodes from '../constants/statusCodes'
 
 const addressService = new AddressService('Address')

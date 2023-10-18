@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { IAccessPermission, IAddress, ICompany, ISecondaryDomain, IUser } from '../types'
+import type { IAccessPermission, IAddress, ICompany, ISecondaryDomain, IUser } from '../types'
 
 const CompanyModel = (sequelize: any, DataTypes: any): any => {
   interface CompanyAttributes {

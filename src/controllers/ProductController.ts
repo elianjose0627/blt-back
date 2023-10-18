@@ -1,7 +1,7 @@
 import BaseController from './BaseController'
 import ProductService from '../services/ProductService'
 import CompanyService from '../services/CompanyService'
-import { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'

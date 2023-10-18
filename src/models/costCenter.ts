@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { ICostCenter } from '../types'
+import type { ICostCenter } from '../types'
 
 const CostCenterModel = (sequelize: any, DataTypes: any): any => {
   interface CostCenterAttributes {
