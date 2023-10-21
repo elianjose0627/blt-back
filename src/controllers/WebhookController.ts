@@ -1,7 +1,7 @@
 import { EventWebhook, EventWebhookHeader } from '@sendgrid/eventwebhook'
 import BaseController from './BaseController'
 import WebhookService from '../services/WebhookService'
-import { CustomRequest, CustomResponse, SlackEvent } from '../types'
+import type { CustomRequest, CustomResponse, SlackEvent } from '../types'
 import SlackService from '../services/SlackService'
 import * as statusCodes from '../constants/statusCodes'
 

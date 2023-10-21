@@ -1,6 +1,6 @@
 import BaseController from './BaseController'
 import CardTemplateService from '../services/CardTemplateService'
-import { CustomRequest, CustomResponse, CustomNext, StatusCode } from '../types'
+import type { CustomRequest, CustomResponse, CustomNext, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'

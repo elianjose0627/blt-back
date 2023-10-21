@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { IAccessPermission, ICompany, Module, Permission, Role } from '../types'
+import type { IAccessPermission, ICompany, Module, Permission, Role } from '../types'
 
 const AccessPermissionModel = (sequelize: any, DataTypes: any): any => {
   interface AccessPermissionAttributes {

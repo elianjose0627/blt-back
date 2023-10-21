@@ -1,4 +1,4 @@
-import { PassportStatic } from 'passport'
+import type { PassportStatic } from 'passport'
 import passportJWT from 'passport-jwt'
 import db from '../models'
 

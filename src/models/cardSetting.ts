@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { ICardSetting } from '../types'
+import type { ICardSetting } from '../types'
 
 const CardSettingModel = (sequelize: any, DataTypes: any): any => {
   interface CardSettingAttributes {

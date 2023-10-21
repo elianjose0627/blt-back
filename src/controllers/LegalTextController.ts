@@ -1,6 +1,6 @@
 import BaseController from './BaseController'
 import LegalTextService from '../services/LegalTextService'
-import { CustomRequest, CustomResponse } from '../types'
+import type { CustomRequest, CustomResponse } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 

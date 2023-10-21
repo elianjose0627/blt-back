@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { TokenType, TokenUser } from '../types'
+import type { TokenType, TokenUser } from '../types'
 
 const secretKey: string = String(process.env.SECRET_KEY)
 const issuer = process.env.TOKEN_ISSUER

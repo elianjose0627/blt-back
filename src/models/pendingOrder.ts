@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { IPendingOrder, OrderLineRequest, ShippingAddressRequest, PaymentInformationRequest, ICompany, Nullable } from '../types'
+import type { IPendingOrder, OrderLineRequest, ShippingAddressRequest, PaymentInformationRequest, ICompany, Nullable } from '../types'
 
 const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
   interface PendingOrderAttributes {

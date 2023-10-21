@@ -3,7 +3,7 @@ import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import paginate from '../../middlewares/pagination'
 import { mockReq, mockRes } from 'sinon-express-mock'
-import { CustomNext, CustomRequest, CustomResponse } from '../../types'
+import type { CustomNext, CustomRequest, CustomResponse } from '../../types'
 
 chai.use(sinonChai)
 

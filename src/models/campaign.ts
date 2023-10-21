@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { CampaignStatus, CampaignType, ICampaign, ICardSetting, ICardTemplate, ICompany } from '../types'
+import type { CampaignStatus, CampaignType, ICampaign, ICardSetting, ICardTemplate, ICompany } from '../types'
 
 const CampaignModel = (sequelize: any, DataTypes: any): any => {
   interface CampaignAttributes {

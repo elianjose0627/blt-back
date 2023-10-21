@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { ILegalText } from '../types'
+import type { ILegalText } from '../types'
 
 const LegalTextModel = (sequelize: any, DataTypes: any): any => {
   interface LegalTextAttributes {

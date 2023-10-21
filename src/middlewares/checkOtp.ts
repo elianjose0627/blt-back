@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import * as statusCodes from '../constants/statusCodes'
 import db from '../models'
-import { CustomNext, CustomRequest, CustomResponse } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse } from '../types'
 
 dayjs.extend(utc)
 
