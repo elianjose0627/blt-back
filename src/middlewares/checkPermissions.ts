@@ -1,5 +1,5 @@
 import * as statusCodes from '../constants/statusCodes'
-import { CustomNext, CustomRequest, CustomResponse, IAccessPermission } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse, IAccessPermission } from '../types'
 import * as userRoles from '../utils/userRoles'
 import * as permissions from '../utils/permissions'
 

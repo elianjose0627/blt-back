@@ -1,5 +1,5 @@
 import * as statusCodes from '../constants/statusCodes'
-import { CustomNext, CustomRequest, CustomResponse } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse } from '../types'
 
 const checkOwner = (req: CustomRequest, res: CustomResponse, next: CustomNext): any => {
   const { user: currentUser, record: { owner, email } } = req

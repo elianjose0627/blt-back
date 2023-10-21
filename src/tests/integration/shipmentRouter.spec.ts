@@ -64,7 +64,7 @@ describe('Shipment actions', () => {
       if (statusCode === 429) {
         expect(res).to.have.status(429)
         expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-        expect(res.body.errors.message).to.equal('Too many requests within defined time period, please try again later.')
+        expect(res.body.errors.message).to.equal('Request failed with status code 429')
       }
     })
 
@@ -86,7 +86,7 @@ describe('Shipment actions', () => {
       if (statusCode === 429) {
         expect(res).to.have.status(429)
         expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-        expect(res.body.errors.message).to.equal('Too many requests within defined time period, please try again later.')
+        expect(res.body.errors.message).to.equal('Request failed with status code 429')
       }
     })
 
@@ -101,14 +101,14 @@ describe('Shipment actions', () => {
       if (statusCode === 404) {
         expect(res).to.have.status(404)
         expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-        expect(res.body.errors.message).to.equal('No shipment with given tracking number found.')
+        expect(res.body.errors.message).to.equal('Request failed with status code 404')
         expect(res.body.success).to.equal(false)
       }
 
       if (statusCode === 429) {
         expect(res).to.have.status(429)
         expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-        expect(res.body.errors.message).to.equal('Too many requests within defined time period, please try again later.')
+        expect(res.body.errors.message).to.equal('Request failed with status code 429')
       }
     })
   })

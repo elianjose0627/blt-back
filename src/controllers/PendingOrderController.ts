@@ -1,6 +1,6 @@
 import BaseController from './BaseController'
 import PendingOrderService from '../services/PendingOrderService'
-import { CustomRequest, CustomResponse, Module, StatusCode } from '../types'
+import type { CustomRequest, CustomResponse, Module, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 

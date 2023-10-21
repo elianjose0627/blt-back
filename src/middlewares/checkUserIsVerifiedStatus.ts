@@ -1,5 +1,5 @@
 import * as statusCodes from '../constants/statusCodes'
-import { CustomNext, CustomRequest, CustomResponse } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse } from '../types'
 
 const checkUserIsVerifiedStatus = (req: CustomRequest, res: CustomResponse, next: CustomNext): any => {
   const { isVerified } = req.user

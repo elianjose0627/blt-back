@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { IShipment } from '../types'
+import type { IShipment } from '../types'
 
 const ShipmentModel = (sequelize: any, DataTypes: any): any => {
   interface ShipmentAttributes {

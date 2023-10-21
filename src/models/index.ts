@@ -3,7 +3,7 @@ import path from 'path'
 import { DataTypes, Model, Options, Sequelize } from 'sequelize'
 import dotenv from 'dotenv'
 import dBConfig from '../config/config.json'
-import { Environment } from '../types'
+import type { Environment } from '../types'
 
 dotenv.config()
 const basename = path.basename(__filename)

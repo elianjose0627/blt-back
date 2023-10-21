@@ -1,6 +1,6 @@
 import BaseController from './BaseController'
 import SalutationService from '../services/SalutationService'
-import { CustomRequest, CustomResponse, StatusCode } from '../types'
+import type { CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 

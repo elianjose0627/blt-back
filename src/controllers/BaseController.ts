@@ -1,5 +1,5 @@
 import * as statusCodes from '../constants/statusCodes'
-import { CustomNext, CustomRequest, CustomResponse, Module } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse, Module } from '../types'
 import { io } from '../utils/socket'
 import db from '../models'
 

@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { ICompany, IProduct, IProductPicture, NetRetailPrice, ProductType } from '../types'
+import type { ICompany, IProduct, IProductPicture, NetRetailPrice, ProductType } from '../types'
 
 const ProductModel = (sequelize: any, DataTypes: any): any => {
   interface ProductAttributes {

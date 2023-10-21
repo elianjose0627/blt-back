@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { ISalutation } from '../types'
+import type { ISalutation } from '../types'
 
 const SalutationModel = (sequelize: any, DataTypes: any): any => {
   interface SalutationAttributes {

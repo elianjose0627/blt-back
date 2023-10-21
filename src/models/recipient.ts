@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { ICompany, IRecipient } from '../types'
+import type { ICompany, IRecipient } from '../types'
 
 const RecipientModel = (sequelize: any, DataTypes: any): any => {
   interface RecipientAttributes {

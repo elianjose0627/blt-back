@@ -1,6 +1,6 @@
 import BaseController from './BaseController'
 import * as statusCodes from '../constants/statusCodes'
-import { CustomRequest, CustomResponse } from '../types'
+import type { CustomRequest, CustomResponse } from '../types'
 import HealthCheckService from '../services/HealthCheckService'
 
 const healthCheckService = new HealthCheckService('CostCenter')

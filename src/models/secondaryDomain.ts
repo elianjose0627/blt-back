@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import { ISecondaryDomain } from '../types'
+import type { ISecondaryDomain } from '../types'
 
 const SecondaryDomainModel = (sequelize: any, DataTypes: any): any => {
   interface SecondaryDomainAttributes {
