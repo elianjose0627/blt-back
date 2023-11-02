@@ -19,7 +19,7 @@ const asyncHandler = (cb: any) => async (req: CustomRequest, res: CustomResponse
     const result = await cb(req, res, next)
     return result
   } catch (err: any) {
-    logger.error(err)
+    logger.error(err.message)
     if (errorNames.includes(err.name)) {
       return res.status(statusCodes.BAD_REQUEST).json({
         statusCode: statusCodes.BAD_REQUEST,
