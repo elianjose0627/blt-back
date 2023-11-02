@@ -9,7 +9,7 @@ const joiErrors = (err: any, req: CustomRequest, res: CustomResponse, next: Cust
     return next(err)
   }
 
-  logger.error(err)
+  logger.error(err.details)
 
   let errorDetails: any = []
   // capture errors in the request body
