@@ -384,4 +384,32 @@ describe('Auth Actions', () => {
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')
     expect(res.body.errors.message).to.equal('Invalid token')
   })
+
+  it('should return 200 when a user requests an auth token', async () => {
+    const res = await chai
+      .request(app)
+      .post('/auth/token')
+      .set('Authorization', `Bearer ${String(tokenAdmin)}`)
+
+    expect(res).to.have.status(200)
+    expect(res.body).to.include.keys('statusCode', 'success', 'auth')
+  })
+
+  it('should return 200 when a user requests an auth refresh token', async () => {
+    const resAuthToken = await chai
+      .request(app)
+      .post('/auth/token')
+      .set('Authorization', `Bearer ${String(tokenAdmin)}`)
+
+    const token = resAuthToken.body.auth.accessToken
+
+    const res = await chai
+      .request(app)
+      .post('/auth/token/refresh')
+      .set('Authorization', `Bearer ${String(tokenAdmin)}`)
+      .send({ auth: { token } })
+
+    expect(res).to.have.status(200)
+    expect(res.body).to.include.keys('statusCode', 'success', 'auth')
+  })
 })

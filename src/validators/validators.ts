@@ -641,6 +641,12 @@ const validatePostedOrderIds = Joi.object().keys({
   postedOrderIds: Joi.array().items(Joi.string().min(17)).min(1).required()
 })
 
+const validateAuthToken = Joi.object({
+  auth: {
+    token: Joi.string().required()
+  }
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -689,5 +695,6 @@ export default {
   validateCardSetting,
   validateGreetingCard,
   validatePostedOrderIds,
-  validateProductId
+  validateProductId,
+  validateAuthToken
 }
