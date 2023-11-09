@@ -5,6 +5,7 @@ import UserController from '../controllers/UserController'
 import asyncHandler from '../middlewares/asyncHandler'
 import checkAuth from '../middlewares/checkAuth'
 import checkResetToken from '../middlewares/checkResetToken'
+import TokenController from '../controllers/TokenController'
 
 const authRoutes = (): any => {
   const authRouter = express.Router()
@@ -32,6 +33,14 @@ const authRoutes = (): any => {
     .patch(celebrate({
       [Segments.BODY]: validator.validatePasswordReset
     }), asyncHandler(checkResetToken), asyncHandler(UserController.resetPassword))
+
+  authRouter.route('/token')
+    .post(asyncHandler(checkAuth), asyncHandler(TokenController.getAuthToken))
+
+  authRouter.route('/token/refresh')
+    .post(celebrate({
+      [Segments.BODY]: validator.validateAuthToken
+    }), asyncHandler(checkAuth), asyncHandler(TokenController.getRefreshToken))
 
   return authRouter
 }
