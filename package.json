@@ -41,7 +41,8 @@
       "src/seeders",
       ".eslintrc.js",
       "src/server/*",
-      "src/utils/socket.ts"
+      "src/utils/socket.ts",
+      "src/constants"
     ],
     "reporter": [
       "html",
