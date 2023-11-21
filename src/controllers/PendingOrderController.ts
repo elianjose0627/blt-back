@@ -1,6 +1,6 @@
 import BaseController from './BaseController'
 import PendingOrderService from '../services/PendingOrderService'
-import type { CustomRequest, CustomResponse, Module, StatusCode } from '../types'
+import type { CustomRequest, CustomResponse, ICampaign, Module, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 
@@ -39,6 +39,20 @@ class PendingOrderController extends BaseController {
         success: false,
         errors: {
           message: `Contact admin to set the company customer id for ${String(campaign.company.name)} - ${String(campaign.company.id)}`
+        }
+      })
+    }
+
+    const { isQuotaEnabled, usedQuota = 0, quota = 0, correctionQuota = 0 } = campaign as ICampaign
+
+    const totalUsedQuota = usedQuota + correctionQuota
+
+    if (isQuotaEnabled && totalUsedQuota >= quota) {
+      return res.status(statusCodes.TOO_MANY_REQUESTS).send({
+        statusCode: statusCodes.TOO_MANY_REQUESTS,
+        success: false,
+        errors: {
+          message: 'Campaign quota has been exceeded'
         }
       })
     }
