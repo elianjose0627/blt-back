@@ -3,6 +3,7 @@ import PendingOrderService from '../services/PendingOrderService'
 import type { CustomRequest, CustomResponse, ICampaign, Module, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
+import * as userRoles from '../utils/userRoles'
 
 const pendingOrderService = new PendingOrderService('PendingOrder')
 
@@ -43,11 +44,12 @@ class PendingOrderController extends BaseController {
       })
     }
 
-    const { isQuotaEnabled, usedQuota = 0, quota = 0, correctionQuota = 0 } = campaign as ICampaign
+    const { isQuotaEnabled, isExceedQuotaEnabled, usedQuota, quota, correctionQuota } = campaign as ICampaign
 
     const totalUsedQuota = usedQuota + correctionQuota
+    const allowedRoles = [userRoles.ADMIN]
 
-    if (isQuotaEnabled && totalUsedQuota >= quota) {
+    if (!allowedRoles.includes(currentUser.role) && (isQuotaEnabled && !isExceedQuotaEnabled) && totalUsedQuota >= quota) {
       return res.status(statusCodes.TOO_MANY_REQUESTS).send({
         statusCode: statusCodes.TOO_MANY_REQUESTS,
         success: false,

@@ -256,6 +256,7 @@ export interface ICampaign {
   correctionQuota: number
   lastQuotaResetDate: Nullable<Date>
   isQuotaEnabled: boolean
+  isExceedQuotaEnabled: boolean
   isNoteEnabled: boolean
   createdAt?: Date
   updatedAt?: Date
