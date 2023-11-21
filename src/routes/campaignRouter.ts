@@ -65,7 +65,8 @@ const CampaignRoutes = (): any => {
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(CampaignController.getAllCampaignOrders))
   campaignRouter.route('/campaigns/:id/pending-orders')
-    .post(PendingOrderController.setModule, asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
+    .post(PendingOrderController.setModule,
+      asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
       celebrate({
         [Segments.BODY]: validator.validatePendingOrder
       }), asyncHandler(PendingOrderController.insert))

@@ -1556,6 +1556,193 @@ describe('Campaign actions', () => {
       expect(res.body.pendingOrders).to.have.lengthOf.above(0)
     })
 
+    it('Should return 429 Too Many Requests when an owner tries creating bulk orders for a campaign that has quota enabled.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Quota',
+            email: 'test@companyquota.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Quota',
+            type: 'onboarding',
+            status: 'draft',
+            isQuotaEnabled: true
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(429)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('Campaign quota has been exceeded')
+    })
+
+    it('Should return 429 Too Many Requests when an owner tries creating bulk orders for a campaign that has reached its quota.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Quota Two',
+            email: 'test@companyquotatwo.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Quota Two',
+            type: 'onboarding',
+            status: 'draft',
+            isQuotaEnabled: true,
+            quota: 10,
+            correctionQuota: 10
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(429)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('Campaign quota has been exceeded')
+    })
+
+    it('Should return 201 Created when an owner tries creating bulk orders for a campaign that has reached its quota but isExceedQuotaEnabled is true.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Quota Three',
+            email: 'test@companyquotathree.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Quota Three',
+            type: 'onboarding',
+            status: 'draft',
+            isQuotaEnabled: true,
+            quota: 10,
+            correctionQuota: 10,
+            isExceedQuotaEnabled: true
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+      expect(res.body.pendingOrders).to.have.lengthOf.above(0)
+    })
+
+    it('Should return 201 Create when an admin tries creating bulk orders for a campaign that has reached its quota.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Quota Four',
+            email: 'test@companyquotafour.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Quota Four',
+            type: 'onboarding',
+            status: 'draft',
+            isQuotaEnabled: true,
+            quota: 10,
+            correctionQuota: 10
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+      expect(res.body.pendingOrders).to.have.lengthOf.above(0)
+    })
+
     it('Should return 201 Created when an owner successfully creates 1000 bulk orders for a campaign.', async () => {
       const resCompany = await chai
         .request(app)
