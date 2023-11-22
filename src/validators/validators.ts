@@ -404,6 +404,7 @@ const validateProduct = Joi.object({
 const validateProductAdmin = Joi.object({
   product: Joi.object({
     companyId: Joi.string().uuid().allow(null).default(null),
+    isVisible: Joi.bool().default(true),
     name: Joi.string().required().max(64),
     jfsku: Joi.string().required().max(64),
     merchantSku: Joi.string().required().max(64),

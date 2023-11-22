@@ -11,6 +11,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     type: ProductType
     netRetailPrice: NetRetailPrice
     pictures: IProductPicture[]
+    isVisible: boolean
   }
 
   class Product extends Model<ProductAttributes> {
@@ -89,6 +90,10 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     pictures: {
       type: DataTypes.JSON,
       defaultValue: []
+    },
+    isVisible: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
     }
   }, {
     sequelize,
