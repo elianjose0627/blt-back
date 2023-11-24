@@ -49,7 +49,8 @@ class ProductService extends BaseService {
 
   async getAllForCompany (limit: number, offset: number, companyId: string, search: string = ''): Promise<any> {
     const where: any = {
-      companyId
+      companyId,
+      isVisible: true
     }
     const attributes: any = { exclude: [] }
     const include: any[] = []

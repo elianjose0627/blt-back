@@ -321,6 +321,7 @@ export interface IProduct {
   updatedAt: Date
   company?: ICompany
   stock?: IStock
+  isVisible?: boolean
 }
 
 export interface ShippingAddress {
