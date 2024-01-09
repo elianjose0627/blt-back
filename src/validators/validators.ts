@@ -308,7 +308,8 @@ const validateCampaignAdmin = Joi.object({
     lastQuotaResetDate: Joi.date().allow(null),
     isQuotaEnabled: Joi.boolean(),
     isExceedQuotaEnabled: Joi.boolean(),
-    isNoteEnabled: Joi.boolean()
+    isNoteEnabled: Joi.boolean(),
+    isActive: Joi.boolean()
   }).required()
 })
 

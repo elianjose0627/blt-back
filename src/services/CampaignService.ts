@@ -41,7 +41,8 @@ class CampaignService extends BaseService {
       order: [['createdAt', 'DESC']],
       attributes: { exclude: [] },
       where: {
-        companyId
+        companyId,
+        isActive: true
       }
     })
 
