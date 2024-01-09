@@ -1656,6 +1656,55 @@ describe('Company actions', () => {
       expect(res.body.campaigns).to.be.an('array')
     })
 
+    it('Should return 200 Success when an owner successfully retrieves all active campaigns.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Active',
+            email: 'test@company10active.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Inactive',
+            type: 'onboarding',
+            status: 'draft',
+            isActive: false
+          }
+        })
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Active',
+            type: 'onboarding',
+            status: 'draft',
+            isActive: true
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaigns')
+      expect(res.body.campaigns).to.be.an('array').lengthOf(1)
+    })
+
     it('Should return 200 Success when an owner successfully retrieves all campaigns with negative pagination params.', async () => {
       const resCompany = await chai
         .request(app)
