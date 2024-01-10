@@ -42,7 +42,7 @@ class CampaignService extends BaseService {
       attributes: { exclude: [] },
       where: {
         companyId,
-        isActive: true
+        isHidden: false
       }
     })
 

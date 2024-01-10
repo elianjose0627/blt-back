@@ -1656,7 +1656,7 @@ describe('Company actions', () => {
       expect(res.body.campaigns).to.be.an('array')
     })
 
-    it('Should return 200 Success when an owner successfully retrieves all active campaigns.', async () => {
+    it('Should return 200 Success when an owner successfully retrieves all unhidden campaigns.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -1679,7 +1679,7 @@ describe('Company actions', () => {
             name: 'Onboarding Inactive',
             type: 'onboarding',
             status: 'draft',
-            isActive: false
+            isHidden: false
           }
         })
       await chai
@@ -1691,7 +1691,7 @@ describe('Company actions', () => {
             name: 'Onboarding Active',
             type: 'onboarding',
             status: 'draft',
-            isActive: true
+            isHidden: true
           }
         })
 
