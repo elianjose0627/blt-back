@@ -27,6 +27,7 @@ const CampaignRoutes = (): any => {
   }, { abortEarly: false }), asyncHandler(CampaignController.checkRecord))
   campaignRouter.route('/campaigns/:id')
     .get(asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(CampaignController.checkIsHiddenOrIsNotActive),
       asyncHandler(checkPermissions), asyncHandler(CampaignController.get))
     .put(asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
       CampaignController.checkValidation, asyncHandler(CampaignController.update))
@@ -67,6 +68,7 @@ const CampaignRoutes = (): any => {
   campaignRouter.route('/campaigns/:id/pending-orders')
     .post(PendingOrderController.setModule,
       asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
+      asyncHandler(CampaignController.checkIsHiddenOrIsNotActive),
       celebrate({
         [Segments.BODY]: validator.validatePendingOrder
       }), asyncHandler(PendingOrderController.insert))

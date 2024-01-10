@@ -202,6 +202,217 @@ describe('Campaign actions', () => {
     })
   })
 
+  describe('Get a campaign by id', () => {
+    it('Should return 200 OK when an admin gets a campaign by id', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Company One',
+            email: 'ivers@kree.kr'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding One',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${String(resCampaign.body.campaign.id)}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaign')
+      expect(res.body.campaign).to.be.an('object')
+      expect(res.body.campaign.name).to.equal('Onboarding One')
+    })
+
+    it('Should return 200 OK when a company admin gets a campaign by id', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Company One',
+            email: 'iversone@starkindustriesmarvel2.com',
+            domain: 'starkindustriesmarvel2.com'
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'sharoncarter@starkindustriesmarvel2.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdmin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'sharoncarter@starkindustriesmarvel2.com', password: 'thepowerbroker' } })
+
+      tokenCompanyAdminTwo = resCompanyAdmin.body.token
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding One',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${String(resCampaign.body.campaign.id)}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaign')
+      expect(res.body.campaign).to.be.an('object')
+      expect(res.body.campaign.name).to.equal('Onboarding One')
+    })
+
+    it('Should return 403 Forbidden when a company admin tries a campaign that is hidden', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Company One',
+            email: 'iversonetwo@starkindustriesmarvel2.com',
+            domain: 'starkindustriesmarvel2.com'
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'sharoncarter@starkindustriesmarvel2.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdmin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'sharoncarter@starkindustriesmarvel2.com', password: 'thepowerbroker' } })
+
+      tokenCompanyAdminTwo = resCompanyAdmin.body.token
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding One',
+            type: 'onboarding',
+            status: 'draft',
+            isHidden: true
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${String(resCampaign.body.campaign.id)}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('This campaign is hidden')
+    })
+
+    it('Should return 403 Forbidden when a company admin tries a campaign that is not active', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Company One',
+            email: 'iversonetwothree@starkindustriesmarvel2.com',
+            domain: 'starkindustriesmarvel2.com'
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'sharoncarter@starkindustriesmarvel2.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdmin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'sharoncarter@starkindustriesmarvel2.com', password: 'thepowerbroker' } })
+
+      tokenCompanyAdminTwo = resCompanyAdmin.body.token
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding One',
+            type: 'onboarding',
+            status: 'draft',
+            isActive: false
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${String(resCampaign.body.campaign.id)}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('This campaign is not active')
+    })
+  })
+
   describe('Add a recipient to a campaign', () => {
     it('Should return 201 Created when a recipient is added to a campaign.', async () => {
       const resCompany = await chai
@@ -1554,6 +1765,134 @@ describe('Campaign actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
       expect(res.body.pendingOrders).to.be.an('array')
       expect(res.body.pendingOrders).to.have.lengthOf.above(0)
+    })
+
+    it('Should return 403 Forbidden when a company admin tries to create bulk orders for a disabled campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Company One',
+            email: 'iversonetwothreefour@starkindustriesmarvel2.com',
+            domain: 'starkindustriesmarvel2.com'
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'sharoncarter@starkindustriesmarvel2.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdmin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'sharoncarter@starkindustriesmarvel2.com', password: 'thepowerbroker' } })
+
+      tokenCompanyAdminTwo = resCompanyAdmin.body.token
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion',
+            type: 'onboarding',
+            status: 'draft',
+            isActive: false
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('This campaign is not active')
+    })
+
+    it('Should return 403 Forbidden when a company admin tries to create bulk orders for a hidden campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Company One',
+            email: 'iversonetwothreefourfive@starkindustriesmarvel2.com',
+            domain: 'starkindustriesmarvel2.com'
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'sharoncarter@starkindustriesmarvel2.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdmin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'sharoncarter@starkindustriesmarvel2.com', password: 'thepowerbroker' } })
+
+      tokenCompanyAdminTwo = resCompanyAdmin.body.token
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion',
+            type: 'onboarding',
+            status: 'draft',
+            isHidden: true
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('This campaign is hidden')
     })
 
     it('Should return 429 Too Many Requests when an owner tries creating bulk orders for a campaign that has quota enabled.', async () => {

@@ -259,6 +259,7 @@ export interface ICampaign {
   isExceedQuotaEnabled: boolean
   isNoteEnabled: boolean
   isActive: boolean
+  isHidden: boolean
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
