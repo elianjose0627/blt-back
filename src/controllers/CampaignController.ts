@@ -30,8 +30,27 @@ class CampaignController extends BaseController {
     }
   }
 
-  checkIsHiddenOrIsNotActive (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
-    const { user: currentUser, record: { isActive, isHidden } } = req
+  checkIsHidden (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { user: currentUser, record: { isHidden } } = req
+
+    if (currentUser.role !== userRoles.ADMIN) {
+      if (isHidden === true) {
+        return res.status(statusCodes.FORBIDDEN).send({
+          statusCode: statusCodes.FORBIDDEN,
+          success: false,
+          errors: {
+            message: 'This campaign is hidden'
+          }
+        })
+      }
+      return next()
+    }
+
+    return next()
+  }
+
+  checkIsNotActive (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { user: currentUser, record: { isActive } } = req
 
     if (currentUser.role !== userRoles.ADMIN) {
       if (isActive === false) {
@@ -40,15 +59,6 @@ class CampaignController extends BaseController {
           success: false,
           errors: {
             message: 'This campaign is not active'
-          }
-        })
-      }
-      if (isHidden === true) {
-        return res.status(statusCodes.FORBIDDEN).send({
-          statusCode: statusCodes.FORBIDDEN,
-          success: false,
-          errors: {
-            message: 'This campaign is hidden'
           }
         })
       }
