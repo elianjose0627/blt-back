@@ -40,6 +40,7 @@ class CampaignService extends BaseService {
       offset,
       order: [['createdAt', 'DESC']],
       attributes: { exclude: [] },
+      distinct: true,
       where: {
         companyId,
         isHidden: false
