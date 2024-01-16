@@ -30,6 +30,44 @@ class CampaignController extends BaseController {
     }
   }
 
+  checkIsHidden (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { user: currentUser, record: { isHidden } } = req
+
+    if (currentUser.role !== userRoles.ADMIN) {
+      if (isHidden === true) {
+        return res.status(statusCodes.FORBIDDEN).send({
+          statusCode: statusCodes.FORBIDDEN,
+          success: false,
+          errors: {
+            message: 'This campaign is hidden'
+          }
+        })
+      }
+      return next()
+    }
+
+    return next()
+  }
+
+  checkIsNotActive (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { user: currentUser, record: { isActive } } = req
+
+    if (currentUser.role !== userRoles.ADMIN) {
+      if (isActive === false) {
+        return res.status(statusCodes.FORBIDDEN).send({
+          statusCode: statusCodes.FORBIDDEN,
+          success: false,
+          errors: {
+            message: 'This campaign is not active'
+          }
+        })
+      }
+      return next()
+    }
+
+    return next()
+  }
+
   checkValidation (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser } = req
     const { role } = currentUser

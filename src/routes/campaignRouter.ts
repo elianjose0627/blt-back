@@ -24,7 +24,7 @@ const CampaignRoutes = (): any => {
     }), asyncHandler(paginate), asyncHandler(CampaignController.getAll))
   campaignRouter.use('/campaigns/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
-  }, { abortEarly: false }), asyncHandler(CampaignController.checkRecord))
+  }, { abortEarly: false }), asyncHandler(CampaignController.checkRecord), asyncHandler(CampaignController.checkIsHidden))
   campaignRouter.route('/campaigns/:id')
     .get(asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions), asyncHandler(CampaignController.get))
@@ -65,7 +65,9 @@ const CampaignRoutes = (): any => {
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(CampaignController.getAllCampaignOrders))
   campaignRouter.route('/campaigns/:id/pending-orders')
-    .post(PendingOrderController.setModule, asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
+    .post(PendingOrderController.setModule,
+      asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
+      asyncHandler(CampaignController.checkIsNotActive),
       celebrate({
         [Segments.BODY]: validator.validatePendingOrder
       }), asyncHandler(PendingOrderController.insert))

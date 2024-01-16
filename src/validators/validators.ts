@@ -307,7 +307,10 @@ const validateCampaignAdmin = Joi.object({
     correctionQuota: Joi.number(),
     lastQuotaResetDate: Joi.date().allow(null),
     isQuotaEnabled: Joi.boolean(),
-    isNoteEnabled: Joi.boolean()
+    isExceedQuotaEnabled: Joi.boolean(),
+    isNoteEnabled: Joi.boolean(),
+    isActive: Joi.boolean(),
+    isHidden: Joi.boolean()
   }).required()
 })
 
@@ -403,6 +406,7 @@ const validateProduct = Joi.object({
 const validateProductAdmin = Joi.object({
   product: Joi.object({
     companyId: Joi.string().uuid().allow(null).default(null),
+    isVisible: Joi.bool().default(true),
     name: Joi.string().required().max(64),
     jfsku: Joi.string().required().max(64),
     merchantSku: Joi.string().required().max(64),

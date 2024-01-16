@@ -1656,6 +1656,55 @@ describe('Company actions', () => {
       expect(res.body.campaigns).to.be.an('array')
     })
 
+    it('Should return 200 Success when an owner successfully retrieves all unhidden campaigns.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Active',
+            email: 'test@company10active.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Inactive',
+            type: 'onboarding',
+            status: 'draft',
+            isHidden: false
+          }
+        })
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Active',
+            type: 'onboarding',
+            status: 'draft',
+            isHidden: true
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaigns')
+      expect(res.body.campaigns).to.be.an('array').lengthOf(1)
+    })
+
     it('Should return 200 Success when an owner successfully retrieves all campaigns with negative pagination params.', async () => {
       const resCompany = await chai
         .request(app)
@@ -2506,6 +2555,60 @@ describe('Company actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'products')
       expect(res.body.products).to.be.an('array')
+    })
+
+    it('Should return 200 Success when an owner successfully retrieves all products without products where isVisible is set to false.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Invisible',
+            email: 'test@company10productbltinvisible.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            companyId: String(companyId),
+            isVisible: false,
+            name: 'Soda Water',
+            jfsku: '123',
+            merchantSku: '123',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+      await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            companyId: String(companyId),
+            name: 'Soda Water Fresh',
+            jfsku: '1234',
+            merchantSku: '1234',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/products`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
     })
 
     it('Should return 200 Success when an owner successfully retrieves all products with negative pagination params.', async () => {

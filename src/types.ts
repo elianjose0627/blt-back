@@ -256,7 +256,10 @@ export interface ICampaign {
   correctionQuota: number
   lastQuotaResetDate: Nullable<Date>
   isQuotaEnabled: boolean
+  isExceedQuotaEnabled: boolean
   isNoteEnabled: boolean
+  isActive: boolean
+  isHidden: boolean
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
@@ -320,6 +323,7 @@ export interface IProduct {
   updatedAt: Date
   company?: ICompany
   stock?: IStock
+  isVisible?: boolean
 }
 
 export interface ShippingAddress {

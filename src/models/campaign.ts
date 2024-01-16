@@ -13,7 +13,10 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     correctionQuota: number
     lastQuotaResetDate: Date
     isQuotaEnabled: boolean
+    isExceedQuotaEnabled: boolean
     isNoteEnabled: boolean
+    isActive: boolean
+    isHidden: boolean
   }
 
   class Campaign extends Model<CampaignAttributes> {
@@ -27,7 +30,10 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     private readonly correctionQuota: number
     private readonly lastQuotaResetDate: Date
     private readonly isQuotaEnabled: boolean
+    private readonly isExceedQuotaEnabled: boolean
     private readonly isNoteEnabled: boolean
+    private readonly isActive: boolean
+    private readonly isHidden: boolean
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany
@@ -74,7 +80,10 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
         correctionQuota: this.correctionQuota,
         lastQuotaResetDate: this.lastQuotaResetDate,
         isQuotaEnabled: this.isQuotaEnabled,
+        isExceedQuotaEnabled: this.isExceedQuotaEnabled,
         isNoteEnabled: this.isNoteEnabled,
+        isActive: this.isActive,
+        isHidden: this.isHidden,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         company: this.company,
@@ -126,7 +135,19 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
+    isExceedQuotaEnabled: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     isNoteEnabled: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+    isHidden: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     }
