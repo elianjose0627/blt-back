@@ -61,6 +61,11 @@ export const generateInclude = (model: string): any => {
           model: db.CardSetting,
           attributes: { exclude: ['deletedAt', 'campaignId'] },
           as: 'cardSetting'
+        },
+        {
+          model: db.CampaignOrderLimit,
+          attributes: { exclude: ['deletedAt', 'campaignId'] },
+          as: 'campaignOrderLimits'
         }
       ]
     )

@@ -651,6 +651,15 @@ const validateAuthToken = Joi.object({
   }
 })
 
+const validateCampaignOrderLimit = Joi.object({
+  campaignOrderLimit: {
+    limit: Joi.number().required(),
+    role: Joi.string()
+      .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
+      .required()
+  }
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -700,5 +709,6 @@ export default {
   validateGreetingCard,
   validatePostedOrderIds,
   validateProductId,
-  validateAuthToken
+  validateAuthToken,
+  validateCampaignOrderLimit
 }

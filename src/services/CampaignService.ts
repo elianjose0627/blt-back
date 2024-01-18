@@ -69,6 +69,11 @@ class CampaignService extends BaseService {
           model: db.CardSetting,
           attributes: { exclude: ['deletedAt', 'campaignId'] },
           as: 'cardSetting'
+        },
+        {
+          model: db.CampaignOrderLimit,
+          attributes: { exclude: ['deletedAt', 'campaignId'] },
+          as: 'campaignOrderLimits'
         }
       ]
     })

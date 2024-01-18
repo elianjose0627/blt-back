@@ -266,6 +266,7 @@ export interface ICampaign {
   cardTemplates?: ICardTemplate[]
   cardSetting?: ICardSetting
   shippingDestinationCountry: Nullable<string>
+  campaignOrderLimits?: ICampaignOrderLimit[]
 }
 
 export interface ISecondaryDomain {
@@ -325,6 +326,14 @@ export interface IProduct {
   company?: ICompany
   stock?: IStock
   isVisible?: boolean
+}
+
+export interface ICampaignOrderLimit {
+  id: string
+  limit: number
+  role: Role
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface ShippingAddress {

@@ -37,6 +37,7 @@ export interface Database {
   CardTemplate?: any
   CardSetting?: any
   GreetingCard?: any
+  CampaignOrderLimit?: any
   [key: string]: any
 }
 
