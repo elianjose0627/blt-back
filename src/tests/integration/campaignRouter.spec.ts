@@ -1767,6 +1767,244 @@ describe('Campaign actions', () => {
       expect(res.body.pendingOrders).to.have.lengthOf.above(0)
     })
 
+    it('Should return 201 Created when a Company Admin successfully creates bulk orders for a campaign with a limit on the role that is not exceeded.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Company Limited 3',
+            email: 'iversonetwothreefourlimited3@starkindustriesmarvel2.com',
+            domain: 'starkindustriesmarvel2.com',
+            customerId: 788
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'sharoncarter@starkindustriesmarvel2.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdmin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'sharoncarter@starkindustriesmarvel2.com', password: 'thepowerbroker' } })
+
+      tokenCompanyAdminTwo = resCompanyAdmin.body.token
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Limited 3',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/order-limits`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignOrderLimit: {
+            limit: 10,
+            role: 'CompanyAdministrator'
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .send({
+          pendingOrders
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+      expect(res.body.pendingOrders).to.have.lengthOf.above(0)
+    })
+
+    it('Should return 429 Too Many Requests when a Company Admin tries to create bulk orders for a campaign with a limit on the role.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Company Limited',
+            email: 'iversonetwothreefourlimited@starkindustriesmarvel2.com',
+            domain: 'starkindustriesmarvel2.com',
+            customerId: 789
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'sharoncarter@starkindustriesmarvel2.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdmin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'sharoncarter@starkindustriesmarvel2.com', password: 'thepowerbroker' } })
+
+      tokenCompanyAdminTwo = resCompanyAdmin.body.token
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Limited',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/order-limits`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignOrderLimit: {
+            limit: 1,
+            role: 'CompanyAdministrator'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(429)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('Campaign order limit has been exceeded')
+    })
+
+    it('Should return 429 Too Many Requests when a Company Admin tries to create bulk orders for a campaign with a limit on the role.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Company Limited 2',
+            email: 'iversonetwothreefourlimited2@starkindustriesmarvel2.com',
+            domain: 'starkindustriesmarvel2.com',
+            customerId: 789
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'sharoncarter@starkindustriesmarvel2.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdmin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'sharoncarter@starkindustriesmarvel2.com', password: 'thepowerbroker' } })
+
+      tokenCompanyAdminTwo = resCompanyAdmin.body.token
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Limited 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/order-limits`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignOrderLimit: {
+            limit: 5,
+            role: 'CompanyAdministrator'
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .send({
+          pendingOrders
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(429)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('Campaign order limit has been exceeded')
+    })
+
     it('Should return 403 Forbidden when a company admin tries to create bulk orders for a disabled campaign.', async () => {
       const resCompany = await chai
         .request(app)
@@ -2659,6 +2897,157 @@ describe('Campaign actions', () => {
             exportOrientation: 'portrait',
             exportSides: 'both',
             supplierEmail: 'ryan@biglittlethings.de'
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only an admin can perform this action')
+    })
+  })
+
+  describe('Campaign Order Limit Actions', () => {
+    it('Should return 201 Created when an admin successfully creates an order limit for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Order Limit',
+            email: 'test@companymarvelsecretinvasionorderlimit.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Order Limit',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/order-limits`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignOrderLimit: {
+            limit: 1,
+            role: userRoles.EMPLOYEE
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignOrderLimit')
+      expect(res.body.campaignOrderLimit).to.be.an('object')
+    })
+
+    it('Should return 200 OK when an admin successfully creates an order limit for a campaign twice.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Order Limit 2',
+            email: 'test@companymarvelsecretinvasionorderlimit2.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Order Limit',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/order-limits`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignOrderLimit: {
+            limit: 1,
+            role: userRoles.EMPLOYEE
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/order-limits`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignOrderLimit: {
+            limit: 1,
+            role: userRoles.EMPLOYEE
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignOrderLimit')
+      expect(res.body.campaignOrderLimit).to.be.an('object')
+    })
+
+    it('Should return 403 Forbidden when a non-admin tries to create an order limit for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Order Limit User',
+            email: 'test@companymarvelsecretinvasionorderlimituser.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Order Limit',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/card-settings`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaignOrderLimit: {
+            limit: 1,
+            role: userRoles.EMPLOYEE
           }
         })
 
