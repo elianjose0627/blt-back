@@ -265,6 +265,7 @@ export interface ICampaign {
   company?: ICompany
   cardTemplates?: ICardTemplate[]
   cardSetting?: ICardSetting
+  shippingDestinationCountry: Nullable<string>
 }
 
 export interface ISecondaryDomain {

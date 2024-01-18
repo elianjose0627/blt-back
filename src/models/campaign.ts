@@ -17,6 +17,7 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     isNoteEnabled: boolean
     isActive: boolean
     isHidden: boolean
+    shippingDestinationCountry: string | null
   }
 
   class Campaign extends Model<CampaignAttributes> {
@@ -39,6 +40,7 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     private readonly company: ICompany
     private readonly cardTemplates: ICardTemplate[]
     private readonly cardSetting: ICardSetting
+    private readonly shippingDestinationCountry: string | null
 
     static associate (models: any): any {
       Campaign.belongsTo(models.Company, {
@@ -88,7 +90,8 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
         updatedAt: this.updatedAt,
         company: this.company,
         cardTemplates: this.cardTemplates,
-        cardSetting: this.cardSetting
+        cardSetting: this.cardSetting,
+        shippingDestinationCountry: this.shippingDestinationCountry
       }
     }
   };
@@ -150,6 +153,10 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     isHidden: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
+    },
+    shippingDestinationCountry: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     sequelize,

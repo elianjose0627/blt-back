@@ -310,7 +310,8 @@ const validateCampaignAdmin = Joi.object({
     isExceedQuotaEnabled: Joi.boolean(),
     isNoteEnabled: Joi.boolean(),
     isActive: Joi.boolean(),
-    isHidden: Joi.boolean()
+    isHidden: Joi.boolean(),
+    shippingDestinationCountry: Joi.string().valid(...countryList.countries).allow('').allow(null)
   }).required()
 })
 
@@ -456,7 +457,6 @@ const validateOrder = Joi.object({
         price: Joi.number(),
         vat: Joi.number(),
         billOfMaterialsId: Joi.string()
-
       })
     ).min(1),
     senderAddress: Joi.object({
