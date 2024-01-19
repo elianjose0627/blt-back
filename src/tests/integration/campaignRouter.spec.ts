@@ -3056,4 +3056,151 @@ describe('Campaign actions', () => {
       expect(res.body.errors.message).to.equal('Only an admin can perform this action')
     })
   })
+
+  describe('Campaign Shipping Destination Actions', () => {
+    it('Should return 201 Created when an admin successfully creates a shipping destination for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Shipping Destination',
+            email: 'test@companymarvelsecretinvasionshippingdestination.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Shipping Destination',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/shipping-destinations`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignShippingDestination: {
+            country: 'Kenya'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignShippingDestination')
+      expect(res.body.campaignShippingDestination).to.be.an('object')
+    })
+
+    it('Should return 200 OK when an admin successfully creates a shipping destination for a campaign twice.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Shipping Destination 2',
+            email: 'test@companymarvelsecretinvasionshippingdestination2.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Shipping Destination',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/shipping-destinations`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignShippingDestination: {
+            country: 'Kenya'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/shipping-destinations`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignShippingDestination: {
+            country: 'Kenya'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignShippingDestination')
+      expect(res.body.campaignShippingDestination).to.be.an('object')
+    })
+
+    it('Should return 403 Forbidden when a non-admin tries to create a shipping destination for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Shipping Destination User',
+            email: 'test@companymarvelsecretinvasionshippingdestinationuser.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Shipping Destination',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/shipping-destinations`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaignShippingDestination: {
+            country: 'Kenya'
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only an admin can perform this action')
+    })
+  })
 })

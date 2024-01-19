@@ -66,6 +66,11 @@ export const generateInclude = (model: string): any => {
           model: db.CampaignOrderLimit,
           attributes: { exclude: ['deletedAt', 'campaignId'] },
           as: 'campaignOrderLimits'
+        },
+        {
+          model: db.CampaignShippingDestination,
+          attributes: { exclude: ['deletedAt', 'campaignId'] },
+          as: 'campaignShippingDestinations'
         }
       ]
     )
