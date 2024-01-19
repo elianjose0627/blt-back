@@ -22,7 +22,7 @@ const validateCreatedUser = Joi.object({
       }),
     password: Joi.string().min(6).max(64).required()
   }).required()
-})
+}).required()
 
 const validateCreatedUserByAdmin = Joi.object({
   user: Joi.object({
@@ -45,14 +45,14 @@ const validateCreatedUserByAdmin = Joi.object({
     isGhost: Joi.boolean().default(false),
     companyId: Joi.string().uuid().allow(null).default(null)
   }).required()
-})
+}).required()
 
 const validateLogin = Joi.object({
   user: Joi.object({
     email: Joi.string().lowercase().email().required(),
     password: Joi.string().required()
   }).required()
-})
+}).required()
 
 const validateUpdatedUser = Joi.object({
   user: Joi.object({
@@ -71,7 +71,7 @@ const validateUpdatedUser = Joi.object({
       country: Joi.string().required().valid(...countryList.countries).allow('').allow(null)
     }).optional()
   }).required()
-})
+}).required()
 
 const validateRole = Joi.object({
   user: Joi.object({
@@ -79,21 +79,21 @@ const validateRole = Joi.object({
       .valid(...[userRoles.USER, userRoles.ADMIN, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
       .required()
   }).required()
-})
+}).required()
 
 const validateEmailVerification = Joi.object({
   user: Joi.object({
     isVerified: Joi.bool()
       .required()
   }).required()
-})
+}).required()
 
 const validateUserActivation = Joi.object({
   user: Joi.object({
     isActive: Joi.bool()
       .required()
   }).required()
-})
+}).required()
 
 const validateUserCompanyRole = Joi.object({
   user: Joi.object({
@@ -101,26 +101,26 @@ const validateUserCompanyRole = Joi.object({
       .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
       .required()
   }).required()
-})
+}).required()
 
 const validateUserCompany = Joi.object({
   user: Joi.object({
     companyId: Joi.string().uuid().required()
   }).required()
-})
+}).required()
 
 const validatePassword = Joi.object({
   user: Joi.object({
     currentPassword: Joi.string().required(),
     password: Joi.string().min(6).max(64).required()
   }).required()
-})
+}).required()
 
 const validatePasswordReset = Joi.object({
   user: Joi.object({
     password: Joi.string().min(6).max(64).required()
   }).required()
-})
+}).required()
 
 const validateUserPhoto = Joi.object({
   user: Joi.object({
@@ -129,33 +129,33 @@ const validateUserPhoto = Joi.object({
       filename: Joi.string().required()
     }).required()
   }).required()
-})
+}).required()
 
 const validateEmail = Joi.object({
   user: Joi.object({
     email: Joi.string().email().lowercase().required()
   }).required()
-})
+}).required()
 
 const validateOtp = Joi.object({
   user: Joi.object({
     email: Joi.string().email().lowercase().required(),
     otp: Joi.number().required()
   }).required()
-})
+}).required()
 
 const validateUUID = Joi.object().keys({
   id: Joi.string().uuid(),
   userId: Joi.string().uuid()
-})
+}).required()
 
 const validateTrackingId = Joi.object().keys({
   trackingId: Joi.string()
-})
+}).required()
 
 const validateProductId = Joi.object().keys({
   id: Joi.alternatives().try(Joi.string().uuid(), Joi.string().length(11))
-})
+}).required()
 
 const validateQueryParams = Joi.object({
   limit: Joi.number().optional(),
@@ -173,7 +173,7 @@ const validateQueryParams = Joi.object({
     companyId: Joi.string().uuid(),
     type: Joi.string().optional()
   }).optional()
-})
+}).required()
 
 const validateNotifications = Joi.object({
   user: Joi.object({
@@ -181,7 +181,7 @@ const validateNotifications = Joi.object({
       isEnabled: Joi.boolean().optional()
     })
   })
-})
+}).required()
 
 const validateCreatedCompany = Joi.object({
   company: Joi.object({
@@ -196,7 +196,7 @@ const validateCreatedCompany = Joi.object({
     domain: Joi.string().domain().allow('').allow(null),
     customerId: Joi.number().optional().allow('').allow(null)
   }).required()
-})
+}).required()
 
 const validateUpdatedCompany = Joi.object({
   company: Joi.object({
@@ -211,13 +211,13 @@ const validateUpdatedCompany = Joi.object({
     domain: Joi.string().domain().allow('').allow(null),
     customerId: Joi.number().optional().allow('').allow(null)
   }).required()
-})
+}).required()
 
 const validateDomain = Joi.object({
   company: Joi.object({
     isDomainVerified: Joi.boolean().required()
   }).required()
-})
+}).required()
 
 const validateCreatedAddress = Joi.object({
   address: Joi.object({
@@ -232,7 +232,7 @@ const validateCreatedAddress = Joi.object({
     addressAddition: Joi.string().allow('').allow(null).max(256),
     vat: Joi.string().allow('').allow(null).max(24)
   }).required()
-})
+}).required()
 
 const validateUpdatedAddress = Joi.object({
   address: Joi.object({
@@ -247,7 +247,7 @@ const validateUpdatedAddress = Joi.object({
     addressAddition: Joi.string().allow('').allow(null).max(256),
     vat: Joi.string().allow('').allow(null).max(24)
   }).required()
-})
+}).required()
 
 const validateCreatedRecipient = Joi.object({
   recipient: Joi.object({
@@ -266,7 +266,7 @@ const validateCreatedRecipient = Joi.object({
     zip: Joi.string().optional().max(24),
     addressAddition: Joi.string().allow('').allow(null).max(256)
   }).required()
-})
+}).required()
 
 const validateUpdatedRecipient = Joi.object({
   recipient: Joi.object({
@@ -285,7 +285,7 @@ const validateUpdatedRecipient = Joi.object({
     zip: Joi.string().optional().max(24),
     addressAddition: Joi.string().allow('').allow(null).max(256)
   }).required()
-})
+}).required()
 
 const commonCampaignSchema = {
   name: Joi.string().required().allow('').allow(null).max(64),
@@ -298,7 +298,7 @@ const validateCampaign = Joi.object({
   campaign: Joi.object({
     ...commonCampaignSchema
   }).required()
-})
+}).required()
 
 const validateCampaignAdmin = Joi.object({
   campaign: Joi.object({
@@ -312,7 +312,7 @@ const validateCampaignAdmin = Joi.object({
     isActive: Joi.boolean(),
     isHidden: Joi.boolean()
   }).required()
-})
+}).required()
 
 const validateJoinCompany = Joi.object({
   user: Joi.object({
@@ -321,13 +321,13 @@ const validateJoinCompany = Joi.object({
       .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER]),
     actionType: Joi.string().valid(...['remove', 'add']).default('add')
   }).required()
-})
+}).required()
 
 const validateSalutation = Joi.object({
   salutation: Joi.object({
     title: Joi.string().required().max(8)
   }).required()
-})
+}).required()
 
 const validatePrivacyRule = Joi.object({
   privacyRule: Joi.object({
@@ -337,19 +337,19 @@ const validatePrivacyRule = Joi.object({
       .required(),
     isEnabled: Joi.boolean()
   }).required()
-})
+}).required()
 
 const validateSecondaryDomain = Joi.object({
   secondaryDomain: Joi.object({
     name: Joi.string().domain()
   }).required()
-})
+}).required()
 
 const validateCostCenter = Joi.object({
   costCenter: Joi.object({
     center: Joi.number().required()
   }).required()
-})
+}).required()
 
 const validateBundle = Joi.object({
   bundle: Joi.object({
@@ -377,7 +377,7 @@ const validateBundle = Joi.object({
       ).min(1).required()
     }).default(null)
   }).required()
-})
+}).required()
 
 const validatePicture = Joi.object({
   picture: Joi.object({
@@ -386,7 +386,7 @@ const validatePicture = Joi.object({
     size: Joi.number(),
     mimeType: Joi.string().valid(...imageMimeTypes).allow(null).allow('')
   }).required()
-})
+}).required()
 
 const validateProduct = Joi.object({
   product: Joi.object({
@@ -401,7 +401,7 @@ const validateProduct = Joi.object({
       discount: Joi.number()
     })
   }).required()
-})
+}).required()
 
 const validateProductAdmin = Joi.object({
   product: Joi.object({
@@ -418,13 +418,13 @@ const validateProductAdmin = Joi.object({
       discount: Joi.number()
     })
   }).required()
-})
+}).required()
 
 const validateProductCompany = Joi.object({
   product: Joi.object({
     companyId: Joi.string().uuid().allow(null).default(null)
   }).required()
-})
+}).required()
 
 const validateOrder = Joi.object({
   order: Joi.object({
@@ -488,7 +488,7 @@ const validateOrder = Joi.object({
     attachments: Joi.any(),
     modificationInfo: Joi.any()
   })
-})
+}).required()
 
 const validateLegalText = Joi.object({
   legalText: Joi.object({
@@ -503,11 +503,11 @@ const validateLegalText = Joi.object({
       ).min(1).required()
     }).required()
   }).required()
-})
+}).required()
 
 const validateRegistrationQueryParams = Joi.object({
   companyId: Joi.string().length(96)
-})
+}).required()
 
 const validateShippingMethod = Joi.object({
   shippingMethod: Joi.object({
@@ -516,7 +516,7 @@ const validateShippingMethod = Joi.object({
     isDropShipping: Joi.boolean().required(),
     insuranceValue: Joi.number().allow(null)
   }).required()
-})
+}).required()
 
 const commonPendingOrderSchema = {
   platform: Joi.number(),
@@ -587,7 +587,7 @@ const validatePendingOrder = Joi.object({
   pendingOrders: Joi.array().items(
     Joi.object({ ...commonPendingOrderSchema })
   ).min(1).required()
-})
+}).required()
 
 const validatePendingOrderAdmin = Joi.object({
   pendingOrders: Joi.array().items(
@@ -598,7 +598,7 @@ const validatePendingOrderAdmin = Joi.object({
       companyId: Joi.string().uuid()
     })
   ).min(1).required()
-})
+}).required()
 
 const validateCardTemplate = Joi.object({
   cardTemplate: Joi.object({
@@ -609,7 +609,7 @@ const validateCardTemplate = Joi.object({
     frontOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape']),
     backOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape'])
   }).required()
-})
+}).required()
 
 const validateCardSetting = Joi.object({
   cardSetting: Joi.object({
@@ -625,7 +625,7 @@ const validateCardSetting = Joi.object({
     supplierEmail: Joi.string().email().allow(null),
     articleId: Joi.string().allow('').allow(null)
   }).required()
-})
+}).required()
 
 const validateGreetingCard = Joi.object({
   greetingCard: Joi.object({
@@ -638,17 +638,17 @@ const validateGreetingCard = Joi.object({
     jtlfpid: Joi.string().required(),
     companyId: Joi.string().uuid().allow(null).default(null)
   }).required()
-})
+}).required()
 
 const validatePostedOrderIds = Joi.object().keys({
   postedOrderIds: Joi.array().items(Joi.string().min(17)).min(1).required()
-})
+}).required()
 
 const validateAuthToken = Joi.object({
   auth: {
     token: Joi.string().required()
   }
-})
+}).required()
 
 const validateCampaignOrderLimit = Joi.object({
   campaignOrderLimit: {
@@ -657,13 +657,13 @@ const validateCampaignOrderLimit = Joi.object({
       .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
       .required()
   }
-})
+}).required()
 
 const validateCampaignShippingDestination = Joi.object({
   campaignShippingDestination: {
     country: Joi.string().required().valid(...countryList.countries)
   }
-})
+}).required()
 
 export default {
   validateCreatedUser,
