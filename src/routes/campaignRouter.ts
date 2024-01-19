@@ -14,6 +14,7 @@ import checkPermissions from '../middlewares/checkPermissions'
 import CardTemplateController from '../controllers/CardTemplateController'
 import CardSettingController from '../controllers/CardSettingController'
 import CampaignOrderLimitController from '../controllers/CampaignOrderLimitController'
+import CampaignShippingDestinationController from '../controllers/CampaignShippingDestinationController'
 
 const CampaignRoutes = (): any => {
   const campaignRouter = express.Router()
@@ -95,6 +96,12 @@ const CampaignRoutes = (): any => {
       celebrate({
         [Segments.BODY]: validator.validateCampaignOrderLimit
       }), asyncHandler(CampaignOrderLimitController.insert))
+  campaignRouter.route('/campaigns/:id/shipping-destinations')
+    .post(asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkAdmin),
+      celebrate({
+        [Segments.BODY]: validator.validateCampaignShippingDestination
+      }), asyncHandler(CampaignShippingDestinationController.insert))
   return campaignRouter
 }
 

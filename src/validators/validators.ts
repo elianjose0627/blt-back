@@ -310,8 +310,7 @@ const validateCampaignAdmin = Joi.object({
     isExceedQuotaEnabled: Joi.boolean(),
     isNoteEnabled: Joi.boolean(),
     isActive: Joi.boolean(),
-    isHidden: Joi.boolean(),
-    shippingDestinationCountry: Joi.string().valid(...countryList.countries).allow('').allow(null)
+    isHidden: Joi.boolean()
   }).required()
 })
 
@@ -660,6 +659,12 @@ const validateCampaignOrderLimit = Joi.object({
   }
 })
 
+const validateCampaignShippingDestination = Joi.object({
+  campaignShippingDestination: {
+    country: Joi.string().required().valid(...countryList.countries)
+  }
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -710,5 +715,6 @@ export default {
   validatePostedOrderIds,
   validateProductId,
   validateAuthToken,
-  validateCampaignOrderLimit
+  validateCampaignOrderLimit,
+  validateCampaignShippingDestination
 }

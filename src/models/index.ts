@@ -38,6 +38,7 @@ export interface Database {
   CardSetting?: any
   GreetingCard?: any
   CampaignOrderLimit?: any
+  CampaignShippingDestination?: any
   [key: string]: any
 }
 
