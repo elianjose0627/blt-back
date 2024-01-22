@@ -11,6 +11,18 @@ import { IPendingOrder } from '../types'
 dayjs.extend(utc)
 
 class PendingOrderService extends BaseService {
+  async findPendingOrders (userId: string, campaignId: string): Promise<any> {
+    const records = await db[this.model].findAndCountAll({
+      distinct: true,
+      where: {
+        userId,
+        campaignId
+      }
+    })
+
+    return records
+  }
+
   async getAll (limit: number, offset: number, search: string = '', filter = { firstname: '', lastname: '', email: '', city: '', country: '' }): Promise<any> {
     const records = await db[this.model].findAndCountAll({
       include: generateInclude(this.model),
