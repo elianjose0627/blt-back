@@ -2,8 +2,15 @@ import { v1 as uuidv1 } from 'uuid'
 import { Op } from 'sequelize'
 import db from '../models'
 
-const includeCompany = ['Address', 'CostCenter', 'Product', 'Order', 'AccessPermission', 'PendingOrder']
-const withoutUser = ['BundleItem', 'Salutation', 'Picture', 'SecondaryDomain', 'LegalText', 'ShippingMethod', 'GreetingCard', 'CampaignShippingDestination']
+const includeCompany = [
+  'Address', 'CostCenter', 'Product',
+  'Order', 'AccessPermission', 'PendingOrder'
+]
+const withoutUser = [
+  'BundleItem', 'Salutation', 'Picture',
+  'SecondaryDomain', 'LegalText', 'ShippingMethod',
+  'GreetingCard', 'CampaignShippingDestination', 'CampaignOrderLimit'
+]
 
 const includeCompanyAndOwner = {
   model: db.Company,
