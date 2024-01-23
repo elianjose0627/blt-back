@@ -24,6 +24,7 @@ import pendingOrderRouter from './pendingOrderRouter'
 import cardTemplateRouter from './cardTemplateRouter'
 import greetingCardRouter from './greetingCardRouter'
 import campaignShippingDestinationRouter from './campaignShippingDestinationRouter'
+import campaignOrderLimitRouter from './campaignOrderLimitRouter'
 
 const routers = {
   authRouter,
@@ -51,7 +52,8 @@ const routers = {
   pendingOrderRouter,
   cardTemplateRouter,
   greetingCardRouter,
-  campaignShippingDestinationRouter
+  campaignShippingDestinationRouter,
+  campaignOrderLimitRouter
 }
 
 export default routers

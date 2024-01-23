@@ -265,8 +265,8 @@ export interface ICampaign {
   company?: ICompany
   cardTemplates?: ICardTemplate[]
   cardSetting?: ICardSetting
-  campaignShippingDestinations?: ICampaignShippingDestination[]
-  campaignOrderLimits?: ICampaignOrderLimit[]
+  campaignShippingDestinations: ICampaignShippingDestination[]
+  campaignOrderLimits: ICampaignOrderLimit[]
 }
 
 export interface ISecondaryDomain {

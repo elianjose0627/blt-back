@@ -63,7 +63,7 @@ class PendingOrderController extends BaseController {
     }
 
     const existingOrders = await pendingOrderService.findPendingOrders(currentUser.id, campaign.id)
-    const campaignOrderLimit = campaignOrderLimits?.find((campaignOrderLimit) => campaignOrderLimit.role === currentUser.role)
+    const campaignOrderLimit = campaignOrderLimits.find((campaignOrderLimit) => campaignOrderLimit.role === currentUser.role)
 
     if (campaignOrderLimit !== undefined && (existingOrders.count >= campaignOrderLimit.limit || (parseInt(pendingOrders.length, 10) + parseInt(existingOrders.count, 10)) >= campaignOrderLimit.limit)) {
       return res.status(statusCodes.TOO_MANY_REQUESTS).send({
