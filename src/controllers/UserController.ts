@@ -224,6 +224,18 @@ class UserController extends BaseController {
     })
   }
 
+  async updatePasswordAdmin (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record, body: { user: { sendEmail } } } = req
+
+    const response = await userService.updatePasswordAdmin(record, { sendEmail, logoutTime: Date(), isActive: true })
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      user: response
+    })
+  }
+
   async logout (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { user } = req
     await userService.logout(user.email)

@@ -8,6 +8,7 @@ import { sendNotifierEmail } from '../utils/sendMail'
 import generateToken from '../utils/generateToken'
 import generateOtp from '../utils/generateOtp'
 import * as userRoles from '../utils/userRoles'
+import generatePassword from '../utils/generatePassword'
 
 dayjs.extend(utc)
 
@@ -20,6 +21,7 @@ const salesMailer = String(process.env.SALES_MAILER_EMAIL)
 const adminEmail = String(process.env.ADMIN_EMAIL)
 const resetPasswordExpiration = '10 minutes'
 const sandboxMode = process.env.NODE_ENV === 'test'
+const passwordLength = 8
 
 const include = [
   {
@@ -196,7 +198,7 @@ class UserService extends BaseService {
         const updatedRecord = await record.update({ password, logoutTime })
 
         const bccStatus = false
-        const message = `Hello ${String(updatedRecord.firstName)}, your password for ${appName} App has been updated. \nIf you didn't ask to change your password, contact us immediately through ${adminEmail}. \n\nThanks,\n\n${appName} Application team`
+        const message = `Hello ${String(updatedRecord.firstName)}, your password for ${appName} app has been updated. \nIf you didn't ask to change your password, contact us immediately through ${adminEmail}. \n\nThanks,\n\n${appName} application team`
         try {
           await sendNotifierEmail(updatedRecord.email, 'Password Change', message, bccStatus, '', sandboxMode)
         } catch (error) {}
@@ -206,6 +208,25 @@ class UserService extends BaseService {
         return { message: 'Current password is incorrect' }
       }
     })
+  }
+
+  async updatePasswordAdmin (record: any, data: any): Promise<any> {
+    const { sendEmail, logoutTime } = data
+
+    const password = generatePassword(passwordLength)
+
+    const updatedRecord = await record.update({ password, logoutTime })
+    if (sendEmail === true) {
+      const bccStatus = false
+      const message = `Hello ${String(updatedRecord.firstName)}, your password for ${appName} app has been updated to: <p><span style="font-size:1.5em;"><strong>${password}</strong></span></p>
+      <p>If you didn't ask to change your password, contact us immediately through ${adminEmail}. </p>
+      <p>Thanks,<br>${appName} application team</p>
+      `
+      try {
+        await sendNotifierEmail(updatedRecord.email, 'Password Change', message, bccStatus, message, sandboxMode)
+      } catch (error) {}
+    }
+    return { ...updatedRecord.toJSONFor(), password }
   }
 
   async forgotPassword (email: string): Promise<any> {
