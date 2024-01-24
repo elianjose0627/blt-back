@@ -665,6 +665,12 @@ const validateCampaignShippingDestination = Joi.object({
   }
 }).required()
 
+const validatePasswordResetAdmin = Joi.object({
+  user: Joi.object({
+    sendEmail: Joi.boolean().default(true)
+  }).required()
+}).required()
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -716,5 +722,6 @@ export default {
   validateProductId,
   validateAuthToken,
   validateCampaignOrderLimit,
-  validateCampaignShippingDestination
+  validateCampaignShippingDestination,
+  validatePasswordResetAdmin
 }

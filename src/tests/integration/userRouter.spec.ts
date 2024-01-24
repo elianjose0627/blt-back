@@ -356,6 +356,32 @@ describe('A user', () => {
       expect(res.body.user).to.be.an('object')
       expect(res.body.user).to.not.have.any.keys('password', 'otp', 'isDeleted')
     })
+
+    it('Should return 200 Success when an admin successfully updates the password of a user.', async () => {
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${userId}/password-reset-admin`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({ user: { sendEmail: true } })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.user).to.not.have.any.keys('otp', 'isDeleted')
+    })
+
+    it('Should return 200 Success when an admin successfully updates the password of a user.', async () => {
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${userId}/password-reset-admin`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({ user: { sendEmail: false } })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.user).to.not.have.any.keys('otp', 'isDeleted')
+    })
   })
 
   describe('Update a role as an admin', () => {
