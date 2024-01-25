@@ -50,6 +50,10 @@ const userRoutes = (): any => {
     .patch(asyncHandler(UserController.checkOwner), celebrate({
       [Segments.BODY]: validator.validatePassword
     }), asyncHandler(UserController.updatePassword))
+  userRouter.route('/users/:id/password-reset-admin')
+    .patch(asyncHandler(checkAdmin), celebrate({
+      [Segments.BODY]: validator.validatePasswordResetAdmin
+    }), asyncHandler(UserController.updatePasswordAdmin))
   userRouter.route('/users/:id/verify')
     .post(asyncHandler(UserController.checkOwner), asyncHandler(UserController.sendVerifyEmail))
   userRouter.route('/users/:id/verify')
