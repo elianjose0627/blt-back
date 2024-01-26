@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { CampaignStatus, CampaignType, ICampaign, ICardSetting, ICardTemplate, ICompany } from '../types'
+import type { CampaignStatus, CampaignType, ICampaign, ICampaignOrderLimit, ICampaignShippingDestination, ICardSetting, ICardTemplate, ICompany } from '../types'
 
 const CampaignModel = (sequelize: any, DataTypes: any): any => {
   interface CampaignAttributes {
@@ -39,6 +39,8 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     private readonly company: ICompany
     private readonly cardTemplates: ICardTemplate[]
     private readonly cardSetting: ICardSetting
+    private readonly campaignShippingDestinations: ICampaignShippingDestination[]
+    private readonly campaignOrderLimits: ICampaignOrderLimit[]
 
     static associate (models: any): any {
       Campaign.belongsTo(models.Company, {
@@ -66,6 +68,16 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
         as: 'cardSetting',
         onDelete: 'CASCADE'
       })
+      Campaign.hasMany(models.CampaignOrderLimit, {
+        foreignKey: 'campaignId',
+        as: 'campaignOrderLimits',
+        onDelete: 'CASCADE'
+      })
+      Campaign.hasMany(models.CampaignShippingDestination, {
+        foreignKey: 'campaignId',
+        as: 'campaignShippingDestinations',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): ICampaign {
@@ -88,7 +100,9 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
         updatedAt: this.updatedAt,
         company: this.company,
         cardTemplates: this.cardTemplates,
-        cardSetting: this.cardSetting
+        cardSetting: this.cardSetting,
+        campaignShippingDestinations: this.campaignShippingDestinations,
+        campaignOrderLimits: this.campaignOrderLimits
       }
     }
   };

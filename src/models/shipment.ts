@@ -48,7 +48,7 @@ const ShipmentModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false
     },
     data: {
-      type: DataTypes.JSON,
+      type: DataTypes.JSONB,
       allowNull: true
     }
   }, {

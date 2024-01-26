@@ -44,7 +44,10 @@ class PendingOrderController extends BaseController {
       })
     }
 
-    const { isQuotaEnabled, isExceedQuotaEnabled, usedQuota, quota, correctionQuota } = campaign as ICampaign
+    const {
+      isQuotaEnabled, isExceedQuotaEnabled, usedQuota, quota, correctionQuota,
+      campaignOrderLimits
+    } = campaign as ICampaign
 
     const totalUsedQuota = usedQuota + correctionQuota
     const allowedRoles = [userRoles.ADMIN]
@@ -59,9 +62,21 @@ class PendingOrderController extends BaseController {
       })
     }
 
-    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
+    const existingOrders = await pendingOrderService.findPendingOrders(currentUser.id, campaign.id)
+    const campaignOrderLimit = campaignOrderLimits.find((campaignOrderLimit) => campaignOrderLimit.role === currentUser.role)
+
+    if (campaignOrderLimit !== undefined && (existingOrders.count >= campaignOrderLimit.limit || (parseInt(pendingOrders.length, 10) + parseInt(existingOrders.count, 10)) >= campaignOrderLimit.limit)) {
+      return res.status(statusCodes.TOO_MANY_REQUESTS).send({
+        statusCode: statusCodes.TOO_MANY_REQUESTS,
+        success: false,
+        errors: {
+          message: 'Campaign order limit has been exceeded'
+        }
+      })
+    }
 
     const { response, status } = await pendingOrderService.insert({ pendingOrders, currentUser, campaign })
+    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 
     const statusCode: StatusCode = {
       200: statusCodes.OK,

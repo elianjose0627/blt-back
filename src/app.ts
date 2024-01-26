@@ -57,6 +57,8 @@ app.use(apiPrefix, routers.webhookRouter())
 app.use(apiPrefix, routers.pendingOrderRouter())
 app.use(apiPrefix, routers.cardTemplateRouter())
 app.use(apiPrefix, routers.greetingCardRouter())
+app.use(apiPrefix, routers.campaignShippingDestinationRouter())
+app.use(apiPrefix, routers.campaignOrderLimitRouter())
 
 // Add validation middleware
 app.use(joiErrors)

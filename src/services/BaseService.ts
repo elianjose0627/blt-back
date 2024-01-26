@@ -2,8 +2,15 @@ import { v1 as uuidv1 } from 'uuid'
 import { Op } from 'sequelize'
 import db from '../models'
 
-const includeCompany = ['Address', 'CostCenter', 'Product', 'Order', 'AccessPermission', 'PendingOrder']
-const withoutUser = ['BundleItem', 'Salutation', 'Picture', 'SecondaryDomain', 'LegalText', 'ShippingMethod', 'GreetingCard']
+const includeCompany = [
+  'Address', 'CostCenter', 'Product',
+  'Order', 'AccessPermission', 'PendingOrder'
+]
+const withoutUser = [
+  'BundleItem', 'Salutation', 'Picture',
+  'SecondaryDomain', 'LegalText', 'ShippingMethod',
+  'GreetingCard', 'CampaignShippingDestination', 'CampaignOrderLimit'
+]
 
 const includeCompanyAndOwner = {
   model: db.Company,
@@ -61,6 +68,16 @@ export const generateInclude = (model: string): any => {
           model: db.CardSetting,
           attributes: { exclude: ['deletedAt', 'campaignId'] },
           as: 'cardSetting'
+        },
+        {
+          model: db.CampaignOrderLimit,
+          attributes: { exclude: ['deletedAt', 'campaignId'] },
+          as: 'campaignOrderLimits'
+        },
+        {
+          model: db.CampaignShippingDestination,
+          attributes: { exclude: ['deletedAt', 'campaignId'] },
+          as: 'campaignShippingDestinations'
         }
       ]
     )
