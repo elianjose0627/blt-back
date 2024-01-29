@@ -671,6 +671,14 @@ const validatePasswordResetAdmin = Joi.object({
   }).required()
 }).required()
 
+const validateEmailTemplate = Joi.object({
+  emailTemplate: Joi.object({
+    subject: Joi.string().max(256),
+    template: Joi.string(),
+    emailTemplateTypeId: Joi.string().uuid()
+  }).required()
+}).required()
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -723,5 +731,6 @@ export default {
   validateAuthToken,
   validateCampaignOrderLimit,
   validateCampaignShippingDestination,
-  validatePasswordResetAdmin
+  validatePasswordResetAdmin,
+  validateEmailTemplate
 }

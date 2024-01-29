@@ -9,7 +9,8 @@ const includeCompany = [
 const withoutUser = [
   'BundleItem', 'Salutation', 'Picture',
   'SecondaryDomain', 'LegalText', 'ShippingMethod',
-  'GreetingCard', 'CampaignShippingDestination', 'CampaignOrderLimit'
+  'GreetingCard', 'CampaignShippingDestination', 'CampaignOrderLimit',
+  'EmailTemplate', 'EmailTemplateType'
 ]
 
 const includeCompanyAndOwner = {
@@ -105,6 +106,15 @@ export const generateInclude = (model: string): any => {
         model: db.Picture,
         attributes: ['id', 'filename', 'url', 'size', 'mimeType', 'updatedAt', 'createdAt'],
         as: 'pictures'
+      }
+    ])
+  }
+  if (model === 'EmailTemplate') {
+    return ([
+      {
+        model: db.EmailTemplateType,
+        attributes: ['id', 'name', 'description', 'updatedAt', 'createdAt'],
+        as: 'emailTemplateType'
       }
     ])
   }

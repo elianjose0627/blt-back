@@ -343,6 +343,23 @@ export interface ICampaignShippingDestination {
   updatedAt: Date
 }
 
+export interface IEmailTemplateType {
+  id: string
+  name: string
+  description: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface IEmailTemplate {
+  id: string
+  subject: string
+  template: string
+  emailTemplateType: IEmailTemplateType
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface ShippingAddress {
   lastname: string
   city: string

@@ -39,6 +39,8 @@ export interface Database {
   GreetingCard?: any
   CampaignOrderLimit?: any
   CampaignShippingDestination?: any
+  EmailTemplate?: any
+  EmailTemplateType?: any
   [key: string]: any
 }
 
