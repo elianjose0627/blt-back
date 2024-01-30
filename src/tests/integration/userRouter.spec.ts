@@ -8,7 +8,8 @@ import {
   deleteTestUser,
   createAdminTestUser,
   createUserWithOtp,
-  createUserWithExpiredOtp
+  createUserWithExpiredOtp,
+  createBlockedDomain
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 
@@ -157,6 +158,29 @@ describe('A user', () => {
       expect(res).to.have.status(404)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('Company not found')
+    })
+
+    it('Should return 422 unprocessable entity when an admin tries to create a user with a blocked email domain.', async () => {
+      await createBlockedDomain('t-online.de')
+      const res = await chai
+        .request(app)
+        .post('/api/users')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            firstName: 'Warriors',
+            lastName: 'Three',
+            email: 'warthree@t-online.de',
+            phone: '254720123456',
+            password: 'thorisgreat',
+            role: userRoles.ADMIN
+          }
+        })
+
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('Kindly register with another email provider, t-online.de is not supported.')
     })
   })
 

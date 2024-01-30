@@ -13,7 +13,8 @@ import {
   createVerifiedUser,
   createVerifiedAdminUser,
   createPrivacyRule,
-  createTestUser
+  createTestUser,
+  createBlockedDomain
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 import * as appModules from '../../utils/appModules'
@@ -3136,6 +3137,28 @@ describe('Company actions', () => {
       expect(res).to.have.status(404)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal(`The user was not found, an invitation email has been sent to ${String(nonExistentEmail)}`)
+    })
+
+    it('Should return 422 Unprocessable entity when an owner tries to add a user with a blocked email domain to a company.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+      await createBlockedDomain('t-online.de')
+
+      const companyId = resCompany.id
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'test@t-online.de'
+          }
+        })
+
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('Kindly register with another email provider, t-online.de is not supported.')
     })
 
     it('Should return 403 Forbidden when an owner tries to add a user with a different domain to a company.', async () => {
