@@ -1,15 +1,18 @@
 import { Model } from 'sequelize'
+import type { IEmailTemplateType } from '../types'
 
 const EmailTemplateTypeModel = (sequelize: any, DataTypes: any): any => {
   interface EmailTemplateTypeAttributes {
     id: string
     name: string
+    type: string
     description: string
   }
 
   class EmailTemplateType extends Model<EmailTemplateTypeAttributes> {
     private readonly id: string
     private readonly name: string
+    private readonly type: string
     private readonly description: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
@@ -20,6 +23,17 @@ const EmailTemplateTypeModel = (sequelize: any, DataTypes: any): any => {
         onDelete: 'CASCADE'
       })
     }
+
+    toJSONFor (): IEmailTemplateType {
+      return {
+        id: this.id,
+        name: this.name,
+        type: this.type,
+        description: this.description,
+        createdAt: this.createdAt,
+        updatedAt: this.updatedAt
+      }
+    }
   };
 
   EmailTemplateType.init({
@@ -29,6 +43,11 @@ const EmailTemplateTypeModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false
     },
     name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
+    },
+    type: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true

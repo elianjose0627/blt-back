@@ -98,14 +98,14 @@ describe('Email Template actions', () => {
 
   describe('Create an email template', () => {
     it('Should return 201 Created when an admin creates an email template.', async () => {
-      const templateTypeId = await createEmailTemplateType('userCreation')
+      const templateTypeId = await createEmailTemplateType('User Creation Hello', 'User Creation Hello', 'userCreationHello')
       const res = await chai
         .request(app)
         .post('/api/email-templates')
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           emailTemplate: {
-            subject: 'Password Reset',
+            subject: 'Password Reset Hello',
             template: 'Hello World',
             emailTemplateTypeId: templateTypeId
           }

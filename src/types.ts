@@ -346,6 +346,7 @@ export interface ICampaignShippingDestination {
 export interface IEmailTemplateType {
   id: string
   name: string
+  type: string
   description: string
   createdAt: Date
   updatedAt: Date

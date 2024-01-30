@@ -26,6 +26,7 @@ import greetingCardRouter from './greetingCardRouter'
 import campaignShippingDestinationRouter from './campaignShippingDestinationRouter'
 import campaignOrderLimitRouter from './campaignOrderLimitRouter'
 import emailTemplateRouter from './emailTemplateRouter'
+import emailTempleTypeRouter from './emailTemplateTypeRouter'
 
 const routers = {
   authRouter,
@@ -55,7 +56,8 @@ const routers = {
   greetingCardRouter,
   campaignShippingDestinationRouter,
   campaignOrderLimitRouter,
-  emailTemplateRouter
+  emailTemplateRouter,
+  emailTempleTypeRouter
 }
 
 export default routers

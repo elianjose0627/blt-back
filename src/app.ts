@@ -60,6 +60,7 @@ app.use(apiPrefix, routers.greetingCardRouter())
 app.use(apiPrefix, routers.campaignShippingDestinationRouter())
 app.use(apiPrefix, routers.campaignOrderLimitRouter())
 app.use(apiPrefix, routers.emailTemplateRouter())
+app.use(apiPrefix, routers.emailTempleTypeRouter())
 
 // Add validation middleware
 app.use(joiErrors)

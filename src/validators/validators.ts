@@ -679,6 +679,14 @@ const validateEmailTemplate = Joi.object({
   }).required()
 }).required()
 
+const validateEmailTemplateType = Joi.object({
+  emailTemplateType: Joi.object({
+    name: Joi.string().max(64),
+    type: Joi.string().max(32),
+    description: Joi.string().max(256)
+  }).required()
+}).required()
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -732,5 +740,6 @@ export default {
   validateCampaignOrderLimit,
   validateCampaignShippingDestination,
   validatePasswordResetAdmin,
-  validateEmailTemplate
+  validateEmailTemplate,
+  validateEmailTemplateType
 }
