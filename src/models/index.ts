@@ -41,6 +41,7 @@ export interface Database {
   CampaignShippingDestination?: any
   EmailTemplate?: any
   EmailTemplateType?: any
+  BlockedDomain?: any
   [key: string]: any
 }
 

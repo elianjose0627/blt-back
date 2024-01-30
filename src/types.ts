@@ -360,6 +360,13 @@ export interface IEmailTemplate {
   updatedAt: Date
 }
 
+export interface IBlockedDomain {
+  id: string
+  domain: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface ShippingAddress {
   lastname: string
   city: string

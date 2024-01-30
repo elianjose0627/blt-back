@@ -1125,3 +1125,12 @@ export const createEmailTemplateType = async (name = 'resetPassword', descriptio
 
   return res.id
 }
+
+export const createBlockedDomain = async (domain: string): Promise<string> => {
+  const res = await db.BlockedDomain.create({
+    id: uuidv4(),
+    domain
+  })
+
+  return res
+}

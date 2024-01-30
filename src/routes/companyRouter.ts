@@ -16,6 +16,7 @@ import SecondaryDomainController from '../controllers/SecondaryDomainController'
 import LegalTextController from '../controllers/LegalTextController'
 import AccessPermissionController from '../controllers/AccessPermissionController'
 import checkPermissions from '../middlewares/checkPermissions'
+import checkBlockedDomain from '../middlewares/checkBlockedDomain'
 
 const companyRoutes = (): any => {
   const companyRouter = express.Router()
@@ -99,9 +100,10 @@ const companyRoutes = (): any => {
     }, { abortEarly: false }),
     asyncHandler(CompanyController.update))
   companyRouter.route('/companies/:id/users')
-    .patch(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions), celebrate({
-      [Segments.BODY]: validator.validateJoinCompany
-    }, { abortEarly: false }), asyncHandler(UserController.addOrRemoveUserFromCompany))
+    .patch(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
+      celebrate({
+        [Segments.BODY]: validator.validateJoinCompany
+      }, { abortEarly: false }), asyncHandler(checkBlockedDomain), asyncHandler(UserController.addOrRemoveUserFromCompany))
     .get(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(CompanyController.getAllUsers))

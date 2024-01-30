@@ -10,7 +10,8 @@ import {
   createLockedOutUser30mins, createUserWithOtp,
   createLockedOutUser1min,
   createAdminTestUser,
-  verifyCompanyDomain
+  verifyCompanyDomain,
+  createBlockedDomain
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 import { encryptUUID } from '../../utils/encryption'
@@ -164,6 +165,28 @@ describe('Auth Actions', () => {
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')
     expect(res.body.success).to.equal(false)
     expect(res.body.errors.message).to.equal('A validation error has occured')
+  })
+
+  it('should return 422 when a user tries to sign up with an email domain that is blocked', async () => {
+    await createBlockedDomain('t-online.de')
+    const res = await chai
+      .request(app)
+      .post('/auth/signup')
+      .send({
+        user: {
+          firstName: 'Peter',
+          lastName: 'Quill',
+          username: 'pquill',
+          email: 'starlord@t-online.de',
+          phone: '254720123456',
+          password: 'footloose'
+        }
+      })
+
+    expect(res).to.have.status(422)
+    expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+    expect(res.body.success).to.equal(false)
+    expect(res.body.errors.message).to.equal('Kindly register with another email provider, t-online.de is not supported.')
   })
 
   it('should return 200 on successful logout', async () => {

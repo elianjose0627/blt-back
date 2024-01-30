@@ -7,6 +7,7 @@ import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
 import checkOtp from '../middlewares/checkOtp'
+import checkBlockedDomain from '../middlewares/checkBlockedDomain'
 
 const userRoutes = (): any => {
   const userRouter = express.Router()
@@ -18,7 +19,7 @@ const userRoutes = (): any => {
     }), asyncHandler(paginate), asyncHandler(UserController.getAll))
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateCreatedUserByAdmin
-    }), asyncHandler(UserController.insert))
+    }), asyncHandler(checkBlockedDomain), asyncHandler(UserController.insert))
   userRouter.use('/users/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(UserController.checkRecord))
