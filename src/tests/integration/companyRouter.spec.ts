@@ -688,7 +688,7 @@ describe('Company actions', () => {
   })
 
   describe('Company invitation link', () => {
-    it('Should return 200 OK when a company administrator gets a company invitation link.', async () => {
+    it('Should return 200 OK when a company administrator gets a company invitation link and code.', async () => {
       const resCompany = await createVerifiedCompany(userId)
 
       const companyId = resCompany.id
@@ -719,7 +719,7 @@ describe('Company actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'company')
       expect(res.body.company).to.be.an('object')
-      expect(res.body.company).to.include.keys('inviteLink')
+      expect(res.body.company).to.include.keys('inviteLink', 'inviteCode')
     })
   })
 

@@ -687,6 +687,12 @@ const validateEmailTemplateType = Joi.object({
   }).required()
 }).required()
 
+const validateUserCompanyInvite = Joi.object({
+  user: Joi.object({
+    companyInviteCode: Joi.string().required().max(128)
+  }).required()
+}).required()
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -741,5 +747,6 @@ export default {
   validateCampaignShippingDestination,
   validatePasswordResetAdmin,
   validateEmailTemplate,
-  validateEmailTemplateType
+  validateEmailTemplateType,
+  validateUserCompanyInvite
 }

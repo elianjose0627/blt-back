@@ -523,13 +523,14 @@ class CompanyController extends BaseController {
     }
   }
 
-  async getInviteLink (req: CustomRequest, res: CustomResponse): Promise<any> {
+  async getInviteLinkAndCode (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { params: { id } } = req
     return res.status(statusCodes.OK).send({
       statusCode: statusCodes.OK,
       success: true,
       company: {
-        inviteLink: `${String(process.env.APP_URL)}/register?companyId=${encryptUUID(id)}`
+        inviteLink: `${String(process.env.APP_URL)}/register?companyId=${encryptUUID(id, 'hex')}`,
+        inviteCode: encryptUUID(id, 'base64')
       }
     })
   }

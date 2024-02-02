@@ -73,6 +73,10 @@ const userRoutes = (): any => {
     .patch(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateUserCompany
     }, { abortEarly: false }), asyncHandler(UserController.updateUserCompany))
+  userRouter.route('/users/:id/company-invite')
+    .patch(asyncHandler(UserController.checkOwner), celebrate({
+      [Segments.BODY]: validator.validateUserCompanyInvite
+    }, { abortEarly: false }), asyncHandler(UserController.updateUserCompanyViaInviteCode))
   return userRouter
 }
 
