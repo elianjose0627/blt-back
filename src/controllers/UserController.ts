@@ -69,7 +69,7 @@ class UserController extends BaseController {
 
     try {
       if (companyId !== undefined) {
-        decryptedCompanyId = decryptUUID(companyId)
+        decryptedCompanyId = decryptUUID(companyId, 'hex')
       }
     } catch (error) {
       return res.status(statusCodes.UNPROCESSABLE_ENTITY).send({
@@ -561,6 +561,63 @@ class UserController extends BaseController {
       statusCode: statusCode[status],
       success: true,
       address: response
+    })
+  }
+
+  async updateUserCompanyViaInviteCode (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { body: { user }, record: userRecord } = req
+    const encryptedCompanyId = user.companyInviteCode
+    let decryptedCompanyId
+
+    try {
+      decryptedCompanyId = decryptUUID(encryptedCompanyId, 'base64')
+    } catch (error) {
+      return res.status(statusCodes.UNPROCESSABLE_ENTITY).send({
+        statusCode: statusCodes.UNPROCESSABLE_ENTITY,
+        success: false,
+        errors: {
+          message: 'Invalid invitation link'
+        }
+      })
+    }
+
+    const uuidSchema = Joi.string().uuid().message('Invalid invitation link')
+
+    const { error } = uuidSchema.validate(decryptedCompanyId)
+
+    if (error != null) {
+      return res.status(statusCodes.UNPROCESSABLE_ENTITY).send({
+        statusCode: statusCodes.UNPROCESSABLE_ENTITY,
+        success: false,
+        errors: {
+          message: error.message
+        }
+      })
+    }
+
+    const company = await companyService.findById(decryptedCompanyId)
+    if (company === null) {
+      return res.status(statusCodes.NOT_FOUND).send({
+        statusCode: statusCodes.NOT_FOUND,
+        success: false,
+        errors: {
+          message: 'Company not found'
+        }
+      })
+    }
+
+    const record = await userService.update(userRecord, {
+      companyId: decryptedCompanyId,
+      role: userRoles.EMPLOYEE,
+      logoutTime: dayjs.utc()
+    })
+
+    io.emit(`${String(userService.singleRecord())}`, { message: `${String(userService.singleRecord())} updated` })
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      [userService.singleRecord()]: record
     })
   }
 }

@@ -138,7 +138,7 @@ const companyRoutes = (): any => {
   companyRouter.route('/companies/:id/invite-link')
     .get(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions),
-      asyncHandler(CompanyController.checkCompanyDomainVerification), asyncHandler(CompanyController.getInviteLink))
+      asyncHandler(CompanyController.checkCompanyDomainVerification), asyncHandler(CompanyController.getInviteLinkAndCode))
   companyRouter.route('/companies/:id/access-permissions')
     .post(AccessPermissionController.setModule, asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions),

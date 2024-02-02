@@ -9,9 +9,11 @@ import {
   createAdminTestUser,
   createUserWithOtp,
   createUserWithExpiredOtp,
-  createBlockedDomain
+  createBlockedDomain,
+  createVerifiedCompany
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
+import { encryptUUID } from '../../utils/encryption'
 
 const { expect } = chai
 
@@ -943,6 +945,134 @@ describe('A user', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'user')
       expect(res.body.user).to.be.an('object')
       expect(res.body.success).to.equal(true)
+    })
+  })
+
+  describe('Company invitation code', () => {
+    it('Should return 200 OK when a user joins a company using an invitation code.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      const resCompanyInvite = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      const companyInviteCode = resCompanyInvite.body.company.inviteCode
+
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser2024@biglittlethings.de', phone: '254720123456', password: 'testuser' } })
+
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'testuser2024@biglittlethings.de', password: 'testuser' } })
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${String(resUser.body.user.id)}/company-invite`)
+        .set('Authorization', `Bearer ${String(resUser.body.token)}`)
+        .send({
+          user: {
+            companyInviteCode
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.success).to.equal(true)
+      expect(res.body.user.role).to.equal(userRoles.EMPLOYEE)
+    })
+
+    it('should return 404 Not Found if a user tries to join using an invite code for a company that does not exists', async () => {
+      const companyInviteCode = encryptUUID(uuidv1(), 'base64')
+
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser20241921@biglittlethings.de', phone: '254720123456', password: 'testuser' } })
+
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'testuser20241921@biglittlethings.de', password: 'testuser' } })
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${String(resUser.body.user.id)}/company-invite`)
+        .set('Authorization', `Bearer ${String(resUser.body.token)}`)
+        .send({
+          user: {
+            companyInviteCode
+          }
+        })
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('Company not found')
+    })
+
+    it('should return 422 Unprocessable entity if a user tries to join a company using an invalid invite code', async () => {
+      const companyInviteCode = 'ZTI4YmI0ODAtYzFkNy0xMWVlLWI0YjgtODc4MmU5NjUwNjk2'
+
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser20241922@biglittlethings.de', phone: '254720123456', password: 'testuser' } })
+
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'testuser20241922@biglittlethings.de', password: 'testuser' } })
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${String(resUser.body.user.id)}/company-invite`)
+        .set('Authorization', `Bearer ${String(resUser.body.token)}`)
+        .send({
+          user: {
+            companyInviteCode
+          }
+        })
+
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('Invalid invitation link')
+    })
+
+    it('should return 422 Unprocessable entity if a user tries to join a company using an invalid invite link that on decryption is not a guid', async () => {
+      const companyInviteCode = encryptUUID('123456780123401234012340123456789012', 'base64')
+
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser20241923@biglittlethings.de', phone: '254720123456', password: 'testuser' } })
+
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'testuser20241923@biglittlethings.de', password: 'testuser' } })
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${String(resUser.body.user.id)}/company-invite`)
+        .set('Authorization', `Bearer ${String(resUser.body.token)}`)
+        .send({
+          user: {
+            companyInviteCode
+          }
+        })
+
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('Invalid invitation link')
     })
   })
 })

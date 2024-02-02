@@ -38,9 +38,9 @@ steps:
     - 'DOTNET_API_KEY=${_DOTNET_API_KEY}'
     - 'DOTNET_APP_SECRET=${_DOTNET_APP_SECRET}'
 - name: 'gcr.io/cloud-builders/npm'
-  args: ['run', 'migrate']
-- name: 'gcr.io/cloud-builders/npm'
   args: ['test']
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['run', 'migrate']
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'codecov-coverage']
   env:

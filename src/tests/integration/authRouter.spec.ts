@@ -96,7 +96,7 @@ describe('Auth Actions', () => {
   })
 
   it('should return 404 Not Found if a user tries to sign up using company id link with a company that does not exists', async () => {
-    const companyId = encryptUUID(uuidv1())
+    const companyId = encryptUUID(uuidv1(), 'hex')
 
     const res = await chai
       .request(app)
@@ -130,7 +130,7 @@ describe('Auth Actions', () => {
   })
 
   it('should return 422 Unprocessable entity if a user tries to sign up using an invalid invite link that on decryption is not a guid', async () => {
-    const companyId = encryptUUID('123456780123401234012340123456789012')
+    const companyId = encryptUUID('123456780123401234012340123456789012', 'hex')
 
     const res = await chai
       .request(app)
