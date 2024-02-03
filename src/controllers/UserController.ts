@@ -576,12 +576,12 @@ class UserController extends BaseController {
         statusCode: statusCodes.UNPROCESSABLE_ENTITY,
         success: false,
         errors: {
-          message: 'Invalid invitation link'
+          message: 'Invalid invitation code'
         }
       })
     }
 
-    const uuidSchema = Joi.string().uuid().message('Invalid invitation link')
+    const uuidSchema = Joi.string().uuid().message('Invalid invitation code')
 
     const { error } = uuidSchema.validate(decryptedCompanyId)
 
