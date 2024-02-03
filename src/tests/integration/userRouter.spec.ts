@@ -1043,10 +1043,10 @@ describe('A user', () => {
       expect(res).to.have.status(422)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.success).to.equal(false)
-      expect(res.body.errors.message).to.equal('Invalid invitation link')
+      expect(res.body.errors.message).to.equal('Invalid invitation code')
     })
 
-    it('should return 422 Unprocessable entity if a user tries to join a company using an invalid invite link that on decryption is not a guid', async () => {
+    it('should return 422 Unprocessable entity if a user tries to join a company using an invalid invite code that on decryption is not a guid', async () => {
       const companyInviteCode = encryptUUID('123456780123401234012340123456789012', 'base64')
 
       await chai
@@ -1072,7 +1072,7 @@ describe('A user', () => {
       expect(res).to.have.status(422)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.success).to.equal(false)
-      expect(res.body.errors.message).to.equal('Invalid invitation link')
+      expect(res.body.errors.message).to.equal('Invalid invitation code')
     })
   })
 })
