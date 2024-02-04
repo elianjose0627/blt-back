@@ -1116,12 +1116,13 @@ export const pendingOrders = [
   }
 ]
 
-export const createEmailTemplateType = async (name = 'Reset Password', description = 'A template for password reset', type = 'resetPassword'): Promise<string> => {
+export const createEmailTemplateType = async (name = 'Reset Password', description = 'A template for password reset', type = 'resetPassword', placeholders = ['firstname']): Promise<string> => {
   const res = await db.EmailTemplateType.create({
     id: uuidv4(),
     name,
     description,
-    type
+    type,
+    placeholders
   })
 
   return res.id

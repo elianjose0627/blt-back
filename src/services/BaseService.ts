@@ -113,7 +113,7 @@ export const generateInclude = (model: string): any => {
     return ([
       {
         model: db.EmailTemplateType,
-        attributes: ['id', 'name', 'description', 'updatedAt', 'createdAt'],
+        attributes: ['id', 'name', 'description', 'placeholders', 'updatedAt', 'createdAt'],
         as: 'emailTemplateType'
       }
     ])

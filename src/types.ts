@@ -348,6 +348,7 @@ export interface IEmailTemplateType {
   name: string
   type: string
   description: string
+  placeholders: string[]
   createdAt: Date
   updatedAt: Date
 }

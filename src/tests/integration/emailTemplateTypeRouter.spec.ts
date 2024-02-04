@@ -65,7 +65,8 @@ describe('Email Template Type actions', () => {
           emailTemplateType: {
             name: 'Password Reset',
             type: 'passwordReset',
-            description: 'This is an email template type for a user password reset'
+            description: 'This is an email template type for a user password reset',
+            placeholders: ['firstname', 'lastname', 'salutation']
           }
         })
 
@@ -91,14 +92,15 @@ describe('Email Template Type actions', () => {
           emailTemplateType: {
             name: 'Forgot Password',
             type: 'forgotPassword',
-            description: 'This is an email template type for a user password reset'
+            description: 'This is an email template type for a user password reset',
+            placeholders: ['firstname', 'lastname', 'salutation']
           }
         })
 
       expect(res).to.have.status(201)
       expect(res.body).to.include.keys('statusCode', 'success', 'emailTemplateType')
       expect(res.body.emailTemplateType).to.be.an('object')
-      expect(res.body.emailTemplateType).to.include.keys('id', 'name', 'type', 'description', 'createdAt', 'updatedAt')
+      expect(res.body.emailTemplateType).to.include.keys('id', 'name', 'type', 'description', 'placeholders', 'createdAt', 'updatedAt')
     })
 
     it('Should return 400 Bad Request when a user creates the same email template type.', async () => {
@@ -110,7 +112,8 @@ describe('Email Template Type actions', () => {
           emailTemplateType: {
             name: 'Password Reset',
             type: 'passwordReset',
-            description: 'This is an email template type for a user password reset'
+            description: 'This is an email template type for a user password reset',
+            placeholders: ['firstname', 'lastname', 'salutation']
           }
         })
 
@@ -130,7 +133,8 @@ describe('Email Template Type actions', () => {
           emailTemplateType: {
             name: 'Email Verification',
             type: 'emailVerification',
-            description: 'This is an email template type for a user to verify the account'
+            description: 'This is an email template type for a user to verify the account',
+            placeholders: ['firstname', 'lastname', 'salutation']
           }
         })
 
@@ -144,7 +148,7 @@ describe('Email Template Type actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'emailTemplateType')
       expect(res.body.emailTemplateType).to.be.an('object')
-      expect(res.body.emailTemplateType).to.include.keys('id', 'name', 'type', 'description', 'createdAt', 'updatedAt')
+      expect(res.body.emailTemplateType).to.include.keys('id', 'name', 'type', 'description', 'placeholders', 'createdAt', 'updatedAt')
     })
 
     it('Should return 200 OK when an administrator updates an email template type by id.', async () => {
@@ -156,7 +160,8 @@ describe('Email Template Type actions', () => {
           emailTemplateType: {
             name: 'Request OTP',
             type: 'requestOtp',
-            description: 'This is an email template type for a user to request an otp'
+            description: 'This is an email template type for a user to request an otp',
+            placeholders: ['firstname', 'lastname', 'salutation']
           }
         })
 
@@ -170,14 +175,15 @@ describe('Email Template Type actions', () => {
           emailTemplateType: {
             name: 'Request OTP Updated',
             type: 'requestOtp',
-            description: 'This is an email template type for a user to request an otp'
+            description: 'This is an email template type for a user to request an otp',
+            placeholders: ['firstname', 'lastname', 'salutation']
           }
         })
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'emailTemplateType')
       expect(res.body.emailTemplateType).to.be.an('object')
-      expect(res.body.emailTemplateType).to.include.keys('id', 'name', 'type', 'description', 'createdAt', 'updatedAt')
+      expect(res.body.emailTemplateType).to.include.keys('id', 'name', 'type', 'description', 'placeholders', 'createdAt', 'updatedAt')
       expect(res.body.emailTemplateType.name).to.equal('Request OTP Updated')
       expect(res.body.emailTemplateType.type).to.equal('requestOtp')
     })
@@ -191,7 +197,8 @@ describe('Email Template Type actions', () => {
           emailTemplateType: {
             name: 'Request OTP 2',
             type: 'requestOtpTwo',
-            description: 'This is an email template type for a user to request an otp'
+            description: 'This is an email template type for a user to request an otp',
+            placeholders: ['firstname', 'lastname', 'salutation']
           }
         })
 
@@ -205,7 +212,8 @@ describe('Email Template Type actions', () => {
           emailTemplateType: {
             name: 'Request OTP',
             type: 'requestOtp',
-            description: 'This is an email template type for a user to request an otp'
+            description: 'This is an email template type for a user to request an otp',
+            placeholders: ['firstname', 'lastname', 'salutation']
           }
         })
 
@@ -223,7 +231,8 @@ describe('Email Template Type actions', () => {
           emailTemplateType: {
             name: 'Request OTP 3',
             type: 'requestOtpThree',
-            description: 'This is an email template type for a user to request an otp'
+            description: 'This is an email template type for a user to request an otp',
+            placeholders: ['firstname', 'lastname', 'salutation']
           }
         })
 
@@ -255,7 +264,8 @@ describe('Email Template Type actions', () => {
           emailTemplateType: {
             name: 'Request OTP 4',
             type: 'requestOtpFour',
-            description: 'This is an email template type for a user to request an otp'
+            description: 'This is an email template type for a user to request an otp',
+            placeholders: ['firstname', 'lastname', 'salutation']
           }
         })
 

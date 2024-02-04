@@ -7,6 +7,7 @@ const EmailTemplateTypeModel = (sequelize: any, DataTypes: any): any => {
     name: string
     type: string
     description: string
+    placeholders: string[]
   }
 
   class EmailTemplateType extends Model<EmailTemplateTypeAttributes> {
@@ -14,6 +15,7 @@ const EmailTemplateTypeModel = (sequelize: any, DataTypes: any): any => {
     private readonly name: string
     private readonly type: string
     private readonly description: string
+    private readonly placeholders: string[]
     private readonly createdAt: Date
     private readonly updatedAt: Date
 
@@ -30,6 +32,7 @@ const EmailTemplateTypeModel = (sequelize: any, DataTypes: any): any => {
         name: this.name,
         type: this.type,
         description: this.description,
+        placeholders: this.placeholders,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       }
@@ -55,6 +58,10 @@ const EmailTemplateTypeModel = (sequelize: any, DataTypes: any): any => {
     description: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    placeholders: {
+      allowNull: false,
+      type: DataTypes.JSONB
     }
   }, {
     sequelize,
