@@ -11,9 +11,9 @@ import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 const salutationRoutes = (): any => {
   const salutationRouter = express.Router()
 
-  salutationRouter.use('/salutations', checkAuth, checkUserIsVerifiedStatus, SalutationController.setModule)
+  salutationRouter.use('/salutations', checkAuth, SalutationController.setModule)
   salutationRouter.route('/salutations')
-    .post(asyncHandler(checkAdmin), celebrate({
+    .post(asyncHandler(checkAdmin), asyncHandler(checkUserIsVerifiedStatus), celebrate({
       [Segments.BODY]: validator.validateSalutation
     }, { abortEarly: false }), asyncHandler(SalutationController.insert))
     .get(celebrate({
@@ -24,10 +24,10 @@ const salutationRoutes = (): any => {
   }, { abortEarly: false }), asyncHandler(SalutationController.checkRecord))
   salutationRouter.route('/salutations/:id')
     .get(asyncHandler(SalutationController.get))
-    .put(asyncHandler(checkAdmin), celebrate({
+    .put(asyncHandler(checkAdmin), asyncHandler(checkUserIsVerifiedStatus), celebrate({
       [Segments.BODY]: validator.validateSalutation
     }), asyncHandler(SalutationController.update))
-    .delete(asyncHandler(checkAdmin), asyncHandler(SalutationController.delete))
+    .delete(asyncHandler(checkAdmin), asyncHandler(checkUserIsVerifiedStatus), asyncHandler(SalutationController.delete))
   return salutationRouter
 }
 

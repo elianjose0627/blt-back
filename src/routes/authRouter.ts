@@ -6,6 +6,7 @@ import asyncHandler from '../middlewares/asyncHandler'
 import checkAuth from '../middlewares/checkAuth'
 import checkResetToken from '../middlewares/checkResetToken'
 import TokenController from '../controllers/TokenController'
+import checkBlockedDomain from '../middlewares/checkBlockedDomain'
 
 const authRoutes = (): any => {
   const authRouter = express.Router()
@@ -14,7 +15,7 @@ const authRoutes = (): any => {
     .post(celebrate({
       [Segments.BODY]: validator.validateCreatedUser,
       [Segments.QUERY]: validator.validateRegistrationQueryParams
-    }, { abortEarly: false }), asyncHandler(UserController.insert))
+    }, { abortEarly: false }), asyncHandler(checkBlockedDomain), asyncHandler(UserController.insert))
 
   authRouter.route('/login')
     .post(celebrate({
