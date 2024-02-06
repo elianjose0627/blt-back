@@ -721,6 +721,40 @@ describe('Company actions', () => {
       expect(res.body.company).to.be.an('object')
       expect(res.body.company).to.include.keys('inviteLink', 'inviteCode')
     })
+
+    it('Should return 200 OK when a company administrator updates a company invitation link and code.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('inviteLink', 'inviteCode')
+    })
   })
 
   describe('Company Employee Data Update', () => {

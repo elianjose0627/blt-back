@@ -197,6 +197,7 @@ export interface ICompany {
   address?: IAddress
   secondaryDomains?: ISecondaryDomain[]
   accessPermissions?: IAccessPermission[]
+  inviteToken?: Nullable<string>
 }
 
 export interface IAddress {

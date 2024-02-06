@@ -10,10 +10,11 @@ import {
   createUserWithOtp,
   createUserWithExpiredOtp,
   createBlockedDomain,
-  createVerifiedCompany
+  createVerifiedCompany,
+  verifyCompanyDomain
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
-import { encryptUUID } from '../../utils/encryption'
+import { encodeString, encryptUUID } from '../../utils/encryption'
 
 const { expect } = chai
 
@@ -964,12 +965,12 @@ describe('A user', () => {
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser2024@biglittlethings.de', phone: '254720123456', password: 'testuser' } })
+        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser2024feb@biglittlethings.de', phone: '254720123456', password: 'testuser' } })
 
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'testuser2024@biglittlethings.de', password: 'testuser' } })
+        .send({ user: { email: 'testuser2024feb@biglittlethings.de', password: 'testuser' } })
 
       const res = await chai
         .request(app)
@@ -988,8 +989,61 @@ describe('A user', () => {
       expect(res.body.user.role).to.equal(userRoles.EMPLOYEE)
     })
 
-    it('should return 404 Not Found if a user tries to join using an invite code for a company that does not exists', async () => {
-      const companyInviteCode = encryptUUID(uuidv1(), 'base64')
+    it('Should return 200 OK when a user joins a company that has a set invite token using an invitation code.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Test Company Invited Token',
+            email: 'test@companyinvitedtokentwo.com',
+            inviteToken: uuidv1()
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      await verifyCompanyDomain(companyId)
+
+      const resCompanyInvite = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      const companyInviteCode = resCompanyInvite.body.company.inviteCode
+
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser2024feb@biglittlethings.de', phone: '254720123456', password: 'testuser' } })
+
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'testuser2024feb@biglittlethings.de', password: 'testuser' } })
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${String(resUser.body.user.id)}/company-invite`)
+        .set('Authorization', `Bearer ${String(resUser.body.token)}`)
+        .send({
+          user: {
+            companyInviteCode
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.success).to.equal(true)
+      expect(res.body.user.role).to.equal(userRoles.EMPLOYEE)
+    })
+
+    it('should return 404 Not Found if a user tries to join using an invite code for a company that does not exist', async () => {
+      const uuid = uuidv1()
+      const encryptedUUID = encryptUUID(uuid, 'base64', uuid)
+      const encryptedUUIDWithCompanyIdBase64 = encodeString(`${encryptedUUID}.${uuid}`, 'base64')
 
       await chai
         .request(app)
@@ -1007,7 +1061,7 @@ describe('A user', () => {
         .set('Authorization', `Bearer ${String(resUser.body.token)}`)
         .send({
           user: {
-            companyInviteCode
+            companyInviteCode: encryptedUUIDWithCompanyIdBase64
           }
         })
 
@@ -1018,7 +1072,7 @@ describe('A user', () => {
     })
 
     it('should return 422 Unprocessable entity if a user tries to join a company using an invalid invite code', async () => {
-      const companyInviteCode = 'ZTI4YmI0ODAtYzFkNy0xMWVlLWI0YjgtODc4MmU5NjUwNjk2'
+      const companyInviteCode = 'SnB6eXVvTHpXdlBCeWNsdUpkR3VndkFlbXptSEp3Zm9HUXY2RGdZMEdDY28wRXcyTDM1R3EvaUJBRkcwZWUrVy5kMmM0NTc0MC1mNGM5LTExZWQtY'
 
       await chai
         .request(app)
@@ -1047,7 +1101,8 @@ describe('A user', () => {
     })
 
     it('should return 422 Unprocessable entity if a user tries to join a company using an invalid invite code that on decryption is not a guid', async () => {
-      const companyInviteCode = encryptUUID('123456780123401234012340123456789012', 'base64')
+      const encryptedNoneUUID = encryptUUID('123456780123401234012340123456789012', 'base64', uuidv1())
+      const encodeDncryptedNoneUUIDWithCompanyIdToBase64 = encodeString(`${encryptedNoneUUID}.${uuidv1()}`, 'base64')
 
       await chai
         .request(app)
@@ -1065,7 +1120,7 @@ describe('A user', () => {
         .set('Authorization', `Bearer ${String(resUser.body.token)}`)
         .send({
           user: {
-            companyInviteCode
+            companyInviteCode: encodeDncryptedNoneUUIDWithCompanyIdToBase64
           }
         })
 

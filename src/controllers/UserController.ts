@@ -11,7 +11,7 @@ import type { CustomNext, CustomRequest, CustomResponse, Nullable, StatusCode } 
 import * as userRoles from '../utils//userRoles'
 import { sendNotifierEmail } from '../utils/sendMail'
 import { io } from '../utils/socket'
-import { decryptUUID } from '../utils/encryption'
+import { decodeString, decryptUUID } from '../utils/encryption'
 
 dayjs.extend(utc)
 const userService = new UserService('User')
@@ -64,12 +64,15 @@ class UserController extends BaseController {
   }
 
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { body: { user }, user: currentUser, query: { companyId } } = req
+    const { body: { user }, user: currentUser, query: { companyId: encodedEncryptedCompanyId } } = req
     let decryptedCompanyId
 
     try {
-      if (companyId !== undefined) {
-        decryptedCompanyId = decryptUUID(companyId, 'hex')
+      if (encodedEncryptedCompanyId !== undefined) {
+        const [encryptedCompanyId, companyId] = decodeString(encodedEncryptedCompanyId, 'hex').split('.')
+        const company = await companyService.findById(companyId)
+        const inviteToken = company?.inviteToken
+        decryptedCompanyId = decryptUUID(encryptedCompanyId, 'base64', inviteToken ?? companyId)
       }
     } catch (error) {
       return res.status(statusCodes.UNPROCESSABLE_ENTITY).send({
@@ -566,12 +569,16 @@ class UserController extends BaseController {
 
   async updateUserCompanyViaInviteCode (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { body: { user }, record: userRecord } = req
-    const encryptedCompanyId = user.companyInviteCode
+    const encodedEncryptedCompanyId = user.companyInviteCode
     let decryptedCompanyId
 
     try {
-      decryptedCompanyId = decryptUUID(encryptedCompanyId, 'base64')
-    } catch (error) {
+      const [encryptedCompanyId, companyId] = decodeString(encodedEncryptedCompanyId, 'base64').split('.')
+      const company = await companyService.findById(companyId)
+      const inviteToken = company?.inviteToken
+
+      decryptedCompanyId = decryptUUID(encryptedCompanyId, 'base64', inviteToken ?? companyId)
+    } catch (error: any) {
       return res.status(statusCodes.UNPROCESSABLE_ENTITY).send({
         statusCode: statusCodes.UNPROCESSABLE_ENTITY,
         success: false,
