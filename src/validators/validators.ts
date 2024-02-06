@@ -194,7 +194,8 @@ const validateCreatedCompany = Joi.object({
       }),
     vat: Joi.string().optional().max(24).allow('').allow(null),
     domain: Joi.string().domain().allow('').allow(null),
-    customerId: Joi.number().optional().allow('').allow(null)
+    customerId: Joi.number().optional().allow('').allow(null),
+    inviteToken: Joi.string().uuid().optional()
   }).required()
 }).required()
 
@@ -209,7 +210,8 @@ const validateUpdatedCompany = Joi.object({
       }),
     vat: Joi.string().optional().max(24).allow('').allow(null),
     domain: Joi.string().domain().allow('').allow(null),
-    customerId: Joi.number().optional().allow('').allow(null)
+    customerId: Joi.number().optional().allow('').allow(null),
+    inviteToken: Joi.string().uuid().optional()
   }).required()
 }).required()
 
@@ -506,7 +508,7 @@ const validateLegalText = Joi.object({
 }).required()
 
 const validateRegistrationQueryParams = Joi.object({
-  companyId: Joi.string().length(96)
+  companyId: Joi.string()
 }).required()
 
 const validateShippingMethod = Joi.object({
@@ -690,7 +692,7 @@ const validateEmailTemplateType = Joi.object({
 
 const validateUserCompanyInvite = Joi.object({
   user: Joi.object({
-    companyInviteCode: Joi.string().required().max(128)
+    companyInviteCode: Joi.string().required()
   }).required()
 }).required()
 

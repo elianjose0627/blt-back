@@ -11,7 +11,7 @@ import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
 import AddressService from '../services/AddressService'
 import { sendNotifierEmail } from '../utils/sendMail'
-import { encryptUUID } from '../utils/encryption'
+import { encryptUUID, encodeString } from '../utils/encryption'
 
 dayjs.extend(utc)
 
@@ -524,13 +524,37 @@ class CompanyController extends BaseController {
   }
 
   async getInviteLinkAndCode (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { params: { id } } = req
+    const { params: { id }, record: { inviteToken } } = req
+    const encryptedUUID = encryptUUID(id, 'base64', inviteToken ?? id)
+    const encryptedUUIDWithCompanyIdHex = encodeString(`${encryptedUUID}.${id}`, 'hex')
+    const encryptedUUIDWithCompanyIdBase64 = encodeString(`${encryptedUUID}.${id}`, 'base64')
+
     return res.status(statusCodes.OK).send({
       statusCode: statusCodes.OK,
       success: true,
       company: {
-        inviteLink: `${String(process.env.APP_URL)}/register?companyId=${encryptUUID(id, 'hex')}`,
-        inviteCode: encryptUUID(id, 'base64')
+        inviteLink: `${String(process.env.APP_URL)}/register?companyId=${encryptedUUIDWithCompanyIdHex}`,
+        inviteCode: encryptedUUIDWithCompanyIdBase64
+      }
+    })
+  }
+
+  async updateInviteLinkAndCode (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { params: { id }, record } = req
+    const inviteToken = uuidv4()
+
+    await companyService.update(record, { inviteToken })
+
+    const encryptedUUID = encryptUUID(id, 'base64', inviteToken)
+    const encryptedUUIDWithCompanyIdHex = encodeString(`${encryptedUUID}.${id}`, 'hex')
+    const encryptedUUIDWithCompanyIdBase64 = encodeString(`${encryptedUUID}.${id}`, 'base64')
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      company: {
+        inviteLink: `${String(process.env.APP_URL)}/register?companyId=${encryptedUUIDWithCompanyIdHex}`,
+        inviteCode: encryptedUUIDWithCompanyIdBase64
       }
     })
   }
