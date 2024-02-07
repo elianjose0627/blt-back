@@ -16,7 +16,8 @@ class AddressService extends BaseService {
       where: {
         [Op.and]: [
           { companyId: company?.id ?? null },
-          { userId: user?.id ?? null }
+          { userId: user?.id ?? null },
+          { type: address.type ?? null }
         ]
       },
       paranoid: false
@@ -29,7 +30,7 @@ class AddressService extends BaseService {
     }
 
     if (company !== null) {
-      response = await db[this.model].create({ ...address, id: uuidv1(), companyId: company?.id })
+      response = await db[this.model].create({ ...address, id: uuidv1(), companyId: company.id })
     } else {
       response = await db[this.model].create({ ...address, id: uuidv1(), userId: user?.id })
     }

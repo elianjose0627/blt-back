@@ -180,6 +180,13 @@ export interface IBundle {
   pictures: IPicture[]
 }
 
+export interface Theme {
+  primaryColor: string
+  secondaryColor: string
+  backgroundColor: string
+  foregroundColor: string
+  accentColor: string
+}
 export interface ICompany {
   id: string
   customerId: number
@@ -198,7 +205,11 @@ export interface ICompany {
   secondaryDomains?: ISecondaryDomain[]
   accessPermissions?: IAccessPermission[]
   inviteToken?: Nullable<string>
+  theme: Nullable<Theme>
+  logo: Nullable<MediaData>
 }
+
+export type AddressType = 'personal' | 'billing' | 'delivery' | 'billingAndDelivery'
 
 export interface IAddress {
   id: string
@@ -211,6 +222,7 @@ export interface IAddress {
   vat?: string
   createdAt?: Date
   updatedAt?: Date
+  type: AddressType
   owner?: IUser
   company?: ICompany
 }
