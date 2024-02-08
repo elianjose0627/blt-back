@@ -63,7 +63,7 @@ export interface IUser {
   loginTime: LoginTime
   logoutTime?: Nullable<Date>
   company: Partial<ICompany> | null
-  address: Partial<IAddress> | null
+  addresses: Array<Partial<IAddress>>
 }
 
 export interface IToken {
@@ -201,7 +201,7 @@ export interface ICompany {
   createdAt?: Date
   updatedAt?: Date
   owner?: IUser
-  address?: IAddress
+  addresses?: IAddress[]
   secondaryDomains?: ISecondaryDomain[]
   accessPermissions?: IAccessPermission[]
   inviteToken?: Nullable<string>

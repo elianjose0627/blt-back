@@ -11,7 +11,8 @@ const errorMessages = [
 
 const errorNames = [
   'SequelizeUniqueConstraintError',
-  'SequelizeConnectionError'
+  'SequelizeConnectionError',
+  'SequelizeEagerLoadingError'
 ]
 
 const asyncHandler = (cb: any) => async (req: CustomRequest, res: CustomResponse, next: CustomNext) => {

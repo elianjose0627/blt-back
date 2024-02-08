@@ -71,7 +71,7 @@ describe('Profile actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'user')
       expect(res.body.user).to.be.an('object')
       expect(res.body.user).to.not.have.any.keys('password', 'otp', 'isDeleted')
-      expect(res.body.user.company).to.include.keys('owner', 'address', 'accessPermissions', 'defaultAccessPermissions')
+      expect(res.body.user.company).to.include.keys('owner', 'addresses', 'accessPermissions', 'defaultAccessPermissions')
     })
   })
 
