@@ -114,4 +114,24 @@ describe('capitalize', () => {
     const capitalizedName = capitalize('Rimböck')
     expect(capitalizedName).to.equal('Rimböck')
   })
+
+  it('tests if Mack with is capitalized', () => {
+    const capitalizedName = capitalize('Mack')
+    expect(capitalizedName).to.equal('Mack')
+  })
+
+  it('tests if Mache with is capitalized', () => {
+    const capitalizedName = capitalize('Mache')
+    expect(capitalizedName).to.equal('Mache')
+  })
+
+  it('tests if Anthony Mackie with is capitalized', () => {
+    const capitalizedName = capitalize('Anthony Mackie')
+    expect(capitalizedName).to.equal('Anthony Mackie')
+  })
+
+  it('tests if Mace Windu with is capitalized', () => {
+    const capitalizedName = capitalize('Mace Windu')
+    expect(capitalizedName).to.equal('Mace Windu')
+  })
 })

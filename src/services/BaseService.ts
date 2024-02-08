@@ -37,8 +37,8 @@ export const generateInclude = (model: string): any => {
         },
         {
           model: db.Address,
-          attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'updatedAt', 'createdAt'],
-          as: 'address'
+          attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type', 'updatedAt', 'createdAt'],
+          as: 'addresses'
         },
         {
           model: db.SecondaryDomain,
@@ -130,8 +130,8 @@ export const generateInclude = (model: string): any => {
         include: [
           {
             model: db.Address,
-            attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition'],
-            as: 'address'
+            attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type'],
+            as: 'addresses'
           }
         ]
       }
@@ -193,8 +193,8 @@ class BaseService {
             include: [
               {
                 model: db.Address,
-                attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition'],
-                as: 'address'
+                attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type'],
+                as: 'addresses'
               },
               {
                 model: db.User,
@@ -205,8 +205,8 @@ class BaseService {
           },
           {
             model: db.Address,
-            attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition'],
-            as: 'address'
+            attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type'],
+            as: 'addresses'
           }
         ]
       : generateInclude(this.model)

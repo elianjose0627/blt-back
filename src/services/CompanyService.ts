@@ -93,7 +93,7 @@ class CompanyService extends BaseService {
         {
           model: db.Address,
           attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition'],
-          as: 'address'
+          as: 'addresses'
         }
       ]
     })
@@ -110,15 +110,15 @@ class CompanyService extends BaseService {
     return {
       count: records.count,
       rows: records.rows.map((record: any) => {
-        if (privacyRule !== null && record.address !== null) {
-          record.address = {
-            phone: record.address.phone?.replace(/./g, '*'),
-            addressAddition: record.address.addressAddition?.replace(/./g, '*'),
-            city: record.address.city.replace(/./g, '*'),
-            street: record.address.street?.replace(/./g, '*'),
-            zip: record.address.zip?.replace(/./g, '*'),
-            country: record.address.country.replace(/./g, '*')
-          }
+        if (privacyRule !== null && record.addresses !== null) {
+          record.addresses = record.addresses.map((address: any) => ({
+            phone: address.phone?.replace(/./g, '*'),
+            addressAddition: address.addressAddition?.replace(/./g, '*'),
+            city: address.city.replace(/./g, '*'),
+            street: address.street?.replace(/./g, '*'),
+            zip: address.zip?.replace(/./g, '*'),
+            country: address.country.replace(/./g, '*')
+          }))
         }
         const item = record.toJSONFor()
         delete item.isGhost
