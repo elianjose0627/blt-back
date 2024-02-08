@@ -192,6 +192,7 @@ class UserService extends BaseService {
 
   async updatePassword (record: any, data: any): Promise<any> {
     const { currentPassword, password, logoutTime } = data
+    // Add a check for updatePassword template
 
     return record.comparePassword(currentPassword, async (match: boolean) => {
       if (match) {
