@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { IAddress, ICompany } from '../types'
+import type { AddressType, IAddress, ICompany } from '../types'
 
 const AddressModel = (sequelize: any, DataTypes: any): any => {
   interface AddressAttributes {
@@ -11,6 +11,7 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
     phone: string
     addressAddition: string
     vat: string
+    type: AddressType
   }
 
   class Address extends Model<AddressAttributes> {
@@ -22,6 +23,7 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
     private readonly phone: string
     private readonly addressAddition: string
     private readonly vat: string
+    private readonly type: AddressType
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany
@@ -49,6 +51,7 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
         phone: this.phone,
         addressAddition: this.addressAddition,
         vat: this.vat,
+        type: this.type,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         company: this.company
@@ -87,6 +90,10 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
       allowNull: true
     },
     vat: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    type: {
       type: DataTypes.STRING,
       allowNull: true
     }

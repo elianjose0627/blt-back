@@ -194,7 +194,29 @@ const validateCreatedCompany = Joi.object({
       }),
     vat: Joi.string().optional().max(24).allow('').allow(null),
     domain: Joi.string().domain().allow('').allow(null),
-    customerId: Joi.number().optional().allow('').allow(null)
+    customerId: Joi.number().optional().allow('').allow(null),
+    inviteToken: Joi.string().uuid().optional(),
+    theme: Joi.object({
+      primaryColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
+        'string.pattern.base': '{#label} must be a valid hex color'
+      }),
+      secondaryColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
+        'string.pattern.base': '{#label} must be a valid hex color'
+      }),
+      backgroundColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
+        'string.pattern.base': '{#label} must be a valid hex color'
+      }),
+      foregroundColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
+        'string.pattern.base': '{#label} must be a valid hex color'
+      }),
+      accentColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
+        'string.pattern.base': '{#label} must be a valid hex color'
+      })
+    }).allow(null),
+    logo: Joi.object({
+      url: Joi.string().uri().required(),
+      filename: Joi.string().required()
+    }).allow(null)
   }).required()
 }).required()
 
@@ -209,7 +231,29 @@ const validateUpdatedCompany = Joi.object({
       }),
     vat: Joi.string().optional().max(24).allow('').allow(null),
     domain: Joi.string().domain().allow('').allow(null),
-    customerId: Joi.number().optional().allow('').allow(null)
+    customerId: Joi.number().optional().allow('').allow(null),
+    inviteToken: Joi.string().uuid().optional(),
+    theme: Joi.object({
+      primaryColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
+        'string.pattern.base': '{#label} must be a valid hex color'
+      }),
+      secondaryColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
+        'string.pattern.base': '{#label} must be a valid hex color'
+      }),
+      backgroundColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
+        'string.pattern.base': '{#label} must be a valid hex color'
+      }),
+      foregroundColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
+        'string.pattern.base': '{#label} must be a valid hex color'
+      }),
+      accentColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
+        'string.pattern.base': '{#label} must be a valid hex color'
+      })
+    }).allow(null),
+    logo: Joi.object({
+      url: Joi.string().uri().required(),
+      filename: Joi.string().required()
+    }).allow(null)
   }).required()
 }).required()
 
@@ -230,7 +274,8 @@ const validateCreatedAddress = Joi.object({
         'string.pattern.base': '{#label} must be numeric'
       }),
     addressAddition: Joi.string().allow('').allow(null).max(256),
-    vat: Joi.string().allow('').allow(null).max(24)
+    vat: Joi.string().allow('').allow(null).max(24),
+    type: Joi.string().valid(...['personal', 'billing', 'delivery', 'billingAndDelivery']).allow(null)
   }).required()
 }).required()
 
@@ -245,7 +290,8 @@ const validateUpdatedAddress = Joi.object({
         'string.pattern.base': '{#label} must be numeric'
       }),
     addressAddition: Joi.string().allow('').allow(null).max(256),
-    vat: Joi.string().allow('').allow(null).max(24)
+    vat: Joi.string().allow('').allow(null).max(24),
+    type: Joi.string().valid(...['personal', 'billing', 'delivery', 'billingAndDelivery']).allow(null)
   }).required()
 }).required()
 
@@ -506,7 +552,7 @@ const validateLegalText = Joi.object({
 }).required()
 
 const validateRegistrationQueryParams = Joi.object({
-  companyId: Joi.string().length(96)
+  companyId: Joi.string()
 }).required()
 
 const validateShippingMethod = Joi.object({
@@ -690,7 +736,7 @@ const validateEmailTemplateType = Joi.object({
 
 const validateUserCompanyInvite = Joi.object({
   user: Joi.object({
-    companyInviteCode: Joi.string().required().max(128)
+    companyInviteCode: Joi.string().required()
   }).required()
 }).required()
 

@@ -73,7 +73,8 @@ describe('Address actions', () => {
         .send({
           address: {
             country: 'Kenya',
-            city: 'Nairobi'
+            city: 'Nairobi',
+            type: 'billing'
           }
         })
 
@@ -85,7 +86,8 @@ describe('Address actions', () => {
           address: {
             country: 'Kenya',
             city: 'Nakuru',
-            street: 'Kanu Street'
+            street: 'Kanu Street',
+            type: 'delivery'
           }
         })
 
@@ -118,7 +120,8 @@ describe('Address actions', () => {
         .send({
           address: {
             country: 'Kenya',
-            city: 'Nairobi'
+            city: 'Nairobi',
+            type: null
           }
         })
 

@@ -129,7 +129,18 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company',
-            email: adminUser.email
+            email: adminUser.email,
+            theme: {
+              primaryColor: '#ffffff',
+              secondaryColor: '#ffffff',
+              backgroundColor: '#ffffff',
+              foregroundColor: '#ffffff',
+              accentColor: '#ffffff'
+            },
+            logo: {
+              url: 'https://google.com',
+              filename: 'test.jpg'
+            }
           }
         })
 
@@ -721,6 +732,40 @@ describe('Company actions', () => {
       expect(res.body.company).to.be.an('object')
       expect(res.body.company).to.include.keys('inviteLink', 'inviteCode')
     })
+
+    it('Should return 200 OK when a company administrator updates a company invitation link and code.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('inviteLink', 'inviteCode')
+    })
   })
 
   describe('Company Employee Data Update', () => {
@@ -910,12 +955,12 @@ describe('Company actions', () => {
         .request(app)
         .post(`/api/companies/${String(companyId)}/users/${String(resNewUser.body.user.id)}/address`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ address: { country: 'Kenya', city: 'Nairobi' } })
+        .send({ address: { country: 'Kenya', city: 'Nairobi', type: 'billing' } })
 
       expect(res).to.have.status(201)
       expect(res.body).to.include.keys('statusCode', 'success', 'address')
       expect(res.body.address).to.be.an('object')
-      expect(res.body.address).to.have.keys('id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'vat', 'createdAt', 'updatedAt')
+      expect(res.body.address).to.have.keys('id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'vat', 'type', 'createdAt', 'updatedAt')
     })
 
     it('Should return 403 Forbidden when a company owner updates the address of an non-employee.', async () => {
@@ -1257,7 +1302,8 @@ describe('Company actions', () => {
         .send({
           address: {
             country: 'Kenya',
-            city: 'Nakuru'
+            city: 'Nakuru',
+            type: 'billing'
           }
         })
 
@@ -1268,7 +1314,8 @@ describe('Company actions', () => {
         .send({
           address: {
             country: 'Kenya',
-            city: 'Nakuru'
+            city: 'Nakuru',
+            type: 'billing'
           }
         })
 
