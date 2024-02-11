@@ -275,7 +275,7 @@ const validateCreatedAddress = Joi.object({
       }),
     addressAddition: Joi.string().allow('').allow(null).max(256),
     vat: Joi.string().allow('').allow(null).max(24),
-    type: Joi.string().valid(...['personal', 'billing', 'delivery', 'billingAndDelivery']).allow(null)
+    type: Joi.string().valid(...['billing', 'delivery', 'billingAndDelivery']).allow(null)
   }).required()
 }).required()
 
@@ -291,7 +291,7 @@ const validateUpdatedAddress = Joi.object({
       }),
     addressAddition: Joi.string().allow('').allow(null).max(256),
     vat: Joi.string().allow('').allow(null).max(24),
-    type: Joi.string().valid(...['personal', 'billing', 'delivery', 'billingAndDelivery']).allow(null)
+    type: Joi.string().valid(...['billing', 'delivery', 'billingAndDelivery']).allow(null)
   }).required()
 }).required()
 
