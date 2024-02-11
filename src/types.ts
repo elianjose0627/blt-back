@@ -209,7 +209,7 @@ export interface ICompany {
   logo: Nullable<MediaData>
 }
 
-export type AddressType = 'personal' | 'billing' | 'delivery' | 'billingAndDelivery'
+export type AddressType = 'billing' | 'delivery' | 'billingAndDelivery'
 
 export interface IAddress {
   id: string

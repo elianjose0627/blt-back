@@ -88,7 +88,7 @@ class ProductService extends BaseService {
     const include: any[] = [
       {
         model: db.Company,
-        attributes: ['id', 'name', 'email', 'phone', 'vat', 'domain'],
+        attributes: ['id', 'name', 'suffix', 'email', 'phone', 'vat', 'domain'],
         as: 'company'
       }
     ]
