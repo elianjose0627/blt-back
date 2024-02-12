@@ -349,8 +349,8 @@ const validateCampaign = Joi.object({
 const validateCampaignAdmin = Joi.object({
   campaign: Joi.object({
     ...commonCampaignSchema,
-    quota: Joi.number().allow(null).default(0),
-    correctionQuota: Joi.number().allow(null).default(0),
+    quota: Joi.number(),
+    correctionQuota: Joi.number(),
     lastQuotaResetDate: Joi.date().allow(null),
     isQuotaEnabled: Joi.boolean(),
     isExceedQuotaEnabled: Joi.boolean(),
