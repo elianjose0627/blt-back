@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { URL } from 'url'
 import { DataTypes, Model, Options, Sequelize } from 'sequelize'
 import dotenv from 'dotenv'
 import dBConfig from '../config/config.json'
@@ -45,10 +46,42 @@ export interface Database {
   [key: string]: any
 }
 
+interface CustomOptions extends Options {
+  use_env_variable: string
+  use_env_variable_read_replica: string
+}
+
 const db: Database = {}
 
-const config = dBConfig[env]
-const sequelize = new Sequelize(process.env[config.use_env_variable] as string, config as Options)
+const config = dBConfig[env] as CustomOptions
+
+const writeURL = process.env[config.use_env_variable] as string
+const readReplicaURL = process.env[config.use_env_variable_read_replica] as string
+
+const parsedWriteConfig = new URL(writeURL)
+const parsedReadReplicaConfig = new URL(readReplicaURL)
+
+const replication = {
+  read: [
+    {
+      host: parsedReadReplicaConfig.hostname,
+      port: parsedReadReplicaConfig.port,
+      username: parsedReadReplicaConfig.username,
+      password: parsedReadReplicaConfig.password,
+      database: parsedReadReplicaConfig.pathname.substring(1)
+    }
+  ],
+  write: {
+    host: parsedWriteConfig.hostname,
+    port: parsedWriteConfig.port,
+    username: parsedWriteConfig.username,
+    password: parsedWriteConfig.password,
+    database: parsedWriteConfig.pathname.substring(1)
+  }
+}
+
+config.replication = replication
+const sequelize = new Sequelize(writeURL, config as Options)
 
 fs
   .readdirSync(__dirname)
