@@ -265,6 +265,9 @@ const validateDomain = Joi.object({
 
 const validateCreatedAddress = Joi.object({
   address: Joi.object({
+    companyName: Joi.string().allow(null),
+    email: Joi.string().email().allow(null),
+    costCenter: Joi.string().allow(null),
     country: Joi.string().required().valid(...countryList.countries).max(64),
     city: Joi.string().required().max(64),
     street: Joi.string().optional().allow('').allow(null).max(64),
@@ -281,6 +284,9 @@ const validateCreatedAddress = Joi.object({
 
 const validateUpdatedAddress = Joi.object({
   address: Joi.object({
+    companyName: Joi.string().allow(null),
+    email: Joi.string().email().allow(null),
+    costCenter: Joi.string().allow(null),
     country: Joi.string().optional().valid(...countryList.countries).max(64),
     city: Joi.string().optional().max(64),
     street: Joi.string().optional().allow('').allow(null).max(64),
@@ -691,9 +697,9 @@ const validatePostedOrderIds = Joi.object().keys({
 }).required()
 
 const validateAuthToken = Joi.object({
-  auth: {
+  auth: Joi.object({
     token: Joi.string().required()
-  }
+  }).required()
 }).required()
 
 const validateCampaignOrderLimit = Joi.object({
@@ -706,9 +712,9 @@ const validateCampaignOrderLimit = Joi.object({
 }).required()
 
 const validateCampaignShippingDestination = Joi.object({
-  campaignShippingDestination: {
+  campaignShippingDestination: Joi.object({
     country: Joi.string().required().valid(...countryList.countries)
-  }
+  }).required()
 }).required()
 
 const validatePasswordResetAdmin = Joi.object({
@@ -737,6 +743,25 @@ const validateEmailTemplateType = Joi.object({
 const validateUserCompanyInvite = Joi.object({
   user: Joi.object({
     companyInviteCode: Joi.string().required()
+  }).required()
+}).required()
+
+const validateCampaignAddress = Joi.object({
+  campaignAddress: Joi.object({
+    companyName: Joi.string().allow(null),
+    email: Joi.string().email().allow(null),
+    costCenter: Joi.string().allow(null),
+    country: Joi.string().required().valid(...countryList.countries).max(64),
+    city: Joi.string().required().max(64),
+    street: Joi.string().optional().allow('').allow(null).max(64),
+    zip: Joi.string().optional().max(24),
+    phone: Joi.string().optional().allow('').allow(null).min(4).max(24).regex(/^(\+?)[0-9()\s-]{4,24}$/)
+      .messages({
+        'string.pattern.base': '{#label} must be numeric'
+      }),
+    addressAddition: Joi.string().allow('').allow(null).max(256),
+    vat: Joi.string().allow('').allow(null).max(24),
+    type: Joi.string().valid(...['billing', 'return']).required()
   }).required()
 }).required()
 
@@ -795,5 +820,6 @@ export default {
   validatePasswordResetAdmin,
   validateEmailTemplate,
   validateEmailTemplateType,
-  validateUserCompanyInvite
+  validateUserCompanyInvite,
+  validateCampaignAddress
 }

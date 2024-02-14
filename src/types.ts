@@ -209,10 +209,13 @@ export interface ICompany {
   logo: Nullable<MediaData>
 }
 
-export type AddressType = 'billing' | 'delivery' | 'billingAndDelivery'
+export type AddressType = 'billing' | 'delivery' | 'billingAndDelivery' | 'return'
 
 export interface IAddress {
   id: string
+  companyName?: string
+  email?: string
+  costCenter?: string
   country: string
   city: string
   street?: string
@@ -225,6 +228,7 @@ export interface IAddress {
   type: AddressType
   owner?: IUser
   company?: ICompany
+  campaign?: ICampaign
 }
 
 export interface IRecipient {
@@ -280,6 +284,7 @@ export interface ICampaign {
   cardSetting?: ICardSetting
   campaignShippingDestinations: ICampaignShippingDestination[]
   campaignOrderLimits: ICampaignOrderLimit[]
+  campaignAddresses: IAddress[]
 }
 
 export interface ISecondaryDomain {
