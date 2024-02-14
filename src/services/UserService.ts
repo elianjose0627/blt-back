@@ -9,6 +9,7 @@ import generateToken from '../utils/generateToken'
 import generateOtp from '../utils/generateOtp'
 import * as userRoles from '../utils/userRoles'
 import generatePassword from '../utils/generatePassword'
+import { IEmailTemplate } from '../types'
 
 dayjs.extend(utc)
 
@@ -69,42 +70,79 @@ class UserService extends BaseService {
       record = await db[this.model].create({ ...user, id: uuidv1() })
     }
 
-    const { email, firstName, role } = record
+    const { email, firstName, role, lastName, salutation } = record
 
     if (isTemporary !== true) {
-      let customMessage = `Thank you very much for registering an account at ${appName}.`
-      if (currentUser?.role === userRoles.ADMIN) {
-        customMessage = `<p>Your account has been created at ${appUrl} with a role of ${String(role)}.<p>
-        <p>Your temporary password is: ${String(user.password)}.</p>`
+      let subject, message
+      const accountWelcomeEmailTemplate: IEmailTemplate = await db.EmailTemplate.findOne({
+        include: {
+          model: db.EmailTemplateType,
+          as: 'emailTemplateType',
+          where: {
+            type: 'accountWelcome'
+          }
+        }
+      })
+      const accountWelcomeEmailTemplateAdmin: IEmailTemplate = await db.EmailTemplate.findOne({
+        include: {
+          model: db.EmailTemplateType,
+          as: 'emailTemplateType',
+          where: {
+            type: 'accountWelcomeAdmin'
+          }
+        }
+      })
+
+      if (accountWelcomeEmailTemplate === null || accountWelcomeEmailTemplateAdmin === null) {
+        let customMessage = `Thank you very much for registering an account at ${appName}.`
+        if (currentUser?.role === userRoles.ADMIN) {
+          customMessage = `<p>Your account has been created at ${appUrl} with a role of ${String(role)}.<p>
+          <p>Your temporary password is: ${String(user.password)}.</p>`
+        }
+        subject = `Verify your email for ${appName}`
+
+        const steps = `
+          <p>Steps to verify:</p>
+          <ol>
+            <li>Login to your account at ${appUrl}.</li>
+            <li>Click on the profile picture at the top right corner of the screen and select "Profile".</li>
+            <li>Under the Pending Actions Section, click "Request Verification OTP" to receive your code via email.</li>
+          </ol>
+          `
+
+        const footer = `
+          <p>For questions regarding your order, please reach out to:
+          <br>
+            Support: ${mailer}
+          <br>
+            Sales: ${salesMailer}
+          </p>
+          `
+
+        message = `<p>Hello ${String(firstName)},</p>
+          <p>${customMessage}<br>
+          To activate your account, please verify the ownership of the associated email address.</p>
+          ${steps}
+          <p>Best Regards,<br>
+          ${appName} team</p>
+          <p>${footer}</p>
+          `
+      } else {
+        subject = accountWelcomeEmailTemplate.subject
+        message = (currentUser?.role === userRoles.ADMIN
+          ? accountWelcomeEmailTemplateAdmin
+          : accountWelcomeEmailTemplate).template
+          .replace(/\[firstname\]/g, firstName)
+          .replace(/\[lastname\]/g, lastName)
+          .replace(/\[salutation\]/g, salutation)
+          .replace(/\[role\]/g, role)
+          .replace(/\[app\]/g, appName)
+          .replace(/\[url\]/g, appUrl)
+          .replace(/\[adminemail\]/g, adminEmail)
+          .replace(/\[mailer\]/g, mailer)
+          .replace(/\[salesmailer\]/g, salesMailer)
+          .replace(/\[password\]/g, user.password)
       }
-      const subject = `Verify your email for ${appName}`
-
-      const steps = `
-        <p>Steps to verify:</p>
-        <ol>
-          <li>Login to your account at ${appUrl}.</li>
-          <li>Click on the profile picture at the top right corner of the screen and select "Profile".</li>
-          <li>Under the Pending Actions Section, click "Request Verification OTP" to receive your code via email.</li>
-        </ol>
-        `
-
-      const footer = `
-        <p>For questions regarding your order, please reach out to:
-        <br>
-          Support: ${mailer}
-        <br>
-          Sales: ${salesMailer}
-        </p>
-        `
-
-      const message = `<p>Hello ${String(firstName)},</p>
-        <p>${customMessage}<br>
-        To activate your account, please verify the ownership of the associated email address.</p>
-        ${steps}
-        <p>Best Regards,<br>
-        ${appName} team</p>
-        <p>${footer}</p>
-        `
 
       await sendNotifierEmail(email, subject, message, false, message, sandboxMode)
     }
@@ -192,16 +230,43 @@ class UserService extends BaseService {
 
   async updatePassword (record: any, data: any): Promise<any> {
     const { currentPassword, password, logoutTime } = data
-    // Add a check for updatePassword template
 
     return record.comparePassword(currentPassword, async (match: boolean) => {
       if (match) {
         const updatedRecord = await record.update({ password, logoutTime })
 
         const bccStatus = false
-        const message = `Hello ${String(updatedRecord.firstName)}, your password for ${appName} app has been updated. \nIf you didn't ask to change your password, contact us immediately through ${adminEmail}. \n\nThanks,\n\n${appName} application team`
+        let message = `Hello ${String(updatedRecord.firstName)}, your password for ${appName} app has been updated. \nIf you didn't ask to change your password, contact us immediately through ${adminEmail}. \n\nThanks,\n\n${appName} application team`
+        let subject = 'Password Change'
+
+        const updatePasswordEmailTemplate: IEmailTemplate = await db.EmailTemplate.findOne({
+          include: {
+            model: db.EmailTemplateType,
+            as: 'emailTemplateType',
+            where: {
+              type: 'updatePassword'
+            }
+          }
+        })
+
+        if (updatePasswordEmailTemplate === null) {
+          message = `Hello ${String(updatedRecord.firstName)}, your password for ${appName} app has been updated to: <p><span style="font-size:1.5em;"><strong>${String(password)}</strong></span></p>
+          <p>If you didn't ask to change your password, contact us immediately through ${adminEmail}. </p>
+          <p>Thanks,<br>${appName} application team</p>
+          `
+        } else {
+          subject = updatePasswordEmailTemplate.subject
+          message = updatePasswordEmailTemplate.template
+            .replace(/\[firstname\]/g, updatedRecord.firstName)
+            .replace(/\[lastname\]/g, updatedRecord.lastName)
+            .replace(/\[salutation\]/g, updatedRecord.salutation)
+            .replace(/\[app\]/g, appName)
+            .replace(/\[password\]/g, password)
+            .replace(/\[adminemail\]/g, adminEmail)
+        }
+
         try {
-          await sendNotifierEmail(updatedRecord.email, 'Password Change', message, bccStatus, '', sandboxMode)
+          await sendNotifierEmail(updatedRecord.email, subject, message, bccStatus, '', sandboxMode)
         } catch (error) {}
 
         return updatedRecord.toJSONFor()
@@ -214,17 +279,42 @@ class UserService extends BaseService {
   async updatePasswordAdmin (record: any, data: any): Promise<any> {
     const { sendEmail, logoutTime } = data
 
+    const updatePasswordEmailTemplate: IEmailTemplate = await db.EmailTemplate.findOne({
+      include: {
+        model: db.EmailTemplateType,
+        as: 'emailTemplateType',
+        where: {
+          type: 'updatePassword'
+        }
+      }
+    })
+
     const password = generatePassword(passwordLength)
 
     const updatedRecord = await record.update({ password, logoutTime })
     if (sendEmail === true) {
       const bccStatus = false
-      const message = `Hello ${String(updatedRecord.firstName)}, your password for ${appName} app has been updated to: <p><span style="font-size:1.5em;"><strong>${password}</strong></span></p>
-      <p>If you didn't ask to change your password, contact us immediately through ${adminEmail}. </p>
-      <p>Thanks,<br>${appName} application team</p>
-      `
+      let message
+      let subject = 'Password Change'
+
+      if (updatePasswordEmailTemplate === null) {
+        message = `Hello ${String(updatedRecord.firstName)}, your password for ${appName} app has been updated to: <p><span style="font-size:1.5em;"><strong>${password}</strong></span></p>
+        <p>If you didn't ask to change your password, contact us immediately through ${adminEmail}. </p>
+        <p>Thanks,<br>${appName} application team</p>
+        `
+      } else {
+        subject = updatePasswordEmailTemplate.subject
+        message = updatePasswordEmailTemplate.template
+          .replace(/\[firstname\]/g, updatedRecord.firstName)
+          .replace(/\[lastname\]/g, updatedRecord.lastName)
+          .replace(/\[salutation\]/g, updatedRecord.salutation)
+          .replace(/\[app\]/g, appName)
+          .replace(/\[password\]/g, password)
+          .replace(/\[adminemail\]/g, adminEmail)
+      }
+
       try {
-        await sendNotifierEmail(updatedRecord.email, 'Password Change', message, bccStatus, message, sandboxMode)
+        await sendNotifierEmail(updatedRecord.email, subject, message, bccStatus, message, sandboxMode)
       } catch (error) {}
     }
     return { ...updatedRecord.toJSONFor(), password }
@@ -238,32 +328,58 @@ class UserService extends BaseService {
     })
 
     if (user !== null) {
-      const { firstName } = user
+      let subject, message
       const token = generateToken(user, 'reset', resetPasswordExpiration)
-      const subject = `Reset password request for ${appName}`
-      const steps = `
-      <p>In order to reset your password please follow these steps:</p>
-      <ol>
-        <li>Go to <a href="${appUrl}/reset-password?token=${token}">link</a>. This link is going to be valid for ${resetPasswordExpiration}.</li>
-        <li>Enter a new password for your account.</li>
-      </ol>
-      `
+      const { firstName, lastName, salutation } = user
 
-      const footer = `
-      <p>For questions regarding your order, please reach out to:
-      <br>
-        Support: ${mailer}
-      <br>
-        Sales: ${salesMailer}
-      </p>
-      `
+      const forgotPasswordEmailTemplate: IEmailTemplate = await db.EmailTemplate.findOne({
+        include: {
+          model: db.EmailTemplateType,
+          as: 'emailTemplateType',
+          where: {
+            type: 'forgotPassword'
+          }
+        }
+      })
 
-      const message = `<p>Hello ${String(firstName)},</p>
-      ${steps}
-      <p>Best Regards,<br>
-      ${appName} team</p>
-      <p>${footer}</p>
-      `
+      if (forgotPasswordEmailTemplate === null) {
+        subject = `Reset password request for ${appName}`
+        const steps = `
+        <p>In order to reset your password please follow these steps:</p>
+        <ol>
+          <li>Go to <a href="${appUrl}/reset-password?token=${token}">link</a>. This link is going to be valid for ${resetPasswordExpiration}.</li>
+          <li>Enter a new password for your account.</li>
+        </ol>
+        `
+
+        const footer = `
+        <p>For questions regarding your order, please reach out to:
+        <br>
+          Support: ${mailer}
+        <br>
+          Sales: ${salesMailer}
+        </p>
+        `
+
+        message = `<p>Hello ${String(firstName)},</p>
+        ${steps}
+        <p>Best Regards,<br>
+        ${appName} team</p>
+        <p>${footer}</p>
+        `
+      } else {
+        subject = forgotPasswordEmailTemplate.subject
+        message = forgotPasswordEmailTemplate.template
+          .replace(/\[firstname\]/g, firstName)
+          .replace(/\[lastname\]/g, lastName)
+          .replace(/\[salutation\]/g, salutation)
+          .replace(/\[app\]/g, appName)
+          .replace(/\[url\]/g, appUrl)
+          .replace(/\[token\]/g, token)
+          .replace(/\[expiration\]/g, resetPasswordExpiration)
+          .replace(/\[mailer\]/g, mailer)
+          .replace(/\[salesmailer\]/g, salesMailer)
+      }
 
       const info = await sendNotifierEmail(email, subject, message, false, message, false)
 
@@ -284,38 +400,63 @@ class UserService extends BaseService {
   }
 
   async sendVerifyEmail (user: any): Promise<any> {
-    const { email, firstName } = user
+    const { email, firstName, lastName, salutation } = user
     const otp = generateOtp()
+    let message
+    let subject
 
-    const subject = `Verify your email for ${appName}`
-    const steps = `
-    <p>Steps to verify:</p>
-    <ol>
-      <li>Login to your account at ${appUrl}.</li>
-      <li>Click on the profile picture at the top right corner of the screen and select "Profile".</li>
-      <li>Under the Pending Actions Section, Enter your verification OTP <strong>${otp}</strong> and click "Verify Email".</li>
-    </ol>
-    `
+    const accountVerificationEmailTemplate: IEmailTemplate = await db.EmailTemplate.findOne({
+      include: {
+        model: db.EmailTemplateType,
+        as: 'emailTemplateType',
+        where: {
+          type: 'accountVerification'
+        }
+      }
+    })
 
-    const footer = `
-    <p>For questions regarding your order, please reach out to:
-    <br>
-      Support: ${mailer}
-    <br>
-      Sales: ${salesMailer}
-    </p>
-    `
+    if (accountVerificationEmailTemplate === null) {
+      subject = `Verify your email for ${appName}`
+      const steps = `
+      <p>Steps to verify:</p>
+      <ol>
+        <li>Login to your account at ${appUrl}.</li>
+        <li>Click on the profile picture at the top right corner of the screen and select "Profile".</li>
+        <li>Under the Pending Actions Section, Enter your verification OTP <strong>${otp}</strong> and click "Verify Email".</li>
+      </ol>
+      `
 
-    const message = `<p>Hello ${String(firstName)},</p>
-    <p>You have requested a verification OTP to activate your account at ${appName}.<br>
-    Your OTP is: <span style="font-size:1.5em;"><strong>${otp}</strong></span>
-    </p>
-    ${steps}
-    <p>If you haven't requested a verification code or created an account at ${appName}, notify us: ${mailer}.</p>
-    <p>Best Regards,<br>
-    ${appName} team</p>
-    <p>${footer}</p>
-    `
+      const footer = `
+      <p>For questions regarding your order, please reach out to:
+      <br>
+        Support: ${mailer}
+      <br>
+        Sales: ${salesMailer}
+      </p>
+      `
+
+      message = `<p>Hello ${String(firstName)},</p>
+      <p>You have requested a verification OTP to activate your account at ${appName}.<br>
+      Your OTP is: <span style="font-size:1.5em;"><strong>${otp}</strong></span>
+      </p>
+      ${steps}
+      <p>If you haven't requested a verification code or created an account at ${appName}, notify us: ${mailer}.</p>
+      <p>Best Regards,<br>
+      ${appName} team</p>
+      <p>${footer}</p>
+      `
+    } else {
+      subject = accountVerificationEmailTemplate.subject
+      message = accountVerificationEmailTemplate.template
+        .replace(/\[firstname\]/g, firstName)
+        .replace(/\[lastname\]/g, lastName)
+        .replace(/\[salutation\]/g, salutation)
+        .replace(/\[url\]/g, appUrl)
+        .replace(/\[app\]/g, appName)
+        .replace(/\[mailer\]/g, mailer)
+        .replace(/\[salesmailer\]/g, salesMailer)
+        .replace(/\[otp\]/g, otp.toString())
+    }
 
     await user.update({ otp: { createdAt: dayjs.utc(), value: otp } })
 
