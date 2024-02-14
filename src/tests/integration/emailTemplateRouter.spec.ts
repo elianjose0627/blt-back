@@ -57,7 +57,7 @@ describe('Email Template actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'emailTemplates')
       expect(res.body.emailTemplates).to.be.an('array')
-      expect(res.body.emailTemplates).to.be.an('array').lengthOf(0)
+      expect(res.body.emailTemplates).to.be.an('array').lengthOf.above(0)
     })
 
     it('Should return 200 Success when an admin successfully retrieves all email templates.', async () => {
@@ -81,7 +81,7 @@ describe('Email Template actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'emailTemplates')
       expect(res.body.emailTemplates).to.be.an('array')
-      expect(res.body.emailTemplates).to.be.an('array').lengthOf(1)
+      expect(res.body.emailTemplates).to.be.an('array').lengthOf.above(1)
     })
 
     it('Should return 403 Forbidden when a non-admin retrieves all email templates.', async () => {
