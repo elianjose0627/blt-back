@@ -10,7 +10,7 @@ const withoutUser = [
   'BundleItem', 'Salutation', 'Picture',
   'SecondaryDomain', 'LegalText', 'ShippingMethod',
   'GreetingCard', 'CampaignShippingDestination', 'CampaignOrderLimit',
-  'EmailTemplate', 'EmailTemplateType', 'BlockedDomain'
+  'EmailTemplate', 'EmailTemplateType', 'BlockedDomain', 'CampaignAddress'
 ]
 
 const includeCompanyAndOwner = {
@@ -79,6 +79,11 @@ export const generateInclude = (model: string): any => {
           model: db.CampaignShippingDestination,
           attributes: { exclude: ['deletedAt', 'campaignId'] },
           as: 'campaignShippingDestinations'
+        },
+        {
+          model: db.CampaignAddress,
+          attributes: { exclude: ['deletedAt', 'campaignId'] },
+          as: 'campaignAddresses'
         }
       ]
     )

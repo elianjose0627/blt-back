@@ -79,6 +79,11 @@ class CampaignService extends BaseService {
           model: db.CampaignShippingDestination,
           attributes: { exclude: ['deletedAt', 'campaignId'] },
           as: 'campaignShippingDestinations'
+        },
+        {
+          model: db.CampaignAddress,
+          attributes: { exclude: ['deletedAt', 'campaignId'] },
+          as: 'campaignAddresses'
         }
       ]
     })
