@@ -89,7 +89,7 @@ export const generateInclude = (model: string): any => {
     )
   }
 
-  if (model === 'Recipient' || model === 'CardTemplate') {
+  if (model === 'Recipient' || model === 'CardTemplate' || model === 'CampaignAddress') {
     return ([
       {
         model: db.Campaign,

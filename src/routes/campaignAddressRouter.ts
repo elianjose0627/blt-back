@@ -3,10 +3,10 @@ import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import CampaignAddressController from '../controllers/CampaignAddressController'
 import asyncHandler from '../middlewares/asyncHandler'
-import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import CampaignController from '../controllers/CampaignController'
+import checkPermissions from '../middlewares/checkPermissions'
 
 const campaignAddressRoutes = (): any => {
   const campaignAddressRouter = express.Router()
@@ -16,7 +16,9 @@ const campaignAddressRoutes = (): any => {
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(CampaignAddressController.checkRecord))
   campaignAddressRouter.route('/campaign-addresses/:id')
-    .delete(asyncHandler(checkAdmin), asyncHandler(CampaignAddressController.delete))
+    .delete(asyncHandler(CampaignAddressController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
+      asyncHandler(CampaignAddressController.delete))
   return campaignAddressRouter
 }
 

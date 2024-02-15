@@ -63,7 +63,7 @@ describe('Campaign Order Limit actions', () => {
   })
 
   describe('Delete a campaign order limit by id', () => {
-    it('Should return 204 No Content when an admin successfully deletes a order limit.', async () => {
+    it('Should return 204 No Content when an admin successfully deletes an order limit.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -108,7 +108,7 @@ describe('Campaign Order Limit actions', () => {
       expect(res).to.have.status(204)
     })
 
-    it('Should return 403 Forbidden when a campaign manager tries to delete a order limit.', async () => {
+    it('Should return 403 Forbidden when a campaign manager tries to delete an order limit.', async () => {
       const resCompany = await createVerifiedCompany(userIdAdmin)
 
       const companyId = resCompany.id
@@ -167,7 +167,7 @@ describe('Campaign Order Limit actions', () => {
       expect(res.body.errors.message).to.equal('Only an admin can perform this action')
     })
 
-    it('Should return 403 Forbidden when a company admin who is not an employee tries to delete a order limit.', async () => {
+    it('Should return 403 Forbidden when a company admin who is not an employee tries to delete an order limit.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -236,7 +236,7 @@ describe('Campaign Order Limit actions', () => {
       expect(res.body.errors.message).to.equal('Only an admin can perform this action')
     })
 
-    it('Should return 403 Forbidden when a user who is not an employee tries to delete a order limit.', async () => {
+    it('Should return 403 Forbidden when a user who is not an employee tries to delete an order limit.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -305,7 +305,7 @@ describe('Campaign Order Limit actions', () => {
       expect(res.body.errors.message).to.equal('Only an admin can perform this action')
     })
 
-    it('Should return 403 Forbidden when a company non owner tries to delete a order limit', async () => {
+    it('Should return 403 Forbidden when a company non owner tries to delete an order limit', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
