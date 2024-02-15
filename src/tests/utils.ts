@@ -290,14 +290,14 @@ export const createUserWithExpiredOtp = async (): Promise<any> => {
   }
 }
 
-export const createVerifiedUser = async (): Promise<any> => {
+export const createVerifiedUser = async (email = 'mantis@aguardiansofthegalaxy.com', password = 'quill'): Promise<any> => {
   const user = await db.User.create({
     id: uuidv1(),
     firstName: 'Mantis',
     lastName: 'Ego',
-    email: 'mantis@aguardiansofthegalaxy.com',
+    email,
     phone: '2222222222',
-    password: 'quill',
+    password,
     isVerified: true,
     isActive: true,
     role: userRoles.USER
@@ -381,14 +381,14 @@ export const verifyUser = async (email: string): Promise<any> => {
 }
 
 export const verifyCompanyDomain = async (id: string): Promise<any> => {
-  const user = await db.Company.findOne({
+  const company = await db.Company.findOne({
     where: {
       id
     }
   })
 
-  if (user !== null) {
-    await user.update({
+  if (company !== null) {
+    await company.update({
       isDomainVerified: true
     })
   }
@@ -1116,7 +1116,7 @@ export const pendingOrders = [
   }
 ]
 
-export const createEmailTemplateType = async (name = 'Reset Password', description = 'A template for password reset', type = 'resetPassword', placeholders = ['firstname']): Promise<string> => {
+export const createEmailTemplateType = async (name = 'Reset Password Test', description = 'A template for password reset', type = 'resetPasswordTest', placeholders = ['firstname']): Promise<string> => {
   const res = await db.EmailTemplateType.create({
     id: uuidv4(),
     name,
@@ -1135,4 +1135,22 @@ export const createBlockedDomain = async (domain: string): Promise<string> => {
   })
 
   return res
+}
+
+export const deleteAllEmailTemplates = async (): Promise<void> => {
+  db.EmailTemplate.truncate()
+}
+
+export const removeCompanyOwnerId = async (id: string): Promise<any> => {
+  const company = await db.Company.findOne({
+    where: {
+      id
+    }
+  })
+
+  if (company !== null) {
+    await company.update({
+      userId: null
+    })
+  }
 }

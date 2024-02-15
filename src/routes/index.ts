@@ -27,6 +27,7 @@ import campaignShippingDestinationRouter from './campaignShippingDestinationRout
 import campaignOrderLimitRouter from './campaignOrderLimitRouter'
 import emailTemplateRouter from './emailTemplateRouter'
 import emailTempleTypeRouter from './emailTemplateTypeRouter'
+import campaignAddressRouter from './campaignAddressRouter'
 
 const routers = {
   authRouter,
@@ -57,7 +58,8 @@ const routers = {
   campaignShippingDestinationRouter,
   campaignOrderLimitRouter,
   emailTemplateRouter,
-  emailTempleTypeRouter
+  emailTempleTypeRouter,
+  campaignAddressRouter
 }
 
 export default routers

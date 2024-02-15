@@ -43,6 +43,7 @@ export interface Database {
   EmailTemplate?: any
   EmailTemplateType?: any
   BlockedDomain?: any
+  CampaignAddress?: any
   [key: string]: any
 }
 

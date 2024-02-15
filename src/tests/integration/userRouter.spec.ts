@@ -11,7 +11,8 @@ import {
   createUserWithExpiredOtp,
   createBlockedDomain,
   createVerifiedCompany,
-  verifyCompanyDomain
+  verifyCompanyDomain,
+  deleteAllEmailTemplates
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 import { encodeString, encryptUUID } from '../../utils/encryption'
@@ -24,12 +25,14 @@ let token: string
 let userId: string
 let tokenAdmin: string
 let userIdAdmin: string
+let emailTemplateTypes: any[]
 
 describe('A user', () => {
   before(async () => {
     await createAdminTestUser()
     await createUserWithOtp()
     await createUserWithExpiredOtp()
+    await deleteAllEmailTemplates()
     await chai
       .request(app)
       .post('/auth/signup')
@@ -1128,6 +1131,158 @@ describe('A user', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.success).to.equal(false)
       expect(res.body.errors.message).to.equal('Invalid invitation code')
+    })
+  })
+
+  describe('Email templates for users', () => {
+    before(async () => {
+      const resEmailTemplateTypes = await chai
+        .request(app)
+        .get('/api/email-template-types')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+      emailTemplateTypes = resEmailTemplateTypes.body.emailTemplateTypes
+    })
+
+    it('Should return 201 Create, on successfully creating a user when a email template exists.', async () => {
+      const accountWelcomeEmailTemplateType = emailTemplateTypes.find(emailTemplateType => emailTemplateType.type === 'accountWelcome')
+      const accountWelcomeAdminEmailTemplateType = emailTemplateTypes.find(emailTemplateType => emailTemplateType.type === 'accountWelcomeAdmin')
+      await chai
+        .request(app)
+        .post('/api/email-templates')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          emailTemplate: {
+            subject: 'Account Welcome',
+            template: 'Hello World, [salutation] [firstname] [lastname], [role], [app], [url], [adminurl], [mailer], [salesmailer], [password]',
+            emailTemplateTypeId: accountWelcomeEmailTemplateType.id
+          }
+        })
+      await chai
+        .request(app)
+        .post('/api/email-templates')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          emailTemplate: {
+            subject: 'Account Welcome',
+            template: 'Hello World, [salutation] [firstname] [lastname], [role], [app], [url], [adminurl], [mailer], [salesmailer], [password]',
+            emailTemplateTypeId: accountWelcomeAdminEmailTemplateType.id
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post('/api/users')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            firstName: 'Warriors',
+            lastName: 'Three',
+            email: 'warthree@asgardtemplate.com',
+            phone: '254720123456',
+            password: 'thorisgreat',
+            role: userRoles.ADMIN
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+    })
+
+    it('Should return 200 Success, on successfully updating the password of a user when an email template exists.', async () => {
+      const updatePasswordEmailTemplateType = emailTemplateTypes.find(emailTemplateType => emailTemplateType.type === 'updatePassword')
+      await chai
+        .request(app)
+        .post('/api/email-templates')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          emailTemplate: {
+            subject: 'Password Reset',
+            template: 'Hello World, [salutation] [firstname] [lastname], [role], [app], [url], [adminurl], [mailer], [salesmailer], [password]',
+            emailTemplateTypeId: updatePasswordEmailTemplateType.id
+          }
+        })
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Tony', lastName: 'Stark', email: 'ironman@starkindustriesmarveltemplate.com', phone: '254720123456', password: 'mackone' } })
+
+      const resLogin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ironman@starkindustriesmarveltemplate.com', password: 'mackone' } })
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${String(resLogin.body.user.id)}/password`)
+        .set('Authorization', `Bearer ${String(resLogin.body.token)}`)
+        .send({ user: { currentPassword: 'mackone', password: '1234567890' } })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.user).to.not.have.any.keys('password', 'otp', 'isDeleted')
+    })
+
+    it('Should return 200 Success when an admin successfully updates the password of a user when a reset template exists.', async () => {
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Tony', lastName: 'Stark', email: 'ironman@starkindustriesmarveltemplate2.com', phone: '254720123456', password: 'mackone' } })
+
+      const resLogin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ironman@starkindustriesmarveltemplate2.com', password: 'mackone' } })
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${String(resLogin.body.user.id)}/password-reset-admin`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({ user: { sendEmail: true } })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.user).to.not.have.any.keys('otp', 'isDeleted')
+    })
+
+    it('should return 200 when a verification code is requested when a reset template exists', async () => {
+      sgMail.setApiKey(String(process.env.SENDGRID_API_KEY))
+      const accountVerificationEmailTemplateType = emailTemplateTypes.find(emailTemplateType => emailTemplateType.type === 'accountVerification')
+      await chai
+        .request(app)
+        .post('/api/email-templates')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          emailTemplate: {
+            subject: 'Account Verification',
+            template: 'Hello World, [salutation] [firstname] [lastname], [role], [app], [url], [adminurl], [mailer], [salesmailer], [password]',
+            emailTemplateTypeId: accountVerificationEmailTemplateType.id
+          }
+        })
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: 'julien' } })
+
+      const resLogin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'raywiretest@gmail.com', password: 'julien' } })
+
+      const token = String(resLogin.body.token)
+      const userId = String(resLogin.body.user.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/users/${userId}/verify`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ user: { email: 'raywiretest@gmail.com' } })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user.email).to.equal('raywiretest@gmail.com')
+      expect(res.body.user.message).to.equal('A verification code has been sent to your email')
     })
   })
 })
