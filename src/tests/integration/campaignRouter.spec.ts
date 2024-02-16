@@ -3240,16 +3240,16 @@ describe('Campaign actions', () => {
         .post(`/api/campaigns/${campaignId}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignAddress: {
+          campaignAddresses: [{
             country: 'Germany',
             city: 'Berlin',
             type: 'billing'
-          }
+          }]
         })
 
       expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('statusCode', 'success', 'campaignAddress')
-      expect(res.body.campaignAddress).to.be.an('object')
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignAddresses')
+      expect(res.body.campaignAddresses).to.be.an('array')
     })
 
     it('Should return 200 OK when an admin successfully creates an address for a campaign twice.', async () => {
@@ -3287,11 +3287,11 @@ describe('Campaign actions', () => {
         .post(`/api/campaigns/${campaignId}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignAddress: {
+          campaignAddresses: [{
             country: 'Germany',
             city: 'Berlin',
             type: 'billing'
-          }
+          }]
         })
 
       const res = await chai
@@ -3299,16 +3299,16 @@ describe('Campaign actions', () => {
         .post(`/api/campaigns/${campaignId}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignAddress: {
+          campaignAddresses: [{
             country: 'Germany',
             city: 'Berlin',
             type: 'billing'
-          }
+          }]
         })
 
       expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'campaignAddress')
-      expect(res.body.campaignAddress).to.be.an('object')
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignAddresses')
+      expect(res.body.campaignAddresses).to.be.an('array')
     })
 
     it('Should return 201 Created when an owner creates an address for a campaign.', async () => {
@@ -3346,15 +3346,15 @@ describe('Campaign actions', () => {
         .post(`/api/campaigns/${campaignId}/addresses`)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          campaignAddress: {
+          campaignAddresses: [{
             country: 'Germany',
             city: 'Berlin',
             type: 'billing'
-          }
+          }]
         })
       expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('statusCode', 'success', 'campaignAddress')
-      expect(res.body.campaignAddress).to.be.an('object')
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignAddresses')
+      expect(res.body.campaignAddresses).to.be.an('array')
     })
 
     it('Should return 201 Created when a company admin creates an address for a campaign', async () => {
@@ -3385,16 +3385,16 @@ describe('Campaign actions', () => {
         .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/addresses`)
         .set('Authorization', `Bearer ${String(tokenCompanyAdminCustom)}`)
         .send({
-          campaignAddress: {
+          campaignAddresses: [{
             country: 'Germany',
             city: 'Berlin',
             type: 'return'
-          }
+          }]
         })
 
       expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('statusCode', 'success', 'campaignAddress')
-      expect(res.body.campaignAddress).to.be.an('object')
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignAddresses')
+      expect(res.body.campaignAddresses).to.be.an('array')
     })
   })
 })

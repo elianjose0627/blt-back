@@ -1,30 +1,50 @@
 import { v1 as uuidv1 } from 'uuid'
 import BaseService from './BaseService'
 import db from '../models'
+import { Op } from 'sequelize'
+import { IAddress } from '../types'
 
 class CampaignAddressService extends BaseService {
+  manyRecords (): string {
+    return 'campaignAddresses'
+  }
+
   async insert (data: any): Promise<any> {
-    const { campaign, campaignAddress } = data
+    const { campaign, campaignAddresses } = data
 
     let response: any
 
-    response = await db[this.model].findOne({
+    response = await db[this.model].findAndCountAll({
       where: {
         campaignId: campaign.id,
-        type: campaignAddress.type
+        type: {
+          [Op.in]: campaignAddresses.map((campaignAddress: IAddress) => campaignAddress.type)
+        }
       },
       paranoid: false // To get soft deleted record
     })
 
-    if (response !== null) {
-      await response.restore()
-      const updatedResponse = await response.update({ ...campaignAddress })
-      return { response: updatedResponse.toJSONFor(), status: 200 }
+    if (response.count > 0) {
+      let updatedResponse
+      const updatedResponseArray = []
+      for (const row of response.rows) {
+        await row.restore()
+        const updatedCampaignAddress = campaignAddresses.find((campaignAddress: IAddress) => campaignAddress.type === row.type)
+        updatedResponse = await row.update({ ...updatedCampaignAddress })
+        updatedResponseArray.push(updatedResponse)
+      }
+      return { response: updatedResponseArray, status: 200 }
     }
 
-    response = await db[this.model].create({ ...campaignAddress, id: uuidv1(), campaignId: campaign.id })
+    const bulkInsertData = campaignAddresses.map((campaignAddress: any) => ({
+      ...campaignAddress,
+      id: uuidv1(),
+      campaignId: campaign.id
+    }))
 
-    return { response: response.toJSONFor(), status: 201 }
+    response = await db[this.model].bulkCreate(bulkInsertData, { returning: true })
+
+    return { response: response.map((response: any) => response.toJSONFor()), status: 201 }
   }
 }
 

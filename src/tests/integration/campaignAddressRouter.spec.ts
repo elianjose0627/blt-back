@@ -93,16 +93,16 @@ describe('Campaign Address actions', () => {
         .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignAddress: {
+          campaignAddresses: [{
             country: 'Germany',
             city: 'Berlin',
             type: 'billing'
-          }
+          }]
         })
 
       const res = await chai
         .request(app)
-        .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddress.id)}`)
+        .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddresses[0].id)}`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(204)
@@ -151,16 +151,16 @@ describe('Campaign Address actions', () => {
         .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignAddress: {
+          campaignAddresses: [{
             country: 'Germany',
             city: 'Berlin',
             type: 'billing'
-          }
+          }]
         })
 
       const res = await chai
         .request(app)
-        .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddress.id)}`)
+        .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddresses[0].id)}`)
         .set('Authorization', `Bearer ${tokenCampaignManager}`)
 
       expect(res).to.have.status(204)
@@ -209,16 +209,16 @@ describe('Campaign Address actions', () => {
         .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignAddress: {
+          campaignAddresses: [{
             country: 'Germany',
             city: 'Berlin',
             type: 'billing'
-          }
+          }]
         })
 
       const res = await chai
         .request(app)
-        .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddress.id)}`)
+        .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddresses[0].id)}`)
         .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
 
       expect(res).to.have.status(204)
@@ -277,16 +277,16 @@ describe('Campaign Address actions', () => {
         .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignAddress: {
+          campaignAddresses: [{
             country: 'Germany',
             city: 'Berlin',
             type: 'billing'
-          }
+          }]
         })
 
       const res = await chai
         .request(app)
-        .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddress.id)}`)
+        .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddresses[0].id)}`)
         .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
 
       expect(res).to.have.status(403)
@@ -347,16 +347,16 @@ describe('Campaign Address actions', () => {
         .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignAddress: {
+          campaignAddresses: [{
             country: 'Germany',
             city: 'Berlin',
             type: 'billing'
-          }
+          }]
         })
 
       const res = await chai
         .request(app)
-        .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddress.id)}`)
+        .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddresses[0].id)}`)
         .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
 
       expect(res).to.have.status(403)
@@ -395,16 +395,16 @@ describe('Campaign Address actions', () => {
         .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignAddress: {
+          campaignAddresses: [{
             country: 'Germany',
             city: 'Berlin',
             type: 'billing'
-          }
+          }]
         })
 
       const res = await chai
         .request(app)
-        .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddress.id)}`)
+        .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddresses[0].id)}`)
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(403)
@@ -446,16 +446,16 @@ describe('Campaign Address actions', () => {
         .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignAddress: {
+          campaignAddresses: [{
             country: 'Germany',
             city: 'Berlin',
             type: 'billing'
-          }
+          }]
         })
 
       const res = await chai
         .request(app)
-        .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddress.id)}`)
+        .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddresses[0].id)}`)
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(403)
@@ -511,11 +511,11 @@ describe('Campaign Address actions', () => {
         .post(`/api/campaigns/${String(resCampaignTwo.body.campaign.id)}/addresses`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignAddress: {
+          campaignAddresses: [{
             country: 'Germany',
             city: 'Berlin',
             type: 'billing'
-          }
+          }]
         })
 
       await createVerifiedUser('divers@kree.kr', 'password')
@@ -538,7 +538,7 @@ describe('Campaign Address actions', () => {
 
       const res = await chai
         .request(app)
-        .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddress.id)}`)
+        .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddresses[0].id)}`)
         .set('Authorization', `Bearer ${String(resUser.body.token)}`)
 
       expect(res).to.have.status(403)
