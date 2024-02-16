@@ -29,11 +29,11 @@ class CampaignOrderLimitController extends BaseController {
   }
 
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { record: campaign, body: { campaignAddress } } = req
+    const { record: campaign, body: { campaignAddresses } } = req
 
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 
-    const { response, status } = await campaignAddressService.insert({ campaign, campaignAddress })
+    const { response, status } = await campaignAddressService.insert({ campaign, campaignAddresses })
 
     const statusCode: StatusCode = {
       200: statusCodes.OK,
@@ -43,7 +43,7 @@ class CampaignOrderLimitController extends BaseController {
     return res.status(statusCode[status]).send({
       statusCode: statusCode[status],
       success: true,
-      [this.recordName()]: response
+      [campaignAddressService.manyRecords()]: response
     })
   }
 

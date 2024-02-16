@@ -747,22 +747,23 @@ const validateUserCompanyInvite = Joi.object({
 }).required()
 
 const validateCampaignAddress = Joi.object({
-  campaignAddress: Joi.object({
-    companyName: Joi.string().allow(null),
-    email: Joi.string().email().allow(null),
-    costCenter: Joi.string().allow(null),
-    country: Joi.string().required().valid(...countryList.countries).max(64),
-    city: Joi.string().required().max(64),
-    street: Joi.string().optional().allow('').allow(null).max(64),
-    zip: Joi.string().optional().max(24),
-    phone: Joi.string().optional().allow('').allow(null).min(4).max(24).regex(/^(\+?)[0-9()\s-]{4,24}$/)
-      .messages({
-        'string.pattern.base': '{#label} must be numeric'
-      }),
-    addressAddition: Joi.string().allow('').allow(null).max(256),
-    vat: Joi.string().allow('').allow(null).max(24),
-    type: Joi.string().valid(...['billing', 'return']).required()
-  }).required()
+  campaignAddresses: Joi.array().items(
+    Joi.object({
+      companyName: Joi.string().allow(null),
+      email: Joi.string().email().allow(null),
+      costCenter: Joi.string().allow(null),
+      country: Joi.string().required().valid(...countryList.countries).max(64),
+      city: Joi.string().required().max(64),
+      street: Joi.string().optional().allow('').allow(null).max(64),
+      zip: Joi.string().optional().max(24),
+      phone: Joi.string().optional().allow('').allow(null).min(4).max(24).regex(/^(\+?)[0-9()\s-]{4,24}$/)
+        .messages({
+          'string.pattern.base': '{#label} must be numeric'
+        }),
+      addressAddition: Joi.string().allow('').allow(null).max(256),
+      vat: Joi.string().allow('').allow(null).max(24),
+      type: Joi.string().valid(...['billing', 'return']).required()
+    })).min(1).required()
 }).required()
 
 export default {
