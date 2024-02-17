@@ -62,7 +62,7 @@ class CampaignService extends BaseService {
       include: [
         {
           model: db.Company,
-          attributes: ['id', 'name', 'email', 'phone', 'vat', 'domain'],
+          attributes: ['id', 'name', 'suffix', 'email', 'phone', 'vat', 'domain'],
           as: 'company'
         },
         {
@@ -79,6 +79,11 @@ class CampaignService extends BaseService {
           model: db.CampaignShippingDestination,
           attributes: { exclude: ['deletedAt', 'campaignId'] },
           as: 'campaignShippingDestinations'
+        },
+        {
+          model: db.CampaignAddress,
+          attributes: { exclude: ['deletedAt', 'campaignId'] },
+          as: 'campaignAddresses'
         }
       ]
     })

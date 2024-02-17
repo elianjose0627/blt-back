@@ -3203,4 +3203,198 @@ describe('Campaign actions', () => {
       expect(res.body.errors.message).to.equal('Only an admin can perform this action')
     })
   })
+
+  describe('Campaign Address Actions', () => {
+    it('Should return 201 Created when an admin successfully creates an address for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Address',
+            email: 'test@companymarvelsecretinvasionaddress.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Address',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/addresses`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignAddresses: [{
+            country: 'Germany',
+            city: 'Berlin',
+            type: 'billing'
+          }]
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignAddresses')
+      expect(res.body.campaignAddresses).to.be.an('array')
+    })
+
+    it('Should return 200 OK when an admin successfully creates an address for a campaign twice.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Address 2',
+            email: 'test@companymarvelsecretinvasionaddress2.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Address',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/addresses`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignAddresses: [{
+            country: 'Germany',
+            city: 'Berlin',
+            type: 'billing'
+          }]
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/addresses`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignAddresses: [{
+            country: 'Germany',
+            city: 'Berlin',
+            type: 'billing'
+          }]
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignAddresses')
+      expect(res.body.campaignAddresses).to.be.an('array')
+    })
+
+    it('Should return 201 Created when an owner creates an address for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Address User',
+            email: 'test@companymarvelsecretinvasionaddressuser.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Address',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/addresses`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaignAddresses: [{
+            country: 'Germany',
+            city: 'Berlin',
+            type: 'billing'
+          }]
+        })
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignAddresses')
+      expect(res.body.campaignAddresses).to.be.an('array')
+    })
+
+    it('Should return 201 Created when a company admin creates an address for a campaign', async () => {
+      const user = await createCompanyAdministratorWithCompany('sharoncarter@starkindustriesmarvel2address.com', 'powerbroker')
+
+      await verifyCompanyDomain(String(user.companyId))
+
+      const resCompanyAdmin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'sharoncarter@starkindustriesmarvel2address.com', password: 'powerbroker' } })
+
+      const tokenCompanyAdminCustom = resCompanyAdmin.body.token
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(user.companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding One',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/addresses`)
+        .set('Authorization', `Bearer ${String(tokenCompanyAdminCustom)}`)
+        .send({
+          campaignAddresses: [{
+            country: 'Germany',
+            city: 'Berlin',
+            type: 'return'
+          }]
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignAddresses')
+      expect(res.body.campaignAddresses).to.be.an('array')
+    })
+  })
 })

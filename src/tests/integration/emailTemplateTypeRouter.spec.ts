@@ -63,8 +63,8 @@ describe('Email Template Type actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           emailTemplateType: {
-            name: 'Password Reset',
-            type: 'passwordReset',
+            name: 'Password Reset Test',
+            type: 'passwordResetTest',
             description: 'This is an email template type for a user password reset',
             placeholders: ['firstname', 'lastname', 'salutation']
           }
@@ -90,8 +90,8 @@ describe('Email Template Type actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           emailTemplateType: {
-            name: 'Forgot Password',
-            type: 'forgotPassword',
+            name: 'Forgot Password Test',
+            type: 'forgotPasswordTest',
             description: 'This is an email template type for a user password reset',
             placeholders: ['firstname', 'lastname', 'salutation']
           }
@@ -110,8 +110,8 @@ describe('Email Template Type actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           emailTemplateType: {
-            name: 'Password Reset',
-            type: 'passwordReset',
+            name: 'Password Reset Test',
+            type: 'passwordResetTest',
             description: 'This is an email template type for a user password reset',
             placeholders: ['firstname', 'lastname', 'salutation']
           }
@@ -131,8 +131,8 @@ describe('Email Template Type actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           emailTemplateType: {
-            name: 'Email Verification',
-            type: 'emailVerification',
+            name: 'Email Verification Test',
+            type: 'emailVerificationTest',
             description: 'This is an email template type for a user to verify the account',
             placeholders: ['firstname', 'lastname', 'salutation']
           }
@@ -158,8 +158,8 @@ describe('Email Template Type actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           emailTemplateType: {
-            name: 'Request OTP',
-            type: 'requestOtp',
+            name: 'Request OTP Test',
+            type: 'requestOtpTest',
             description: 'This is an email template type for a user to request an otp',
             placeholders: ['firstname', 'lastname', 'salutation']
           }
@@ -173,8 +173,8 @@ describe('Email Template Type actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           emailTemplateType: {
-            name: 'Request OTP Updated',
-            type: 'requestOtp',
+            name: 'Request OTP Updated Test',
+            type: 'requestOtpTest',
             description: 'This is an email template type for a user to request an otp',
             placeholders: ['firstname', 'lastname', 'salutation']
           }
@@ -184,8 +184,8 @@ describe('Email Template Type actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'emailTemplateType')
       expect(res.body.emailTemplateType).to.be.an('object')
       expect(res.body.emailTemplateType).to.include.keys('id', 'name', 'type', 'description', 'placeholders', 'createdAt', 'updatedAt')
-      expect(res.body.emailTemplateType.name).to.equal('Request OTP Updated')
-      expect(res.body.emailTemplateType.type).to.equal('requestOtp')
+      expect(res.body.emailTemplateType.name).to.equal('Request OTP Updated Test')
+      expect(res.body.emailTemplateType.type).to.equal('requestOtpTest')
     })
 
     it('Should return 403 Forbidden when an non-administrator tries to update an email template type by id.', async () => {
@@ -195,8 +195,8 @@ describe('Email Template Type actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           emailTemplateType: {
-            name: 'Request OTP 2',
-            type: 'requestOtpTwo',
+            name: 'Request OTP 2 Test',
+            type: 'requestOtpTwoTest',
             description: 'This is an email template type for a user to request an otp',
             placeholders: ['firstname', 'lastname', 'salutation']
           }
@@ -210,8 +210,8 @@ describe('Email Template Type actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           emailTemplateType: {
-            name: 'Request OTP',
-            type: 'requestOtp',
+            name: 'Request OTP Test',
+            type: 'requestOtpTest',
             description: 'This is an email template type for a user to request an otp',
             placeholders: ['firstname', 'lastname', 'salutation']
           }
@@ -229,8 +229,8 @@ describe('Email Template Type actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           emailTemplateType: {
-            name: 'Request OTP 3',
-            type: 'requestOtpThree',
+            name: 'Request OTP 3 Test',
+            type: 'requestOtpThreeTest',
             description: 'This is an email template type for a user to request an otp',
             placeholders: ['firstname', 'lastname', 'salutation']
           }
@@ -262,8 +262,8 @@ describe('Email Template Type actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           emailTemplateType: {
-            name: 'Request OTP 4',
-            type: 'requestOtpFour',
+            name: 'Request OTP 4 Test',
+            type: 'requestOtpFourTest',
             description: 'This is an email template type for a user to request an otp',
             placeholders: ['firstname', 'lastname', 'salutation']
           }

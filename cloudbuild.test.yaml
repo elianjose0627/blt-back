@@ -6,6 +6,7 @@ steps:
   env:
     - 'ENVIRONMENT=${_ENVIRONMENT}'
     - 'DATABASE_URL=${_DATABASE_URL}'
+    - 'DATABASE_URL_READ=${_DATABASE_URL_READ}'
     - 'DATABASE_URL_TEST=${_DATABASE_URL_TEST}'
     - 'NODE_ENV=${_NODE_ENV}'
     - 'PORT=${_PORT}'
@@ -39,8 +40,6 @@ steps:
     - 'DOTNET_APP_SECRET=${_DOTNET_APP_SECRET}'
 - name: 'gcr.io/cloud-builders/npm'
   args: ['test']
-- name: 'gcr.io/cloud-builders/npm'
-  args: ['run', 'migrate']
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'codecov-coverage']
   env:

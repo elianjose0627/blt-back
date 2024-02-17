@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { IAccessPermission, IAddress, ICompany, ISecondaryDomain, IUser } from '../types'
+import type { IAccessPermission, IAddress, ICompany, ISecondaryDomain, IUser, MediaData, Nullable, Theme } from '../types'
 
 const CompanyModel = (sequelize: any, DataTypes: any): any => {
   interface CompanyAttributes {
@@ -13,6 +13,9 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     domain: string
     isDomainVerified: boolean
     domainVerificationCode: { value: string, createdAt: Date }
+    inviteToken: Nullable<string>
+    theme: Nullable<Theme>
+    logo: Nullable<MediaData>
   }
 
   class Company extends Model<CompanyAttributes> {
@@ -29,9 +32,11 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly owner: IUser
-    private readonly address: IAddress
+    private readonly addresses: IAddress[]
     private readonly secondaryDomains: ISecondaryDomain[]
     private readonly accessPermissions: IAccessPermission[]
+    private readonly theme: Nullable<Theme>
+    private readonly logo: Nullable<MediaData>
 
     static associate (models: any): any {
       Company.belongsTo(models.User, {
@@ -44,9 +49,9 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         as: 'employees',
         onDelete: 'CASCADE'
       })
-      Company.hasOne(models.Address, {
+      Company.hasMany(models.Address, {
         foreignKey: 'companyId',
-        as: 'address',
+        as: 'addresses',
         onDelete: 'CASCADE'
       })
       Company.hasMany(models.Campaign, {
@@ -101,9 +106,11 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         owner: this.owner,
-        address: this.address,
+        addresses: this.addresses,
         secondaryDomains: this.secondaryDomains,
-        accessPermissions: this.accessPermissions
+        accessPermissions: this.accessPermissions,
+        theme: this.theme,
+        logo: this.logo
       }
     }
   };
@@ -153,6 +160,18 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         createdAt: null,
         value: null
       }
+    },
+    inviteToken: {
+      type: DataTypes.UUID,
+      defaultValue: null
+    },
+    theme: {
+      type: DataTypes.JSON,
+      defaultValue: null
+    },
+    logo: {
+      type: DataTypes.JSON,
+      defaultValue: null
     }
   }, {
     sequelize,

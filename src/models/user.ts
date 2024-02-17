@@ -46,7 +46,7 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany
-    private readonly address: IAddress
+    private readonly addresses: IAddress[]
 
     static associate (models: any): any {
       User.belongsTo(models.Company, {
@@ -58,9 +58,9 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
         foreignKey: 'userId',
         onDelete: 'CASCADE'
       })
-      User.hasOne(models.Address, {
+      User.hasMany(models.Address, {
         foreignKey: 'userId',
-        as: 'address',
+        as: 'addresses',
         onDelete: 'CASCADE'
       })
     }
@@ -86,7 +86,7 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
         notifications: this.notifications,
         loginTime: this.loginTime,
         company: this.company,
-        address: this.address
+        addresses: this.addresses
       }
     }
 

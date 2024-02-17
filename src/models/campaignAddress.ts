@@ -1,8 +1,8 @@
 import { Model } from 'sequelize'
-import type { AddressType, IAddress, ICompany } from '../types'
+import type { AddressType, IAddress, ICampaign } from '../types'
 
-const AddressModel = (sequelize: any, DataTypes: any): any => {
-  interface AddressAttributes {
+const CampaignAddressModel = (sequelize: any, DataTypes: any): any => {
+  interface CampaignAddressAttributes {
     id: string
     companyName: string
     email: string
@@ -17,7 +17,7 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
     type: AddressType
   }
 
-  class Address extends Model<AddressAttributes> {
+  class CampaignAddress extends Model<CampaignAddressAttributes> {
     private readonly id: string
     private readonly companyName: string
     private readonly email: string
@@ -32,17 +32,12 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
     private readonly type: AddressType
     private readonly createdAt: Date
     private readonly updatedAt: Date
-    private readonly company: ICompany
+    private readonly campaign: ICampaign
 
     static associate (models: any): any {
-      Address.belongsTo(models.User, {
-        foreignKey: 'userId',
-        as: 'owner',
-        onDelete: 'CASCADE'
-      })
-      Address.belongsTo(models.Company, {
-        foreignKey: 'companyId',
-        as: 'company',
+      CampaignAddress.belongsTo(models.Campaign, {
+        foreignKey: 'campaignId',
+        as: 'campaign',
         onDelete: 'CASCADE'
       })
     }
@@ -63,16 +58,28 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
         type: this.type,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
-        company: this.company
+        campaign: this.campaign
       }
     }
   };
 
-  Address.init({
+  CampaignAddress.init({
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
       allowNull: false
+    },
+    companyName: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    costCenter: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     country: {
       type: DataTypes.STRING,
@@ -105,26 +112,14 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
     type: {
       type: DataTypes.STRING,
       allowNull: true
-    },
-    companyName: {
-      type: DataTypes.STRING,
-      allowNull: true
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: true
-    },
-    costCenter: {
-      type: DataTypes.STRING,
-      allowNull: true
     }
   }, {
     sequelize,
     paranoid: true,
-    modelName: 'Address'
+    modelName: 'CampaignAddress'
   })
 
-  return Address
+  return CampaignAddress
 }
 
-module.exports = AddressModel
+module.exports = CampaignAddressModel

@@ -10,12 +10,12 @@ const withoutUser = [
   'BundleItem', 'Salutation', 'Picture',
   'SecondaryDomain', 'LegalText', 'ShippingMethod',
   'GreetingCard', 'CampaignShippingDestination', 'CampaignOrderLimit',
-  'EmailTemplate', 'EmailTemplateType', 'BlockedDomain'
+  'EmailTemplate', 'EmailTemplateType', 'BlockedDomain', 'CampaignAddress'
 ]
 
 const includeCompanyAndOwner = {
   model: db.Company,
-  attributes: ['id', 'customerId', 'name', 'email', 'phone', 'vat', 'domain'],
+  attributes: ['id', 'customerId', 'name', 'suffix', 'email', 'phone', 'vat', 'domain', 'isDomainVerified'],
   as: 'company',
   include: [
     {
@@ -37,8 +37,8 @@ export const generateInclude = (model: string): any => {
         },
         {
           model: db.Address,
-          attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'updatedAt', 'createdAt'],
-          as: 'address'
+          attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type', 'updatedAt', 'createdAt'],
+          as: 'addresses'
         },
         {
           model: db.SecondaryDomain,
@@ -79,12 +79,17 @@ export const generateInclude = (model: string): any => {
           model: db.CampaignShippingDestination,
           attributes: { exclude: ['deletedAt', 'campaignId'] },
           as: 'campaignShippingDestinations'
+        },
+        {
+          model: db.CampaignAddress,
+          attributes: { exclude: ['deletedAt', 'campaignId'] },
+          as: 'campaignAddresses'
         }
       ]
     )
   }
 
-  if (model === 'Recipient' || model === 'CardTemplate') {
+  if (model === 'Recipient' || model === 'CardTemplate' || model === 'CampaignAddress') {
     return ([
       {
         model: db.Campaign,
@@ -130,8 +135,8 @@ export const generateInclude = (model: string): any => {
         include: [
           {
             model: db.Address,
-            attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition'],
-            as: 'address'
+            attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type'],
+            as: 'addresses'
           }
         ]
       }
@@ -188,13 +193,13 @@ class BaseService {
       ? [
           {
             model: db.Company,
-            attributes: ['id', 'customerId', 'name', 'email', 'phone', 'vat', 'domain'],
+            attributes: ['id', 'customerId', 'name', 'suffix', 'email', 'phone', 'vat', 'domain', 'isDomainVerified'],
             as: 'company',
             include: [
               {
                 model: db.Address,
-                attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition'],
-                as: 'address'
+                attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type'],
+                as: 'addresses'
               },
               {
                 model: db.User,
@@ -205,8 +210,8 @@ class BaseService {
           },
           {
             model: db.Address,
-            attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition'],
-            as: 'address'
+            attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type'],
+            as: 'addresses'
           }
         ]
       : generateInclude(this.model)

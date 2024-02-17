@@ -63,7 +63,7 @@ export interface IUser {
   loginTime: LoginTime
   logoutTime?: Nullable<Date>
   company: Partial<ICompany> | null
-  address: Partial<IAddress> | null
+  addresses: Array<Partial<IAddress>>
 }
 
 export interface IToken {
@@ -180,6 +180,13 @@ export interface IBundle {
   pictures: IPicture[]
 }
 
+export interface Theme {
+  primaryColor: string
+  secondaryColor: string
+  backgroundColor: string
+  foregroundColor: string
+  accentColor: string
+}
 export interface ICompany {
   id: string
   customerId: number
@@ -194,13 +201,21 @@ export interface ICompany {
   createdAt?: Date
   updatedAt?: Date
   owner?: IUser
-  address?: IAddress
+  addresses?: IAddress[]
   secondaryDomains?: ISecondaryDomain[]
   accessPermissions?: IAccessPermission[]
+  inviteToken?: Nullable<string>
+  theme: Nullable<Theme>
+  logo: Nullable<MediaData>
 }
+
+export type AddressType = 'billing' | 'delivery' | 'billingAndDelivery' | 'return'
 
 export interface IAddress {
   id: string
+  companyName?: string
+  email?: string
+  costCenter?: string
   country: string
   city: string
   street?: string
@@ -210,8 +225,10 @@ export interface IAddress {
   vat?: string
   createdAt?: Date
   updatedAt?: Date
+  type: AddressType
   owner?: IUser
   company?: ICompany
+  campaign?: ICampaign
 }
 
 export interface IRecipient {
@@ -267,6 +284,7 @@ export interface ICampaign {
   cardSetting?: ICardSetting
   campaignShippingDestinations: ICampaignShippingDestination[]
   campaignOrderLimits: ICampaignOrderLimit[]
+  campaignAddresses: IAddress[]
 }
 
 export interface ISecondaryDomain {

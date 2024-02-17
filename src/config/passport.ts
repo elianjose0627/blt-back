@@ -16,13 +16,13 @@ const passportAuth = (passport: PassportStatic): any => {
     include: [
       {
         model: db.Company,
-        attributes: ['id', 'customerId', 'name', 'email', 'phone', 'vat', 'domain'],
+        attributes: ['id', 'customerId', 'name', 'suffix', 'email', 'phone', 'vat', 'domain', 'isDomainVerified'],
         as: 'company',
         include: [
           {
             model: db.Address,
-            attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition'],
-            as: 'address'
+            attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type'],
+            as: 'addresses'
           },
           {
             model: db.User,
@@ -42,8 +42,8 @@ const passportAuth = (passport: PassportStatic): any => {
       },
       {
         model: db.Address,
-        attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition'],
-        as: 'address'
+        attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type'],
+        as: 'addresses'
       }
     ],
     where: {

@@ -14,13 +14,14 @@ import {
   createBlockedDomain
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
-import { encryptUUID } from '../../utils/encryption'
+import { encodeString, encryptUUID } from '../../utils/encryption'
 
 const { expect } = chai
 
 chai.use(chaiHttp)
 
 let tokenAdmin: string
+let emailTemplateTypes: any[]
 
 describe('Auth Actions', () => {
   before(async () => {
@@ -95,14 +96,52 @@ describe('Auth Actions', () => {
     expect(res.body.user.role).to.equal(userRoles.EMPLOYEE)
   })
 
-  it('should return 404 Not Found if a user tries to sign up using company id link with a company that does not exists', async () => {
-    const companyId = encryptUUID(uuidv1(), 'hex')
+  it('should return 201 Created on successful sign up using company id link for company with inviteToken', async () => {
+    const resCompany = await chai
+      .request(app)
+      .post('/api/companies')
+      .set('Authorization', `Bearer ${tokenAdmin}`)
+      .send({
+        company: {
+          name: 'Test Company Invited Token',
+          email: 'test@companyinvitedtoken.com',
+          inviteToken: uuidv1()
+        }
+      })
+
+    const companyId = resCompany.body.company.id
+
+    await verifyCompanyDomain(companyId)
+
+    const resInviteLink = await chai
+      .request(app)
+      .get(`/api/companies/${String(companyId)}/invite-link`)
+      .set('Authorization', `Bearer ${tokenAdmin}`)
 
     const res = await chai
       .request(app)
       .post('/auth/signup')
       .query({
-        companyId
+        companyId: resInviteLink.body.company.inviteLink.split('=')[1]
+      })
+      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoontwo@guardiansofthegalaxy.com', phone: '254720123456', password: 'friend' } })
+
+    expect(res).to.have.status(201)
+    expect(res.body).to.include.keys('statusCode', 'success', 'user')
+    expect(res.body.success).to.equal(true)
+    expect(res.body.user.role).to.equal(userRoles.EMPLOYEE)
+  })
+
+  it('should return 404 Not Found if a user tries to sign up using company id link with a company that does not exists', async () => {
+    const companyId = uuidv1()
+    const encryptedUUID = encryptUUID(companyId, 'base64', companyId)
+    const encryptedUUIDWithCompanyIdHex = encodeString(`${encryptedUUID}.${companyId}`, 'hex')
+
+    const res = await chai
+      .request(app)
+      .post('/auth/signup')
+      .query({
+        companyId: encryptedUUIDWithCompanyIdHex
       })
       .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoon1@guardiansofthegalaxy.com', phone: '254720123456', password: 'friend' } })
 
@@ -130,13 +169,14 @@ describe('Auth Actions', () => {
   })
 
   it('should return 422 Unprocessable entity if a user tries to sign up using an invalid invite link that on decryption is not a guid', async () => {
-    const companyId = encryptUUID('123456780123401234012340123456789012', 'hex')
+    const companyId = encryptUUID('123456780123401234012340123456789012', 'base64', uuidv1())
+    const encodeCompanyIdToHex = encodeString(`${companyId}.${uuidv1()}`, 'hex')
 
     const res = await chai
       .request(app)
       .post('/auth/signup')
       .query({
-        companyId
+        companyId: encodeCompanyIdToHex
       })
       .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoon1@guardiansofthegalaxy.com', phone: '254720123456', password: 'friend' } })
 
@@ -434,5 +474,85 @@ describe('Auth Actions', () => {
 
     expect(res).to.have.status(200)
     expect(res.body).to.include.keys('statusCode', 'success', 'auth')
+  })
+
+  describe('Email templates for auth', () => {
+    before(async () => {
+      const resEmailTemplateTypes = await chai
+        .request(app)
+        .get('/api/email-template-types')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+      emailTemplateTypes = resEmailTemplateTypes.body.emailTemplateTypes
+    })
+
+    it('Should return 201 Create, on successfully creating a user when a email template exists.', async () => {
+      const accountWelcomeEmailTemplateType = emailTemplateTypes.find(emailTemplateType => emailTemplateType.type === 'accountWelcome')
+      const accountWelcomeAdminEmailTemplateType = emailTemplateTypes.find(emailTemplateType => emailTemplateType.type === 'accountWelcomeAdmin')
+      await chai
+        .request(app)
+        .post('/api/email-templates')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          emailTemplate: {
+            subject: 'Account Welcome',
+            template: 'Hello World, [salutation] [firstname] [lastname], [role], [app], [url], [adminurl], [mailer], [salesmailer], [password]',
+            emailTemplateTypeId: accountWelcomeEmailTemplateType.id
+          }
+        })
+      await chai
+        .request(app)
+        .post('/api/email-templates')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          emailTemplate: {
+            subject: 'Account Welcome Admin',
+            template: 'Hello World, [salutation] [firstname] [lastname], [role], [app], [url], [adminurl], [mailer], [salesmailer], [password]',
+            emailTemplateTypeId: accountWelcomeAdminEmailTemplateType.id
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({
+          user: {
+            firstName: 'Warriors',
+            lastName: 'Three',
+            email: 'warthree@asgardtemplateauth.com',
+            phone: '254720123456',
+            password: 'thorisgreat'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+    })
+
+    it('should return 200 when a reset link is requested when a template exists.', async () => {
+      sgMail.setApiKey(String(process.env.SENDGRID_API_KEY))
+      const forgotPasswordEmailTemplateType = emailTemplateTypes.find(emailTemplateType => emailTemplateType.type === 'forgotPassword')
+      await chai
+        .request(app)
+        .post('/api/email-templates')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          emailTemplate: {
+            subject: 'Forgot Password',
+            template: 'Hello World, [salutation] [firstname] [lastname], [role], [app], [url], [adminurl], [mailer], [salesmailer], [password]',
+            emailTemplateTypeId: forgotPasswordEmailTemplateType.id
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post('/auth/forgot-password')
+        .send({ user: { email: 'raywiretest@gmail.com' } })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user.email).to.equal('raywiretest@gmail.com')
+      expect(res.body.user.message).to.equal('A password reset link has been sent to your email')
+    })
   })
 })

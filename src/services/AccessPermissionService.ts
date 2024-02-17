@@ -54,7 +54,7 @@ class AccessPermissionService extends BaseService {
       include: [
         {
           model: db.Company,
-          attributes: ['id', 'customerId', 'name', 'email', 'phone', 'vat', 'domain'],
+          attributes: ['id', 'customerId', 'name', 'suffix', 'email', 'phone', 'vat', 'domain'],
           as: 'company'
         }
       ]
@@ -81,7 +81,7 @@ class AccessPermissionService extends BaseService {
       include: [
         {
           model: db.Company,
-          attributes: ['name'],
+          attributes: ['name', 'suffix'],
           as: 'company'
         }
       ]
