@@ -1932,7 +1932,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           costCenter: {
-            center: 1
+            center: '1'
           }
         })
 
@@ -1971,7 +1971,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${tokenCampaignManager}`)
         .send({
           costCenter: {
-            center: 1
+            center: '1'
           }
         })
 
@@ -2016,7 +2016,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${tokenCampaignManager}`)
         .send({
           costCenter: {
-            center: 1
+            center: '1'
           }
         })
 
@@ -2045,7 +2045,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           costCenter: {
-            center: 1
+            center: '1'
           }
         })
 
@@ -2055,7 +2055,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           costCenter: {
-            center: 1
+            center: '1'
           }
         })
 
@@ -2085,7 +2085,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           costCenter: {
-            center: 10
+            center: '10'
           }
         })
 
@@ -2117,7 +2117,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           costCenter: {
-            center: 5
+            center: '5'
           }
         })
 

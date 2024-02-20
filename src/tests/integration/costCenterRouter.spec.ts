@@ -83,7 +83,7 @@ describe('Cost Centers actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           costCenter: {
-            center: 10
+            center: '10'
           }
         })
 
@@ -120,7 +120,7 @@ describe('Cost Centers actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           costCenter: {
-            center: 10
+            center: '10'
           }
         })
 
@@ -132,7 +132,7 @@ describe('Cost Centers actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           costCenter: {
-            center: 11
+            center: '11'
           }
         })
 
@@ -140,7 +140,7 @@ describe('Cost Centers actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'costCenter')
       expect(res.body.costCenter).to.be.an('object')
       expect(res.body.costCenter).to.include.keys('id', 'center', 'createdAt', 'updatedAt')
-      expect(res.body.costCenter.center).to.equal(11)
+      expect(res.body.costCenter.center).to.equal('11')
     })
 
     it('Should return 200 OK when a company admin updates a cost center by id.', async () => {
@@ -183,7 +183,7 @@ describe('Cost Centers actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           costCenter: {
-            center: 10
+            center: '10'
           }
         })
 
@@ -195,7 +195,7 @@ describe('Cost Centers actions', () => {
         .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
         .send({
           costCenter: {
-            center: 11
+            center: '11'
           }
         })
 
@@ -203,7 +203,7 @@ describe('Cost Centers actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'costCenter')
       expect(res.body.costCenter).to.be.an('object')
       expect(res.body.costCenter).to.include.keys('id', 'center', 'createdAt', 'updatedAt')
-      expect(res.body.costCenter.center).to.equal(11)
+      expect(res.body.costCenter.center).to.equal('11')
     })
 
     it('Should return 403 Forbidden when a campaign manager without access permissions tries to update a cost center by id.', async () => {
@@ -246,7 +246,7 @@ describe('Cost Centers actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           costCenter: {
-            center: 10
+            center: '10'
           }
         })
 
@@ -258,7 +258,7 @@ describe('Cost Centers actions', () => {
         .set('Authorization', `Bearer ${tokenCampaignManager}`)
         .send({
           costCenter: {
-            center: 11
+            center: '11'
           }
         })
 
@@ -288,7 +288,7 @@ describe('Cost Centers actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           costCenter: {
-            center: 10
+            center: '10'
           }
         })
       const costCenterId = resCostCenter.body.costCenter.id
@@ -321,7 +321,7 @@ describe('Cost Centers actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           costCenter: {
-            center: 10
+            center: '10'
           }
         })
       const costCenterId = resCostCenter.body.costCenter.id
