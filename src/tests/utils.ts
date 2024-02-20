@@ -1154,3 +1154,26 @@ export const removeCompanyOwnerId = async (id: string): Promise<any> => {
     })
   }
 }
+
+export const createShipment = async (): Promise<any> => {
+  const foundShipment = await db.Shipment.findOne({
+    where: {
+      id: '6b8ce000-d011-11ee-8842-2dce8a298382',
+      trackingId: '12345678900'
+    }
+  })
+
+  if (foundShipment !== null) {
+    await foundShipment.destroy({ force: true })
+  }
+  const shipment = await db.Shipment.create({
+    id: '6b8ce000-d011-11ee-8842-2dce8a298382',
+    trackingId: '12345678900',
+    statusCode: 'transit',
+    data: '[{"id": "12345678900", "events": [{"location": {"address": {"addressLocality": "Tarnów"}}, "timestamp": "2022-04-15T14:44:17", "statusCode": "transit", "description": "przesyłka przyjęta w terminalu nadawczym DHL"}], "status": {"location": {"address": {"addressLocality": "Tarnów"}}, "timestamp": "2022-04-15T14:44:17", "statusCode": "transit", "description": "przesyłka przyjęta w terminalu nadawczym DHL"}, "details": {"proofOfDeliverySignedAvailable": false}, "service": "parcel-pl"}]',
+    createdAt: '2024-02-20 19:59:33.248+03',
+    updatedAt: '2024-02-20 19:59:33.248+03',
+    deletedAt: null
+  })
+  return shipment
+}

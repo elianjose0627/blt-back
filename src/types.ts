@@ -133,7 +133,7 @@ export interface IShippingMethod {
 
 export interface ICostCenter {
   id: string
-  center: number
+  center: string
   createdAt: Date
   updatedAt: Date
 }

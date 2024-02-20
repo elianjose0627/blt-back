@@ -4,12 +4,12 @@ import type { ICostCenter } from '../types'
 const CostCenterModel = (sequelize: any, DataTypes: any): any => {
   interface CostCenterAttributes {
     id: string
-    center: number
+    center: string
   }
 
   class CostCenter extends Model<CostCenterAttributes> {
     private readonly id: string
-    private readonly center: number
+    private readonly center: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
 
@@ -38,7 +38,7 @@ const CostCenterModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false
     },
     center: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false
     }
   }, {

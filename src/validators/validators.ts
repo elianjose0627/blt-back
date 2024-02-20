@@ -399,7 +399,7 @@ const validateSecondaryDomain = Joi.object({
 
 const validateCostCenter = Joi.object({
   costCenter: Joi.object({
-    center: Joi.number().required()
+    center: Joi.string().required()
   }).required()
 }).required()
 
