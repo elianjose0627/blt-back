@@ -10,7 +10,8 @@ const withoutUser = [
   'BundleItem', 'Salutation', 'Picture',
   'SecondaryDomain', 'LegalText', 'ShippingMethod',
   'GreetingCard', 'CampaignShippingDestination', 'CampaignOrderLimit',
-  'EmailTemplate', 'EmailTemplateType', 'BlockedDomain', 'CampaignAddress'
+  'EmailTemplate', 'EmailTemplateType', 'BlockedDomain', 'CampaignAddress',
+  'MaintenanceMode'
 ]
 
 const includeCompanyAndOwner = {

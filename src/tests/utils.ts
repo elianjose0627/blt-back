@@ -1138,7 +1138,7 @@ export const createBlockedDomain = async (domain: string): Promise<string> => {
 }
 
 export const deleteAllEmailTemplates = async (): Promise<void> => {
-  db.EmailTemplate.truncate()
+  await db.EmailTemplate.truncate()
 }
 
 export const removeCompanyOwnerId = async (id: string): Promise<any> => {
@@ -1176,4 +1176,18 @@ export const createShipment = async (): Promise<any> => {
     deletedAt: null
   })
   return shipment
+}
+
+export const createMaintenanceMode = async (startDate: dayjs.Dayjs, endDate: dayjs.Dayjs, reason = 'A new module is being set up', isActive = true): Promise<any> => {
+  await db.MaintenanceMode.create({
+    id: uuidv4(),
+    isActive,
+    reason,
+    startDate,
+    endDate
+  })
+}
+
+export const deleteAllMaintenanceModes = async (): Promise<void> => {
+  await db.MaintenanceMode.truncate()
 }
