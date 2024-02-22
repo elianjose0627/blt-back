@@ -387,6 +387,16 @@ export interface IBlockedDomain {
   updatedAt: Date
 }
 
+export interface IMaintenanceMode {
+  id: string
+  reason: string
+  isActive: boolean
+  startDate: Date
+  endDate: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface ShippingAddress {
   lastname: string
   city: string

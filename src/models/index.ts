@@ -44,6 +44,7 @@ export interface Database {
   EmailTemplateType?: any
   BlockedDomain?: any
   CampaignAddress?: any
+  MaintenanceMode?: any
   [key: string]: any
 }
 
