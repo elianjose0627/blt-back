@@ -28,6 +28,7 @@ import campaignOrderLimitRouter from './campaignOrderLimitRouter'
 import emailTemplateRouter from './emailTemplateRouter'
 import emailTempleTypeRouter from './emailTemplateTypeRouter'
 import campaignAddressRouter from './campaignAddressRouter'
+import maintenanceModeRouter from './maintenanceRouter'
 
 const routers = {
   authRouter,
@@ -59,7 +60,8 @@ const routers = {
   campaignOrderLimitRouter,
   emailTemplateRouter,
   emailTempleTypeRouter,
-  campaignAddressRouter
+  campaignAddressRouter,
+  maintenanceModeRouter
 }
 
 export default routers
