@@ -1,15 +1,27 @@
 'use strict'
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('CostCenters', {
+    await queryInterface.createTable('MaintenanceModes', {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID
       },
-      center: {
-        allowNull: false,
+      isActive: {
+        type: Sequelize.BOOLEAN,
+        default: true
+      },
+      reason: {
+        allowNull: true,
         type: Sequelize.STRING
+      },
+      startDate: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      endDate: {
+        allowNull: false,
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,
@@ -22,20 +34,10 @@ module.exports = {
       deletedAt: {
         allowNull: true,
         type: Sequelize.DATE
-      },
-      companyId: {
-        allowNull: true,
-        type: Sequelize.UUID,
-        onDelete: 'CASCADE',
-        references: {
-          model: 'Companies',
-          key: 'id',
-          as: 'companyId'
-        }
       }
     })
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('CostCenters')
+    await queryInterface.dropTable('MaintenanceModes')
   }
 }

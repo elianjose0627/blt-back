@@ -10,6 +10,7 @@ import * as statusCodes from './constants/statusCodes'
 // Require our routes and passport into the application
 import routers from './routes'
 import passportAuth from './config/passport'
+import checkMaintenanceMode from './middlewares/checkMaintenanceMode'
 
 dotenv.config()
 passportAuth(passport)
@@ -30,6 +31,9 @@ app.use(logger('dev'))
 // Parse incoming requests data
 app.use(express.json({ limit }))
 app.use(express.urlencoded({ extended: false, limit, parameterLimit: 2000000 }))
+
+// Middleware to check for maintenance mode
+app.use(checkMaintenanceMode)
 
 // Add routes to the app
 app.use(apiPrefix, routers.userRouter())
@@ -62,6 +66,7 @@ app.use(apiPrefix, routers.campaignOrderLimitRouter())
 app.use(apiPrefix, routers.emailTemplateRouter())
 app.use(apiPrefix, routers.emailTempleTypeRouter())
 app.use(apiPrefix, routers.campaignAddressRouter())
+app.use(apiPrefix, routers.maintenanceModeRouter())
 
 // Add validation middleware
 app.use(joiErrors)

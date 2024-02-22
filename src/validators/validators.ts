@@ -1,9 +1,13 @@
 import { Joi } from 'celebrate'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 
 import * as countryList from '../utils/countries'
 import * as userRoles from '../utils/userRoles'
 import * as currencies from '../utils/currencies'
 import * as appModules from '../utils/appModules'
+
+dayjs.extend(utc)
 
 const imageMimeTypes = ['image/bmp', 'image/jpeg', 'image/x-png', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
 
@@ -399,7 +403,7 @@ const validateSecondaryDomain = Joi.object({
 
 const validateCostCenter = Joi.object({
   costCenter: Joi.object({
-    center: Joi.number().required()
+    center: Joi.string().required()
   }).required()
 }).required()
 
@@ -766,6 +770,22 @@ const validateCampaignAddress = Joi.object({
     })).min(1).required()
 }).required()
 
+const validateMaintenanceMode = Joi.object({
+  maintenanceMode: Joi.object({
+    isActive: Joi.boolean().required(),
+    reason: Joi.string().required(),
+    startDate: Joi.date().min(dayjs().toDate()).required(),
+    endDate: Joi.date()
+      .min(Joi.ref('startDate'))
+      .not(Joi.ref('startDate')).messages({
+        'any.invalid': 'End date must not be equal to start date'
+      })
+      .messages({
+        'date.min': 'End date must be after start date'
+      }).required()
+  }).required()
+}).required()
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -822,5 +842,6 @@ export default {
   validateEmailTemplate,
   validateEmailTemplateType,
   validateUserCompanyInvite,
-  validateCampaignAddress
+  validateCampaignAddress,
+  validateMaintenanceMode
 }

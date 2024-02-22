@@ -133,7 +133,7 @@ export interface IShippingMethod {
 
 export interface ICostCenter {
   id: string
-  center: number
+  center: string
   createdAt: Date
   updatedAt: Date
 }
@@ -383,6 +383,16 @@ export interface IEmailTemplate {
 export interface IBlockedDomain {
   id: string
   domain: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface IMaintenanceMode {
+  id: string
+  reason: string
+  isActive: boolean
+  startDate: Date
+  endDate: Date
   createdAt: Date
   updatedAt: Date
 }
