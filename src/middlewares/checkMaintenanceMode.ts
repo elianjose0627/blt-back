@@ -17,7 +17,7 @@ const checkMaintenanceMode = async (req: CustomRequest, res: CustomResponse, nex
 
   const records = await maintenanceModeService.getAll(100, 0)
   const maintenanceModes: IMaintenanceMode[] = records.rows
-  const inMaintenance = maintenanceModes.find(maintenanceMode => (now >= maintenanceMode.startDate && now <= maintenanceMode.endDate))
+  const inMaintenance = maintenanceModes.find(maintenanceMode => (maintenanceMode.isActive && (now >= maintenanceMode.startDate && now <= maintenanceMode.endDate)))
 
   if (inMaintenance !== undefined && disallowedMethods.includes(method)) {
     const retryInterval = dayjs(inMaintenance.endDate).diff(dayjs(inMaintenance.startDate), 'second')
