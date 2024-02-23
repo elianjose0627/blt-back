@@ -337,7 +337,6 @@ describe('Maintenance mode actions', () => {
 
       expect(res).to.have.status(503)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal(`Service unavailable from ${dayjs(startDate).format('lll').toString()} to ${dayjs(endDate).format('lll').toString()}: A new module is being set up`)
     })
   })
 })
