@@ -12,7 +12,6 @@ class MaintenanceModeService extends BaseService {
       order: [['startDate', 'ASC']],
       attributes: { exclude: [] },
       where: {
-        isActive: true,
         endDate: {
           [Op.gte]: now
         }
