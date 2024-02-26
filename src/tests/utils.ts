@@ -1191,3 +1191,14 @@ export const createMaintenanceMode = async (startDate: dayjs.Dayjs, endDate: day
 export const deleteAllMaintenanceModes = async (): Promise<void> => {
   await db.MaintenanceMode.truncate()
 }
+
+export const setSubscriptionToPaid = async (subscriptionId: string): Promise<void> => {
+  const subscription = await db.CompanySubscription.findOne({
+    where: {
+      id: subscriptionId
+    }
+  })
+  if (subscription !== null) {
+    await subscription.update({ paymentStatus: 'paid' })
+  }
+}

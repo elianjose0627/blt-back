@@ -1,6 +1,7 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import { v4 as uuidv4 } from 'uuid'
+import dayjs from 'dayjs'
 import app from '../../app'
 import {
   deleteTestUser,
@@ -14,7 +15,8 @@ import {
   createVerifiedAdminUser,
   createPrivacyRule,
   createTestUser,
-  createBlockedDomain
+  createBlockedDomain,
+  setSubscriptionToPaid
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 import * as appModules from '../../utils/appModules'
@@ -129,18 +131,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Company',
-            email: adminUser.email,
-            theme: {
-              primaryColor: '#ffffff',
-              secondaryColor: '#ffffff',
-              backgroundColor: '#ffffff',
-              foregroundColor: '#ffffff',
-              accentColor: '#ffffff'
-            },
-            logo: {
-              url: 'https://google.com',
-              filename: 'test.jpg'
-            }
+            email: adminUser.email
           }
         })
 
@@ -4340,6 +4331,573 @@ describe('Company actions', () => {
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
+    })
+  })
+
+  describe('Create a company subscription', () => {
+    it('Should return 200 OK when an admin updates the theme of a company without a subscription.', async () => {
+      const company = await createVerifiedCompany(userIdAdmin, true)
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(company.id)}/themes`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            theme: {
+              primaryColor: '#ffffff',
+              secondaryColor: '#ffffff',
+              backgroundColor: '#ffffff',
+              foregroundColor: '#ffffff',
+              accentColor: '#ffffff'
+            },
+            logo: {
+              url: 'https://google.com/test.jpg',
+              filename: 'test.jpg'
+            }
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('id', 'customerId', 'suffix', 'name', 'email', 'phone', 'vat', 'theme', 'logo', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 201 Created when a company owner successfully creates a company subscription.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company14paymentsubscription.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/subscriptions`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          companySubscription: {
+            plan: 'trial',
+            description: 'Company Theme',
+            startDate: dayjs().utc().toDate(),
+            endDate: dayjs().utc().add(1, 'month').toDate()
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'companySubscription')
+      expect(res.body.companySubscription).to.be.an('object')
+      expect(res.body.companySubscription).to.include.keys('id', 'email', 'plan', 'startDate', 'endDate', 'paymentStatus', 'description', 'price', 'discount', 'vat', 'autoRenew', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 403 Forbidden when a company admin for a company tries to update theme without a subscription.', async () => {
+      await deleteTestUser('nickfury@starkindustriesmarvel.com')
+      await createCompanyAdministrator()
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/themes`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .send({
+          company: {
+            theme: {
+              primaryColor: '#ffffff',
+              secondaryColor: '#ffffff',
+              backgroundColor: '#ffffff',
+              foregroundColor: '#ffffff',
+              accentColor: '#ffffff'
+            },
+            logo: {
+              url: 'https://google.com/test.jpg',
+              filename: 'test.jpg'
+            }
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have an active subscription')
+    })
+
+    it('Should return 200 OK when a company admin for a company tries successfully updates theme with a subscription.', async () => {
+      await deleteTestUser('nickfury@starkindustriesmarvel.com')
+      await createCompanyAdministrator()
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      const resSubscription = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/subscriptions`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          companySubscription: {
+            plan: 'trial',
+            description: 'Company Theme',
+            startDate: dayjs().utc().toDate(),
+            endDate: dayjs().utc().add(1, 'month').toDate()
+          }
+        })
+
+      // set status to paid
+      await setSubscriptionToPaid(resSubscription.body.companySubscription.id)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/themes`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .send({
+          company: {
+            theme: {
+              primaryColor: '#ffffff',
+              secondaryColor: '#ffffff',
+              backgroundColor: '#ffffff',
+              foregroundColor: '#ffffff',
+              accentColor: '#ffffff'
+            },
+            logo: {
+              url: 'https://google.com/test.jpg',
+              filename: 'test.jpg'
+            }
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+    })
+
+    it('Should return 403 Forbidden when a campaign manager for a company tries to create a company subscription.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'happyhogan@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+
+      tokenCampaignManager = resCampaignManager.body.token
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/subscriptions`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+        .send({
+          companySubscription: {
+            plan: 'trial',
+            description: 'Company Theme',
+            startDate: dayjs().utc().toDate(),
+            endDate: dayjs().utc().add(1, 'month').toDate()
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
+    })
+
+    it('Should return 403 Forbidden when a non-employee Campaign Manager tries to creates a company subscription for a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company13companysubscription.com'
+          }
+        })
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(resCompany.body.company.id)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'happyhogan@starkindustriesmarvel.com',
+            actionType: 'remove'
+          }
+        })
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+
+      tokenCampaignManager = resCampaignManager.body.token
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/subscriptions`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+        .send({
+          companySubscription: {
+            plan: 'trial',
+            description: 'Company Theme',
+            startDate: dayjs().utc().toDate(),
+            endDate: dayjs().utc().add(1, 'month').toDate()
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner or administrator can perform this action')
+    })
+
+    it('Should return 200 Success when a company owner tries to create a company subscription that exists.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company12companysubscription.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/subscriptions`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          companySubscription: {
+            plan: 'basic',
+            description: 'Company Theme',
+            startDate: dayjs().utc().toDate(),
+            endDate: dayjs().utc().add(1, 'month').toDate()
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/subscriptions`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          companySubscription: {
+            plan: 'basic',
+            description: 'Company Theme',
+            startDate: dayjs().utc().toDate(),
+            endDate: dayjs().utc().add(1, 'month').toDate()
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'companySubscription')
+      expect(res.body.companySubscription).to.be.an('object')
+      expect(res.body.companySubscription).to.include.keys('id', 'email', 'plan', 'startDate', 'endDate', 'paymentStatus', 'description', 'price', 'discount', 'vat', 'autoRenew', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 201 Created when an admin creates a company subscription.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company11companysubscriptions.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/subscriptions`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          companySubscription: {
+            plan: 'trial',
+            description: 'Company Theme',
+            startDate: dayjs().utc().toDate(),
+            endDate: dayjs().utc().add(1, 'month').toDate()
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'companySubscription')
+      expect(res.body.companySubscription).to.be.an('object')
+      expect(res.body.companySubscription).to.include.keys('id', 'email', 'plan', 'startDate', 'endDate', 'paymentStatus', 'description', 'price', 'discount', 'vat', 'autoRenew', 'createdAt', 'updatedAt')
+    })
+  })
+
+  describe('Get company subscriptions', () => {
+    it('Should return 200 Success when an owner successfully retrieves all company subscriptions.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company10companysubscriptions.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/subscriptions`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          companySubscription: {
+            plan: 'trial',
+            description: 'Company Theme',
+            startDate: dayjs().utc().toDate(),
+            endDate: dayjs().utc().add(1, 'month').toDate()
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/subscriptions`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'companySubscriptions')
+      expect(res.body.companySubscriptions).to.be.an('array')
+    })
+
+    it('Should return 200 Success when an owner successfully retrieves all company subscriptions with negative pagination params.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company9companysubscriptions.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/subscriptions`)
+        .query({
+          limit: -10,
+          page: -1
+        })
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'companySubscriptions')
+      expect(res.body.companySubscriptions).to.be.an('array')
+    })
+
+    it('Should return 200 Success when an owner successfully retrieves all company subscriptions with pagination params.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company8companysubscriptions.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/subscriptions`)
+        .query({
+          limit: 1,
+          page: 1,
+          search: 1
+        })
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'companySubscriptions')
+      expect(res.body.companySubscriptions).to.be.an('array')
+    })
+
+    it('Should return 200 Success when a company administrator successfully retrieves all company subscriptions.', async () => {
+      await deleteTestUser('nickfury@starkindustriesmarvel.com')
+      await createCompanyAdministrator()
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/subscriptions`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'companySubscriptions')
+      expect(res.body.companySubscriptions).to.be.an('array')
+    })
+
+    it('Should return 403 Forbidden when a company admin who is not an employee tries to retrieve all company subscriptions.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company6companysubscriptions.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustriesmarvel.com',
+            actionType: 'remove'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/subscriptions`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner or administrator can perform this action')
+    })
+
+    it('Should return 200 when an admin retrieves all company company subscriptions for a verified company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company5companysubscriptions.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/subscriptions`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'companySubscriptions')
+      expect(res.body.companySubscriptions).to.be.an('array')
+    })
+
+    it('Should return 200 when an admin retrieves all company company subscriptions for an unverified company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'sabasaba@company5companysubscriptions.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/subscriptions`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'companySubscriptions')
+      expect(res.body.companySubscriptions).to.be.an('array')
     })
   })
 })

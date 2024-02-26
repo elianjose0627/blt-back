@@ -199,28 +199,7 @@ const validateCreatedCompany = Joi.object({
     vat: Joi.string().optional().max(24).allow('').allow(null),
     domain: Joi.string().domain().allow('').allow(null),
     customerId: Joi.number().optional().allow('').allow(null),
-    inviteToken: Joi.string().uuid().optional(),
-    theme: Joi.object({
-      primaryColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
-        'string.pattern.base': '{#label} must be a valid hex color'
-      }),
-      secondaryColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
-        'string.pattern.base': '{#label} must be a valid hex color'
-      }),
-      backgroundColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
-        'string.pattern.base': '{#label} must be a valid hex color'
-      }),
-      foregroundColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
-        'string.pattern.base': '{#label} must be a valid hex color'
-      }),
-      accentColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
-        'string.pattern.base': '{#label} must be a valid hex color'
-      })
-    }).allow(null),
-    logo: Joi.object({
-      url: Joi.string().uri().required(),
-      filename: Joi.string().required()
-    }).allow(null)
+    inviteToken: Joi.string().uuid().optional()
   }).required()
 }).required()
 
@@ -236,28 +215,7 @@ const validateUpdatedCompany = Joi.object({
     vat: Joi.string().optional().max(24).allow('').allow(null),
     domain: Joi.string().domain().allow('').allow(null),
     customerId: Joi.number().optional().allow('').allow(null),
-    inviteToken: Joi.string().uuid().optional(),
-    theme: Joi.object({
-      primaryColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
-        'string.pattern.base': '{#label} must be a valid hex color'
-      }),
-      secondaryColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
-        'string.pattern.base': '{#label} must be a valid hex color'
-      }),
-      backgroundColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
-        'string.pattern.base': '{#label} must be a valid hex color'
-      }),
-      foregroundColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
-        'string.pattern.base': '{#label} must be a valid hex color'
-      }),
-      accentColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
-        'string.pattern.base': '{#label} must be a valid hex color'
-      })
-    }).allow(null),
-    logo: Joi.object({
-      url: Joi.string().uri().required(),
-      filename: Joi.string().required()
-    }).allow(null)
+    inviteToken: Joi.string().uuid().optional()
   }).required()
 }).required()
 
@@ -786,6 +744,49 @@ const validateMaintenanceMode = Joi.object({
   }).required()
 }).required()
 
+const validateCompanyTheme = Joi.object({
+  company: Joi.object({
+    theme: Joi.object({
+      primaryColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
+        'string.pattern.base': '{#label} must be a valid hex color'
+      }),
+      secondaryColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
+        'string.pattern.base': '{#label} must be a valid hex color'
+      }),
+      backgroundColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
+        'string.pattern.base': '{#label} must be a valid hex color'
+      }),
+      foregroundColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
+        'string.pattern.base': '{#label} must be a valid hex color'
+      }),
+      accentColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
+        'string.pattern.base': '{#label} must be a valid hex color'
+      })
+    }).allow(null).default(null),
+    logo: Joi.object({
+      url: Joi.string().uri().required(),
+      filename: Joi.string().required()
+    }).allow(null).default(null)
+  }).required()
+}).required()
+
+const validateCompanySubscription = Joi.object({
+  companySubscription: Joi.object({
+    plan: Joi.string().required().valid(...['premium', 'basic', 'custom', 'trial']),
+    description: Joi.string().required().max(64),
+    startDate: Joi.date().min(dayjs().toDate()).required(),
+    endDate: Joi.date()
+      .min(Joi.ref('startDate'))
+      .not(Joi.ref('startDate')).messages({
+        'any.invalid': 'End date must not be equal to start date'
+      })
+      .messages({
+        'date.min': 'End date must be after start date'
+      }).required(),
+    autoRenew: Joi.boolean().default(false)
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -843,5 +844,7 @@ export default {
   validateEmailTemplateType,
   validateUserCompanyInvite,
   validateCampaignAddress,
-  validateMaintenanceMode
+  validateMaintenanceMode,
+  validateCompanyTheme,
+  validateCompanySubscription
 }
