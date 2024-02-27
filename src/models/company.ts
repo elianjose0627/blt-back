@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { IAccessPermission, IAddress, ICompany, ISecondaryDomain, IUser, MediaData, Nullable, Theme } from '../types'
+import type { IAccessPermission, IAddress, ICompany, ICompanySubscription, ISecondaryDomain, IUser, MediaData, Nullable, Theme } from '../types'
 
 const CompanyModel = (sequelize: any, DataTypes: any): any => {
   interface CompanyAttributes {
@@ -37,6 +37,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     private readonly accessPermissions: IAccessPermission[]
     private readonly theme: Nullable<Theme>
     private readonly logo: Nullable<MediaData>
+    private readonly subscriptions: ICompanySubscription[]
 
     static associate (models: any): any {
       Company.belongsTo(models.User, {
@@ -89,6 +90,11 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         as: 'accessPermissions',
         onDelete: 'CASCADE'
       })
+      Company.hasMany(models.CompanySubscription, {
+        foreignKey: 'companyId',
+        as: 'subscriptions',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): ICompany {
@@ -110,7 +116,8 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         secondaryDomains: this.secondaryDomains,
         accessPermissions: this.accessPermissions,
         theme: this.theme,
-        logo: this.logo
+        logo: this.logo,
+        subscriptions: this.subscriptions
       }
     }
   };

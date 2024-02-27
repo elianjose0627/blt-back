@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import CampaignController from '../controllers/CampaignController'
@@ -17,7 +17,7 @@ import CampaignOrderLimitController from '../controllers/CampaignOrderLimitContr
 import CampaignShippingDestinationController from '../controllers/CampaignShippingDestinationController'
 import CampaignAddressController from '../controllers/CampaignAddressController'
 
-const CampaignRoutes = (): any => {
+const CampaignRoutes = (): Router => {
   const campaignRouter = express.Router()
 
   campaignRouter.use('/campaigns', checkAuth, checkUserIsVerifiedStatus, CampaignController.setModule)
