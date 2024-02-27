@@ -45,6 +45,7 @@ export interface Database {
   BlockedDomain?: any
   CampaignAddress?: any
   MaintenanceMode?: any
+  CompanySubscription?: any
   [key: string]: any
 }
 
