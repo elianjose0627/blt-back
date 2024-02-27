@@ -4340,7 +4340,7 @@ describe('Company actions', () => {
 
       const res = await chai
         .request(app)
-        .patch(`/api/companies/${String(company.id)}/themes`)
+        .patch(`/api/companies/${String(company.id)}/theme`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           company: {
@@ -4350,7 +4350,25 @@ describe('Company actions', () => {
               backgroundColor: '#ffffff',
               foregroundColor: '#ffffff',
               accentColor: '#ffffff'
-            },
+            }
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('id', 'customerId', 'suffix', 'name', 'email', 'phone', 'vat', 'theme', 'logo', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 200 OK when an admin updates the logo of a company without a subscription.', async () => {
+      const company = await createVerifiedCompany(userIdAdmin, true)
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(company.id)}/logo`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
             logo: {
               url: 'https://google.com/test.jpg',
               filename: 'test.jpg'
@@ -4424,7 +4442,7 @@ describe('Company actions', () => {
 
       const res = await chai
         .request(app)
-        .patch(`/api/companies/${String(companyId)}/themes`)
+        .patch(`/api/companies/${String(companyId)}/theme`)
         .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
         .send({
           company: {
@@ -4434,10 +4452,6 @@ describe('Company actions', () => {
               backgroundColor: '#ffffff',
               foregroundColor: '#ffffff',
               accentColor: '#ffffff'
-            },
-            logo: {
-              url: 'https://google.com/test.jpg',
-              filename: 'test.jpg'
             }
           }
         })
@@ -4447,7 +4461,7 @@ describe('Company actions', () => {
       expect(res.body.errors.message).to.equal('You do not have an active subscription')
     })
 
-    it('Should return 200 OK when a company admin for a company tries successfully updates theme with a subscription.', async () => {
+    it('Should return 200 OK when a company admin for a company successfully updates theme with a subscription.', async () => {
       await deleteTestUser('nickfury@starkindustriesmarvel.com')
       await createCompanyAdministrator()
       const resCompany = await createVerifiedCompany(userId)
@@ -4490,7 +4504,7 @@ describe('Company actions', () => {
 
       const res = await chai
         .request(app)
-        .patch(`/api/companies/${String(companyId)}/themes`)
+        .patch(`/api/companies/${String(companyId)}/theme`)
         .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
         .send({
           company: {
@@ -4500,10 +4514,6 @@ describe('Company actions', () => {
               backgroundColor: '#ffffff',
               foregroundColor: '#ffffff',
               accentColor: '#ffffff'
-            },
-            logo: {
-              url: 'https://google.com/test.jpg',
-              filename: 'test.jpg'
             }
           }
         })

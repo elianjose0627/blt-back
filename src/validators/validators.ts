@@ -762,11 +762,16 @@ const validateCompanyTheme = Joi.object({
       accentColor: Joi.string().required().regex(/^#[A-Fa-f0-9]{6}$/).messages({
         'string.pattern.base': '{#label} must be a valid hex color'
       })
-    }).allow(null).default(null),
+    }).allow(null)
+  }).required()
+}).required()
+
+const validateCompanyLogo = Joi.object({
+  company: Joi.object({
     logo: Joi.object({
       url: Joi.string().uri().required(),
       filename: Joi.string().required()
-    }).allow(null).default(null)
+    }).allow(null)
   }).required()
 }).required()
 
@@ -846,5 +851,6 @@ export default {
   validateCampaignAddress,
   validateMaintenanceMode,
   validateCompanyTheme,
-  validateCompanySubscription
+  validateCompanySubscription,
+  validateCompanyLogo
 }

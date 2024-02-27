@@ -155,11 +155,17 @@ const companyRoutes = (): Router => {
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(AccessPermissionController.getAllForCompany))
-  companyRouter.route('/companies/:id/themes')
+  companyRouter.route('/companies/:id/theme')
     .patch(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
       asyncHandler(checkCompanySubscription),
       celebrate({
         [Segments.BODY]: validator.validateCompanyTheme
+      }), asyncHandler(CompanyController.checkCompanyDomainAndEmailDomain), asyncHandler(CompanyController.update))
+  companyRouter.route('/companies/:id/logo')
+    .patch(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
+      asyncHandler(checkCompanySubscription),
+      celebrate({
+        [Segments.BODY]: validator.validateCompanyLogo
       }), asyncHandler(CompanyController.checkCompanyDomainAndEmailDomain), asyncHandler(CompanyController.update))
   companyRouter.route('/companies/:id/subscriptions')
     .post(CompanySubscriptionController.setModule, asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),

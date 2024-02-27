@@ -27,7 +27,7 @@ class CompanySubscriptionService extends BaseService {
           [Op.eq]: companySubscription.plan
         }
       },
-      paranoid: false // To get soft deleted record
+      paranoid: true // To not get soft deleted record
     })
 
     if (response !== null) {
