@@ -32,7 +32,7 @@ const includeCompanyAndOwner = {
 }
 
 export const generateInclude = (model: string): any => {
-  const nowEndOfDay = dayjs().utc().endOf('day').toDate()
+  const now = dayjs().utc().toDate()
   if (model === 'Company') {
     return (
       [
@@ -63,7 +63,7 @@ export const generateInclude = (model: string): any => {
           where: {
             paymentStatus: 'paid',
             endDate: {
-              [Op.gte]: nowEndOfDay
+              [Op.gte]: now
             }
           },
           required: false

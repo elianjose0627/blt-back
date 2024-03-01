@@ -16,7 +16,7 @@ const jwtOptions = {
 }
 
 const passportAuth = (passport: PassportStatic): any => {
-  const nowEndOfDay = dayjs().utc().endOf('day').toDate()
+  const now = dayjs().utc().toDate()
   const getUser = async (email: string): Promise<any> => db.User.findOne({
     attributes: { exclude: ['password'] },
     include: [
@@ -51,7 +51,7 @@ const passportAuth = (passport: PassportStatic): any => {
             where: {
               paymentStatus: 'paid',
               endDate: {
-                [Op.gte]: nowEndOfDay
+                [Op.gte]: now
               }
             },
             required: false

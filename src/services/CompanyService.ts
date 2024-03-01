@@ -17,7 +17,7 @@ class CompanyService extends BaseService {
   async getAll (limit: number, offset: number, user?: any): Promise<any> {
     let records
 
-    const nowEndOfDay = dayjs().utc().endOf('day').toDate()
+    const now = dayjs().utc().toDate()
 
     const include = [
       {
@@ -37,7 +37,7 @@ class CompanyService extends BaseService {
         where: {
           paymentStatus: 'paid',
           endDate: {
-            [Op.gte]: nowEndOfDay
+            [Op.gte]: now
           }
         },
         required: false
