@@ -12,16 +12,16 @@ class CompanySubscriptionService extends BaseService {
     const { company, companySubscription } = data
     let response: any
 
-    const nowEndOfDay = dayjs().utc().endOf('day').toDate()
+    const now = dayjs().utc().toDate()
 
     response = await db[this.model].findOne({
       where: {
         companyId: company.id,
         startDate: {
-          [Op.lte]: nowEndOfDay
+          [Op.lte]: now
         },
         endDate: {
-          [Op.gte]: nowEndOfDay
+          [Op.gte]: now
         },
         plan: {
           [Op.eq]: companySubscription.plan

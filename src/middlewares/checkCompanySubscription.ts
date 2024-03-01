@@ -17,7 +17,7 @@ const checkCompanySubscription = async (req: CustomRequest, res: CustomResponse,
   const records = await companySubscriptionService.getAllForCompany(100, 0, company.id)
   const subscriptions: ICompanySubscription[] = records.rows
   const activeSubscription = subscriptions
-    .find(subscription => (subscription.paymentStatus === 'paid' && (now >= dayjs(subscription.startDate).startOf('day').toDate() && now <= dayjs(subscription.endDate).endOf('day').toDate())))
+    .find(subscription => (subscription.paymentStatus === 'paid' && (now >= dayjs(subscription.startDate).utc().toDate() && now <= dayjs(subscription.endDate).utc().toDate())))
 
   if (activeSubscription === undefined && currentUser.role !== userRoles.ADMIN) {
     return res.status(statusCodes.FORBIDDEN).send({
