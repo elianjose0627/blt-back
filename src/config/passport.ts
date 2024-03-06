@@ -1,6 +1,11 @@
 import type { PassportStatic } from 'passport'
 import passportJWT from 'passport-jwt'
+import { Op } from 'sequelize'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import db from '../models'
+
+dayjs.extend(utc)
 
 const { ExtractJwt } = passportJWT
 const JwtStrategy = passportJWT.Strategy
@@ -11,12 +16,13 @@ const jwtOptions = {
 }
 
 const passportAuth = (passport: PassportStatic): any => {
+  const now = dayjs().utc().toDate()
   const getUser = async (email: string): Promise<any> => db.User.findOne({
     attributes: { exclude: ['password'] },
     include: [
       {
         model: db.Company,
-        attributes: ['id', 'customerId', 'name', 'suffix', 'email', 'phone', 'vat', 'domain', 'isDomainVerified'],
+        attributes: ['id', 'customerId', 'name', 'suffix', 'email', 'phone', 'vat', 'domain', 'isDomainVerified', 'theme', 'logo'],
         as: 'company',
         include: [
           {
@@ -35,6 +41,18 @@ const passportAuth = (passport: PassportStatic): any => {
             as: 'accessPermissions',
             where: {
               isEnabled: true
+            },
+            required: false
+          },
+          {
+            model: db.CompanySubscription,
+            attributes: { exclude: ['companyId', 'deletedAt'] },
+            as: 'subscriptions',
+            where: {
+              paymentStatus: 'paid',
+              endDate: {
+                [Op.gte]: now
+              }
             },
             required: false
           }

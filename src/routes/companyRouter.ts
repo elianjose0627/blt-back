@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import CompanyController from '../controllers/CompanyController'
@@ -17,8 +17,10 @@ import LegalTextController from '../controllers/LegalTextController'
 import AccessPermissionController from '../controllers/AccessPermissionController'
 import checkPermissions from '../middlewares/checkPermissions'
 import checkBlockedDomain from '../middlewares/checkBlockedDomain'
+import CompanySubscriptionController from '../controllers/CompanySubscriptionController'
+import checkCompanySubscription from '../middlewares/checkCompanySubscription'
 
-const companyRoutes = (): any => {
+const companyRoutes = (): Router => {
   const companyRouter = express.Router()
 
   companyRouter.use('/companies', checkAuth, checkUserIsVerifiedStatus, CompanyController.setModule)
@@ -153,6 +155,29 @@ const companyRoutes = (): any => {
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(AccessPermissionController.getAllForCompany))
+  companyRouter.route('/companies/:id/theme')
+    .patch(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
+      asyncHandler(checkCompanySubscription),
+      celebrate({
+        [Segments.BODY]: validator.validateCompanyTheme
+      }), asyncHandler(CompanyController.checkCompanyDomainAndEmailDomain), asyncHandler(CompanyController.update))
+  companyRouter.route('/companies/:id/logo')
+    .patch(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
+      asyncHandler(checkCompanySubscription),
+      celebrate({
+        [Segments.BODY]: validator.validateCompanyLogo
+      }), asyncHandler(CompanyController.checkCompanyDomainAndEmailDomain), asyncHandler(CompanyController.update))
+  companyRouter.route('/companies/:id/subscriptions')
+    .post(CompanySubscriptionController.setModule, asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
+      asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
+        [Segments.BODY]: validator.validateCompanySubscription
+      }, { abortEarly: false }), asyncHandler(CompanySubscriptionController.insert))
+    .get(CompanySubscriptionController.setModule, asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
+      asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
+        [Segments.QUERY]: validator.validateQueryParams
+      }), asyncHandler(paginate), asyncHandler(CompanySubscriptionController.getAllForCompany))
   return companyRouter
 }
 

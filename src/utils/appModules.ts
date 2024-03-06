@@ -16,6 +16,7 @@ export const SALUTATIONS = 'salutations'
 export const SECONDARYDOMAINS = 'secondaryDomains'
 export const SHIPMENTS = 'shipments'
 export const USERS = 'users'
+export const COMPANYSUBSCRIPTIONS = 'companySubscriptions'
 
 export const MODULES_ARRAY = [
   'accessPermissions',
@@ -33,7 +34,8 @@ export const MODULES_ARRAY = [
   'salutations',
   'secondaryDomains',
   'shipments',
-  'users'
+  'users',
+  'companySubscriptions'
 ]
 
 export const allowedCompanyModules: Array<{ name: string, value: Module }> = [
@@ -45,5 +47,6 @@ export const allowedCompanyModules: Array<{ name: string, value: Module }> = [
   { name: 'Cost Centers', value: COSTCENTERS },
   { name: 'Inventory Products', value: PRODUCTS },
   { name: 'Addresses', value: ADDRESSES },
-  { name: 'Orders', value: ORDERS }
+  { name: 'Orders', value: ORDERS },
+  { name: 'Company Subscriptions', value: COMPANYSUBSCRIPTIONS }
 ]

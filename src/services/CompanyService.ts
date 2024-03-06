@@ -1,8 +1,13 @@
 import { v1 as uuidv1 } from 'uuid'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import { Op } from 'sequelize'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 import * as userRoles from '../utils/userRoles'
 import * as appModules from '../utils/appModules'
+
+dayjs.extend(utc)
 
 class CompanyService extends BaseService {
   manyRecords (): string {
@@ -11,6 +16,8 @@ class CompanyService extends BaseService {
 
   async getAll (limit: number, offset: number, user?: any): Promise<any> {
     let records
+
+    const now = dayjs().utc().toDate()
 
     const include = [
       {
@@ -22,6 +29,18 @@ class CompanyService extends BaseService {
         model: db.AccessPermission,
         attributes: { exclude: ['companyId', 'deletedAt'] },
         as: 'accessPermissions'
+      },
+      {
+        model: db.CompanySubscription,
+        attributes: { exclude: ['companyId', 'deletedAt'] },
+        as: 'subscriptions',
+        where: {
+          paymentStatus: 'paid',
+          endDate: {
+            [Op.gte]: now
+          }
+        },
+        required: false
       }
     ]
 

@@ -1,6 +1,10 @@
 import { v1 as uuidv1 } from 'uuid'
 import { Op } from 'sequelize'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import db from '../models'
+
+dayjs.extend(utc)
 
 const includeCompany = [
   'Address', 'CostCenter', 'Product',
@@ -11,7 +15,7 @@ const withoutUser = [
   'SecondaryDomain', 'LegalText', 'ShippingMethod',
   'GreetingCard', 'CampaignShippingDestination', 'CampaignOrderLimit',
   'EmailTemplate', 'EmailTemplateType', 'BlockedDomain', 'CampaignAddress',
-  'MaintenanceMode'
+  'MaintenanceMode', 'CompanySubscription'
 ]
 
 const includeCompanyAndOwner = {
@@ -28,6 +32,7 @@ const includeCompanyAndOwner = {
 }
 
 export const generateInclude = (model: string): any => {
+  const now = dayjs().utc().toDate()
   if (model === 'Company') {
     return (
       [
@@ -45,6 +50,23 @@ export const generateInclude = (model: string): any => {
           model: db.SecondaryDomain,
           attributes: ['id', 'name', 'isVerified', 'updatedAt', 'createdAt'],
           as: 'secondaryDomains'
+        },
+        {
+          model: db.AccessPermission,
+          attributes: { exclude: ['companyId', 'deletedAt'] },
+          as: 'accessPermissions'
+        },
+        {
+          model: db.CompanySubscription,
+          attributes: { exclude: ['companyId', 'deletedAt'] },
+          as: 'subscriptions',
+          where: {
+            paymentStatus: 'paid',
+            endDate: {
+              [Op.gte]: now
+            }
+          },
+          required: false
         }
       ]
     )

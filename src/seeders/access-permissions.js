@@ -117,6 +117,18 @@ module.exports = {
       companyId: null
     },
     {
+      id: '7D3D0355-A89C-4051-9C27-4F5677DB29DA',
+      name: 'Company Administrator Read Write Subscriptions',
+      module: 'companySubscriptions',
+      role: 'CompanyAdministrator',
+      permission: 'readwrite',
+      isEnabled: 'TRUE',
+      createdAt,
+      updatedAt,
+      deletedAt: null,
+      companyId: null
+    },
+    {
       id: 'D705B5FB-4247-478C-87FD-1C3011F6B09B',
       name: 'Campaign Manager Read Write Campaigns',
       module: 'campaigns',

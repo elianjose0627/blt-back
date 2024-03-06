@@ -109,7 +109,8 @@ typeof appModules.ORDERS | typeof appModules.PICTURES |
 typeof appModules.PICTURES | typeof appModules.PRIVACYRULES |
 typeof appModules.PRODUCTS | typeof appModules.RECIPIENTS |
 typeof appModules.SALUTATIONS | typeof appModules.SECONDARYDOMAINS |
-typeof appModules.SHIPMENTS | typeof appModules.USERS
+typeof appModules.SHIPMENTS | typeof appModules.USERS |
+typeof appModules.COMPANYSUBSCRIPTIONS
 
 export type Permission = typeof permissions.READ | typeof permissions.READWRITE
 export interface IPrivacyRule {
@@ -207,6 +208,7 @@ export interface ICompany {
   inviteToken?: Nullable<string>
   theme: Nullable<Theme>
   logo: Nullable<MediaData>
+  subscriptions: ICompanySubscription[]
 }
 
 export type AddressType = 'billing' | 'delivery' | 'billingAndDelivery' | 'return'
@@ -780,6 +782,24 @@ export interface IGreetingCard {
   inventory: number
   availableStock: number
   jtlfpid: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type SubscriptionPlan = 'premium' | 'basic' | 'custom' | 'trial'
+export type SubscriptionPaymentStatus = 'paid' | 'pending'
+export interface ICompanySubscription {
+  id: string
+  email: string
+  plan: SubscriptionPlan
+  startDate: Date
+  endDate: Date
+  paymentStatus: SubscriptionPaymentStatus
+  price: number
+  discount: number
+  vat: number
+  description: string
+  autoRenew: boolean
   createdAt: Date
   updatedAt: Date
 }
