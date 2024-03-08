@@ -1108,6 +1108,71 @@ describe('Campaign actions', () => {
       expect(res.body.bundles).to.have.lengthOf.above(0)
     })
 
+    it('Should return 200 Success when an owner successfully retrieves all searched bundles of a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Marvel',
+            email: 'test2repeat@companymarvel.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/bundles`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          bundle: {
+            merchantSku: '39262696145050',
+            name: 'Staffbase Bundle 1',
+            specifications: {
+              billOfMaterialsComponents: [
+                {
+                  name: 'Interdimensional Goggles',
+                  jfsku: '56CJ0124JWR',
+                  merchantSku: 'ART2389871'
+                }
+              ]
+            }
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${campaignId}/bundles`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .query({
+          limit: 10,
+          page: 1,
+          search: '39262696145050'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'bundles')
+      expect(res.body.bundles).to.be.an('array')
+      expect(res.body.bundles).to.have.lengthOf.above(0)
+    })
+
     it('Should return 200 Success when a campaign manager successfully retrieves all bundles of a campaign.', async () => {
       const resCompany = await chai
         .request(app)
