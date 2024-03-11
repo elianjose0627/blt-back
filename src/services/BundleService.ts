@@ -1,4 +1,5 @@
 import { v1 as uuidv1 } from 'uuid'
+import { Op } from 'sequelize'
 import BaseService, { generateInclude } from './BaseService'
 import db, { sequelizeInstance } from '../models'
 
@@ -59,24 +60,46 @@ class BundleService extends BaseService {
     return updatedRecord.toJSONFor()
   }
 
-  async getAll (limit: number, offset: number, campaignId?: string): Promise<any> {
-    const records = await db[this.model].findAndCountAll({
-      limit,
-      offset,
-      order: [['createdAt', 'DESC']],
-      include: [
-        {
-          model: db.Picture,
-          attributes: ['id', 'filename', 'url', 'size', 'mimeType', 'updatedAt', 'createdAt'],
-          as: 'pictures'
-        }
-      ],
-      attributes: { exclude: [] },
-      where: {
-        campaignId
-      },
-      distinct: true
-    })
+  async getAll (limit: number, offset: number, campaignId?: string, search?: string): Promise<any> {
+    let records
+
+    const include = [
+      {
+        model: db.Picture,
+        attributes: ['id', 'filename', 'url', 'size', 'mimeType', 'updatedAt', 'createdAt'],
+        as: 'pictures'
+      }
+    ]
+    if (search !== undefined) {
+      records = await db[this.model].findAndCountAll({
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        include,
+        attributes: { exclude: [] },
+        where: {
+          campaignId,
+          [Op.or]: [
+            { name: { [Op.iLike]: `%${search}%` } },
+            { jfsku: { [Op.iLike]: `%${search}%` } },
+            { merchantSku: { [Op.iLike]: `%${search}%` } }
+          ]
+        },
+        distinct: true
+      })
+    } else {
+      records = await db[this.model].findAndCountAll({
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        include,
+        attributes: { exclude: [] },
+        where: {
+          campaignId
+        },
+        distinct: true
+      })
+    }
 
     return {
       count: records.count,
