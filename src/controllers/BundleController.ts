@@ -27,9 +27,9 @@ class BundleController extends BaseController {
   }
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { limit, page, offset } = req.query
-    const { id } = req.params
-    const records = await this.service.getAll(limit, offset, id)
+    const { query: { limit, page, offset, search }, params: { id } } = req
+
+    const records = await this.service.getAll(limit, offset, id, search)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),
