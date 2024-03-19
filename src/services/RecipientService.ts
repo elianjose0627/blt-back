@@ -1,4 +1,5 @@
 import { v1 as uuidv1 } from 'uuid'
+import { Op } from 'sequelize'
 import BaseService from './BaseService'
 import db from '../models'
 import * as appModules from '../utils/appModules'
@@ -12,16 +13,41 @@ class RecipientService extends BaseService {
     return { response: response.toJSONFor(campaign), status: 201 }
   }
 
-  async getAll (limit: number, offset: number, campaignId?: string, user?: any): Promise<any> {
-    const records = await db[this.model].findAndCountAll({
-      limit,
-      offset,
-      order: [['createdAt', 'DESC']],
-      attributes: { exclude: [] },
-      where: {
-        campaignId
-      }
-    })
+  async getAll (limit: number, offset: number, campaignId?: string, user?: any, search?: string): Promise<any> {
+    let records
+
+    if (search !== undefined) {
+      records = await db[this.model].findAndCountAll({
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude: [] },
+        where: {
+          campaignId,
+          [Op.or]: [
+            { email: { [Op.iLike]: `%${search}%` } },
+            { firstName: { [Op.iLike]: `%${search}%` } },
+            { lastName: { [Op.iLike]: `%${search}%` } },
+            { companyName: { [Op.iLike]: `%${search}%` } },
+            { country: { [Op.iLike]: `%${search}%` } },
+            { city: { [Op.iLike]: `%${search}%` } },
+            { street: { [Op.iLike]: `%${search}%` } },
+            { costCenter: { [Op.iLike]: `%${search}%` } },
+            { addressAddition: { [Op.iLike]: `%${search}%` } }
+          ]
+        }
+      })
+    } else {
+      records = await db[this.model].findAndCountAll({
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude: [] },
+        where: {
+          campaignId
+        }
+      })
+    }
 
     const companyId = user.company?.id
     const privacyRule = companyId !== undefined

@@ -246,6 +246,7 @@ export interface IRecipient {
   street?: string
   zip?: string
   addressAddition?: string
+  costCenter?: string
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
