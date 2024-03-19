@@ -15,6 +15,7 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
     street: string
     zip: string
     addressAddition: string
+    costCenter: string
   }
 
   class Recipient extends Model<RecipientAttributes> {
@@ -30,6 +31,7 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
     private readonly street: string
     private readonly zip: string
     private readonly addressAddition: string
+    private readonly costCenter: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany
@@ -56,6 +58,7 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
         street: this.street,
         zip: this.zip,
         addressAddition: this.addressAddition,
+        costCenter: this.costCenter,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         company: this.company
@@ -110,6 +113,10 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
       allowNull: true
     },
     addressAddition: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    costCenter: {
       type: DataTypes.STRING,
       allowNull: true
     }

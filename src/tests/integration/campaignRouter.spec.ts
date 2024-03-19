@@ -22,7 +22,6 @@ let tokenAdmin: string
 let token: string
 let tokenCompanyAdminTwo: string
 let tokenCampaignManager: string
-let companyTwoId: string
 
 describe('Campaign actions', () => {
   before(async () => {
@@ -60,7 +59,6 @@ describe('Campaign actions', () => {
     token = res1.body.token
     tokenCompanyAdminTwo = resCompanyAdminTwo.body.token
     tokenCampaignManager = resCampaignManager.body.token
-    companyTwoId = resCompanyAdminTwo.body.user.company.id
   })
 
   after(async () => {
@@ -684,14 +682,76 @@ describe('Campaign actions', () => {
       expect(res.body.recipients).to.be.an('array')
     })
 
-    it('Should return 200 Success when a company admin successfully retrieves all recipients with a privacy rule.', async () => {
-      await verifyCompanyDomain(companyTwoId)
-      await createPrivacyRule(companyTwoId, appModules.RECIPIENTS, userRoles.COMPANYADMINISTRATOR)
+    it('Should return 200 OK when an admin searches for campaign recipients.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company 3 Search',
+            email: 'test3@company3companysearch.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
 
       const resCampaign = await chai
         .request(app)
-        .post(`/api/companies/${String(companyTwoId)}/campaigns`)
-        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/recipients`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          recipient: {
+            firstName: 'Jane',
+            lastName: 'Doe',
+            email: 'janedoe@doe.com',
+            country: 'Kenya',
+            city: 'Nairobi',
+            costCenter: '123abc456'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${String(resCampaign.body.campaign.id)}/recipients`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .query({
+          limit: 10,
+          page: 1,
+          search: 'janedoe@doe.com'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'recipients')
+      expect(res.body.recipients).to.be.an('array').lengthOf(1)
+    })
+
+    it('Should return 200 Success when a company admin successfully retrieves all recipients with a privacy rule.', async () => {
+      const resCompanyAdminTwoPrivacyRule = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'sharoncarter@starkindustriesmarvel2.com', password: 'thepowerbroker' } })
+
+      const companyIdPrivacyRule = resCompanyAdminTwoPrivacyRule.body.user.company.id
+      const tokenCompanyAdminTwoPrivacyRule = String(resCompanyAdminTwoPrivacyRule.body.token)
+      await createPrivacyRule(companyIdPrivacyRule, appModules.RECIPIENTS, userRoles.COMPANYADMINISTRATOR)
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyIdPrivacyRule)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwoPrivacyRule}`)
         .send({
           campaign: {
             name: 'Onboarding Privacy',
@@ -703,7 +763,7 @@ describe('Campaign actions', () => {
       await chai
         .request(app)
         .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/recipients`)
-        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwoPrivacyRule}`)
         .send({
           recipient: {
             firstName: 'John',
@@ -717,7 +777,7 @@ describe('Campaign actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/campaigns/${String(resCampaign.body.campaign.id)}/recipients`)
-        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwoPrivacyRule}`)
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'recipients')
@@ -726,13 +786,19 @@ describe('Campaign actions', () => {
     })
 
     it('Should return 200 Success when a company admin successfully retrieves all recipients with a privacy rule with street, zip and address addition set.', async () => {
-      await verifyCompanyDomain(companyTwoId)
-      await createPrivacyRule(companyTwoId, appModules.RECIPIENTS, userRoles.COMPANYADMINISTRATOR)
+      const resCompanyAdminTwoPrivacyRule = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'sharoncarter@starkindustriesmarvel2.com', password: 'thepowerbroker' } })
+
+      const companyIdPrivacyRule = resCompanyAdminTwoPrivacyRule.body.user.company.id
+      const tokenCompanyAdminTwoPrivacyRule = String(resCompanyAdminTwoPrivacyRule.body.token)
+      await createPrivacyRule(companyIdPrivacyRule, appModules.RECIPIENTS, userRoles.COMPANYADMINISTRATOR)
 
       const resCampaign = await chai
         .request(app)
-        .post(`/api/companies/${String(companyTwoId)}/campaigns`)
-        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .post(`/api/companies/${String(companyIdPrivacyRule)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwoPrivacyRule}`)
         .send({
           campaign: {
             name: 'Onboarding Privacy',
@@ -744,7 +810,7 @@ describe('Campaign actions', () => {
       await chai
         .request(app)
         .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/recipients`)
-        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwoPrivacyRule}`)
         .send({
           recipient: {
             firstName: 'John',
@@ -752,16 +818,16 @@ describe('Campaign actions', () => {
             email: 'johndoe@doe.com',
             country: 'Kenya',
             city: 'Nairobi',
-            street: 'Doe Avenue',
-            zip: '1111',
-            addressAddition: 'HSE 1'
+            street: 'Bungoma Road',
+            zip: '1234',
+            addressAddition: 'Hse 1'
           }
         })
 
       const res = await chai
         .request(app)
         .get(`/api/campaigns/${String(resCampaign.body.campaign.id)}/recipients`)
-        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwoPrivacyRule}`)
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'recipients')
