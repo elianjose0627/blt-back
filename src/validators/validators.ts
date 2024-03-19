@@ -278,7 +278,8 @@ const validateCreatedRecipient = Joi.object({
     city: Joi.string().required().max(64),
     street: Joi.string().optional().allow('').allow(null).max(64),
     zip: Joi.string().optional().max(24),
-    addressAddition: Joi.string().allow('').allow(null).max(256)
+    addressAddition: Joi.string().optional().allow('').allow(null).max(256),
+    costCenter: Joi.string().optional().allow('').allow(null)
   }).required()
 }).required()
 
@@ -297,7 +298,8 @@ const validateUpdatedRecipient = Joi.object({
     city: Joi.string().optional().max(64),
     street: Joi.string().optional().allow('').allow(null).max(64),
     zip: Joi.string().optional().max(24),
-    addressAddition: Joi.string().allow('').allow(null).max(256)
+    addressAddition: Joi.string().optional().allow('').allow(null).max(256),
+    costCenter: Joi.string().optional().allow('').allow(null)
   }).required()
 }).required()
 

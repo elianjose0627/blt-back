@@ -15,7 +15,7 @@ class RecipientController extends BaseController {
     const { user: currentUser, record: { campaign: { companyId, company: { owner } } } } = req
 
     const isOwnerOrAdmin = currentUser.id === owner.id || currentUser.role === userRoles.ADMIN
-    const isEmployee = currentUser?.companyId === companyId
+    const isEmployee = currentUser.companyId === companyId
 
     if (isOwnerOrAdmin || (isEmployee)) {
       req.isOwnerOrAdmin = isOwnerOrAdmin
@@ -69,9 +69,9 @@ class RecipientController extends BaseController {
   }
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { user: currentUser, query: { limit, page, offset }, params: { id } } = req
+    const { user: currentUser, query: { limit, page, offset, search }, params: { id } } = req
 
-    const records = await recipientService.getAll(limit, offset, id, currentUser)
+    const records = await recipientService.getAll(limit, offset, id, currentUser, search)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),
