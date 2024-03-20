@@ -53,7 +53,19 @@ class CampaignService extends BaseService {
     }
   }
 
-  async getAll (limit: number, offset: number): Promise<any> {
+  async getAll (limit: number, offset: number, search?: string): Promise<any> {
+    let where
+
+    if (search !== undefined) {
+      where = {
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${search}%` } },
+          { type: { [Op.iLike]: `%${search}%` } },
+          { status: { [Op.iLike]: `%${search}%` } }
+        ]
+      }
+    }
+
     const records = await db[this.model].findAndCountAll({
       limit,
       offset,
@@ -85,7 +97,9 @@ class CampaignService extends BaseService {
           attributes: { exclude: ['deletedAt', 'campaignId'] },
           as: 'campaignAddresses'
         }
-      ]
+      ],
+      distinct: true,
+      where
     })
 
     return {

@@ -32,7 +32,7 @@ class CompanyController extends BaseController {
     const { user: currentUser, record: company } = req
 
     const isOwnerOrAdmin = currentUser.id === company?.owner?.id || currentUser.role === userRoles.ADMIN
-    const isEmployee = currentUser?.companyId === company.id
+    const isEmployee = currentUser.companyId === company.id
 
     if (isOwnerOrAdmin || (isEmployee)) {
       req.isOwnerOrAdmin = isOwnerOrAdmin
@@ -149,9 +149,9 @@ class CompanyController extends BaseController {
   }
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { query: { limit, page, offset }, user } = req
+    const { query: { limit, page, offset, search }, user } = req
 
-    const records = await this.service.getAll(limit, offset, user)
+    const records = await this.service.getAll(limit, offset, user, search)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),

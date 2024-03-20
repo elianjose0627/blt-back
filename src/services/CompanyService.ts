@@ -14,8 +14,20 @@ class CompanyService extends BaseService {
     return 'companies'
   }
 
-  async getAll (limit: number, offset: number, user?: any): Promise<any> {
+  async getAll (limit: number, offset: number, user?: any, search?: string): Promise<any> {
     let records
+    let where
+
+    if (search !== undefined) {
+      where = {
+        [Op.or]: [
+          { email: { [Op.iLike]: `%${search}%` } },
+          { name: { [Op.iLike]: `%${search}%` } },
+          { domain: { [Op.iLike]: `%${search}%` } },
+          { vat: { [Op.iLike]: `%${search}%` } }
+        ]
+      }
+    }
 
     const now = dayjs().utc().toDate()
 
@@ -51,7 +63,8 @@ class CompanyService extends BaseService {
         order: [['createdAt', 'DESC']],
         attributes: { exclude: [] },
         include,
-        distinct: true
+        distinct: true,
+        where
       })
     } else {
       records = await db[this.model].findAndCountAll({
@@ -60,7 +73,8 @@ class CompanyService extends BaseService {
         order: [['createdAt', 'DESC']],
         attributes: { exclude: [] },
         where: {
-          userId: user.id
+          userId: user.id,
+          ...where
         },
         include,
         distinct: true
