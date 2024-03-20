@@ -101,6 +101,43 @@ describe('Company actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'companies')
       expect(res.body.companies).to.be.an('array')
     })
+    it('Should return 200 Success when an admin successfully searches for companies.', async () => {
+      await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Test Search Company',
+            email: 'test@searchcompany.com'
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .query({
+          search: 'test@searchcompany.com'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'companies')
+      expect(res.body.companies).to.be.an('array')
+    })
+
+    it('Should return 200 when a non admin tries to search for companies.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .query({
+          search: 'Search'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'companies')
+      expect(res.body.companies).to.be.an('array')
+    })
   })
 
   describe('Create a company', () => {

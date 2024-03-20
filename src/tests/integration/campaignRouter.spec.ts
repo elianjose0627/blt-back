@@ -102,6 +102,45 @@ describe('Campaign actions', () => {
       expect(res.body.campaigns).to.be.an('array')
     })
 
+    it('Should return 200 OK when an admin searches for campaigns', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Search Company',
+            email: 'ivers@kree.kr'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/campaigns')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .query({
+          search: 'onboarding'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaigns')
+      expect(res.body.campaigns).to.be.an('array')
+    })
+
     it('Should return 200 OK when an admin fetches all campaigns of a company', async () => {
       const resCompany = await chai
         .request(app)
