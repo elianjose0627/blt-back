@@ -729,6 +729,7 @@ export interface IPendingOrder {
   paymentTarget: number
   discount: number
   orderStatus: number
+  quantity: number
   createdBy: string
   updatedBy: string
   createdByFullName: string
