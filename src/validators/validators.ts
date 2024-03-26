@@ -550,6 +550,7 @@ const commonPendingOrderSchema = {
   paymentTarget: Joi.number(),
   discount: Joi.number(),
   orderStatus: Joi.number(),
+  quantity: Joi.number().default(1),
   orderLineRequests: Joi.array().items(
     Joi.object({
       itemName: Joi.string(),

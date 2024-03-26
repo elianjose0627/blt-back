@@ -23,6 +23,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     paymentTarget: number
     discount: number
     orderStatus: number
+    quantity: number
     createdBy: string
     updatedBy: string
     createdByFullName: string
@@ -56,6 +57,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly paymentTarget: number
     private readonly discount: number
     private readonly orderStatus: number
+    private readonly quantity: number
     private readonly createdBy: string
     private readonly updatedBy: string
     private readonly createdByFullName: string
@@ -110,6 +112,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
         paymentTarget: this.paymentTarget,
         discount: this.discount,
         orderStatus: this.orderStatus,
+        quantity: this.quantity,
         createdBy: this.createdBy,
         updatedBy: this.updatedBy,
         createdByFullName: this.createdByFullName,
@@ -208,6 +211,11 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     orderStatus: {
       type: DataTypes.NUMBER,
       allowNull: true
+    },
+    quantity: {
+      type: DataTypes.NUMBER,
+      allowNull: false,
+      defaultValue: 1
     },
     createdBy: {
       type: DataTypes.STRING,
