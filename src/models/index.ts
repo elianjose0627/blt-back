@@ -46,6 +46,7 @@ export interface Database {
   CampaignAddress?: any
   MaintenanceMode?: any
   CompanySubscription?: any
+  ProductCategory?: any
   [key: string]: any
 }
 

@@ -333,6 +333,14 @@ export interface IStock {
   updatedAt: Date
 }
 
+export interface IProductCategory {
+  id: string
+  name: string
+  description: Nullable<string>
+  picture: Nullable<MediaData>
+  createdAt: Date
+  updatedAt: Date
+}
 export interface IProduct {
   id: string
   jfsku: string
@@ -347,6 +355,7 @@ export interface IProduct {
   company?: ICompany
   stock?: IStock
   isVisible?: boolean
+  category?: IProductCategory
 }
 
 export interface ICampaignOrderLimit {

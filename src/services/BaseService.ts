@@ -7,7 +7,7 @@ import db from '../models'
 dayjs.extend(utc)
 
 const includeCompany = [
-  'Address', 'CostCenter', 'Product',
+  'Address', 'CostCenter',
   'Order', 'AccessPermission', 'PendingOrder'
 ]
 const withoutUser = [
@@ -15,7 +15,7 @@ const withoutUser = [
   'SecondaryDomain', 'LegalText', 'ShippingMethod',
   'GreetingCard', 'CampaignShippingDestination', 'CampaignOrderLimit',
   'EmailTemplate', 'EmailTemplateType', 'BlockedDomain', 'CampaignAddress',
-  'MaintenanceMode', 'CompanySubscription'
+  'MaintenanceMode', 'CompanySubscription', 'ProductCategory'
 ]
 
 const includeCompanyAndOwner = {
@@ -146,6 +146,18 @@ export const generateInclude = (model: string): any => {
       }
     ])
   }
+  if (model === 'Product') {
+    return ([
+      includeCompanyAndOwner,
+      {
+        model: db.ProductCategory,
+        attributes: {
+          exclude: ['deletedAt']
+        },
+        as: 'category'
+      }
+    ])
+  }
   if (withoutUser.includes(model)) {
     return ([])
   }
@@ -208,6 +220,10 @@ class BaseService {
 
   manyRecords (): string {
     return `${String(this.model.charAt(0).toLowerCase())}${String(this.model.slice(1))}s`
+  }
+
+  recordName (): string {
+    return this.model
   }
 
   async findById (id: string, paranoid = true): Promise<any> {

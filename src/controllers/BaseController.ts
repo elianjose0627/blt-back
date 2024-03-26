@@ -53,7 +53,7 @@ class BaseController {
         statusCode: statusCodes.NOT_FOUND,
         success: false,
         errors: {
-          message: `${String(this.service.model)} not found`
+          message: `${String(this.service.recordName())} not found`
         }
       })
     }

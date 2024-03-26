@@ -497,6 +497,94 @@ describe('Product actions', () => {
       expect(res.body.product.name).to.equal('Soda Water Fresh')
     })
 
+    it('Should return 200 OK when an administrator updates a product by id with a category.', async () => {
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: '1231',
+            merchantSku: '1231',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      const productId = resProduct.body.product.id
+
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'Beverage'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      const res = await chai
+        .request(app)
+        .put(`/api/products/${String(productId)}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Soda Water Fresh',
+            jfsku: '1231',
+            merchantSku: '1231',
+            type: 'generic',
+            productGroup: 'beverage',
+            productCategoryId
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt', 'company', 'category')
+      expect(res.body.product.name).to.equal('Soda Water Fresh')
+    })
+
+    it('Should return 404 Not Found when an administrator updates a product by id with a category that does not exist.', async () => {
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: '1231',
+            merchantSku: '1231',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      const productId = resProduct.body.product.id
+
+      const res = await chai
+        .request(app)
+        .put(`/api/products/${String(productId)}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Soda Water Fresh',
+            jfsku: '1231',
+            merchantSku: '1231',
+            type: 'generic',
+            productGroup: 'beverage',
+            productCategoryId: uuidv1()
+          }
+        })
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Product category not found')
+    })
+
     it('Should return 403 Forbidden when an non-employee, non-admin, non-owner tries to update a product by id.', async () => {
       const resProduct = await chai
         .request(app)

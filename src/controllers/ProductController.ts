@@ -1,6 +1,7 @@
 import BaseController from './BaseController'
 import ProductService from '../services/ProductService'
 import CompanyService from '../services/CompanyService'
+import ProductCategoryService from '../services/ProductCategoryService'
 import type { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
@@ -8,6 +9,7 @@ import * as userRoles from '../utils/userRoles'
 
 const productService = new ProductService('Product')
 const companyService = new CompanyService('Company')
+const productCategoryService = new ProductCategoryService('ProductCategory')
 
 class ProductController extends BaseController {
   async checkRecord (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
@@ -42,6 +44,28 @@ class ProductController extends BaseController {
         success: false,
         errors: {
           message: 'Only the owner, admin or employee can perform this action'
+        }
+      })
+    }
+  }
+
+  async checkProductCategory (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
+    const { body: { product: { productCategoryId } } } = req
+
+    if (productCategoryId === null) {
+      return next()
+    }
+
+    const productCategory = await productCategoryService.findById(productCategoryId)
+
+    if (productCategory !== null) {
+      return next()
+    } else {
+      return res.status(statusCodes.NOT_FOUND).send({
+        statusCode: statusCodes.NOT_FOUND,
+        success: false,
+        errors: {
+          message: 'Product category not found'
         }
       })
     }

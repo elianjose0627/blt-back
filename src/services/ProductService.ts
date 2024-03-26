@@ -53,7 +53,15 @@ class ProductService extends BaseService {
       isVisible: true
     }
     const attributes: any = { exclude: [] }
-    const include: any[] = []
+    const include: any[] = [
+      {
+        model: db.ProductCategory,
+        attributes: {
+          exclude: ['deletedAt']
+        },
+        as: 'category'
+      }
+    ]
 
     if (search !== '') {
       where[Op.and] = [
@@ -90,6 +98,13 @@ class ProductService extends BaseService {
         model: db.Company,
         attributes: ['id', 'name', 'suffix', 'email', 'phone', 'vat', 'domain'],
         as: 'company'
+      },
+      {
+        model: db.ProductCategory,
+        attributes: {
+          exclude: ['deletedAt']
+        },
+        as: 'category'
       }
     ]
 
