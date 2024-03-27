@@ -32,6 +32,29 @@ class ProductCategoryService extends BaseService {
 
     return { response: response.toJSONFor(), status: 201 }
   }
+
+  async getAll (limit: number, offset: number): Promise<any> {
+    const records = await db[this.model].findAndCountAll({
+      limit,
+      offset,
+      include: [
+        {
+          model: db.ProductCategoryTag,
+          attributes: {
+            exclude: ['deletedAt', 'productCategoryId']
+          },
+          as: 'productCategoryTags'
+        }
+      ],
+      order: [['createdAt', 'DESC']],
+      attributes: { exclude: [] }
+    })
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
+  }
 }
 
 export default ProductCategoryService

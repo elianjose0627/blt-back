@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import ProductCategoryController from '../controllers/ProductCategoryController'
@@ -7,8 +7,9 @@ import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
+import ProductCategoryTagController from '../controllers/ProductCategoryTagController'
 
-const productCategoryRoutes = (): any => {
+const productCategoryRoutes = (): Router => {
   const productCategoryRouter = express.Router()
 
   productCategoryRouter.use('/product-categories', checkAuth, checkUserIsVerifiedStatus, ProductCategoryController.setModule)
@@ -28,6 +29,10 @@ const productCategoryRoutes = (): any => {
       [Segments.BODY]: validator.validateProductCategory
     }), asyncHandler(ProductCategoryController.update))
     .delete(asyncHandler(checkAdmin), asyncHandler(ProductCategoryController.delete))
+  productCategoryRouter.route('/product-categories/:id/tags')
+    .post(asyncHandler(checkAdmin), celebrate({
+      [Segments.BODY]: validator.validateProductCategoryTag
+    }), asyncHandler(ProductCategoryTagController.insert))
   return productCategoryRouter
 }
 

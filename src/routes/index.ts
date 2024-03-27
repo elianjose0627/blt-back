@@ -30,6 +30,7 @@ import emailTempleTypeRouter from './emailTemplateTypeRouter'
 import campaignAddressRouter from './campaignAddressRouter'
 import maintenanceModeRouter from './maintenanceRouter'
 import productCategoryRouter from './productCategoryRouter'
+import productCategoryTagRouter from './productCategoryTagRouter'
 
 const routers = {
   authRouter,
@@ -63,7 +64,8 @@ const routers = {
   emailTempleTypeRouter,
   campaignAddressRouter,
   maintenanceModeRouter,
-  productCategoryRouter
+  productCategoryRouter,
+  productCategoryTagRouter
 }
 
 export default routers

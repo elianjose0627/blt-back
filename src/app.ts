@@ -68,6 +68,7 @@ app.use(apiPrefix, routers.emailTempleTypeRouter())
 app.use(apiPrefix, routers.campaignAddressRouter())
 app.use(apiPrefix, routers.maintenanceModeRouter())
 app.use(apiPrefix, routers.productCategoryRouter())
+app.use(apiPrefix, routers.productCategoryTagRouter())
 
 // Add validation middleware
 app.use(joiErrors)

@@ -808,6 +808,12 @@ const validateProductCategory = Joi.object({
   }).required()
 })
 
+const validateProductCategoryTag = Joi.object({
+  productCategoryTag: Joi.object({
+    name: Joi.string().lowercase().required()
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -869,5 +875,6 @@ export default {
   validateCompanyTheme,
   validateCompanySubscription,
   validateCompanyLogo,
-  validateProductCategory
+  validateProductCategory,
+  validateProductCategoryTag
 }

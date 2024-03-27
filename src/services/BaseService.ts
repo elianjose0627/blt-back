@@ -14,8 +14,9 @@ const withoutUser = [
   'BundleItem', 'Salutation', 'Picture',
   'SecondaryDomain', 'LegalText', 'ShippingMethod',
   'GreetingCard', 'CampaignShippingDestination', 'CampaignOrderLimit',
-  'EmailTemplate', 'EmailTemplateType', 'BlockedDomain', 'CampaignAddress',
-  'MaintenanceMode', 'CompanySubscription', 'ProductCategory'
+  'EmailTemplate', 'EmailTemplateType', 'BlockedDomain',
+  'CampaignAddress', 'MaintenanceMode', 'CompanySubscription',
+  'ProductCategory', 'ProductCategoryTag'
 ]
 
 const includeCompanyAndOwner = {
@@ -155,6 +156,17 @@ export const generateInclude = (model: string): any => {
           exclude: ['deletedAt']
         },
         as: 'category'
+      }
+    ])
+  }
+  if (model === 'ProductCategory') {
+    return ([
+      {
+        model: db.ProductCategoryTag,
+        attributes: {
+          exclude: ['deletedAt', 'productCategoryId']
+        },
+        as: 'productCategoryTags'
       }
     ])
   }

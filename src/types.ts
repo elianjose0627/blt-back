@@ -333,6 +333,13 @@ export interface IStock {
   updatedAt: Date
 }
 
+export interface IProductCategoryTag {
+  id: string
+  name: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface IProductCategory {
   id: string
   name: string
@@ -340,6 +347,7 @@ export interface IProductCategory {
   picture: Nullable<MediaData>
   createdAt: Date
   updatedAt: Date
+  productCategoryTags?: IProductCategoryTag[]
 }
 export interface IProduct {
   id: string

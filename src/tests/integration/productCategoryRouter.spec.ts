@@ -45,6 +45,16 @@ describe('Product Category actions', () => {
 
   describe('Get all product categories', () => {
     it('Should return 200 Success when an admin successfully retrieves all product categories.', async () => {
+      await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'kitchenware'
+          }
+        })
+
       const res = await chai
         .request(app)
         .get('/api/product-categories')
@@ -292,6 +302,76 @@ describe('Product Category actions', () => {
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('Only an admin can perform this action')
+    })
+  })
+
+  describe('Product Category Tag actions', () => {
+    it('Should return 201 when an admin adds a tag to a product category.', async () => {
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'Technology'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      const res = await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'laptop'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCategoryTag')
+      expect(res.body.productCategoryTag).to.be.an('object')
+      expect(res.body.productCategoryTag).to.include.keys('id', 'name', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 200 when an admin adds a tag twice to a product category.', async () => {
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'Perfume'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'givenchy'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'givenchy'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCategoryTag')
+      expect(res.body.productCategoryTag).to.be.an('object')
+      expect(res.body.productCategoryTag).to.include.keys('id', 'name', 'createdAt', 'updatedAt')
     })
   })
 })

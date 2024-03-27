@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { IProductCategory, MediaData, Nullable } from '../types'
+import type { IProductCategory, IProductCategoryTag, MediaData, Nullable } from '../types'
 
 const ProductCategoryModel = (sequelize: any, DataTypes: any): any => {
   interface ProductAttributes {
@@ -16,9 +16,14 @@ const ProductCategoryModel = (sequelize: any, DataTypes: any): any => {
     private readonly picture: Nullable<MediaData>
     private readonly createdAt: Date
     private readonly updatedAt: Date
+    private readonly productCategoryTags: IProductCategoryTag[]
 
     static associate (models: any): any {
-
+      ProductCategory.hasMany(models.ProductCategoryTag, {
+        foreignKey: 'productCategoryId',
+        as: 'productCategoryTags',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): IProductCategory {
@@ -28,7 +33,8 @@ const ProductCategoryModel = (sequelize: any, DataTypes: any): any => {
         description: this.description,
         picture: this.picture,
         createdAt: this.createdAt,
-        updatedAt: this.updatedAt
+        updatedAt: this.updatedAt,
+        productCategoryTags: this.productCategoryTags
       }
     }
   };

@@ -47,6 +47,7 @@ export interface Database {
   MaintenanceMode?: any
   CompanySubscription?: any
   ProductCategory?: any
+  ProductCategoryTag?: any
   [key: string]: any
 }
 
