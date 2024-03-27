@@ -340,6 +340,13 @@ export interface IProductCategoryTag {
   updatedAt: Date
 }
 
+export interface IProductTag {
+  id: string
+  productCategoryTag: IProductCategoryTag
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface IProductCategory {
   id: string
   name: string
@@ -363,7 +370,8 @@ export interface IProduct {
   company?: ICompany
   stock?: IStock
   isVisible?: boolean
-  category?: IProductCategory
+  productCategory?: IProductCategory
+  productTags?: IProductCategoryTag[]
 }
 
 export interface ICampaignOrderLimit {

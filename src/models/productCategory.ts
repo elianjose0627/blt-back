@@ -2,14 +2,14 @@ import { Model } from 'sequelize'
 import type { IProductCategory, IProductCategoryTag, MediaData, Nullable } from '../types'
 
 const ProductCategoryModel = (sequelize: any, DataTypes: any): any => {
-  interface ProductAttributes {
+  interface ProductCategoryAttributes {
     id: string
     name: string
     description: Nullable<string>
     picture: Nullable<MediaData>
   }
 
-  class ProductCategory extends Model<ProductAttributes> {
+  class ProductCategory extends Model<ProductCategoryAttributes> {
     private readonly id: string
     private readonly name: string
     private readonly description: Nullable<string>

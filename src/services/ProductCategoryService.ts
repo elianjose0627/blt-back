@@ -47,7 +47,8 @@ class ProductCategoryService extends BaseService {
         }
       ],
       order: [['createdAt', 'DESC']],
-      attributes: { exclude: [] }
+      attributes: { exclude: [] },
+      distinct: true
     })
 
     return {

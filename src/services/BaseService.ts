@@ -16,7 +16,7 @@ const withoutUser = [
   'GreetingCard', 'CampaignShippingDestination', 'CampaignOrderLimit',
   'EmailTemplate', 'EmailTemplateType', 'BlockedDomain',
   'CampaignAddress', 'MaintenanceMode', 'CompanySubscription',
-  'ProductCategory', 'ProductCategoryTag'
+  'ProductCategory', 'ProductCategoryTag', 'ProductTag'
 ]
 
 const includeCompanyAndOwner = {
@@ -155,7 +155,23 @@ export const generateInclude = (model: string): any => {
         attributes: {
           exclude: ['deletedAt']
         },
-        as: 'category'
+        as: 'productCategory'
+      },
+      {
+        model: db.ProductTag,
+        include: [
+          {
+            model: db.ProductCategoryTag,
+            attributes: {
+              exclude: ['deletedAt', 'productCategoryId']
+            },
+            as: 'productCategoryTag'
+          }
+        ],
+        attributes: {
+          exclude: ['deletedAt', 'productId', 'productCategoryTagId']
+        },
+        as: 'productTags'
       }
     ])
   }

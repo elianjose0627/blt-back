@@ -48,6 +48,7 @@ export interface Database {
   CompanySubscription?: any
   ProductCategory?: any
   ProductCategoryTag?: any
+  ProductTag?: any
   [key: string]: any
 }
 

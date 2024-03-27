@@ -8,6 +8,7 @@ import paginate from '../middlewares/pagination'
 import checkAdmin from '../middlewares/checkAdmin'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import checkPermissions from '../middlewares/checkPermissions'
+import ProductTagController from '../controllers/ProductTagController'
 
 const ProductRoutes = (): Router => {
   const productRouter = express.Router()
@@ -49,6 +50,10 @@ const ProductRoutes = (): Router => {
     .patch(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateProductCompany
     }, { abortEarly: false }), asyncHandler(ProductController.updateProductCompany))
+  productRouter.route('/products/:id/tags')
+    .post(asyncHandler(checkAdmin), celebrate({
+      [Segments.BODY]: validator.validateProductTag
+    }, { abortEarly: false }), asyncHandler(ProductTagController.insert))
   return productRouter
 }
 
