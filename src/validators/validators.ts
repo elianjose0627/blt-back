@@ -415,7 +415,8 @@ const validateProduct = Joi.object({
       amount: Joi.number(),
       currency: Joi.string().required().valid(...currencies.currencies),
       discount: Joi.number()
-    })
+    }),
+    productCategoryId: Joi.string().uuid().allow(null).default(null)
   }).required()
 }).required()
 
@@ -432,7 +433,8 @@ const validateProductAdmin = Joi.object({
       amount: Joi.number(),
       currency: Joi.string().required().valid(...currencies.currencies),
       discount: Joi.number()
-    })
+    }),
+    productCategoryId: Joi.string().uuid().allow(null).default(null)
   }).required()
 }).required()
 
@@ -795,6 +797,29 @@ const validateCompanySubscription = Joi.object({
   }).required()
 })
 
+const validateProductCategory = Joi.object({
+  productCategory: Joi.object({
+    name: Joi.string().lowercase().required(),
+    description: Joi.string().max(256),
+    picture: Joi.object({
+      url: Joi.string().uri().required(),
+      filename: Joi.string().required()
+    }).allow(null)
+  }).required()
+})
+
+const validateProductCategoryTag = Joi.object({
+  productCategoryTag: Joi.object({
+    name: Joi.string().lowercase().required()
+  }).required()
+})
+
+const validateProductTag = Joi.object({
+  productTag: Joi.object({
+    productCategoryTagIds: Joi.array().items(Joi.string().uuid()).required()
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -855,5 +880,8 @@ export default {
   validateMaintenanceMode,
   validateCompanyTheme,
   validateCompanySubscription,
-  validateCompanyLogo
+  validateCompanyLogo,
+  validateProductCategory,
+  validateProductCategoryTag,
+  validateProductTag
 }

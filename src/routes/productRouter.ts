@@ -8,6 +8,7 @@ import paginate from '../middlewares/pagination'
 import checkAdmin from '../middlewares/checkAdmin'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import checkPermissions from '../middlewares/checkPermissions'
+import ProductTagController from '../controllers/ProductTagController'
 
 const ProductRoutes = (): Router => {
   const productRouter = express.Router()
@@ -16,7 +17,7 @@ const ProductRoutes = (): Router => {
   productRouter.route('/products')
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateProductAdmin
-    }), asyncHandler(ProductController.insert))
+    }), asyncHandler(ProductController.checkProductCategory), asyncHandler(ProductController.insert))
     .get(asyncHandler(checkAdmin), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(ProductController.getAll))
@@ -27,11 +28,11 @@ const ProductRoutes = (): Router => {
     .get(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions), asyncHandler(ProductController.get))
     .put(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
-      asyncHandler(checkPermissions), celebrate({
+      asyncHandler(checkAdmin), celebrate({
         [Segments.BODY]: validator.validateProduct
-      }), asyncHandler(ProductController.update))
+      }), asyncHandler(ProductController.checkProductCategory), asyncHandler(ProductController.update))
     .delete(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
-      asyncHandler(checkPermissions), asyncHandler(ProductController.delete))
+      asyncHandler(checkAdmin), asyncHandler(ProductController.delete))
   productRouter.route('/products/:id/stocks')
     .get(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions), asyncHandler(ProductController.getProductStock))
@@ -49,6 +50,10 @@ const ProductRoutes = (): Router => {
     .patch(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateProductCompany
     }, { abortEarly: false }), asyncHandler(ProductController.updateProductCompany))
+  productRouter.route('/products/:id/tags')
+    .post(asyncHandler(checkAdmin), celebrate({
+      [Segments.BODY]: validator.validateProductTag
+    }, { abortEarly: false }), asyncHandler(ProductTagController.insert))
   return productRouter
 }
 
