@@ -22,23 +22,19 @@ class ProductTagService extends BaseService {
       paranoid: false // To get soft deleted record
     })
 
+    const newProductCategoryTags = productCategoryTags.filter((tag: any) => foundProductTagsResponse.rows.map((row: any) => row.productCategoryTagId).includes(tag.id) === false)
+    const existingProductCategoryTags = productCategoryTags.filter((tag: any) => foundProductTagsResponse.rows.map((row: any) => row.productCategoryTagId).includes(tag.id))
     const productTagsToDelete = product.productTags.filter((productTag: any) => productCategoryTags.map((tag: any) => tag.id).includes(productTag.productCategoryTag.id) === false)
 
     if (productTagsToDelete.length > 0) {
-      const deletedResponse = await db[this.model].destroy({
+      await db[this.model].destroy({
         where: {
           id: {
             [Op.in]: productTagsToDelete.map((tag: any) => tag.id)
           }
         }
       })
-
-      return { response: deletedResponse, status: 204 }
     }
-
-    // Check if any new tag exists
-    const newProductCategoryTags = productCategoryTags.filter((tag: any) => foundProductTagsResponse.rows.map((row: any) => row.productCategoryTagId).includes(tag.id) === false)
-    const existingProductCategoryTags = productCategoryTags.filter((tag: any) => foundProductTagsResponse.rows.map((row: any) => row.productCategoryTagId).includes(tag.id))
 
     if (newProductCategoryTags.length > 0) {
       const bulkInsertData = newProductCategoryTags.map((newProductCategoryTag: any) => ({
@@ -60,6 +56,10 @@ class ProductTagService extends BaseService {
         returning: true
       })
       return { response: updatedResponse.map((response: any) => response.toJSONFor()), status: 200 }
+    }
+
+    if (productCategoryTags.length === 0) {
+      return { response: [], status: 204 }
     }
 
     return { response: response.map((response: any) => response.toJSONFor()), status: 201 }

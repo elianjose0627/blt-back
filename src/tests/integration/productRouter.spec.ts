@@ -1110,7 +1110,7 @@ describe('Product actions', () => {
       expect(res.body.errors.message).to.be.equal('Product Tag not found')
     })
 
-    it('Should return 204 No Content when an admin adds a tag to a product', async () => {
+    it('Should return 204 No Content when an admin removes tags from a product', async () => {
       const resProductCategory = await chai
         .request(app)
         .post('/api/product-categories')
@@ -1173,6 +1173,97 @@ describe('Product actions', () => {
         })
 
       expect(res).to.have.status(204)
+    })
+
+    it('Should return 200 OK when an admin removes some tags from a product but adds a new one', async () => {
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'agriculture'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      const resProductCategoryTag = await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'tractors'
+          }
+        })
+
+      const productCategoryTagId = resProductCategoryTag.body.productCategoryTag.id
+
+      const resProductCategoryTagTwo = await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'fertilizers'
+          }
+        })
+
+      const productCategoryTagIdTwo = resProductCategoryTagTwo.body.productCategoryTag.id
+
+      const resProductCategoryTagThree = await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'fertilizers'
+          }
+        })
+
+      const productCategoryTagIdThree = resProductCategoryTagThree.body.productCategoryTag.id
+
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Mercedes truck',
+            jfsku: 'J12312',
+            merchantSku: '12312',
+            type: 'generic',
+            productGroup: 'machinery',
+            productCategoryId
+          }
+        })
+
+      const productId = resProduct.body.product.id
+
+      await chai
+        .request(app)
+        .post(`/api/products/${String(productId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productTag: {
+            productCategoryTagIds: [productCategoryTagId, productCategoryTagIdTwo]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/products/${String(productId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productTag: {
+            productCategoryTagIds: [productCategoryTagIdThree]
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productTags')
+      expect(res.body.productTags).to.be.an('array')
     })
   })
 })
