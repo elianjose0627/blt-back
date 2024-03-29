@@ -61,7 +61,7 @@ describe('Auth Actions', () => {
     expect(res.body).to.include.keys('statusCode', 'success', 'token', 'user')
   })
 
-  it('should return 201 Created on successful sign up using company id link', async () => {
+  it('should return 201 Created on successful sign up using company invite link', async () => {
     const resCompany = await chai
       .request(app)
       .post('/api/companies')
@@ -96,7 +96,7 @@ describe('Auth Actions', () => {
     expect(res.body.user.role).to.equal(userRoles.EMPLOYEE)
   })
 
-  it('should return 201 Created on successful sign up using company id link for company with inviteToken', async () => {
+  it('should return 201 Created on successful sign up using company invite link for company with inviteToken', async () => {
     const resCompany = await chai
       .request(app)
       .post('/api/companies')
@@ -125,6 +125,41 @@ describe('Auth Actions', () => {
         companyId: resInviteLink.body.company.inviteLink.split('=')[1]
       })
       .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoontwo@guardiansofthegalaxy.com', phone: '254720123456', password: 'friend' } })
+
+    expect(res).to.have.status(201)
+    expect(res.body).to.include.keys('statusCode', 'success', 'user')
+    expect(res.body.success).to.equal(true)
+    expect(res.body.user.role).to.equal(userRoles.EMPLOYEE)
+  })
+
+  it('should return 201 Created on successful sign up using company short invite link', async () => {
+    const resCompany = await chai
+      .request(app)
+      .post('/api/companies')
+      .set('Authorization', `Bearer ${tokenAdmin}`)
+      .send({
+        company: {
+          name: 'Test Company Invited Short Token',
+          email: 'test@companyinvitedshorttoken.com'
+        }
+      })
+
+    const companyId = resCompany.body.company.id
+
+    await verifyCompanyDomain(companyId)
+
+    const resInviteLink = await chai
+      .request(app)
+      .get(`/api/companies/${String(companyId)}/invite-link`)
+      .set('Authorization', `Bearer ${tokenAdmin}`)
+
+    const res = await chai
+      .request(app)
+      .post('/auth/signup')
+      .query({
+        companyId: resInviteLink.body.company.shortInviteLink.split('=')[1]
+      })
+      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoontwotwo@guardiansofthegalaxy.com', phone: '254720123456', password: 'friend' } })
 
     expect(res).to.have.status(201)
     expect(res.body).to.include.keys('statusCode', 'success', 'user')
