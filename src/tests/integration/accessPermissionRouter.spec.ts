@@ -11,6 +11,8 @@ import {
   createCampaignManager
 } from '../utils'
 import * as appModules from '../../utils/appModules'
+import * as userRoles from '../../utils/userRoles'
+import { READ, READWRITE } from '../../utils/permissions'
 
 const { expect } = chai
 
@@ -115,10 +117,33 @@ describe('Access Permissions actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           accessPermission: {
-            name: 'Campaign Manager Permission',
+            name: 'Campaign Manager Read Campaigns',
             module: 'campaigns',
             role: 'CampaignManager',
             permission: 'read',
+            companyId
+          }
+        })
+
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('A validation error has occured')
+    })
+
+    it('Should return 422 Unprocessable Entity when an admin tries to create a readwrite access permission for a readonly module.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+      const res = await chai
+        .request(app)
+        .post('/api/access-permissions')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          accessPermission: {
+            name: 'Campaign Manager Read Write Products',
+            module: appModules.PRODUCTS,
+            role: userRoles.CAMPAIGNMANAGER,
+            permission: READWRITE,
             companyId
           }
         })
@@ -466,9 +491,9 @@ describe('Access Permissions actions', () => {
         .send({
           accessPermission: {
             name: 'Cost Center Permission',
-            module: 'costCenters',
-            role: 'CampaignManager',
-            permission: 'readwrite'
+            module: appModules.COSTCENTERS,
+            role: userRoles.CAMPAIGNMANAGER,
+            permission: READWRITE
           }
         })
 
@@ -482,8 +507,8 @@ describe('Access Permissions actions', () => {
           accessPermission: {
             name: 'Access Permission',
             module: appModules.ACCESSPERMISSIONS,
-            role: 'CampaignManager',
-            permission: 'readwrite'
+            role: userRoles.CAMPAIGNMANAGER,
+            permission: READWRITE
           }
         })
 
@@ -493,10 +518,10 @@ describe('Access Permissions actions', () => {
         .set('Authorization', `Bearer ${tokenCampaignManager}`)
         .send({
           accessPermission: {
-            name: 'Access Permission',
-            module: appModules.ACCESSPERMISSIONS,
-            role: 'CampaignManager',
-            permission: 'read'
+            name: 'Cost Center Permission',
+            module: appModules.COSTCENTERS,
+            role: userRoles.CAMPAIGNMANAGER,
+            permission: READ
           }
         })
 
