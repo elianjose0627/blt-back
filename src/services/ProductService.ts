@@ -97,7 +97,8 @@ class ProductService extends BaseService {
       where,
       limit,
       offset,
-      order
+      order,
+      distinct: true
     })
 
     return {
@@ -154,7 +155,8 @@ class ProductService extends BaseService {
       where,
       limit,
       offset,
-      order
+      order,
+      distinct: true
     })
 
     return {
