@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import shortUUID from 'short-uuid'
 
 const algorithm = 'aes-256-cbc'
 const secretKey = String(process.env.COMPANY_INVITE_SECRET_KEY)
@@ -15,6 +16,14 @@ export const decodeString = (text: string, encoding: Encoding): string => {
 
 const generateIV = (value: string): string => {
   return crypto.createHash('sha256').update(value).digest('hex').slice(0, 16)
+}
+
+export const shortenUUID = (uuid: string): string => {
+  return shortUUID().fromUUID(uuid)
+}
+
+export const expandShortUUID = (shortenedUUID: string): string => {
+  return shortUUID().toUUID(shortenedUUID)
 }
 
 export const encryptUUID = (uuid: string, outputEncoding: Encoding, initializationVectorValue: string): string => {
