@@ -53,7 +53,31 @@ class ProductService extends BaseService {
       isVisible: true
     }
     const attributes: any = { exclude: [] }
-    const include: any[] = []
+    const include: any[] = [
+      {
+        model: db.ProductCategory,
+        attributes: {
+          exclude: ['deletedAt']
+        },
+        as: 'productCategory'
+      },
+      {
+        model: db.ProductTag,
+        include: [
+          {
+            model: db.ProductCategoryTag,
+            attributes: {
+              exclude: ['deletedAt', 'productCategoryId']
+            },
+            as: 'productCategoryTag'
+          }
+        ],
+        attributes: {
+          exclude: ['deletedAt', 'productId', 'productCategoryTagId']
+        },
+        as: 'productTags'
+      }
+    ]
 
     if (search !== '') {
       where[Op.and] = [
@@ -73,7 +97,8 @@ class ProductService extends BaseService {
       where,
       limit,
       offset,
-      order
+      order,
+      distinct: true
     })
 
     return {
@@ -90,6 +115,29 @@ class ProductService extends BaseService {
         model: db.Company,
         attributes: ['id', 'name', 'suffix', 'email', 'phone', 'vat', 'domain'],
         as: 'company'
+      },
+      {
+        model: db.ProductCategory,
+        attributes: {
+          exclude: ['deletedAt']
+        },
+        as: 'productCategory'
+      },
+      {
+        model: db.ProductTag,
+        include: [
+          {
+            model: db.ProductCategoryTag,
+            attributes: {
+              exclude: ['deletedAt', 'productCategoryId']
+            },
+            as: 'productCategoryTag'
+          }
+        ],
+        attributes: {
+          exclude: ['deletedAt', 'productId', 'productCategoryTagId']
+        },
+        as: 'productTags'
       }
     ]
 
@@ -107,7 +155,8 @@ class ProductService extends BaseService {
       where,
       limit,
       offset,
-      order
+      order,
+      distinct: true
     })
 
     return {

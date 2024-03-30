@@ -38,15 +38,15 @@ export const MODULES_ARRAY = [
   'companySubscriptions'
 ]
 
-export const allowedCompanyModules: Array<{ name: string, value: Module }> = [
-  { name: 'Access Permissions', value: ACCESSPERMISSIONS },
-  { name: 'Companies', value: COMPANIES },
-  { name: 'Campaigns', value: CAMPAIGNS },
-  { name: 'Recipients', value: RECIPIENTS },
-  { name: 'Bundles', value: BUNDLES },
-  { name: 'Cost Centers', value: COSTCENTERS },
-  { name: 'Inventory Products', value: PRODUCTS },
-  { name: 'Addresses', value: ADDRESSES },
-  { name: 'Orders', value: ORDERS },
-  { name: 'Company Subscriptions', value: COMPANYSUBSCRIPTIONS }
+export const allowedCompanyModules: Array<{ name: string, value: Module, readonly: boolean }> = [
+  { name: 'Access Permissions', value: ACCESSPERMISSIONS, readonly: false },
+  { name: 'Addresses', value: ADDRESSES, readonly: false },
+  { name: 'Bundles', value: BUNDLES, readonly: true },
+  { name: 'Campaigns', value: CAMPAIGNS, readonly: false },
+  { name: 'Companies', value: COMPANIES, readonly: false },
+  { name: 'Company Subscriptions', value: COMPANYSUBSCRIPTIONS, readonly: false },
+  { name: 'Cost Centers', value: COSTCENTERS, readonly: false },
+  { name: 'Inventory Products', value: PRODUCTS, readonly: true },
+  { name: 'Orders', value: ORDERS, readonly: false },
+  { name: 'Recipients', value: RECIPIENTS, readonly: false }
 ]

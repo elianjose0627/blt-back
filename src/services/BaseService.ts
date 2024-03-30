@@ -7,15 +7,16 @@ import db from '../models'
 dayjs.extend(utc)
 
 const includeCompany = [
-  'Address', 'CostCenter', 'Product',
+  'Address', 'CostCenter',
   'Order', 'AccessPermission', 'PendingOrder'
 ]
 const withoutUser = [
   'BundleItem', 'Salutation', 'Picture',
   'SecondaryDomain', 'LegalText', 'ShippingMethod',
   'GreetingCard', 'CampaignShippingDestination', 'CampaignOrderLimit',
-  'EmailTemplate', 'EmailTemplateType', 'BlockedDomain', 'CampaignAddress',
-  'MaintenanceMode', 'CompanySubscription'
+  'EmailTemplate', 'EmailTemplateType', 'BlockedDomain',
+  'CampaignAddress', 'MaintenanceMode', 'CompanySubscription',
+  'ProductCategory', 'ProductCategoryTag', 'ProductTag'
 ]
 
 const includeCompanyAndOwner = {
@@ -146,6 +147,45 @@ export const generateInclude = (model: string): any => {
       }
     ])
   }
+  if (model === 'Product') {
+    return ([
+      includeCompanyAndOwner,
+      {
+        model: db.ProductCategory,
+        attributes: {
+          exclude: ['deletedAt']
+        },
+        as: 'productCategory'
+      },
+      {
+        model: db.ProductTag,
+        include: [
+          {
+            model: db.ProductCategoryTag,
+            attributes: {
+              exclude: ['deletedAt', 'productCategoryId']
+            },
+            as: 'productCategoryTag'
+          }
+        ],
+        attributes: {
+          exclude: ['deletedAt', 'productId', 'productCategoryTagId']
+        },
+        as: 'productTags'
+      }
+    ])
+  }
+  if (model === 'ProductCategory') {
+    return ([
+      {
+        model: db.ProductCategoryTag,
+        attributes: {
+          exclude: ['deletedAt', 'productCategoryId']
+        },
+        as: 'productCategoryTags'
+      }
+    ])
+  }
   if (withoutUser.includes(model)) {
     return ([])
   }
@@ -208,6 +248,10 @@ class BaseService {
 
   manyRecords (): string {
     return `${String(this.model.charAt(0).toLowerCase())}${String(this.model.slice(1))}s`
+  }
+
+  recordName (): string {
+    return this.model
   }
 
   async findById (id: string, paranoid = true): Promise<any> {

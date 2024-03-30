@@ -333,6 +333,29 @@ export interface IStock {
   updatedAt: Date
 }
 
+export interface IProductCategoryTag {
+  id: string
+  name: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface IProductTag {
+  id: string
+  productCategoryTag: IProductCategoryTag
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface IProductCategory {
+  id: string
+  name: string
+  description: Nullable<string>
+  picture: Nullable<MediaData>
+  createdAt: Date
+  updatedAt: Date
+  productCategoryTags?: IProductCategoryTag[]
+}
 export interface IProduct {
   id: string
   jfsku: string
@@ -347,6 +370,8 @@ export interface IProduct {
   company?: ICompany
   stock?: IStock
   isVisible?: boolean
+  productCategory?: IProductCategory
+  productTags?: IProductCategoryTag[]
 }
 
 export interface ICampaignOrderLimit {
@@ -729,6 +754,7 @@ export interface IPendingOrder {
   paymentTarget: number
   discount: number
   orderStatus: number
+  quantity: number
   createdBy: string
   updatedBy: string
   createdByFullName: string

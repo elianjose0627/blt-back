@@ -11,7 +11,7 @@ import type { CustomNext, CustomRequest, CustomResponse, Nullable, StatusCode } 
 import * as userRoles from '../utils//userRoles'
 import { sendNotifierEmail } from '../utils/sendMail'
 import { io } from '../utils/socket'
-import { decodeString, decryptUUID } from '../utils/encryption'
+import { decodeString, decryptUUID, expandShortUUID } from '../utils/encryption'
 
 dayjs.extend(utc)
 const userService = new UserService('User')
@@ -69,10 +69,12 @@ class UserController extends BaseController {
 
     try {
       if (encodedEncryptedCompanyId !== undefined) {
-        const [encryptedCompanyId, companyId] = decodeString(encodedEncryptedCompanyId, 'hex').split('.')
+        let [encryptedCompanyId, companyId] = decodeString(encodedEncryptedCompanyId, 'hex').split('.')
+        companyId = companyId.length === 36 ? companyId : expandShortUUID(companyId)
         const company = await companyService.findById(companyId)
         const inviteToken = company?.inviteToken
         decryptedCompanyId = decryptUUID(encryptedCompanyId, 'base64', inviteToken ?? companyId)
+        decryptedCompanyId = decryptedCompanyId.length === 36 ? decryptedCompanyId : expandShortUUID(decryptedCompanyId)
       }
     } catch (error) {
       return res.status(statusCodes.UNPROCESSABLE_ENTITY).send({
@@ -573,11 +575,15 @@ class UserController extends BaseController {
     let decryptedCompanyId
 
     try {
-      const [encryptedCompanyId, companyId] = decodeString(encodedEncryptedCompanyId, 'base64').split('.')
+      let [encryptedCompanyId, companyId] = decodeString(encodedEncryptedCompanyId, 'base64').split(/\.{1,3}/)
+
+      companyId = companyId.length === 36 ? companyId : expandShortUUID(companyId)
+
       const company = await companyService.findById(companyId)
       const inviteToken = company?.inviteToken
 
       decryptedCompanyId = decryptUUID(encryptedCompanyId, 'base64', inviteToken ?? companyId)
+      decryptedCompanyId = decryptedCompanyId.length === 36 ? decryptedCompanyId : expandShortUUID(decryptedCompanyId)
     } catch (error: any) {
       return res.status(statusCodes.UNPROCESSABLE_ENTITY).send({
         statusCode: statusCodes.UNPROCESSABLE_ENTITY,
