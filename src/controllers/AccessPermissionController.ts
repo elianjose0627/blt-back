@@ -2,7 +2,7 @@ import { Joi, Segments, celebrate } from 'celebrate'
 import BaseController from './BaseController'
 import AccessPermissionService from '../services/AccessPermissionService'
 import CompanyService from '../services/CompanyService'
-import type { CustomNext, CustomRequest, CustomResponse, IAccessPermission, Role, StatusCode } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse, IAccessPermission, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
@@ -12,28 +12,32 @@ import { allowedCompanyModules } from '../utils/appModules'
 const accessPermissionService = new AccessPermissionService('AccessPermission')
 const companyService = new CompanyService('Company')
 
-const generateAccessPermissionSchema = (accessPermissions: IAccessPermission[], role: Role): any => {
-  const allowedCampaignManagerModules = accessPermissions
-    .filter((accessPermission: IAccessPermission) => accessPermission.role === userRoles.CAMPAIGNMANAGER)
+type CreatedAccessPermission = Pick<IAccessPermission, 'name' | 'module' | 'permission' | 'role'> & {
+  override: boolean
+}
+const generateAccessPermissionSchema = (accessPermissions: IAccessPermission[], createdAccessPermission: CreatedAccessPermission): any => {
+  const defaultRoleModules = accessPermissions
+    .filter((accessPermission: IAccessPermission) => accessPermission.role === createdAccessPermission.role)
     .map((accessPermission: IAccessPermission) => accessPermission.module)
 
   return {
     name: Joi.string().required().max(128),
-    module: Joi.when('role', {
-      is: role,
-      then: Joi.when('override', {
-        is: true,
-        then: Joi.string().required().valid(...allowedCompanyModules.map(allowedCompanyModule => allowedCompanyModule.value)),
-        otherwise: Joi.string().required()
-          .valid(...allowedCompanyModules
-            .filter(module => !allowedCampaignManagerModules.includes(module.value))
-            .map(allowedCompanyModule => allowedCompanyModule.value))
-      })
+    module: Joi.when('override', {
+      is: true,
+      then: Joi.string().required().valid(...allowedCompanyModules.map(allowedCompanyModule => allowedCompanyModule.value)),
+      otherwise: Joi.string().required()
+        .valid(...allowedCompanyModules
+          .filter(companyModule => !defaultRoleModules.includes(companyModule.value))
+          .map(allowedCompanyModule => allowedCompanyModule.value))
     }),
     role: Joi.string()
       .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.CAMPAIGNMANAGER])
       .required(),
-    permission: Joi.string().required().valid(...[permissions.READ, permissions.READWRITE]),
+    permission: Joi.when('module', {
+      is: (allowedCompanyModules.find(allowedCompanyModule => allowedCompanyModule.value === createdAccessPermission.module)?.readonly === true ? createdAccessPermission.module : ''),
+      then: Joi.string().required().valid(...[permissions.READ]),
+      otherwise: Joi.string().required().valid(...[permissions.READ, permissions.READWRITE])
+    }),
     isEnabled: Joi.boolean().default(true),
     override: Joi.boolean().default(false)
   }
@@ -62,9 +66,9 @@ class AccessPermissionController extends BaseController {
   }
 
   checkAllowedModules (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
-    const { accessPermissions = [] } = req
+    const { accessPermissions = [], body: { accessPermission } } = req
 
-    const commonAccessPermissionSchema = generateAccessPermissionSchema(accessPermissions, userRoles.CAMPAIGNMANAGER)
+    const commonAccessPermissionSchema = generateAccessPermissionSchema(accessPermissions, accessPermission)
 
     const validateAccessPermission = Joi.object({
       accessPermission: Joi.object(commonAccessPermissionSchema).required()
@@ -76,9 +80,9 @@ class AccessPermissionController extends BaseController {
   }
 
   checkAllowedModulesAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
-    const { accessPermissions = [] } = req
+    const { accessPermissions = [], body: { accessPermission } } = req
 
-    const commonAccessPermissionSchema = generateAccessPermissionSchema(accessPermissions, userRoles.CAMPAIGNMANAGER)
+    const commonAccessPermissionSchema = generateAccessPermissionSchema(accessPermissions, accessPermission)
 
     const validateAccessPermissionAdmin = Joi.object({
       accessPermission: Joi.object({

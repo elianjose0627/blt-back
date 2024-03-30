@@ -11,7 +11,7 @@ import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
 import AddressService from '../services/AddressService'
 import { sendNotifierEmail } from '../utils/sendMail'
-import { encryptUUID, encodeString } from '../utils/encryption'
+import { encryptUUID, encodeString, shortenUUID } from '../utils/encryption'
 
 dayjs.extend(utc)
 
@@ -529,12 +529,20 @@ class CompanyController extends BaseController {
     const encryptedUUIDWithCompanyIdHex = encodeString(`${encryptedUUID}.${id}`, 'hex')
     const encryptedUUIDWithCompanyIdBase64 = encodeString(`${encryptedUUID}.${id}`, 'base64')
 
+    // Short versions
+    const shortUUID = shortenUUID(id)
+    const shortEncryptedUUID = encryptUUID(shortUUID, 'base64', inviteToken ?? id)
+    const shortEncryptedUUIDWithCompanyIdHex = encodeString(`${shortEncryptedUUID}.${shortUUID}`, 'hex')
+    const shortEncryptedUUIDWithCompanyIdBase64 = encodeString(`${shortEncryptedUUID}...${shortUUID}`, 'base64')
+
     return res.status(statusCodes.OK).send({
       statusCode: statusCodes.OK,
       success: true,
       company: {
         inviteLink: `${String(process.env.APP_URL)}/register?companyId=${encryptedUUIDWithCompanyIdHex}`,
-        inviteCode: encryptedUUIDWithCompanyIdBase64
+        inviteCode: encryptedUUIDWithCompanyIdBase64,
+        shortInviteLink: `${String(process.env.APP_URL)}/register?companyId=${shortEncryptedUUIDWithCompanyIdHex}`,
+        shortInviteCode: shortEncryptedUUIDWithCompanyIdBase64
       }
     })
   }

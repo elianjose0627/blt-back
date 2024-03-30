@@ -8,8 +8,13 @@ const checkPermissions = (req: CustomRequest, res: CustomResponse, next: CustomN
 
   const { role, company } = currentUser
 
+  const allowed = {
+    [permissions.READ]: ['GET'],
+    [permissions.READWRITE]: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
+  }
+
   const allowedCompanyAdminModules = defaultAccessPermissions
-    .filter((defaultAccessPermission: IAccessPermission) => defaultAccessPermission.role === userRoles.COMPANYADMINISTRATOR)
+    .filter((defaultAccessPermission: IAccessPermission) => defaultAccessPermission.role === userRoles.COMPANYADMINISTRATOR && allowed[defaultAccessPermission.permission].includes(method))
     .map((defaultAccessPermission: IAccessPermission) => defaultAccessPermission.module)
 
   if (role === userRoles.ADMIN || isOwnerOrAdmin === true || isOwner === true) {
@@ -37,11 +42,6 @@ const checkPermissions = (req: CustomRequest, res: CustomResponse, next: CustomN
           message: 'You do not have the necessary permissions to perform this action'
         }
       })
-    }
-
-    const allowed = {
-      [permissions.READ]: ['GET'],
-      [permissions.READWRITE]: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
     }
 
     if (

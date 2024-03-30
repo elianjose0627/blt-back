@@ -1043,6 +1043,45 @@ describe('A user', () => {
       expect(res.body.user.role).to.equal(userRoles.EMPLOYEE)
     })
 
+    it('Should return 200 OK when a user joins a company using an invitation code.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      const resCompanyInvite = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      const companyInviteCode = resCompanyInvite.body.company.shortInviteCode
+
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser2024febshort@biglittlethings.de', phone: '254720123456', password: 'testuser' } })
+
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'testuser2024febshort@biglittlethings.de', password: 'testuser' } })
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${String(resUser.body.user.id)}/company-invite`)
+        .set('Authorization', `Bearer ${String(resUser.body.token)}`)
+        .send({
+          user: {
+            companyInviteCode
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.success).to.equal(true)
+      expect(res.body.user.role).to.equal(userRoles.EMPLOYEE)
+    })
+
     it('should return 404 Not Found if a user tries to join using an invite code for a company that does not exist', async () => {
       const uuid = uuidv1()
       const encryptedUUID = encryptUUID(uuid, 'base64', uuid)
