@@ -2,12 +2,11 @@ import { Joi, Segments, celebrate } from 'celebrate'
 import BaseController from './BaseController'
 import AccessPermissionService from '../services/AccessPermissionService'
 import CompanyService from '../services/CompanyService'
-import type { CustomNext, CustomRequest, CustomResponse, IAccessPermission, StatusCode } from '../types'
+import type { AllowedCompanyModule, CustomNext, CustomRequest, CustomResponse, IAccessPermission, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
 import * as permissions from '../utils/permissions'
-import { allowedCompanyModules } from '../utils/appModules'
 
 const accessPermissionService = new AccessPermissionService('AccessPermission')
 const companyService = new CompanyService('Company')
@@ -20,21 +19,25 @@ const generateAccessPermissionSchema = (accessPermissions: IAccessPermission[], 
     .filter((accessPermission: IAccessPermission) => accessPermission.role === createdAccessPermission.role)
     .map((accessPermission: IAccessPermission) => accessPermission.module)
 
+  const allowedCompanyModules: AllowedCompanyModule[] = accessPermissions
+    .filter((accessPermission: IAccessPermission) => accessPermission.role === userRoles.COMPANYADMINISTRATOR)
+    .map(accessPermission => ({ name: accessPermission.module, module: accessPermission.module, permission: accessPermission.permission }))
+
   return {
     name: Joi.string().required().max(128),
     module: Joi.when('override', {
       is: true,
-      then: Joi.string().required().valid(...allowedCompanyModules.map(allowedCompanyModule => allowedCompanyModule.value)),
+      then: Joi.string().required().valid(...allowedCompanyModules.map(allowedCompanyModule => allowedCompanyModule.module)),
       otherwise: Joi.string().required()
         .valid(...allowedCompanyModules
-          .filter(companyModule => !defaultRoleModules.includes(companyModule.value))
-          .map(allowedCompanyModule => allowedCompanyModule.value))
+          .filter(companyModule => !defaultRoleModules.includes(companyModule.module))
+          .map(allowedCompanyModule => allowedCompanyModule.module))
     }),
     role: Joi.string()
       .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.CAMPAIGNMANAGER])
       .required(),
     permission: Joi.when('module', {
-      is: (allowedCompanyModules.find(allowedCompanyModule => allowedCompanyModule.value === createdAccessPermission.module)?.readonly === true ? createdAccessPermission.module : ''),
+      is: (allowedCompanyModules.find(allowedCompanyModule => allowedCompanyModule.module === createdAccessPermission.module)?.permission === permissions.READ ? createdAccessPermission.module : ''),
       then: Joi.string().required().valid(...[permissions.READ]),
       otherwise: Joi.string().required().valid(...[permissions.READ, permissions.READWRITE])
     }),
@@ -49,7 +52,7 @@ class AccessPermissionController extends BaseController {
     const company = accessPermission.company
 
     const isOwnerOrAdmin = currentUser.id === company?.owner.id || currentUser.role === userRoles.ADMIN
-    const isEmployee = currentUser?.companyId === company.id
+    const isEmployee = currentUser?.companyId === company?.id
 
     if (isOwnerOrAdmin || (isEmployee)) {
       req.isOwnerOrAdmin = isOwnerOrAdmin
@@ -139,6 +142,23 @@ class AccessPermissionController extends BaseController {
       pageCount: Math.ceil(records.count / limit),
       perPage: limit,
       page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      [accessPermissionService.manyRecords()]: records.rows
+    })
+  }
+
+  async getDefaultPermissions (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const records = await accessPermissionService.getDefaultPermissions()
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / records.count),
+      perPage: records.count,
+      page: 1
     }
 
     return res.status(statusCodes.OK).send({
