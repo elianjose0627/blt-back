@@ -92,6 +92,21 @@ class AccessPermissionService extends BaseService {
       rows: records.rows.map((record: any) => record.toJSONFor())
     }
   }
+
+  async getDefaultPermissions (): Promise<any> {
+    const records = await db[this.model].findAndCountAll({
+      order: [['role', 'ASC'], ['createdAt', 'DESC']],
+      attributes: { exclude: [] },
+      where: {
+        companyId: null
+      }
+    })
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
+  }
 }
 
 export default AccessPermissionService
