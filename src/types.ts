@@ -113,6 +113,8 @@ typeof appModules.SHIPMENTS | typeof appModules.USERS |
 typeof appModules.COMPANYSUBSCRIPTIONS
 
 export type Permission = typeof permissions.READ | typeof permissions.READWRITE
+
+export interface AllowedCompanyModule { name: string, module: Module, permission: Permission }
 export interface IPrivacyRule {
   id: string
   module: Module

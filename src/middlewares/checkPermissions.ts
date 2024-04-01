@@ -64,6 +64,13 @@ const checkPermissions = (req: CustomRequest, res: CustomResponse, next: CustomN
       })
     }
   }
+  return res.status(statusCodes.FORBIDDEN).send({
+    statusCode: statusCodes.FORBIDDEN,
+    success: false,
+    errors: {
+      message: 'You do not have the necessary permissions to perform this action'
+    }
+  })
 }
 
 export default checkPermissions
