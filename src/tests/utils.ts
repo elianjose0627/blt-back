@@ -1202,3 +1202,17 @@ export const setSubscriptionToPaid = async (subscriptionId: string): Promise<voi
     await subscription.update({ paymentStatus: 'paid' })
   }
 }
+
+export const updateCampaignUsedQuota = async (campaignId: string, usedQuota: number): Promise<any> => {
+  const campaign = await db.Campaign.findOne({
+    where: {
+      id: campaignId
+    }
+  })
+
+  if (campaign !== null) {
+    await campaign.update({
+      usedQuota
+    })
+  }
+}
