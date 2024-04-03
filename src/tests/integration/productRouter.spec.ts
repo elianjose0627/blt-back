@@ -817,6 +817,38 @@ describe('Product actions', () => {
   })
 
   describe('Product Tags', () => {
+    it('Should return 400 Bad Request when an admin tries to add a tag to a product without a category', async () => {
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Sparkling Water',
+            jfsku: 'J13371',
+            merchantSku: '10371',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      const productId = resProduct.body.product.id
+
+      const res = await chai
+        .request(app)
+        .post(`/api/products/${String(productId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productTag: {
+            productCategoryTagIds: [uuidv1()]
+          }
+        })
+
+      expect(res).to.have.status(400)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Assign a category to this product in order to add tags')
+    })
+
     it('Should return 201 Created when an admin adds a tag to a product', async () => {
       const resProductCategory = await chai
         .request(app)
