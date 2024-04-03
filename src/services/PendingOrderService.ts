@@ -53,11 +53,18 @@ class PendingOrderService extends BaseService {
 
     const response = await db.PendingOrder.bulkCreate(bulkInsertData, { returning: true })
 
-    const topicId = 'pending-orders'
+    const pendingOrdersTopicId = 'pending-orders'
     const environment = String(process.env.ENVIRONMENT)
-    const attributes = { environment }
+    const pendingOrdersAttributes = { environment }
 
-    await triggerPubSub(topicId, 'postPendingOrders', attributes)
+    await triggerPubSub(pendingOrdersTopicId, 'postPendingOrders', pendingOrdersAttributes)
+
+    // Recalculate Quota
+    const quotaTopicId = 'campaign-quota'
+    const campaignId = campaign.id
+    const attributes = { campaignId }
+
+    await triggerPubSub(quotaTopicId, 'updateCorrectionQuotaPerCampaign', attributes)
 
     return { response: response.map((response: any) => response.toJSONFor()), status: 201 }
   }

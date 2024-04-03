@@ -7,7 +7,8 @@ import {
   createCompanyAdministratorWithCompany,
   createCampaignManager,
   orderTwo,
-  pendingOrders
+  pendingOrders,
+  updateCampaignUsedQuota
 } from '../utils'
 import bulkPendingOrders from '../bulkPendingOrders.json'
 import humongousPendingOrders from '../humongousPendingOrders.json'
@@ -2090,7 +2091,7 @@ describe('Campaign actions', () => {
       expect(res).to.have.status(429)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.success).to.equal(false)
-      expect(res.body.errors.message).to.equal('Campaign order limit has been exceeded')
+      expect(res.body.errors.message).to.equal('Campaign order limit has been exceeded by 3')
     })
 
     it('Should return 429 Too Many Requests when a Company Admin tries to create bulk orders for a campaign with a limit on the role.', async () => {
@@ -2172,7 +2173,171 @@ describe('Campaign actions', () => {
       expect(res).to.have.status(429)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.success).to.equal(false)
-      expect(res.body.errors.message).to.equal('Campaign order limit has been exceeded')
+      expect(res.body.errors.message).to.equal('Campaign order limit has been exceeded by 3')
+    })
+
+    it('Should return 201 Created when a Company Admin creates bulk orders for a campaign with a limit on the role.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Company Limited 2 Too Close',
+            email: 'iversonetwothreefourlimited2tooclose@starkindustriesmarvel2.com',
+            domain: 'starkindustriesmarvel2.com',
+            customerId: 859
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'sharoncarter@starkindustriesmarvel2.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdmin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'sharoncarter@starkindustriesmarvel2.com', password: 'thepowerbroker' } })
+
+      tokenCompanyAdminTwo = resCompanyAdmin.body.token
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Limited 2 Too Close',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/order-limits`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignOrderLimit: {
+            limit: 5,
+            role: 'CompanyAdministrator'
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .send({
+          pendingOrders
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .send({
+          pendingOrders: pendingOrders.slice(0, 1)
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+      expect(res.body.pendingOrders).to.have.lengthOf.above(0)
+    })
+
+    it('Should return 429 Too Many Requests when a Company Admin tries to create bulk orders for a campaign with a limit on the role.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Company Limited 2 Too Close 2',
+            email: 'iversonetwothreefourlimited2tooclose2@starkindustriesmarvel2.com',
+            domain: 'starkindustriesmarvel2.com',
+            customerId: 859
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'sharoncarter@starkindustriesmarvel2.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdmin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'sharoncarter@starkindustriesmarvel2.com', password: 'thepowerbroker' } })
+
+      tokenCompanyAdminTwo = resCompanyAdmin.body.token
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Limited 2 Too Close 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/order-limits`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignOrderLimit: {
+            limit: 5,
+            role: 'CompanyAdministrator'
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .send({
+          pendingOrders
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${tokenCompanyAdminTwo}`)
+        .send({
+          pendingOrders: pendingOrders.slice(0, 2)
+        })
+
+      expect(res).to.have.status(429)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('Campaign order limit has been exceeded by 1')
     })
 
     it('Should return 403 Forbidden when a company admin tries to create bulk orders for a disabled campaign.', async () => {
@@ -2345,7 +2510,7 @@ describe('Campaign actions', () => {
       expect(res).to.have.status(429)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.success).to.equal(false)
-      expect(res.body.errors.message).to.equal('Campaign quota has been exceeded')
+      expect(res.body.errors.message).to.equal('Campaign quota has been exceeded by 4')
     })
 
     it('Should return 429 Too Many Requests when an owner tries creating bulk orders for a campaign that has reached its quota.', async () => {
@@ -2392,7 +2557,172 @@ describe('Campaign actions', () => {
       expect(res).to.have.status(429)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.success).to.equal(false)
-      expect(res.body.errors.message).to.equal('Campaign quota has been exceeded')
+      expect(res.body.errors.message).to.equal('Campaign quota has been exceeded by 4')
+    })
+
+    it('Should return 429 Too Many Requests when an owner tries creating bulk orders for a campaign that has reached its quota.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Quota Two Far 2',
+            email: 'test@companyquotatwofar2.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Quota Two Far 2',
+            type: 'onboarding',
+            status: 'draft',
+            isQuotaEnabled: true,
+            quota: 5,
+            correctionQuota: 0
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const resPendingOrders = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders
+        })
+
+      if (resPendingOrders.body.success === true) {
+        await updateCampaignUsedQuota(campaignId, resPendingOrders.body.pendingOrders.length)
+      }
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders: pendingOrders.slice(0, 2)
+        })
+
+      expect(res).to.have.status(429)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('Campaign quota has been exceeded by 1')
+    })
+
+    it('Should return 201 Created when an owner creates bulk orders for a campaign that has not reached its quota.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Quota Two Far',
+            email: 'test@companyquotatwofar.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Quota Two Far',
+            type: 'onboarding',
+            status: 'draft',
+            isQuotaEnabled: true,
+            quota: 4,
+            correctionQuota: 0
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+      expect(res.body.pendingOrders).to.have.lengthOf.above(0)
+    })
+
+    it('Should return 201 Created when an owner creates bulk orders for a campaign that has not reached its quota.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Quota Not Two Far',
+            email: 'test@companyquotanottwofar.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Quota Not Two Far',
+            type: 'onboarding',
+            status: 'draft',
+            isQuotaEnabled: true,
+            quota: 4,
+            correctionQuota: 0
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const resPendingOrders = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders: pendingOrders.slice(0, 3)
+        })
+
+      if (resPendingOrders.body.success === true) {
+        await updateCampaignUsedQuota(campaignId, resPendingOrders.body.pendingOrders.length)
+      }
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders: pendingOrders.slice(0, 1)
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+      expect(res.body.pendingOrders).to.have.lengthOf.above(0)
     })
 
     it('Should return 201 Created when an owner tries creating bulk orders for a campaign that has reached its quota but isExceedQuotaEnabled is true.', async () => {
