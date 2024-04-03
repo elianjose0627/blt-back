@@ -62,7 +62,7 @@ class PendingOrderService extends BaseService {
     // Recalculate Quota
     const quotaTopicId = 'campaign-quota'
     const campaignId = campaign.id
-    const attributes = { campaignId }
+    const attributes = { campaignId, environment }
 
     await triggerPubSub(quotaTopicId, 'updateCorrectionQuotaPerCampaign', attributes)
 

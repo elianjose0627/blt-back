@@ -12,6 +12,16 @@ class ProductTagController extends BaseController {
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { body: { productTag }, record: product } = req
 
+    if (product.productCategory === null) {
+      return res.status(statusCodes.BAD_REQUEST).send({
+        statusCode: statusCodes.BAD_REQUEST,
+        success: false,
+        errors: {
+          message: 'Assign a category to this product in order to add tags'
+        }
+      })
+    }
+
     const foundProductCategoryTags = await productCategoryTagService.searchProductCategoryTagsByIds(productTag.productCategoryTagIds, product.productCategory.id)
 
     if (productTag.productCategoryTagIds.length > 0 && foundProductCategoryTags.count === 0) {

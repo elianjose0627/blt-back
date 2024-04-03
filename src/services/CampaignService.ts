@@ -61,7 +61,8 @@ class CampaignService extends BaseService {
         [Op.or]: [
           { name: { [Op.iLike]: `%${search}%` } },
           { type: { [Op.iLike]: `%${search}%` } },
-          { status: { [Op.iLike]: `%${search}%` } }
+          { status: { [Op.iLike]: `%${search}%` } },
+          { '$company.name$': { [Op.iLike]: `%${search}%` } } // Needs required true on company include to work
         ]
       }
     }
@@ -75,7 +76,8 @@ class CampaignService extends BaseService {
         {
           model: db.Company,
           attributes: ['id', 'name', 'suffix', 'email', 'phone', 'vat', 'domain'],
-          as: 'company'
+          as: 'company',
+          required: true // Returns records that have matching values in both tables
         },
         {
           model: db.CardSetting,
