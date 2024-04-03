@@ -1,6 +1,6 @@
 import BaseController from './BaseController'
 import PendingOrderService from '../services/PendingOrderService'
-import type { CustomRequest, CustomResponse, ICampaign, Module, StatusCode } from '../types'
+import type { CustomRequest, CustomResponse, ICampaign, IPendingOrder, Module, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
@@ -49,15 +49,16 @@ class PendingOrderController extends BaseController {
       campaignOrderLimits
     } = campaign as ICampaign
 
+    const pendingOrdersQuantity: number = pendingOrders.reduce((accumulator: number, pendingOrder: IPendingOrder) => accumulator + pendingOrder.quantity, 0)
     const totalUsedQuota = usedQuota + correctionQuota
     const allowedRoles = [userRoles.ADMIN]
 
-    if (!allowedRoles.includes(currentUser.role) && (isQuotaEnabled && !isExceedQuotaEnabled) && totalUsedQuota >= quota) {
+    if (!allowedRoles.includes(currentUser.role) && (isQuotaEnabled && !isExceedQuotaEnabled) && (totalUsedQuota + pendingOrdersQuantity) > quota) {
       return res.status(statusCodes.TOO_MANY_REQUESTS).send({
         statusCode: statusCodes.TOO_MANY_REQUESTS,
         success: false,
         errors: {
-          message: 'Campaign quota has been exceeded'
+          message: `Campaign quota has been exceeded by ${(totalUsedQuota + pendingOrdersQuantity) - quota}`
         }
       })
     }
@@ -65,12 +66,12 @@ class PendingOrderController extends BaseController {
     const existingOrders = await pendingOrderService.findPendingOrders(currentUser.id, campaign.id)
     const campaignOrderLimit = campaignOrderLimits.find((campaignOrderLimit) => campaignOrderLimit.role === currentUser.role)
 
-    if (campaignOrderLimit !== undefined && (existingOrders.count >= campaignOrderLimit.limit || (parseInt(pendingOrders.length, 10) + parseInt(existingOrders.count, 10)) >= campaignOrderLimit.limit)) {
+    if (campaignOrderLimit !== undefined && ((pendingOrdersQuantity + parseInt(existingOrders.count, 10)) > campaignOrderLimit.limit)) {
       return res.status(statusCodes.TOO_MANY_REQUESTS).send({
         statusCode: statusCodes.TOO_MANY_REQUESTS,
         success: false,
         errors: {
-          message: 'Campaign order limit has been exceeded'
+          message: `Campaign order limit has been exceeded by ${(pendingOrdersQuantity + parseInt(existingOrders.count, 10)) - campaignOrderLimit.limit}`
         }
       })
     }
