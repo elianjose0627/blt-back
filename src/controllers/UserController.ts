@@ -7,11 +7,12 @@ import UserService from '../services/UserService'
 import CompanyService from '../services/CompanyService'
 import AddressService from '../services/AddressService'
 import * as statusCodes from '../constants/statusCodes'
-import type { CustomNext, CustomRequest, CustomResponse, Nullable, StatusCode } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse, IEmailTemplate, Nullable, StatusCode } from '../types'
 import * as userRoles from '../utils//userRoles'
 import { sendNotifierEmail } from '../utils/sendMail'
 import { io } from '../utils/socket'
 import { decodeString, decryptUUID, expandShortUUID } from '../utils/encryption'
+import db from '../models'
 
 dayjs.extend(utc)
 const userService = new UserService('User')
@@ -21,6 +22,8 @@ const companyService = new CompanyService('Company')
 const appName = String(process.env.APP_NAME)
 const appUrl = String(process.env.APP_URL)
 const mailer = String(process.env.MAILER_EMAIL)
+const salesMailer = String(process.env.SALES_MAILER_EMAIL)
+const adminEmail = String(process.env.ADMIN_EMAIL)
 const sandboxMode = process.env.NODE_ENV === 'test'
 
 interface SelectedCompanyId {
@@ -346,7 +349,7 @@ class UserController extends BaseController {
     const {
       user,
       body: { user: { email, actionType, role } },
-      record: { id: companyId, name, domain, isDomainVerified }
+      record: { id: companyId, name: companyName, domain, isDomainVerified }
     } = req
 
     const emailDomain = email.split('@').pop()
@@ -384,30 +387,56 @@ class UserController extends BaseController {
     const employee = await userService.findByEmail(email)
 
     if (employee === null) {
-      const subject = `You have been invited by ${String(user.firstName)} ${String(user.lastName)} to create an account at ${String(name)}`
+      let subject = ''
+      let message = ''
 
-      const steps = `
-      <p>Steps to register an account:</p>
-      <ol>
-        <li>Register an account using your email address ${String(email)} at ${appUrl}</li>
-        <li>Verify your account to fully activate it.</li>
-      </ol>
-      `
+      let accountInvitationEmailTemplate: IEmailTemplate = await db.EmailTemplate.findOne({
+        include: {
+          model: db.EmailTemplateType,
+          as: 'emailTemplateType',
+          where: {
+            type: 'accountInvitation'
+          }
+        },
+        where: {
+          isDefault: false
+        }
+      })
 
-      const footer = `
-      <p>For questions regarding your order, please reach out to:
-      <br>
-        Support: ${mailer}
-      </p>
-      `
+      if (accountInvitationEmailTemplate === null) {
+        const defaultAccountInvitationEmailTemplate: IEmailTemplate = await db.EmailTemplate.findOne({
+          include: {
+            model: db.EmailTemplateType,
+            as: 'emailTemplateType',
+            where: {
+              type: 'accountInvitation'
+            }
+          },
+          where: {
+            isDefault: true
+          }
+        })
+        accountInvitationEmailTemplate = defaultAccountInvitationEmailTemplate
+      }
+      subject = (accountInvitationEmailTemplate).subject
+        .replace(/\[app\]/g, appName)
+        .replace(/\[firstname\]/g, user.firstName)
+        .replace(/\[lastname\]/g, user.lastName)
+        .replace(/\[url\]/g, appUrl)
+        .replace(/\[company\]/g, companyName)
 
-      const message = `<p>Hello,</p>
-      <p>You have been invited by ${String(user.firstName)} ${String(user.lastName)} to create an account at ${appUrl}.<p>
-      ${steps}
-      <p>Best Regards,<br>
-      ${appName} team</p>
-      <p>${footer}</p>
-      `
+      message = (accountInvitationEmailTemplate).template
+        .replace(/\[firstname\]/g, user.firstName)
+        .replace(/\[lastname\]/g, user.lastName)
+        .replace(/\[salutation\]/g, user.salutation)
+        .replace(/\[role\]/g, role)
+        .replace(/\[app\]/g, appName)
+        .replace(/\[url\]/g, appUrl)
+        .replace(/\[company\]/g, companyName)
+        .replace(/\[useremail\]/g, email)
+        .replace(/\[adminemail\]/g, adminEmail)
+        .replace(/\[mailer\]/g, mailer)
+        .replace(/\[salesmailer\]/g, salesMailer)
 
       await sendNotifierEmail(email, subject, message, false, message, sandboxMode)
 
@@ -442,22 +471,56 @@ class UserController extends BaseController {
     }
 
     if (actionType === 'add') {
-      const subject = `You have been granted a new user role by ${String(user.firstName)} ${String(user.lastName)} at ${String(name)}`
+      let subject = ''
+      let message = ''
 
-      const footer = `
-      <p>For questions regarding your order, please reach out to:
-      <br>
-        Support: ${mailer}
-      </p>
-      `
+      let updateRoleEmailTemplate: IEmailTemplate = await db.EmailTemplate.findOne({
+        include: {
+          model: db.EmailTemplateType,
+          as: 'emailTemplateType',
+          where: {
+            type: 'updateRole'
+          }
+        },
+        where: {
+          isDefault: false
+        }
+      })
 
-      const message = `<p>Hello,</p>
-      <p>You have been granted a new user role by ${String(user.firstName)} ${String(user.lastName)} at ${appUrl}.<p>
-      <p>Please login to your account.</p>
-      <p>Best Regards,<br>
-      ${appName} team</p>
-      <p>${footer}</p>
-      `
+      if (updateRoleEmailTemplate === null) {
+        const defaultUpdateRoleEmailTemplate: IEmailTemplate = await db.EmailTemplate.findOne({
+          include: {
+            model: db.EmailTemplateType,
+            as: 'emailTemplateType',
+            where: {
+              type: 'updateRole'
+            }
+          },
+          where: {
+            isDefault: true
+          }
+        })
+        updateRoleEmailTemplate = defaultUpdateRoleEmailTemplate
+      }
+      subject = (updateRoleEmailTemplate).subject
+        .replace(/\[app\]/g, appName)
+        .replace(/\[firstname\]/g, user.firstName)
+        .replace(/\[lastname\]/g, user.lastName)
+        .replace(/\[url\]/g, appUrl)
+        .replace(/\[company\]/g, companyName)
+
+      message = (updateRoleEmailTemplate).template
+        .replace(/\[firstname\]/g, user.firstName)
+        .replace(/\[lastname\]/g, user.lastName)
+        .replace(/\[salutation\]/g, user.salutation)
+        .replace(/\[role\]/g, role)
+        .replace(/\[app\]/g, appName)
+        .replace(/\[url\]/g, appUrl)
+        .replace(/\[company\]/g, companyName)
+        .replace(/\[useremail\]/g, email)
+        .replace(/\[adminemail\]/g, adminEmail)
+        .replace(/\[mailer\]/g, mailer)
+        .replace(/\[salesmailer\]/g, salesMailer)
 
       await sendNotifierEmail(email, subject, message, false, message, sandboxMode)
     }

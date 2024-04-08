@@ -9,7 +9,8 @@ class EmailTemplateService extends BaseService {
 
     response = await db[this.model].findOne({
       where: {
-        emailTemplateTypeId: emailTemplate.emailTemplateTypeId
+        emailTemplateTypeId: emailTemplate.emailTemplateTypeId,
+        isDefault: false
       },
       paranoid: false // To get soft deleted record
     })
@@ -30,7 +31,7 @@ class EmailTemplateService extends BaseService {
       include: generateInclude(this.model),
       limit,
       offset,
-      order: [['createdAt', 'DESC']],
+      order: [['isDefault', 'DESC'], ['createdAt', 'DESC']],
       attributes: { exclude: [] }
     })
 
