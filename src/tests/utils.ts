@@ -1137,8 +1137,13 @@ export const createBlockedDomain = async (domain: string): Promise<string> => {
   return res
 }
 
-export const deleteAllEmailTemplates = async (): Promise<void> => {
-  await db.EmailTemplate.truncate()
+export const deleteAllNonDefaultEmailTemplates = async (): Promise<void> => {
+  await db.EmailTemplate.destroy({
+    force: true,
+    where: {
+      isDefault: false
+    }
+  })
 }
 
 export const removeCompanyOwnerId = async (id: string): Promise<any> => {
