@@ -12,12 +12,14 @@ import * as userRoles from '../utils//userRoles'
 import { sendNotifierEmail } from '../utils/sendMail'
 import { io } from '../utils/socket'
 import { decodeString, decryptUUID, expandShortUUID } from '../utils/encryption'
-import db from '../models'
+import EmailTemplateService from '../services/EmailTemplateService'
+import { replacePlaceholders } from '../utils/replacePlaceholders'
 
 dayjs.extend(utc)
 const userService = new UserService('User')
 const addressService = new AddressService('Address')
 const companyService = new CompanyService('Company')
+const emailTemplateService = new EmailTemplateService('EmailTemplate')
 
 const appName = String(process.env.APP_NAME)
 const appUrl = String(process.env.APP_URL)
@@ -352,6 +354,20 @@ class UserController extends BaseController {
       record: { id: companyId, name: companyName, domain, isDomainVerified }
     } = req
 
+    const replacements = {
+      app: appName,
+      firstname: user.firstName,
+      lastname: user.lastName,
+      url: appUrl,
+      company: companyName,
+      salutation: user.salutation,
+      role,
+      useremail: email,
+      adminemail: adminEmail,
+      mailer,
+      salesmailer: salesMailer
+    }
+
     const emailDomain = email.split('@').pop()
 
     if (domain === null || domain === '') {
@@ -390,53 +406,15 @@ class UserController extends BaseController {
       let subject = ''
       let message = ''
 
-      let accountInvitationEmailTemplate: IEmailTemplate = await db.EmailTemplate.findOne({
-        include: {
-          model: db.EmailTemplateType,
-          as: 'emailTemplateType',
-          where: {
-            type: 'accountInvitation'
-          }
-        },
-        where: {
-          isDefault: false
-        }
-      })
+      let accountInvitationEmailTemplate: IEmailTemplate = await emailTemplateService.getEmailTemplate('accountInvitation', false)
 
       if (accountInvitationEmailTemplate === null) {
-        const defaultAccountInvitationEmailTemplate: IEmailTemplate = await db.EmailTemplate.findOne({
-          include: {
-            model: db.EmailTemplateType,
-            as: 'emailTemplateType',
-            where: {
-              type: 'accountInvitation'
-            }
-          },
-          where: {
-            isDefault: true
-          }
-        })
+        const defaultAccountInvitationEmailTemplate: IEmailTemplate = await emailTemplateService.getEmailTemplate('accountInvitation', true)
         accountInvitationEmailTemplate = defaultAccountInvitationEmailTemplate
       }
-      subject = (accountInvitationEmailTemplate).subject
-        .replace(/\[app\]/g, appName)
-        .replace(/\[firstname\]/g, user.firstName)
-        .replace(/\[lastname\]/g, user.lastName)
-        .replace(/\[url\]/g, appUrl)
-        .replace(/\[company\]/g, companyName)
 
-      message = (accountInvitationEmailTemplate).template
-        .replace(/\[firstname\]/g, user.firstName)
-        .replace(/\[lastname\]/g, user.lastName)
-        .replace(/\[salutation\]/g, user.salutation)
-        .replace(/\[role\]/g, role)
-        .replace(/\[app\]/g, appName)
-        .replace(/\[url\]/g, appUrl)
-        .replace(/\[company\]/g, companyName)
-        .replace(/\[useremail\]/g, email)
-        .replace(/\[adminemail\]/g, adminEmail)
-        .replace(/\[mailer\]/g, mailer)
-        .replace(/\[salesmailer\]/g, salesMailer)
+      subject = replacePlaceholders(accountInvitationEmailTemplate.subject, replacements)
+      message = replacePlaceholders(accountInvitationEmailTemplate.template, replacements)
 
       await sendNotifierEmail(email, subject, message, false, message, sandboxMode)
 
@@ -474,53 +452,14 @@ class UserController extends BaseController {
       let subject = ''
       let message = ''
 
-      let updateRoleEmailTemplate: IEmailTemplate = await db.EmailTemplate.findOne({
-        include: {
-          model: db.EmailTemplateType,
-          as: 'emailTemplateType',
-          where: {
-            type: 'updateRole'
-          }
-        },
-        where: {
-          isDefault: false
-        }
-      })
+      let updateRoleEmailTemplate: IEmailTemplate = await emailTemplateService.getEmailTemplate('updateRole', false)
 
       if (updateRoleEmailTemplate === null) {
-        const defaultUpdateRoleEmailTemplate: IEmailTemplate = await db.EmailTemplate.findOne({
-          include: {
-            model: db.EmailTemplateType,
-            as: 'emailTemplateType',
-            where: {
-              type: 'updateRole'
-            }
-          },
-          where: {
-            isDefault: true
-          }
-        })
+        const defaultUpdateRoleEmailTemplate: IEmailTemplate = await emailTemplateService.getEmailTemplate('updateRole', true)
         updateRoleEmailTemplate = defaultUpdateRoleEmailTemplate
       }
-      subject = (updateRoleEmailTemplate).subject
-        .replace(/\[app\]/g, appName)
-        .replace(/\[firstname\]/g, user.firstName)
-        .replace(/\[lastname\]/g, user.lastName)
-        .replace(/\[url\]/g, appUrl)
-        .replace(/\[company\]/g, companyName)
-
-      message = (updateRoleEmailTemplate).template
-        .replace(/\[firstname\]/g, user.firstName)
-        .replace(/\[lastname\]/g, user.lastName)
-        .replace(/\[salutation\]/g, user.salutation)
-        .replace(/\[role\]/g, role)
-        .replace(/\[app\]/g, appName)
-        .replace(/\[url\]/g, appUrl)
-        .replace(/\[company\]/g, companyName)
-        .replace(/\[useremail\]/g, email)
-        .replace(/\[adminemail\]/g, adminEmail)
-        .replace(/\[mailer\]/g, mailer)
-        .replace(/\[salesmailer\]/g, salesMailer)
+      subject = replacePlaceholders(updateRoleEmailTemplate.subject, replacements)
+      message = replacePlaceholders(updateRoleEmailTemplate.template, replacements)
 
       await sendNotifierEmail(email, subject, message, false, message, sandboxMode)
     }

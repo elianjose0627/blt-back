@@ -53,16 +53,6 @@ module.exports = {
           deletedAt: null
         },
         {
-          id: 'A3D4BEEF-A40A-4E6B-98A4-6D3940101D61', // This one is missing a template
-          name: 'Password Reset',
-          type: 'passwordReset',
-          description: 'This is used for the password reset email',
-          placeholders,
-          createdAt,
-          updatedAt,
-          deletedAt: null
-        },
-        {
           id: '209FE2F4-3CF0-4B6D-86D6-F41934D24AD6',
           name: 'Forgot Password',
           type: 'forgotPassword',
@@ -87,6 +77,26 @@ module.exports = {
           name: 'Update Role',
           type: 'updateRole',
           description: 'This is used for the update role email',
+          placeholders,
+          createdAt,
+          updatedAt,
+          deletedAt: null
+        },
+        {
+          id: '005BEE60-E1BE-4A93-9F7D-92CAD51C3784',
+          name: 'Company Account Creation Nonexistent User',
+          type: 'companyAccountCreationNonexistent',
+          description: 'This is used for the new company account creation plus a nonexistent user email',
+          placeholders,
+          createdAt,
+          updatedAt,
+          deletedAt: null
+        },
+        {
+          id: 'C726EEF5-31A7-4D2D-8F99-05970D918B18',
+          name: 'Company Account Creation Existent User',
+          type: 'companyAccountCreationExistent',
+          description: 'This is used for the new company account creation plus an existent user email',
           placeholders,
           createdAt,
           updatedAt,
@@ -127,7 +137,7 @@ module.exports = {
       },
       {
         id: '90bf5a8c-56a1-48e6-a014-fb9105073132',
-        subject: 'Reset password request for big little things',
+        subject: 'Reset password request for [app]',
         template: '<p>Hello [firstname],<br></p>\n\n<p>In order to reset your password please follow these steps:</p>\n<ol>\n  <li>Go to <a href="[url]/reset-password?token=[token]">link</a>. This link is going to be valid for [expiration].</li>\n  <li>Enter a new password for your account.</li>\n</ol>\n<p>\n  Best Regards, <br>\n  [app] team\n</p>\n<p>\n  For questions regarding your order, please reach out to: <br>\n  Support: [mailer] <br>\n  Sales: [salesmailer]\n</p>',
         createdAt: dayjs(now).add(4, 'M').toDate(),
         updatedAt: dayjs(now).add(4, 'M').toDate(),
@@ -138,7 +148,7 @@ module.exports = {
       {
         id: 'e7ae56ee-d3c8-4e2e-8060-97cdc954381e',
         subject: 'Verify your email for [app]',
-        template: "<p>Hello [firstname],</p>\n\n<p>You have requested a verification OTP to activate your account at [app].<br>\nYour OTP is: <span style=\"font-size:1.5em;\"><strong>[otp]</strong></span></p>\n\n<p>Steps to verify:</p>\n\n<ol>\n  <li>Login to your account at [url].</li>\n  <li>Click on the profile picture at the top right corner of the screen and select \"Profile\".</li>\n  <li>Under the Pending Actions Section, Enter your verification OTP <strong>[otp]</strong> and click \"Verify Email\".</li>\n</ol>\n\n<p>If you haven't requested a verification code or created an account at big little things, notify us: [mailer].</p>\n\n<p>\n  Best Regards,<br>\n  [app] team\n</p>\n<p>\n  For questions regarding your order, please reach out to: <br>\n  Support: [mailer] <br>\n  Sales: [salesmailer]\n</p>",
+        template: "<p>Hello [firstname],</p>\n\n<p>You have requested a verification OTP to activate your account at [app].<br>\nYour OTP is: <span style=\"font-size:1.5em;\"><strong>[otp]</strong></span></p>\n\n<p>Steps to verify:</p>\n\n<ol>\n  <li>Login to your account at [url].</li>\n  <li>Click on the profile picture at the top right corner of the screen and select \"Profile\".</li>\n  <li>Under the Pending Actions Section, Enter your verification OTP <strong>[otp]</strong> and click \"Verify Email\".</li>\n</ol>\n\n<p>If you haven't requested a verification code or created an account at [app], notify us: [mailer].</p>\n\n<p>\n  Best Regards,<br>\n  [app] team\n</p>\n<p>\n  For questions regarding your order, please reach out to: <br>\n  Support: [mailer] <br>\n  Sales: [salesmailer]\n</p>",
         createdAt: dayjs(now).add(5, 'M').toDate(),
         updatedAt: dayjs(now).add(5, 'M').toDate(),
         deletedAt: null,
@@ -158,11 +168,31 @@ module.exports = {
       {
         id: 'd2ba51b0-2cc5-4c96-97b8-eb0bcb1f50fe',
         subject: 'You have been granted a new user role by [firstname] [lastname] at [company]',
-        template: '<p>Hello,</p>\n\n<p>You have been granted a new user role by Ryan Wire at [url].</p>\n\n<p>Please login to your account.</p>\n\n<p>\n  Best Regards, <br>\n  big little things team\n</p>\n<p>\n  For questions regarding your order, please reach out to: <br>\n  Support: [mailer]\n</p>',
+        template: '<p>Hello,</p>\n\n<p>You have been granted a new user role by Ryan Wire at [url].</p>\n\n<p>Please login to your account.</p>\n\n<p>\n  Best Regards, <br>\n  [app]\n</p>\n<p>\n  For questions regarding your order, please reach out to: <br>\n  Support: [mailer]\n</p>',
         createdAt: dayjs(now).add(7, 'M').toDate(),
         updatedAt: dayjs(now).add(7, 'M').toDate(),
         deletedAt: null,
         emailTemplateTypeId: '49E2A392-5C74-4EA1-9399-D3E4EF43C97B',
+        isDefault: true
+      },
+      {
+        id: '1d0583cd-2c89-464f-b08e-dac7ad78f698',
+        subject: 'An account has been created on your behalf at [url]',
+        template: '<p>Hello,</p>\n<p>Your account has been created at [url] in order to grant you access to the [app] corporate merchandise platform on behalf of [company].</p>\n\n<p>Your e-mail is: [useremail].</p>\n<p>Your temporary password is: [password].</p>\n\n<p>Steps to register an account:</p>\n\n<ol>\n  <li>Please login to your personal user account at [url] and change your password.</li>\n  <li>Please verify your user account.</li>\n  <li>Click on the profile picture at the top right corner of the screen and select "Profile".</li>\n  <li>Under the Pending Actions Section, click "Request Verification OTP" to receive your code via email.</li>\n</ol>\n\n<p>You have been granted elevated rights as a Company Administrator of [company].</p>\n<p>\n  Best Regards, <br>\n  [app] team\n</p>\n<p>\n  For questions, please reach out to: <br>\n  General Support: [mailer] <br>\n  Orders: [salesmailer]\n</p>',
+        createdAt: dayjs(now).add(8, 'M').toDate(),
+        updatedAt: dayjs(now).add(8, 'M').toDate(),
+        deletedAt: null,
+        emailTemplateTypeId: '005BEE60-E1BE-4A93-9F7D-92CAD51C3784',
+        isDefault: true
+      },
+      {
+        id: 'e8990394-099b-4c32-8541-38d592900114',
+        subject: 'You have been granted elevated rights as company admin of [company]',
+        template: '<p>Hello,</p>\n\n<p>To make full use of the [app] corporate merchandise platform your company [company] has been setup.</p>\n\n<p>You have been granted elevated rights as a Company Administrator of [company].</p>\n\n<p>Please login to your user account at [url]</p>\n<p>\n  Best Regards, <br>\n  [app] team\n</p>\n<p>\n  For questions, please reach out to: <br>\n  General Support: [mailer] <br>\n  Orders: [salesmailer]\n</p>',
+        createdAt: dayjs(now).add(9, 'M').toDate(),
+        updatedAt: dayjs(now).add(9, 'M').toDate(),
+        deletedAt: null,
+        emailTemplateTypeId: 'C726EEF5-31A7-4D2D-8F99-05970D918B18',
         isDefault: true
       }
     ], {}))

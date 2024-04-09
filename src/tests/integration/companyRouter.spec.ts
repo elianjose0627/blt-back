@@ -581,7 +581,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only an admin, the owner or your company administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only an admin, the owner or your company administrator can perform this action for a company employee')
     })
 
     it('Should return 403 Forbidden when a company owner tries to update their role.', async () => {
@@ -696,7 +696,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only an admin, the owner or your company administrator can perform this action')
+      expect(res.body.errors.message).to.equal('Only an admin, the owner or your company administrator can perform this action for a company employee')
     })
 
     it('Should return 404 Not Found when a company owner updates the role of an non-existent employee.', async () => {
@@ -5060,6 +5060,88 @@ describe('Company actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'user')
       expect(res.body.user).to.be.an('object')
       expect(res.body.user).to.not.have.any.keys('password', 'otp', 'isDeleted')
+    })
+  })
+
+  describe('Company email template actions', () => {
+    it('Should return 201 Created when a user creates a company for an existent user.', async () => {
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk21@starkindustriesmarvel21.com', phone: '254720123456', password: 'mackone' } })
+      await verifyUser('shehulk21@starkindustriesmarvel21.com')
+
+      const emailTemplateTypesRes = await chai
+        .request(app)
+        .get('/api/email-template-types')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      const companyAccountCreationExistentTemplateType = emailTemplateTypesRes.body.emailTemplateTypes.find((emailTemplateType: IEmailTemplateType) => emailTemplateType.type === 'companyAccountCreationExistent')
+
+      await chai
+        .request(app)
+        .post('/api/email-templates')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          emailTemplate: {
+            subject: 'Password Reset Hello',
+            template: 'Hello World',
+            emailTemplateTypeId: companyAccountCreationExistentTemplateType.id
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'shehulk21@starkindustriesmarvel21.com'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('id', 'customerId', 'suffix', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 201 Created when a user creates a company for an nonexistent user.', async () => {
+      const emailTemplateTypesRes = await chai
+        .request(app)
+        .get('/api/email-template-types')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      const companyAccountCreationNonexistentTemplateType = emailTemplateTypesRes.body.emailTemplateTypes.find((emailTemplateType: IEmailTemplateType) => emailTemplateType.type === 'companyAccountCreationNonexistent')
+
+      await chai
+        .request(app)
+        .post('/api/email-templates')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          emailTemplate: {
+            subject: 'Password Reset Hello',
+            template: 'Hello World',
+            emailTemplateTypeId: companyAccountCreationNonexistentTemplateType.id
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'shehulk22@starkindustriesmarvel22.com'
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('id', 'customerId', 'suffix', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
     })
   })
 })

@@ -10,6 +10,7 @@ import generateOtp from '../utils/generateOtp'
 import * as userRoles from '../utils/userRoles'
 import generatePassword from '../utils/generatePassword'
 import { IEmailTemplate } from '../types'
+import { replacePlaceholders } from '../utils/replacePlaceholders'
 
 dayjs.extend(utc)
 
@@ -103,24 +104,22 @@ class UserService extends BaseService {
         })
         accountWelcomeEmailTemplate = defaultAccountWelcomeEmailTemplate
       }
-      subject = (accountWelcomeEmailTemplate).subject
-        .replace(/\[app\]/g, appName)
-        .replace(/\[firstname\]/g, firstName)
-        .replace(/\[lastname\]/g, lastName)
-        .replace(/\[salutation\]/g, salutation)
-        .replace(/\[role\]/g, role)
+      const replacements = {
+        app: appName,
+        firstname: firstName,
+        lastname: lastName,
+        salutation,
+        url: appUrl,
+        role,
+        useremail: email,
+        adminemail: adminEmail,
+        mailer,
+        salesmailer: salesMailer,
+        password: user.password
+      }
+      subject = replacePlaceholders(accountWelcomeEmailTemplate.subject, replacements)
 
-      message = (accountWelcomeEmailTemplate).template
-        .replace(/\[firstname\]/g, firstName)
-        .replace(/\[lastname\]/g, lastName)
-        .replace(/\[salutation\]/g, salutation)
-        .replace(/\[role\]/g, role)
-        .replace(/\[app\]/g, appName)
-        .replace(/\[url\]/g, appUrl)
-        .replace(/\[adminemail\]/g, adminEmail)
-        .replace(/\[mailer\]/g, mailer)
-        .replace(/\[salesmailer\]/g, salesMailer)
-        .replace(/\[password\]/g, user.password)
+      message = replacePlaceholders(accountWelcomeEmailTemplate.template, replacements)
 
       await sendNotifierEmail(email, subject, message, false, message, sandboxMode)
     }
@@ -304,14 +303,19 @@ class UserService extends BaseService {
         })
         updatePasswordEmailTemplate = defaultUpdatePasswordEmailTemplate
       }
-      subject = updatePasswordEmailTemplate.subject
-      message = updatePasswordEmailTemplate.template
-        .replace(/\[firstname\]/g, updatedRecord.firstName)
-        .replace(/\[lastname\]/g, updatedRecord.lastName)
-        .replace(/\[salutation\]/g, updatedRecord.salutation)
-        .replace(/\[app\]/g, appName)
-        .replace(/\[password\]/g, password)
-        .replace(/\[adminemail\]/g, adminEmail)
+      const replacements = {
+        app: appName,
+        firstname: updatedRecord.firstName,
+        lastname: updatedRecord.lastName,
+        url: appUrl,
+        salutation: updatedRecord.salutation,
+        adminemail: adminEmail,
+        mailer,
+        salesmailer: salesMailer,
+        password
+      }
+      subject = replacePlaceholders(updatePasswordEmailTemplate.subject, replacements)
+      message = replacePlaceholders(updatePasswordEmailTemplate.template, replacements)
 
       try {
         await sendNotifierEmail(updatedRecord.email, subject, message, bccStatus, message, sandboxMode)
@@ -330,6 +334,19 @@ class UserService extends BaseService {
     if (user !== null) {
       const token = generateToken(user, 'reset', resetPasswordExpiration)
       const { firstName, lastName, salutation } = user
+
+      const replacements = {
+        app: appName,
+        firstname: firstName,
+        lastname: lastName,
+        url: appUrl,
+        salutation,
+        adminemail: adminEmail,
+        mailer,
+        salesmailer: salesMailer,
+        token,
+        expiration: resetPasswordExpiration
+      }
 
       let subject = ''
       let message = ''
@@ -362,17 +379,8 @@ class UserService extends BaseService {
         })
         forgotPasswordEmailTemplate = defaultForgotPasswordEmailTemplate
       }
-      subject = forgotPasswordEmailTemplate.subject
-      message = forgotPasswordEmailTemplate.template
-        .replace(/\[firstname\]/g, firstName)
-        .replace(/\[lastname\]/g, lastName)
-        .replace(/\[salutation\]/g, salutation)
-        .replace(/\[app\]/g, appName)
-        .replace(/\[url\]/g, appUrl)
-        .replace(/\[token\]/g, token)
-        .replace(/\[expiration\]/g, resetPasswordExpiration)
-        .replace(/\[mailer\]/g, mailer)
-        .replace(/\[salesmailer\]/g, salesMailer)
+      subject = replacePlaceholders(forgotPasswordEmailTemplate.subject, replacements)
+      message = replacePlaceholders(forgotPasswordEmailTemplate.template, replacements)
 
       const info = await sendNotifierEmail(email, subject, message, false, message, false)
 
@@ -426,19 +434,19 @@ class UserService extends BaseService {
       })
       accountVerificationEmailTemplate = defaultAccountVerificationEmailTemplate
     }
-    subject = accountVerificationEmailTemplate.subject
-      .replace(/\[app\]/g, appName)
-      .replace(/\[firstname\]/g, firstName)
-      .replace(/\[lastname\]/g, lastName)
-    message = accountVerificationEmailTemplate.template
-      .replace(/\[firstname\]/g, firstName)
-      .replace(/\[lastname\]/g, lastName)
-      .replace(/\[salutation\]/g, salutation)
-      .replace(/\[url\]/g, appUrl)
-      .replace(/\[app\]/g, appName)
-      .replace(/\[mailer\]/g, mailer)
-      .replace(/\[salesmailer\]/g, salesMailer)
-      .replace(/\[otp\]/g, otp.toString())
+    const replacements = {
+      app: appName,
+      firstname: firstName,
+      lastname: lastName,
+      url: appUrl,
+      salutation,
+      adminemail: adminEmail,
+      mailer,
+      salesmailer: salesMailer,
+      otp: otp.toString()
+    }
+    subject = replacePlaceholders(accountVerificationEmailTemplate.subject, replacements)
+    message = replacePlaceholders(accountVerificationEmailTemplate.template, replacements)
 
     await user.update({ otp: { createdAt: dayjs.utc(), value: otp } })
 

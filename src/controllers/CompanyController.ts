@@ -5,24 +5,28 @@ import dns from 'dns'
 import BaseController from './BaseController'
 import CompanyService from '../services/CompanyService'
 import UserService from '../services/UserService'
-import type { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse, IEmailTemplate, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
 import AddressService from '../services/AddressService'
 import { sendNotifierEmail } from '../utils/sendMail'
 import { encryptUUID, encodeString, shortenUUID } from '../utils/encryption'
+import EmailTemplateService from '../services/EmailTemplateService'
+import { replacePlaceholders } from '../utils/replacePlaceholders'
 
 dayjs.extend(utc)
 
 const companyService = new CompanyService('Company')
 const userService = new UserService('User')
 const addressService = new AddressService('Address')
+const emailTemplateService = new EmailTemplateService('EmailTemplate')
 
 const appName = String(process.env.APP_NAME)
 const appUrl = String(process.env.APP_URL)
 const mailer = String(process.env.MAILER_EMAIL)
 const salesMailer = String(process.env.SALES_MAILER_EMAIL)
+const adminEmail = String(process.env.ADMIN_EMAIL)
 const sandboxMode = process.env.NODE_ENV === 'test'
 
 const mininumWaitDaysForDomainVerificationCode = 7
@@ -171,9 +175,24 @@ class CompanyController extends BaseController {
     const { user, body: { company } } = req
 
     const adminCreatedUser = await userService.findByEmail(company.email)
+    const temporaryPassword = uuidv4().substring(0, 8)
+
+    const replacements = {
+      app: appName,
+      firstname: user.firstName,
+      lastname: user.lastName,
+      salutation: user.salutation,
+      url: appUrl,
+      company: company.name,
+      role: userRoles.COMPANYADMINISTRATOR,
+      useremail: company.email,
+      adminemail: adminEmail,
+      mailer,
+      salesmailer: salesMailer,
+      password: temporaryPassword
+    }
 
     if (adminCreatedUser === null) {
-      const temporaryPassword = uuidv4().substring(0, 8)
       const temporaryUser = {
         firstName: '',
         lastName: '',
@@ -184,60 +203,38 @@ class CompanyController extends BaseController {
       }
       const createdTemporaryUser = await userService.insert({ user: temporaryUser, isTemporary: true })
 
-      const subject = `An account has been created on your behalf at ${appUrl}`
+      let subject = ''
+      let message = ''
+      let companyAccountCreationNonexistentEmailTemplate: IEmailTemplate = await emailTemplateService.getEmailTemplate('companyAccountCreationNonexistent', false)
 
-      const steps = `
-      <p>Steps to register an account:</p>
-      <ol>
-        <li>Please login to your personal user account at ${appUrl} and change your password.</li>
-        <li>Please verify your user account.</li>
-        <li>Click on the profile picture at the top right corner of the screen and select "Profile".</li>
-        <li>Under the Pending Actions Section, click "Request Verification OTP" to receive your code via email.</li>
-      </ol>
-      `
+      if (companyAccountCreationNonexistentEmailTemplate === null) {
+        const defaultCompanyAccountCreationNonexistentEmailTemplate: IEmailTemplate = await emailTemplateService.getEmailTemplate('companyAccountCreationNonexistent', true)
+        companyAccountCreationNonexistentEmailTemplate = defaultCompanyAccountCreationNonexistentEmailTemplate
+      }
 
-      const footer = `
-      <p>For questions, please reach out to:
-      <br>
-      General Support: ${mailer}
-      <br>
-      Orders: ${salesMailer}
-      </p>
-      `
+      subject = replacePlaceholders(companyAccountCreationNonexistentEmailTemplate.subject, replacements)
 
-      const message = `<p>Hello,</p>
-      <p>Your account has been created at ${appUrl} in order to grant you access to the ${appName} corporate merchandise platform on behalf of ${String(company.name)}.<p>
-      <p>Your e-mail is: ${String(createdTemporaryUser.email)}. <br/>Your temporary password is: ${temporaryPassword}.</p>
-      ${steps}
-      <p>You have been granted elevated rights as a company administrator of ${String(company.name)}.</p>
-      <p>Best Regards,<br>
-      ${appName} team</p>
-      <p>${footer}</p>
-      `
+      message = replacePlaceholders(companyAccountCreationNonexistentEmailTemplate.template, replacements)
+
       await sendNotifierEmail(createdTemporaryUser.email, subject, message, false, message, sandboxMode)
     } else {
       if (adminCreatedUser.role === userRoles.USER) {
         await userService.update(adminCreatedUser, { role: userRoles.COMPANYADMINISTRATOR, logoutTime: Date() })
 
-        const subject = `You have been granted elevated rights as company admin of (${String(company.name)})`
+        let subject = ''
+        let message = ''
 
-        const footer = `
-        <p>For questions, please reach out to:
-        <br>
-        General Support: ${mailer}
-        <br>
-        Orders: ${salesMailer}
-        </p>
-        `
+        let companyAccountCreationExistentEmailTemplate: IEmailTemplate = await emailTemplateService.getEmailTemplate('companyAccountCreationExistent', false)
 
-        const message = `<p>Hello ${String(adminCreatedUser.firstName)},</p>
-        <p>To make full use of the ${String(appName)} corporate merchandise platform your company ${String(company.name)} has been setup.<p>
-        <p>You have been granted elevated rights as company admin of ${String(company.name)}.</p>
-        <p>Please login to your user account at ${appUrl}</p>
-        <p>Best Regards,<br>
-        ${appName} team</p>
-        <p>${footer}</p>
-        `
+        if (companyAccountCreationExistentEmailTemplate === null) {
+          const defaultCompanyAccountCreationExistentEmailTemplate: IEmailTemplate = await emailTemplateService.getEmailTemplate('companyAccountCreationExistent', true)
+
+          companyAccountCreationExistentEmailTemplate = defaultCompanyAccountCreationExistentEmailTemplate
+        }
+
+        subject = replacePlaceholders(companyAccountCreationExistentEmailTemplate.subject, replacements)
+        message = replacePlaceholders(companyAccountCreationExistentEmailTemplate.template, replacements)
+
         await sendNotifierEmail(adminCreatedUser.email, subject, message, false, message, sandboxMode)
       }
 
@@ -334,22 +331,31 @@ class CompanyController extends BaseController {
     ) {
       const response = await userService.update(userToUpdate, { role, logoutTime: Date() })
 
-      const subject = `You have been granted a new user role by ${String(currentUser.firstName)} ${String(currentUser.lastName)} at ${String(company.name)}`
+      let subject = ''
+      let message = ''
 
-      const footer = `
-      <p>For questions regarding your order, please reach out to:
-      <br>
-        Support: ${mailer}
-      </p>
-      `
+      let updateRoleEmailTemplate: IEmailTemplate = await emailTemplateService.getEmailTemplate('updateRole', false)
 
-      const message = `<p>Hello,</p>
-      <p>You have been granted a new user role by ${String(currentUser.firstName)} ${String(currentUser.lastName)} at ${appUrl}.<p>
-      <p>Please login to your account.</p>
-      <p>Best Regards,<br>
-      ${appName} team</p>
-      <p>${footer}</p>
-      `
+      if (updateRoleEmailTemplate === null) {
+        const defaultUpdateRoleEmailTemplate: IEmailTemplate = await emailTemplateService.getEmailTemplate('updateRole', true)
+        updateRoleEmailTemplate = defaultUpdateRoleEmailTemplate
+      }
+      const replacements = {
+        app: appName,
+        firstname: currentUser.firstName,
+        lastname: currentUser.lastName,
+        salutation: currentUser.salutation,
+        url: appUrl,
+        company: company.name,
+        role,
+        useremail: userToUpdate.email,
+        adminemail: adminEmail,
+        mailer,
+        salesmailer: salesMailer
+      }
+
+      subject = replacePlaceholders(updateRoleEmailTemplate.subject, replacements)
+      message = replacePlaceholders(updateRoleEmailTemplate.template, replacements)
 
       await sendNotifierEmail(userToUpdate.email, subject, message, false, message, sandboxMode)
 
@@ -364,7 +370,7 @@ class CompanyController extends BaseController {
       statusCode: statusCodes.FORBIDDEN,
       success: false,
       errors: {
-        message: 'Only an admin, the owner or your company administrator can perform this action'
+        message: 'Only an admin, the owner or your company administrator can perform this action for a company employee'
       }
     })
   }

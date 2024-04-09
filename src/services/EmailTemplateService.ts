@@ -1,6 +1,7 @@
 import { v1 as uuidv1 } from 'uuid'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
+import { IEmailTemplate } from '../types'
 
 class EmailTemplateService extends BaseService {
   async insert (data: any): Promise<any> {
@@ -39,6 +40,23 @@ class EmailTemplateService extends BaseService {
       count: records.count,
       rows: records.rows.map((record: any) => record.toJSONFor())
     }
+  }
+
+  async getEmailTemplate (type: string, isDefault: boolean): Promise<any> {
+    const emailTemplate: IEmailTemplate = await db.EmailTemplate.findOne({
+      include: {
+        model: db.EmailTemplateType,
+        as: 'emailTemplateType',
+        where: {
+          type
+        }
+      },
+      where: {
+        isDefault
+      }
+    })
+
+    return emailTemplate
   }
 }
 
