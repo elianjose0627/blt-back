@@ -13,9 +13,9 @@ const emailTemplateRoutes = (): any => {
 
   emailTemplateRouter.use('/email-templates', checkAuth, checkUserIsVerifiedStatus, EmailTemplateController.setModule)
   emailTemplateRouter.route('/email-templates')
-    .post(asyncHandler(checkAdmin), asyncHandler(EmailTemplateController.checkEmailTemplateType), celebrate({
+    .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateEmailTemplate
-    }, { abortEarly: false }), asyncHandler(EmailTemplateController.insert))
+    }, { abortEarly: false }), asyncHandler(EmailTemplateController.checkEmailTemplateType), asyncHandler(EmailTemplateController.insert))
     .get(asyncHandler(checkAdmin), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(EmailTemplateController.getAll))
@@ -24,9 +24,9 @@ const emailTemplateRoutes = (): any => {
   }, { abortEarly: false }), asyncHandler(EmailTemplateController.checkRecord))
   emailTemplateRouter.route('/email-templates/:id')
     .get(asyncHandler(EmailTemplateController.get))
-    .put(asyncHandler(checkAdmin), asyncHandler(EmailTemplateController.checkEmailTemplateType), celebrate({
+    .put(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateEmailTemplate
-    }), asyncHandler(EmailTemplateController.update))
+    }), asyncHandler(EmailTemplateController.checkEmailTemplateType), asyncHandler(EmailTemplateController.update))
     .delete(asyncHandler(checkAdmin), asyncHandler(EmailTemplateController.delete))
   return emailTemplateRouter
 }

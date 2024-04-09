@@ -7,6 +7,7 @@ import {
   verifyUser,
   createEmailTemplateType
 } from '../utils'
+import { IEmailTemplate } from '../../types'
 
 const { expect } = chai
 
@@ -240,6 +241,31 @@ describe('Email Template actions', () => {
       expect(res.body.emailTemplate).to.be.an('object')
       expect(res.body.emailTemplate).to.include.keys('id', 'subject', 'template', 'createdAt', 'updatedAt')
       expect(res.body.emailTemplate.template).to.equal('<p>Hello World</p>')
+    })
+
+    it('Should return 403 Forbidden when an administrator tries to update a default email template by id.', async () => {
+      const resEmailTemplates = await chai
+        .request(app)
+        .get('/api/email-templates')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      const emailTemplate = resEmailTemplates.body.emailTemplates.find((emailTemplate: IEmailTemplate) => emailTemplate.isDefault)
+
+      const res = await chai
+        .request(app)
+        .put(`/api/email-templates/${String(emailTemplate.id)}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          emailTemplate: {
+            subject: 'Password Reset',
+            template: '<p>Hello World</p>',
+            emailTemplateTypeId
+          }
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Default email templates are not editable')
     })
 
     it('Should return 403 Forbidden when an non-administrator tries to update an email template by id.', async () => {

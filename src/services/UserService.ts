@@ -118,7 +118,6 @@ class UserService extends BaseService {
         password: user.password
       }
       subject = replacePlaceholders(accountWelcomeEmailTemplate.subject, replacements)
-
       message = replacePlaceholders(accountWelcomeEmailTemplate.template, replacements)
 
       await sendNotifierEmail(email, subject, message, false, message, sandboxMode)
@@ -244,14 +243,20 @@ class UserService extends BaseService {
           })
           updatePasswordEmailTemplate = defaultUpdatePasswordEmailTemplate
         }
-        subject = updatePasswordEmailTemplate.subject
-        message = updatePasswordEmailTemplate.template
-          .replace(/\[firstname\]/g, updatedRecord.firstName)
-          .replace(/\[lastname\]/g, updatedRecord.lastName)
-          .replace(/\[salutation\]/g, updatedRecord.salutation)
-          .replace(/\[app\]/g, appName)
-          .replace(/\[password\]/g, password)
-          .replace(/\[adminemail\]/g, adminEmail)
+        const replacements = {
+          app: appName,
+          firstname: updatedRecord.firstName,
+          lastname: updatedRecord.lastName,
+          salutation: updatedRecord.salutation,
+          url: appUrl,
+          adminemail: adminEmail,
+          mailer,
+          salesmailer: salesMailer,
+          password,
+          useremail: updatedRecord.email
+        }
+        subject = replacePlaceholders(updatePasswordEmailTemplate.subject, replacements)
+        message = replacePlaceholders(updatePasswordEmailTemplate.template, replacements)
 
         try {
           await sendNotifierEmail(updatedRecord.email, subject, message, bccStatus, message, sandboxMode)
