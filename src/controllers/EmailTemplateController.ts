@@ -42,6 +42,30 @@ class EmailTemplateController extends BaseController {
       [this.recordName()]: response
     })
   }
+
+  async update (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record: emailTemplate, body } = req
+
+    if (emailTemplate.isDefault === true) {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'Default email templates are not editable'
+        }
+      })
+    }
+
+    const response = await this.service.update(emailTemplate, body[this.recordName()])
+
+    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} updated` })
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      [this.service.singleRecord()]: response
+    })
+  }
 }
 
 export default new EmailTemplateController(emailTemplateService)
