@@ -168,7 +168,7 @@ module.exports = {
       {
         id: 'd2ba51b0-2cc5-4c96-97b8-eb0bcb1f50fe',
         subject: 'You have been granted a new user role by [firstname] [lastname] at [company]',
-        template: '<p>Hello,</p>\n\n<p>You have been granted a new user role by Ryan Wire at [url].</p>\n\n<p>Please login to your account.</p>\n\n<p>\n  Best Regards, <br>\n  [app]\n</p>\n<p>\n  For questions regarding your order, please reach out to: <br>\n  Support: [mailer]\n</p>',
+        template: '<p>Hello,</p>\n\n<p>You have been granted a new user role by [firstname] [lastname] at [url].</p>\n\n<p>Please login to your account.</p>\n\n<p>\n  Best Regards, <br>\n  [app]\n</p>\n<p>\n  For questions regarding your order, please reach out to: <br>\n  Support: [mailer]\n</p>',
         createdAt: dayjs(now).add(7, 'M').toDate(),
         updatedAt: dayjs(now).add(7, 'M').toDate(),
         deletedAt: null,
