@@ -406,6 +406,7 @@ export interface IEmailTemplate {
   subject: string
   template: string
   emailTemplateType: IEmailTemplateType
+  isDefault: boolean
   createdAt: Date
   updatedAt: Date
 }

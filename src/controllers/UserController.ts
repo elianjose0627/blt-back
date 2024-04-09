@@ -7,20 +7,25 @@ import UserService from '../services/UserService'
 import CompanyService from '../services/CompanyService'
 import AddressService from '../services/AddressService'
 import * as statusCodes from '../constants/statusCodes'
-import type { CustomNext, CustomRequest, CustomResponse, Nullable, StatusCode } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse, IEmailTemplate, Nullable, StatusCode } from '../types'
 import * as userRoles from '../utils//userRoles'
 import { sendNotifierEmail } from '../utils/sendMail'
 import { io } from '../utils/socket'
 import { decodeString, decryptUUID, expandShortUUID } from '../utils/encryption'
+import EmailTemplateService from '../services/EmailTemplateService'
+import { replacePlaceholders } from '../utils/replacePlaceholders'
 
 dayjs.extend(utc)
 const userService = new UserService('User')
 const addressService = new AddressService('Address')
 const companyService = new CompanyService('Company')
+const emailTemplateService = new EmailTemplateService('EmailTemplate')
 
 const appName = String(process.env.APP_NAME)
 const appUrl = String(process.env.APP_URL)
 const mailer = String(process.env.MAILER_EMAIL)
+const salesMailer = String(process.env.SALES_MAILER_EMAIL)
+const adminEmail = String(process.env.ADMIN_EMAIL)
 const sandboxMode = process.env.NODE_ENV === 'test'
 
 interface SelectedCompanyId {
@@ -346,8 +351,22 @@ class UserController extends BaseController {
     const {
       user,
       body: { user: { email, actionType, role } },
-      record: { id: companyId, name, domain, isDomainVerified }
+      record: { id: companyId, name: companyName, domain, isDomainVerified }
     } = req
+
+    const replacements = {
+      app: appName,
+      firstname: user.firstName,
+      lastname: user.lastName,
+      url: appUrl,
+      company: companyName,
+      salutation: user.salutation,
+      role,
+      useremail: email,
+      adminemail: adminEmail,
+      mailer,
+      salesmailer: salesMailer
+    }
 
     const emailDomain = email.split('@').pop()
 
@@ -384,30 +403,18 @@ class UserController extends BaseController {
     const employee = await userService.findByEmail(email)
 
     if (employee === null) {
-      const subject = `You have been invited by ${String(user.firstName)} ${String(user.lastName)} to create an account at ${String(name)}`
+      let subject = ''
+      let message = ''
 
-      const steps = `
-      <p>Steps to register an account:</p>
-      <ol>
-        <li>Register an account using your email address ${String(email)} at ${appUrl}</li>
-        <li>Verify your account to fully activate it.</li>
-      </ol>
-      `
+      let accountInvitationEmailTemplate: IEmailTemplate = await emailTemplateService.getEmailTemplate('accountInvitation', false)
 
-      const footer = `
-      <p>For questions regarding your order, please reach out to:
-      <br>
-        Support: ${mailer}
-      </p>
-      `
+      if (accountInvitationEmailTemplate === null) {
+        const defaultAccountInvitationEmailTemplate: IEmailTemplate = await emailTemplateService.getEmailTemplate('accountInvitation', true)
+        accountInvitationEmailTemplate = defaultAccountInvitationEmailTemplate
+      }
 
-      const message = `<p>Hello,</p>
-      <p>You have been invited by ${String(user.firstName)} ${String(user.lastName)} to create an account at ${appUrl}.<p>
-      ${steps}
-      <p>Best Regards,<br>
-      ${appName} team</p>
-      <p>${footer}</p>
-      `
+      subject = replacePlaceholders(accountInvitationEmailTemplate.subject, replacements)
+      message = replacePlaceholders(accountInvitationEmailTemplate.template, replacements)
 
       await sendNotifierEmail(email, subject, message, false, message, sandboxMode)
 
@@ -442,22 +449,17 @@ class UserController extends BaseController {
     }
 
     if (actionType === 'add') {
-      const subject = `You have been granted a new user role by ${String(user.firstName)} ${String(user.lastName)} at ${String(name)}`
+      let subject = ''
+      let message = ''
 
-      const footer = `
-      <p>For questions regarding your order, please reach out to:
-      <br>
-        Support: ${mailer}
-      </p>
-      `
+      let updateRoleEmailTemplate: IEmailTemplate = await emailTemplateService.getEmailTemplate('updateRole', false)
 
-      const message = `<p>Hello,</p>
-      <p>You have been granted a new user role by ${String(user.firstName)} ${String(user.lastName)} at ${appUrl}.<p>
-      <p>Please login to your account.</p>
-      <p>Best Regards,<br>
-      ${appName} team</p>
-      <p>${footer}</p>
-      `
+      if (updateRoleEmailTemplate === null) {
+        const defaultUpdateRoleEmailTemplate: IEmailTemplate = await emailTemplateService.getEmailTemplate('updateRole', true)
+        updateRoleEmailTemplate = defaultUpdateRoleEmailTemplate
+      }
+      subject = replacePlaceholders(updateRoleEmailTemplate.subject, replacements)
+      message = replacePlaceholders(updateRoleEmailTemplate.template, replacements)
 
       await sendNotifierEmail(email, subject, message, false, message, sandboxMode)
     }

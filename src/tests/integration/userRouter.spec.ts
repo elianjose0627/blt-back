@@ -12,7 +12,7 @@ import {
   createBlockedDomain,
   createVerifiedCompany,
   verifyCompanyDomain,
-  deleteAllEmailTemplates
+  deleteAllNonDefaultEmailTemplates
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 import { encodeString, encryptUUID } from '../../utils/encryption'
@@ -32,7 +32,7 @@ describe('A user', () => {
     await createAdminTestUser()
     await createUserWithOtp()
     await createUserWithExpiredOtp()
-    await deleteAllEmailTemplates()
+    await deleteAllNonDefaultEmailTemplates()
     await chai
       .request(app)
       .post('/auth/signup')
