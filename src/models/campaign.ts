@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { CampaignStatus, CampaignType, IAddress, ICampaign, ICampaignOrderLimit, ICampaignShippingDestination, ICardSetting, ICardTemplate, ICompany } from '../types'
+import type { CampaignStatus, CampaignType, IAddress, ICampaign, ICampaignOrderLimit, ICampaignShippingDestination, ICardSetting, ICardTemplate, ICompany, Nullable } from '../types'
 
 const CampaignModel = (sequelize: any, DataTypes: any): any => {
   interface CampaignAttributes {
@@ -17,6 +17,8 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     isNoteEnabled: boolean
     isActive: boolean
     isHidden: boolean
+    shippingMethodType: Nullable<number>
+    shippingMethodIsDropShipping: boolean
   }
 
   class Campaign extends Model<CampaignAttributes> {
@@ -42,6 +44,8 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     private readonly campaignShippingDestinations: ICampaignShippingDestination[]
     private readonly campaignOrderLimits: ICampaignOrderLimit[]
     private readonly campaignAddresses: IAddress[]
+    private readonly shippingMethodType: Nullable<number>
+    private readonly shippingMethodIsDropShipping: boolean
 
     static associate (models: any): any {
       Campaign.belongsTo(models.Company, {
@@ -109,7 +113,9 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
         cardSetting: this.cardSetting,
         campaignShippingDestinations: this.campaignShippingDestinations,
         campaignOrderLimits: this.campaignOrderLimits,
-        campaignAddresses: this.campaignAddresses
+        campaignAddresses: this.campaignAddresses,
+        shippingMethodType: this.shippingMethodType,
+        shippingMethodIsDropShipping: this.shippingMethodIsDropShipping
       }
     }
   };
@@ -169,6 +175,14 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
       defaultValue: true
     },
     isHidden: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    shippingMethodType: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    shippingMethodIsDropShipping: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     }
