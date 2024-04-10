@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import EmailTemplateController from '../controllers/EmailTemplateController'
@@ -8,7 +8,7 @@ import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 
-const emailTemplateRoutes = (): any => {
+const emailTemplateRoutes = (): Router => {
   const emailTemplateRouter = express.Router()
 
   emailTemplateRouter.use('/email-templates', checkAuth, checkUserIsVerifiedStatus, EmailTemplateController.setModule)

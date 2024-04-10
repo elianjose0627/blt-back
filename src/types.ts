@@ -290,6 +290,8 @@ export interface ICampaign {
   campaignShippingDestinations: ICampaignShippingDestination[]
   campaignOrderLimits: ICampaignOrderLimit[]
   campaignAddresses: IAddress[]
+  shippingMethodType: Nullable<number>
+  shippingMethodIsDropShipping: boolean
 }
 
 export interface ISecondaryDomain {

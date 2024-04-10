@@ -326,7 +326,9 @@ const validateCampaignAdmin = Joi.object({
     isExceedQuotaEnabled: Joi.boolean(),
     isNoteEnabled: Joi.boolean(),
     isActive: Joi.boolean(),
-    isHidden: Joi.boolean()
+    isHidden: Joi.boolean(),
+    shippingMethodType: Joi.number().allow(null).default(null),
+    shippingMethodIsDropShipping: Joi.boolean()
   }).required()
 }).required()
 
