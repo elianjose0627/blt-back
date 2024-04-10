@@ -1685,7 +1685,9 @@ describe('Company actions', () => {
             quota: 100,
             correctionQuota: 10,
             isQuotaEnabled: true,
-            isNoteEnabled: true
+            isNoteEnabled: true,
+            shippingMethodType: 12,
+            shippingMethodIsDropShipping: true
           }
         })
 
