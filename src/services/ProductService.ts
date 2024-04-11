@@ -19,6 +19,38 @@ const apiClient: any = axios.create({
 })
 
 const order = [['createdAt', 'DESC']]
+const includeCategoryTagProduct = [
+  {
+    model: db.ProductCategory,
+    attributes: {
+      exclude: ['deletedAt']
+    },
+    as: 'productCategory'
+  },
+  {
+    model: db.ProductTag,
+    include: [
+      {
+        model: db.ProductCategoryTag,
+        attributes: {
+          exclude: ['deletedAt', 'productCategoryId']
+        },
+        as: 'productCategoryTag'
+      }
+    ],
+    attributes: {
+      exclude: ['deletedAt', 'productId', 'productCategoryTagId']
+    },
+    as: 'productTags'
+  },
+  {
+    model: db.Product,
+    attributes: {
+      exclude: ['deletedAt', 'parentId', 'productCategoryId', 'companyId']
+    },
+    as: 'children'
+  }
+]
 
 class ProductService extends BaseService {
   async insert (data: any): Promise<any> {
@@ -47,36 +79,14 @@ class ProductService extends BaseService {
     return { response: response.toJSONFor(company), status: 201 }
   }
 
-  async getAllForCompany (limit: number, offset: number, companyId: string, search: string = ''): Promise<any> {
+  async getAllForCompany (limit: number, offset: number, companyId: string, search: string = '', filter = { isParent: false }): Promise<any> {
     const where: any = {
       companyId,
       isVisible: true
     }
     const attributes: any = { exclude: [] }
     const include: any[] = [
-      {
-        model: db.ProductCategory,
-        attributes: {
-          exclude: ['deletedAt']
-        },
-        as: 'productCategory'
-      },
-      {
-        model: db.ProductTag,
-        include: [
-          {
-            model: db.ProductCategoryTag,
-            attributes: {
-              exclude: ['deletedAt', 'productCategoryId']
-            },
-            as: 'productCategoryTag'
-          }
-        ],
-        attributes: {
-          exclude: ['deletedAt', 'productId', 'productCategoryTagId']
-        },
-        as: 'productTags'
-      }
+      ...includeCategoryTagProduct
     ]
 
     if (search !== '') {
@@ -107,7 +117,7 @@ class ProductService extends BaseService {
     }
   }
 
-  async getAll (limit: number, offset: number, search: string = ''): Promise<any> {
+  async getAll (limit: number, offset: number, search: string = '', filter = { isParent: 'true, false' }): Promise<any> {
     const where: any = {}
     const attributes: any = { exclude: [] }
     const include: any[] = [
@@ -116,29 +126,7 @@ class ProductService extends BaseService {
         attributes: ['id', 'name', 'suffix', 'email', 'phone', 'vat', 'domain'],
         as: 'company'
       },
-      {
-        model: db.ProductCategory,
-        attributes: {
-          exclude: ['deletedAt']
-        },
-        as: 'productCategory'
-      },
-      {
-        model: db.ProductTag,
-        include: [
-          {
-            model: db.ProductCategoryTag,
-            attributes: {
-              exclude: ['deletedAt', 'productCategoryId']
-            },
-            as: 'productCategoryTag'
-          }
-        ],
-        attributes: {
-          exclude: ['deletedAt', 'productId', 'productCategoryTagId']
-        },
-        as: 'productTags'
-      }
+      ...includeCategoryTagProduct
     ]
 
     if (search !== '') {
@@ -152,7 +140,12 @@ class ProductService extends BaseService {
     const records = await db[this.model].findAndCountAll({
       attributes,
       include,
-      where,
+      where: {
+        ...where,
+        isParent: {
+          [Op.in]: filter.isParent.split(',')
+        }
+      },
       limit,
       offset,
       order,
@@ -221,6 +214,32 @@ class ProductService extends BaseService {
     })
 
     return product
+  }
+
+  async findParentsOrChildren (ids: string[], isParent: boolean): Promise<any> {
+    const products = await db.Product.findAndCountAll({
+      attributes: ['id'],
+      where: {
+        id: {
+          [Op.in]: ids
+        },
+        isParent
+      }
+    })
+
+    return products
+  }
+
+  async updateChildren (ids: string[], parentId: string | null): Promise<any> {
+    const response = await db.Product.update({ parentId }, {
+      where: {
+        id: {
+          [Op.in]: ids
+        }
+      },
+      returning: true
+    })
+    return response
   }
 }
 

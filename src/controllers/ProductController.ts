@@ -2,7 +2,7 @@ import BaseController from './BaseController'
 import ProductService from '../services/ProductService'
 import CompanyService from '../services/CompanyService'
 import ProductCategoryService from '../services/ProductCategoryService'
-import type { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse, IProduct, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
@@ -116,8 +116,8 @@ class ProductController extends BaseController {
   }
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { limit, page, offset, search } = req.query
-    const records = await productService.getAll(limit, offset, search)
+    const { limit, page, offset, search, filter } = req.query
+    const records = await productService.getAll(limit, offset, search, filter)
 
     const meta = {
       total: records.count,
@@ -135,9 +135,9 @@ class ProductController extends BaseController {
   }
 
   async getAllForCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { limit, page, offset, search } = req.query
+    const { limit, page, offset, search, filter } = req.query
     const { id } = req.params
-    const records = await productService.getAllForCompany(limit, offset, id, search)
+    const records = await productService.getAllForCompany(limit, offset, id, search, filter)
 
     const meta = {
       total: records.count,
@@ -224,6 +224,83 @@ class ProductController extends BaseController {
       statusCode: statusCodes.OK,
       success: true,
       product: updatedRecord
+    })
+  }
+
+  async updateChild (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record, body: { product: { parentId } } } = req
+
+    const foundParents = await productService.findParentsOrChildren([parentId], true)
+
+    if (foundParents.count === 0) {
+      return res.status(statusCodes.NOT_FOUND).send({
+        statusCode: statusCodes.NOT_FOUND,
+        success: false,
+        errors: {
+          message: 'Parent product not found'
+        }
+      })
+    }
+
+    const response = await productService.update(record, { parentId })
+
+    io.emit(`${String(productService.recordName())}`, { message: `${String(productService.recordName())} updated` })
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      [productService.singleRecord()]: response
+    })
+  }
+
+  async removeChild (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record } = req
+
+    const response = await productService.update(record, { parentId: null })
+
+    io.emit(`${String(productService.recordName())}`, { message: `${String(productService.recordName())} updated` })
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      [productService.singleRecord()]: response
+    })
+  }
+
+  async updateChildren (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record, body: { product: { childIds } }, params: { id: productId } } = req
+
+    const foundParents = await productService.findParentsOrChildren([productId], true)
+
+    if (foundParents.count === 0) {
+      return res.status(statusCodes.NOT_FOUND).send({
+        statusCode: statusCodes.NOT_FOUND,
+        success: false,
+        errors: {
+          message: 'Parent product not found'
+        }
+      })
+    }
+
+    const { rows } = await productService.findParentsOrChildren(childIds, false)
+    const originalChildrenIds: string[] = record.children.map((child: IProduct) => child.id)
+    const foundChildrenIds: string[] = rows.map((child: IProduct) => child.id)
+
+    const childIdsToAdd = foundChildrenIds.filter((childId) => !originalChildrenIds.includes(childId))
+    const childIdsToRemove = originalChildrenIds.filter((childId) => !foundChildrenIds.includes(childId))
+
+    const [addedChildrenTotal, addedChildren] = await productService.updateChildren(childIdsToAdd, productId)
+    const [removedChildrenTotal, removedChildren] = await productService.updateChildren(childIdsToRemove, null)
+
+    io.emit(`${String(productService.recordName())}`, { message: `${String(productService.recordName())} updated` })
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      [productService.singleRecord()]: {
+        added: { addedChildrenTotal, addedChildren },
+        removed: { removedChildrenTotal, removedChildren }
+      }
     })
   }
 }
