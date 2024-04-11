@@ -172,6 +172,13 @@ export const generateInclude = (model: string): any => {
           exclude: ['deletedAt', 'productId', 'productCategoryTagId']
         },
         as: 'productTags'
+      },
+      {
+        model: db.Product,
+        attributes: {
+          exclude: ['deletedAt', 'parentId', 'productCategoryId', 'companyId']
+        },
+        as: 'children'
       }
     ])
   }

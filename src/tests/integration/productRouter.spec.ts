@@ -82,7 +82,10 @@ describe('Product actions', () => {
         .query({
           limit: 10,
           page: 1,
-          search: '123'
+          search: '123',
+          filter: {
+            isParent: 'false'
+          }
         })
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
@@ -1296,6 +1299,293 @@ describe('Product actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'productTags')
       expect(res.body.productTags).to.be.an('array')
+    })
+  })
+
+  describe('Set product parent child relationship', () => {
+    it('Should return 200 OK when an admin sets a product as a child.', async () => {
+      const resProductParent = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Jumper',
+            jfsku: 'j123',
+            merchantSku: 'j123',
+            type: 'generic',
+            productGroup: 'clothing',
+            isParent: true
+          }
+        })
+
+      const productParentId = resProductParent.body.product.id
+
+      const resProductChild = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Jumper - Red',
+            jfsku: 'j124',
+            merchantSku: 'j123-red',
+            type: 'generic',
+            productGroup: 'clothing'
+          }
+        })
+
+      const productChildId = resProductChild.body.product.id
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/products/${String(productChildId)}/child`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            parentId: productParentId
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('id', 'name', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 404 Not Found when an admin tries to set a product as a child to a non-existent parent.', async () => {
+      const resProductChild = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Jumper - Red',
+            jfsku: 'j124',
+            merchantSku: 'j123-red',
+            type: 'generic',
+            productGroup: 'clothing'
+          }
+        })
+
+      const productChildId = resProductChild.body.product.id
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/products/${String(productChildId)}/child`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            parentId: uuidv1()
+          }
+        })
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('Parent product not found')
+    })
+
+    it('Should return 200 OK when an admin removes a product as a child.', async () => {
+      const resProductParent = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Jumper',
+            jfsku: 'j125',
+            merchantSku: 'j125',
+            type: 'generic',
+            productGroup: 'clothing',
+            isParent: true
+          }
+        })
+
+      const productParentId = resProductParent.body.product.id
+
+      const resProductChild = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Jumper - Red',
+            jfsku: 'j125',
+            merchantSku: 'j125-red',
+            type: 'generic',
+            productGroup: 'clothing'
+          }
+        })
+
+      const productChildId = resProductChild.body.product.id
+
+      await chai
+        .request(app)
+        .patch(`/api/products/${String(productChildId)}/child`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            parentId: productParentId
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .delete(`/api/products/${String(productChildId)}/child`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('id', 'name', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 200 OK when an admin adds children to a product.', async () => {
+      const resProductParent = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Shirt',
+            jfsku: 'sh123',
+            merchantSku: 'sh123',
+            type: 'generic',
+            productGroup: 'clothing',
+            isParent: true
+          }
+        })
+
+      const productParentId = resProductParent.body.product.id
+
+      const resProductChild = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Shirt - Blue',
+            jfsku: 'sh124',
+            merchantSku: 'sh123-blue',
+            type: 'generic',
+            productGroup: 'clothing'
+          }
+        })
+
+      const productChildId = resProductChild.body.product.id
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/products/${String(productParentId)}/children`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            childIds: [productChildId]
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('added', 'removed')
+      expect(res.body.product.added.addedChildrenTotal).to.equal(1)
+      expect(res.body.product.removed.removedChildrenTotal).to.equal(0)
+    })
+
+    it('Should return 200 OK when an admin removes children from a product.', async () => {
+      const resProductParent = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Shirt',
+            jfsku: 'sh123',
+            merchantSku: 'sh123',
+            type: 'generic',
+            productGroup: 'clothing',
+            isParent: true
+          }
+        })
+
+      const productParentId = resProductParent.body.product.id
+
+      const resProductChild = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Shirt - Blue',
+            jfsku: 'sh124',
+            merchantSku: 'sh123-blue',
+            type: 'generic',
+            productGroup: 'clothing'
+          }
+        })
+
+      const productChildId = resProductChild.body.product.id
+
+      await chai
+        .request(app)
+        .patch(`/api/products/${String(productParentId)}/children`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            childIds: [productChildId]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/products/${String(productParentId)}/children`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            childIds: []
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('added', 'removed')
+      expect(res.body.product.added.addedChildrenTotal).to.equal(0)
+      expect(res.body.product.removed.removedChildrenTotal).to.equal(1)
+    })
+
+    it('Should return 404 Not Found when an admin tries to add children to a product that is not a parent.', async () => {
+      const resProductChild = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Jumper - Red',
+            jfsku: 'j124',
+            merchantSku: 'j123-red',
+            type: 'generic',
+            productGroup: 'clothing'
+          }
+        })
+
+      const productChildId = resProductChild.body.product.id
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/products/${String(productChildId)}/children`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            childIds: [uuidv1()]
+          }
+        })
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('Parent product not found')
     })
   })
 })
