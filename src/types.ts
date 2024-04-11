@@ -376,6 +376,9 @@ export interface IProduct {
   isVisible?: boolean
   productCategory?: IProductCategory
   productTags?: IProductCategoryTag[]
+  properties: { [key: string]: [string] }
+  isParent: boolean
+  children: Array<Pick<IProduct, 'id' | 'jfsku' | 'name' | 'merchantSku' | 'pictures' | 'properties' | 'createdAt' | 'updatedAt'>>
 }
 
 export interface ICampaignOrderLimit {

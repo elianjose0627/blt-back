@@ -54,6 +54,15 @@ const ProductRoutes = (): Router => {
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateProductTag
     }, { abortEarly: false }), asyncHandler(ProductTagController.insert))
+  productRouter.route('/products/:id/child')
+    .patch(asyncHandler(checkAdmin), celebrate({
+      [Segments.BODY]: validator.validateChild
+    }, { abortEarly: false }), asyncHandler(ProductController.updateChild))
+    .delete(asyncHandler(checkAdmin), asyncHandler(ProductController.removeChild))
+  productRouter.route('/products/:id/children')
+    .patch(asyncHandler(checkAdmin), celebrate({
+      [Segments.BODY]: validator.validateChildren
+    }, { abortEarly: false }), asyncHandler(ProductController.updateChildren))
   return productRouter
 }
 
