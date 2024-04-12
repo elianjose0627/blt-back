@@ -1221,3 +1221,26 @@ export const updateCampaignUsedQuota = async (campaignId: string, usedQuota: num
     })
   }
 }
+
+export const createJTLShippingMethod = async (): Promise<any> => {
+  const jtlShippingMethod = await db.JtlShippingMethod.create({
+    id: uuidv4(),
+    shippingMethodId: 'NDZ20AG4HTCWN6XW',
+    name: 'Big Little Things Einzelversand',
+    fulfillerId: 'NDZ2',
+    shippingType: 'Standard',
+    trackingUrlSchema: null,
+    carrierCode: 'DHL',
+    carrierName: null,
+    cutoffTime: null,
+    note: null,
+    modificationInfo: {
+      createdAt: '2022-04-21T06:44:40.236+00:00',
+      updatedAt: '2022-04-21T06:44:40.236+00:00',
+      state: 'New'
+    },
+    createdAt: '2024-04-12T20:52:17.000Z',
+    updatedAt: '2024-04-12T20:52:17.000Z'
+  })
+  return jtlShippingMethod
+}
