@@ -49,6 +49,7 @@ export interface Database {
   ProductCategory?: any
   ProductCategoryTag?: any
   ProductTag?: any
+  JtlShippingMethod?: any
   [key: string]: any
 }
 

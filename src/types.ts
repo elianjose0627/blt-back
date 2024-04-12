@@ -433,6 +433,22 @@ export interface IMaintenanceMode {
   updatedAt: Date
 }
 
+export interface IJtlShippingMethod {
+  id: string
+  shippingMethodId: string
+  name: string
+  fulfillerId: string
+  shippingType: string
+  trackingUrlSchema: string
+  carrierName: string
+  carrierCode: string
+  cutoffTime: string
+  note: string
+  modificationInfo: ModificationInfo
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface ShippingAddress {
   lastname: string
   city: string

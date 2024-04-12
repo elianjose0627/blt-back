@@ -1,13 +1,14 @@
 import { celebrate, Segments } from 'celebrate'
-import express from 'express'
+import express, { Router } from 'express'
 import ShippingMethodController from '../controllers/ShippingMethodController'
 import asyncHandler from '../middlewares/asyncHandler'
 import checkAuth from '../middlewares/checkAuth'
 import validator from '../validators/validators'
 import paginate from '../middlewares/pagination'
 import checkAdmin from '../middlewares/checkAdmin'
+import JtlShippingMethodController from '../controllers/jtl/JtlShippingMethodController'
 
-const shippingMethodRoutes = (): any => {
+const shippingMethodRoutes = (): Router => {
   const shippingMethodRouter = express.Router()
 
   shippingMethodRouter.use('/shipping-methods', checkAuth, ShippingMethodController.setModule)
@@ -27,6 +28,10 @@ const shippingMethodRoutes = (): any => {
       [Segments.BODY]: validator.validateShippingMethod
     }), asyncHandler(ShippingMethodController.update))
     .delete(asyncHandler(checkAdmin), asyncHandler(ShippingMethodController.delete))
+  shippingMethodRouter.route('/shipping-methods-jtl')
+    .get(celebrate({
+      [Segments.QUERY]: validator.validateQueryParams
+    }), asyncHandler(paginate), asyncHandler(JtlShippingMethodController.getAll))
   return shippingMethodRouter
 }
 
