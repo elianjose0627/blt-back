@@ -376,6 +376,9 @@ export interface IProduct {
   isVisible?: boolean
   productCategory?: IProductCategory
   productTags?: IProductCategoryTag[]
+  properties: { [key: string]: [string] }
+  isParent: boolean
+  children: Array<Pick<IProduct, 'id' | 'jfsku' | 'name' | 'merchantSku' | 'pictures' | 'properties' | 'createdAt' | 'updatedAt'>>
 }
 
 export interface ICampaignOrderLimit {
@@ -426,6 +429,22 @@ export interface IMaintenanceMode {
   isActive: boolean
   startDate: Date
   endDate: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface IJtlShippingMethod {
+  id: string
+  shippingMethodId: string
+  name: string
+  fulfillerId: string
+  shippingType: string
+  trackingUrlSchema: string
+  carrierName: string
+  carrierCode: string
+  cutoffTime: string
+  note: string
+  modificationInfo: ModificationInfo
   createdAt: Date
   updatedAt: Date
 }

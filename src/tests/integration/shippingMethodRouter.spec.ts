@@ -4,7 +4,8 @@ import app from '../../app'
 import {
   deleteTestUser,
   createAdminTestUser,
-  verifyUser
+  verifyUser,
+  createJTLShippingMethod
 } from '../utils'
 
 const { expect } = chai
@@ -17,6 +18,7 @@ let token: string
 describe('Shipping methods actions', () => {
   before(async () => {
     await createAdminTestUser()
+    await createJTLShippingMethod()
 
     await chai
       .request(app)
@@ -304,6 +306,19 @@ describe('Shipping methods actions', () => {
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('Only an admin can perform this action')
+    })
+  })
+
+  describe('Shipping methods JTL Actions', () => {
+    it('Should return 200 OK when a logged in user gets all shipping methods coming from JTL', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/shipping-methods-jtl')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'jtlShippingMethods')
+      expect(res.body.jtlShippingMethods).to.be.an('array').lengthOf.greaterThan(0)
     })
   })
 })

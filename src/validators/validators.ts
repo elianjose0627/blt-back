@@ -175,7 +175,8 @@ const validateQueryParams = Joi.object({
     country: Joi.string().length(2).optional(),
     company: Joi.string().optional(),
     companyId: Joi.string().uuid(),
-    type: Joi.string().optional()
+    type: Joi.string().optional(),
+    isParent: Joi.string().trim().valid(...['true', 'false', 'true,false', 'false,true', 'true, false', 'false, true'])
   }).optional()
 }).required()
 
@@ -418,7 +419,13 @@ const validateProduct = Joi.object({
       currency: Joi.string().required().valid(...currencies.currencies),
       discount: Joi.number()
     }),
-    productCategoryId: Joi.string().uuid().allow(null).default(null)
+    productCategoryId: Joi.string().uuid().allow(null).default(null),
+    isParent: Joi.boolean(),
+    properties: Joi.object({
+      color: Joi.string().required().allow(null).allow(''),
+      material: Joi.string().required().allow(null).allow(''),
+      size: Joi.string().required().allow(null).allow('')
+    })
   }).required()
 }).required()
 
@@ -436,7 +443,13 @@ const validateProductAdmin = Joi.object({
       currency: Joi.string().required().valid(...currencies.currencies),
       discount: Joi.number()
     }),
-    productCategoryId: Joi.string().uuid().allow(null).default(null)
+    productCategoryId: Joi.string().uuid().allow(null).default(null),
+    isParent: Joi.boolean(),
+    properties: Joi.object({
+      color: Joi.string().required().allow(null).allow(''),
+      material: Joi.string().required().allow(null).allow(''),
+      size: Joi.string().required().allow(null).allow('')
+    })
   }).required()
 }).required()
 
@@ -822,6 +835,18 @@ const validateProductTag = Joi.object({
   }).required()
 })
 
+const validateChild = Joi.object({
+  product: Joi.object({
+    parentId: Joi.string().uuid().required()
+  }).required()
+})
+
+const validateChildren = Joi.object({
+  product: Joi.object({
+    childIds: Joi.array().items(Joi.string().uuid()).required()
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -885,5 +910,7 @@ export default {
   validateCompanyLogo,
   validateProductCategory,
   validateProductCategoryTag,
-  validateProductTag
+  validateProductTag,
+  validateChild,
+  validateChildren
 }

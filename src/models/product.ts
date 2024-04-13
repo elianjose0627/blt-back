@@ -12,6 +12,8 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     netRetailPrice: NetRetailPrice
     pictures: IProductPicture[]
     isVisible: boolean
+    properties: { [key: string]: [string] }
+    isParent: boolean
   }
 
   class Product extends Model<ProductAttributes> {
@@ -28,6 +30,9 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     private readonly company: ICompany
     private readonly productCategory: IProductCategory
     private readonly productTags: IProductCategoryTag[]
+    private readonly properties: { [key: string]: [string] }
+    private readonly isParent: boolean
+    private readonly children: IProduct[]
 
     static associate (models: any): any {
       Product.belongsTo(models.Company, {
@@ -43,6 +48,11 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
       Product.hasMany(models.ProductTag, {
         foreignKey: 'productId',
         as: 'productTags',
+        onDelete: 'CASCADE'
+      })
+      Product.hasMany(models.Product, {
+        foreignKey: 'parentId',
+        as: 'children',
         onDelete: 'CASCADE'
       })
     }
@@ -61,7 +71,10 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         updatedAt: this.updatedAt,
         company: this.company,
         productCategory: this.productCategory,
-        productTags: this.productTags
+        productTags: this.productTags,
+        properties: this.properties,
+        isParent: this.isParent,
+        children: this.children
       }
     }
   };
@@ -105,9 +118,21 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
       type: DataTypes.JSON,
       defaultValue: []
     },
+    properties: {
+      type: DataTypes.JSON,
+      defaultValue: {
+        color: null,
+        material: null,
+        size: null
+      }
+    },
     isVisible: {
       type: DataTypes.BOOLEAN,
       defaultValue: true
+    },
+    isParent: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   }, {
     sequelize,
