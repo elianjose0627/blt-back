@@ -557,6 +557,7 @@ export interface IOrder {
   updatedAt?: Date
   company?: ICompany
   shipments?: IShipment[]
+  trackingId: Nullable<string>
 }
 
 export interface CustomRequest extends Request {

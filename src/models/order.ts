@@ -28,6 +28,7 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
     deliveryDate: Nullable<Date>
     createdAtByUser: Nullable<Date>
     modificationInfo: Nullable<ModificationInfo>
+    trackingId: Nullable<string>
   }
 
   class Order extends Model<OrderAttributes> {
@@ -60,6 +61,7 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly updatedAt: Date
     private readonly company: ICompany
     private readonly shipments: IShipment[]
+    private readonly trackingId: Nullable<string>
 
     static associate (models: any): any {
       Order.belongsTo(models.Company, {
@@ -103,7 +105,8 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
         updatedAt: this.updatedAt,
         modificationInfo: this.modificationInfo,
         company: this.company,
-        shipments: this.shipments
+        shipments: this.shipments,
+        trackingId: this.trackingId
       }
     }
   };
@@ -210,6 +213,10 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
     },
     modificationInfo: {
       type: DataTypes.JSON,
+      allowNull: true
+    },
+    trackingId: {
+      type: DataTypes.STRING,
       allowNull: true
     }
   }, {
