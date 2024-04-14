@@ -169,6 +169,14 @@ class CampaignService extends BaseService {
     let records
     const allowedCompanyRoles = [userRoles.CAMPAIGNMANAGER, userRoles.COMPANYADMINISTRATOR]
 
+    const include = [
+      {
+        model: db.Shipment,
+        as: 'shipments',
+        attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt', 'orderId'] }
+      }
+    ]
+
     if (user.role === userRoles.ADMIN) {
       records = await db.Order.findAndCountAll({
         limit,
@@ -180,7 +188,8 @@ class CampaignService extends BaseService {
             Sequelize.literal(`(${query})`),
             where
           ]
-        }
+        },
+        include
       })
     } else if (allowedCompanyRoles.includes(user.role)) {
       records = await db.Order.findAndCountAll({
@@ -194,7 +203,8 @@ class CampaignService extends BaseService {
             where
           ],
           companyId: user.company.id
-        }
+        },
+        include
       })
     } else {
       records = await db.Order.findAndCountAll({
@@ -208,7 +218,8 @@ class CampaignService extends BaseService {
             where
           ],
           'shippingAddress.email': user.email
-        }
+        },
+        include
       })
     }
 
