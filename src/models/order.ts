@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { Attribute, ICompany, IOrder, Item, ModificationInfo, Nullable, SenderAddress, ShippingAddress } from '../types'
+import type { Attribute, ICompany, IOrder, IShipment, Item, ModificationInfo, Nullable, SenderAddress, ShippingAddress } from '../types'
 
 const OrderModel = (sequelize: any, DataTypes: any): any => {
   interface OrderAttributes {
@@ -59,12 +59,17 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany
+    private readonly shipments: IShipment[]
 
     static associate (models: any): any {
       Order.belongsTo(models.Company, {
         foreignKey: 'companyId',
         as: 'company',
         onDelete: 'CASCADE'
+      })
+      Order.hasMany(models.Shipment, {
+        foreignKey: 'orderId',
+        as: 'shipments'
       })
     }
 
@@ -97,7 +102,8 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         modificationInfo: this.modificationInfo,
-        company: this.company
+        company: this.company,
+        shipments: this.shipments
       }
     }
   };

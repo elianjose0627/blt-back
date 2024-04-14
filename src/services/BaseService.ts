@@ -8,7 +8,7 @@ dayjs.extend(utc)
 
 const includeCompany = [
   'Address', 'CostCenter',
-  'Order', 'AccessPermission', 'PendingOrder'
+  'AccessPermission', 'PendingOrder'
 ]
 const withoutUser = [
   'BundleItem', 'Salutation', 'Picture',
@@ -192,6 +192,18 @@ export const generateInclude = (model: string): any => {
         as: 'productCategoryTags'
       }
     ])
+  }
+  if (model === 'Order') {
+    return (
+      [
+        includeCompanyAndOwner,
+        {
+          model: db.Shipment,
+          as: 'shipments',
+          attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt', 'orderId'] }
+        }
+      ]
+    )
   }
   if (withoutUser.includes(model)) {
     return ([])
