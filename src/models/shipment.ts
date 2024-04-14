@@ -18,7 +18,11 @@ const ShipmentModel = (sequelize: any, DataTypes: any): any => {
     private readonly updatedAt: Date
 
     static associate (models: any): any {
-
+      Shipment.belongsTo(models.Order, {
+        foreignKey: 'orderId',
+        as: 'shipments',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): IShipment {

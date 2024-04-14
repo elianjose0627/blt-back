@@ -556,6 +556,7 @@ export interface IOrder {
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
+  shipments?: IShipment[]
 }
 
 export interface CustomRequest extends Request {
