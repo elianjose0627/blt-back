@@ -85,10 +85,11 @@ class ProductService extends BaseService {
     return { response: response.toJSONFor(company), status: 201 }
   }
 
-  async getAllForCompany (limit: number, offset: number, companyId: string, search: string = '', filter = { isParent: false, category: '' }): Promise<any> {
-    const { category } = filter
+  async getAllForCompany (limit: number, offset: number, companyId: string, search: string = '', filter = { isParent: false, category: '', minPrice: 0, maxPrice: 0 }): Promise<any> {
+    const { category, minPrice, maxPrice } = filter
 
     const whereFilterCategory = generateFilterQuery({ name: category })
+    const whereFilterPrice: any = {}
     const where: any = {
       companyId,
       isVisible: true
@@ -110,10 +111,21 @@ class ProductService extends BaseService {
       ]
     }
 
+    if (maxPrice > 0) {
+      whereFilterPrice[Op.and] = [
+        {
+          'netRetailPrice.amount': { [Op.between]: [minPrice, maxPrice] }
+        }
+      ]
+    }
+
     const records = await db[this.model].findAndCountAll({
       attributes,
       include,
-      where,
+      where: {
+        ...where,
+        ...whereFilterPrice
+      },
       limit,
       offset,
       order,
@@ -126,11 +138,12 @@ class ProductService extends BaseService {
     }
   }
 
-  async getAll (limit: number, offset: number, search: string = '', filter = { isParent: 'true, false', category: '' }): Promise<any> {
-    const { isParent = 'true, false', category } = filter
+  async getAll (limit: number, offset: number, search: string = '', filter = { isParent: 'true, false', category: '', minPrice: 0, maxPrice: 0 }): Promise<any> {
+    const { isParent = 'true, false', category, minPrice, maxPrice } = filter
 
     const whereSearch: any = {}
     const whereFilterCategory = generateFilterQuery({ name: category })
+    const whereFilterPrice: any = {}
 
     const attributes: any = { exclude: [] }
     const include: any[] = [
@@ -150,6 +163,14 @@ class ProductService extends BaseService {
       ]
     }
 
+    if (maxPrice > 0) {
+      whereFilterPrice[Op.and] = [
+        {
+          'netRetailPrice.amount': { [Op.between]: [minPrice, maxPrice] }
+        }
+      ]
+    }
+
     const records = await db[this.model].findAndCountAll({
       attributes,
       include,
@@ -157,7 +178,8 @@ class ProductService extends BaseService {
         ...whereSearch,
         isParent: {
           [Op.in]: isParent.split(',')
-        }
+        },
+        ...whereFilterPrice
       },
       limit,
       offset,
