@@ -176,7 +176,9 @@ const validateQueryParams = Joi.object({
     company: Joi.string().optional(),
     companyId: Joi.string().uuid(),
     type: Joi.string().optional(),
-    isParent: Joi.string().trim().valid(...['true', 'false', 'true,false', 'false,true', 'true, false', 'false, true'])
+    isParent: Joi.string().trim().lowercase()
+      .valid(...['true', 'false', 'true,false', 'false,true', 'true, false', 'false, true']),
+    category: Joi.string().optional()
   }).optional()
 }).required()
 
