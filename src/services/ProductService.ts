@@ -85,8 +85,11 @@ class ProductService extends BaseService {
     return { response: response.toJSONFor(company), status: 201 }
   }
 
-  async getAllForCompany (limit: number, offset: number, companyId: string, search: string = '', filter = { isParent: false, category: '', minPrice: 0, maxPrice: 0 }): Promise<any> {
-    const { category, minPrice, maxPrice } = filter
+  async getAllForCompany (
+    limit: number, offset: number, companyId: string, search: string = '',
+    filter = { isParent: false, category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '' }
+  ): Promise<any> {
+    const { category, minPrice, maxPrice, color, material, size } = filter
 
     const whereFilterCategory = generateFilterQuery({ name: category })
     const whereFilterPrice: any = {}
@@ -94,6 +97,12 @@ class ProductService extends BaseService {
       companyId,
       isVisible: true
     }
+    const wherePropertiesFilter = generateFilterQuery({
+      'properties.color': color,
+      'properties.material': material,
+      'properties.size': size
+    })
+
     const attributes: any = { exclude: [] }
     const include: any[] = [
       ...generateIncludeCategoryTagProduct(whereFilterCategory)
@@ -124,7 +133,8 @@ class ProductService extends BaseService {
       include,
       where: {
         ...where,
-        ...whereFilterPrice
+        ...whereFilterPrice,
+        ...wherePropertiesFilter
       },
       limit,
       offset,
@@ -138,12 +148,20 @@ class ProductService extends BaseService {
     }
   }
 
-  async getAll (limit: number, offset: number, search: string = '', filter = { isParent: 'true, false', category: '', minPrice: 0, maxPrice: 0 }): Promise<any> {
-    const { isParent = 'true, false', category, minPrice, maxPrice } = filter
+  async getAll (
+    limit: number, offset: number, search: string = '',
+    filter = { isParent: 'true, false', category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '' }
+  ): Promise<any> {
+    const { isParent = 'true, false', category, minPrice, maxPrice, color, material, size } = filter
 
     const whereSearch: any = {}
     const whereFilterCategory = generateFilterQuery({ name: category })
     const whereFilterPrice: any = {}
+    const wherePropertiesFilter = generateFilterQuery({
+      'properties.color': color,
+      'properties.material': material,
+      'properties.size': size
+    })
 
     const attributes: any = { exclude: [] }
     const include: any[] = [
@@ -179,7 +197,8 @@ class ProductService extends BaseService {
         isParent: {
           [Op.in]: isParent.split(',')
         },
-        ...whereFilterPrice
+        ...whereFilterPrice,
+        ...wherePropertiesFilter
       },
       limit,
       offset,

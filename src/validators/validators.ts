@@ -180,7 +180,10 @@ const validateQueryParams = Joi.object({
       .valid(...['true', 'false', 'true,false', 'false,true', 'true, false', 'false, true']),
     category: Joi.string().optional(),
     minPrice: Joi.number().min(0).optional(),
-    maxPrice: Joi.number().min(0).optional()
+    maxPrice: Joi.number().min(0).optional(),
+    color: Joi.string().optional(),
+    material: Joi.string().optional(),
+    size: Joi.string().optional()
   }).optional()
 }).required()
 

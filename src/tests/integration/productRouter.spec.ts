@@ -188,6 +188,57 @@ describe('Product actions', () => {
       expect(res.body.products).to.be.an('array').lengthOf.above(0)
     })
 
+    it('Should return 200 Success when an admin successfully retrieves all products with properties params.', async () => {
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'shoes'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Boots',
+            jfsku: '1231bt',
+            merchantSku: '1231bt',
+            type: 'generic',
+            productGroup: 'shoes',
+            productCategoryId,
+            properties: {
+              color: 'black',
+              material: 'leather',
+              size: '44'
+            }
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get('/api/products')
+        .query({
+          limit: 10,
+          page: 1,
+          filter: {
+            color: 'black',
+            material: 'leather',
+            size: '44'
+          }
+        })
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf.above(0)
+    })
+
     it('Should return 403 when a non-admin retrieves all products.', async () => {
       const res = await chai
         .request(app)
