@@ -89,12 +89,12 @@ class ProductService extends BaseService {
 
   async getAllForCompany (
     limit: number, offset: number, companyId: string, search: string = '',
-    filter = { isParent: false, category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tag: '' }
+    filter = { isParent: false, category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tags: '' }
   ): Promise<any> {
-    const { category, minPrice = 0, maxPrice = 0, color, material, size, tag } = filter
+    const { category, minPrice = 0, maxPrice = 0, color, material, size, tags } = filter
 
     const whereFilterCategory = generateFilterQuery({ name: category })
-    const whereFilterTag = generateFilterQuery({ productCategoryTagId: tag })
+    const whereFilterTags = generateFilterQuery({ productCategoryTagId: tags }, 'in')
     let whereFilterPrice: any = {}
     const where: any = {
       companyId,
@@ -108,7 +108,7 @@ class ProductService extends BaseService {
 
     const attributes: any = { exclude: [] }
     const include: any[] = [
-      ...generateIncludeCategoryTagProduct(whereFilterCategory, whereFilterTag)
+      ...generateIncludeCategoryTagProduct(whereFilterCategory, whereFilterTags)
     ]
 
     if (search !== '') {
@@ -149,13 +149,13 @@ class ProductService extends BaseService {
 
   async getAll (
     limit: number, offset: number, search: string = '',
-    filter = { isParent: 'true, false', category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tag: '' }
+    filter = { isParent: 'true, false', category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tags: '' }
   ): Promise<any> {
-    const { isParent = 'true, false', category, minPrice = 0, maxPrice = 0, color, material, size, tag } = filter
+    const { isParent = 'true, false', category, minPrice = 0, maxPrice = 0, color, material, size, tags } = filter
 
     const whereSearch: any = {}
     const whereFilterCategory = generateFilterQuery({ name: category })
-    const whereFilterTag = generateFilterQuery({ productCategoryTagId: tag })
+    const whereFilterTags = generateFilterQuery({ productCategoryTagId: tags }, 'in')
     let whereFilterPrice: any = {}
     const wherePropertiesFilter = generateFilterQuery({
       'properties.color': color,
@@ -170,7 +170,7 @@ class ProductService extends BaseService {
         attributes: ['id', 'name', 'suffix', 'email', 'phone', 'vat', 'domain'],
         as: 'company'
       },
-      ...generateIncludeCategoryTagProduct(whereFilterCategory, whereFilterTag)
+      ...generateIncludeCategoryTagProduct(whereFilterCategory, whereFilterTags)
     ]
 
     if (search !== '') {
