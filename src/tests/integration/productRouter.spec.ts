@@ -164,7 +164,7 @@ describe('Product actions', () => {
             productGroup: 'clothing',
             productCategoryId,
             netRetailPrice: {
-              amount: 100,
+              amount: 200,
               currency: 'EUR',
               discount: 0
             }
@@ -177,8 +177,8 @@ describe('Product actions', () => {
           limit: 10,
           page: 1,
           filter: {
-            minPrice: 50,
-            maxPrice: 100
+            minPrice: 150,
+            maxPrice: 200
           }
         })
         .set('Authorization', `Bearer ${tokenAdmin}`)
@@ -186,6 +186,7 @@ describe('Product actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'products')
       expect(res.body.products).to.be.an('array').lengthOf.above(0)
+      expect(res.body.meta.total).to.equal(1)
     })
 
     it('Should return 200 Success when an admin successfully retrieves all products with properties params.', async () => {
@@ -215,8 +216,8 @@ describe('Product actions', () => {
             productCategoryId,
             properties: {
               color: 'black',
-              material: 'leather',
-              size: '44'
+              material: 'suede',
+              size: '46'
             }
           }
         })
@@ -228,8 +229,8 @@ describe('Product actions', () => {
           page: 1,
           filter: {
             color: 'black',
-            material: 'leather',
-            size: '44'
+            material: 'suede',
+            size: '46'
           }
         })
         .set('Authorization', `Bearer ${tokenAdmin}`)
@@ -237,6 +238,7 @@ describe('Product actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'products')
       expect(res.body.products).to.be.an('array').lengthOf.above(0)
+      expect(res.body.meta.total).to.equal(1)
     })
 
     it('Should return 403 when a non-admin retrieves all products.', async () => {

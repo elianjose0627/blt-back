@@ -183,7 +183,8 @@ const validateQueryParams = Joi.object({
     maxPrice: Joi.number().min(0).optional(),
     color: Joi.string().optional(),
     material: Joi.string().optional(),
-    size: Joi.string().optional()
+    size: Joi.string().optional(),
+    tag: Joi.string().uuid().optional()
   }).optional()
 }).required()
 

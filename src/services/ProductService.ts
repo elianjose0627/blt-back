@@ -19,7 +19,7 @@ const apiClient: any = axios.create({
 })
 
 const order = [['createdAt', 'DESC']]
-const generateIncludeCategoryTagProduct = (filterCategory: object): object[] => {
+const generateIncludeCategoryTagProduct = (filterCategory: object, filterTag: object): object[] => {
   return (
     [
       {
@@ -42,6 +42,8 @@ const generateIncludeCategoryTagProduct = (filterCategory: object): object[] => 
             as: 'productCategoryTag'
           }
         ],
+        where: filterTag,
+        required: Object.keys(filterTag).length > 0,
         attributes: {
           exclude: ['deletedAt', 'productId', 'productCategoryTagId']
         },
@@ -87,12 +89,13 @@ class ProductService extends BaseService {
 
   async getAllForCompany (
     limit: number, offset: number, companyId: string, search: string = '',
-    filter = { isParent: false, category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '' }
+    filter = { isParent: false, category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tag: '' }
   ): Promise<any> {
-    const { category, minPrice, maxPrice, color, material, size } = filter
+    const { category, minPrice = 0, maxPrice = 0, color, material, size, tag } = filter
 
     const whereFilterCategory = generateFilterQuery({ name: category })
-    const whereFilterPrice: any = {}
+    const whereFilterTag = generateFilterQuery({ productCategoryTagId: tag })
+    let whereFilterPrice: any = {}
     const where: any = {
       companyId,
       isVisible: true
@@ -105,7 +108,7 @@ class ProductService extends BaseService {
 
     const attributes: any = { exclude: [] }
     const include: any[] = [
-      ...generateIncludeCategoryTagProduct(whereFilterCategory)
+      ...generateIncludeCategoryTagProduct(whereFilterCategory, whereFilterTag)
     ]
 
     if (search !== '') {
@@ -121,11 +124,7 @@ class ProductService extends BaseService {
     }
 
     if (maxPrice > 0) {
-      whereFilterPrice[Op.and] = [
-        {
-          'netRetailPrice.amount': { [Op.between]: [minPrice, maxPrice] }
-        }
-      ]
+      whereFilterPrice = { 'netRetailPrice.amount': { [Op.between]: [minPrice, maxPrice] } }
     }
 
     const records = await db[this.model].findAndCountAll({
@@ -150,13 +149,14 @@ class ProductService extends BaseService {
 
   async getAll (
     limit: number, offset: number, search: string = '',
-    filter = { isParent: 'true, false', category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '' }
+    filter = { isParent: 'true, false', category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tag: '' }
   ): Promise<any> {
-    const { isParent = 'true, false', category, minPrice, maxPrice, color, material, size } = filter
+    const { isParent = 'true, false', category, minPrice = 0, maxPrice = 0, color, material, size, tag } = filter
 
     const whereSearch: any = {}
     const whereFilterCategory = generateFilterQuery({ name: category })
-    const whereFilterPrice: any = {}
+    const whereFilterTag = generateFilterQuery({ productCategoryTagId: tag })
+    let whereFilterPrice: any = {}
     const wherePropertiesFilter = generateFilterQuery({
       'properties.color': color,
       'properties.material': material,
@@ -170,7 +170,7 @@ class ProductService extends BaseService {
         attributes: ['id', 'name', 'suffix', 'email', 'phone', 'vat', 'domain'],
         as: 'company'
       },
-      ...generateIncludeCategoryTagProduct(whereFilterCategory)
+      ...generateIncludeCategoryTagProduct(whereFilterCategory, whereFilterTag)
     ]
 
     if (search !== '') {
@@ -182,11 +182,7 @@ class ProductService extends BaseService {
     }
 
     if (maxPrice > 0) {
-      whereFilterPrice[Op.and] = [
-        {
-          'netRetailPrice.amount': { [Op.between]: [minPrice, maxPrice] }
-        }
-      ]
+      whereFilterPrice = { 'netRetailPrice.amount': { [Op.between]: [minPrice, maxPrice] } }
     }
 
     const records = await db[this.model].findAndCountAll({
