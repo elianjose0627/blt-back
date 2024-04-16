@@ -176,7 +176,15 @@ const validateQueryParams = Joi.object({
     company: Joi.string().optional(),
     companyId: Joi.string().uuid(),
     type: Joi.string().optional(),
-    isParent: Joi.string().trim().valid(...['true', 'false', 'true,false', 'false,true', 'true, false', 'false, true'])
+    isParent: Joi.string().trim().lowercase()
+      .valid(...['true', 'false', 'true,false', 'false,true', 'true, false', 'false, true']),
+    category: Joi.string().optional(),
+    minPrice: Joi.number().min(0).optional(),
+    maxPrice: Joi.number().min(0).optional(),
+    color: Joi.string().optional(),
+    material: Joi.string().optional(),
+    size: Joi.string().optional(),
+    tag: Joi.string().uuid().optional()
   }).optional()
 }).required()
 
