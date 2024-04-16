@@ -250,7 +250,7 @@ export function generateFilterQuery (filter: object, operator: FilterOperator = 
 
   Object.entries(filter).forEach(([key, value]) => {
     if (value !== undefined && value !== '') {
-      const op = operator in operators ? operators[operator] : operators.equals
+      const op = operators[operator]
       filterQuery[key] = {
         [op]: operator === 'in' ? value.split(',') : value
       }
