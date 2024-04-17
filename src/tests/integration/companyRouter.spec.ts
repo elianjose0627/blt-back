@@ -2634,6 +2634,239 @@ describe('Company actions', () => {
       expect(res.body.products).to.be.an('array')
     })
 
+    it('Should return 200 Success when an owner successfully retrieves all products excluding children.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Exclude Children',
+            email: 'test@company10productbltexcludechildren.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
+
+      const resProductParent = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/products`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          product: {
+            name: 'Fridge 1',
+            jfsku: '1231fr1',
+            merchantSku: '1231fr1',
+            type: 'generic',
+            productGroup: 'technology',
+            isParent: true
+          }
+        })
+      const parentProductId = String(resProductParent.body.product.id)
+      const resProductChild = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/products`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          product: {
+            name: 'Fridge 2',
+            jfsku: '1231fr2',
+            merchantSku: '1231fr2',
+            type: 'generic',
+            productGroup: 'technology'
+          }
+        })
+      const childProductId = String(resProductChild.body.product.id)
+      await chai
+        .request(app)
+        .patch(`/api/products/${childProductId}/child`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            parentId: parentProductId
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/products`)
+        .set('Authorization', `Bearer ${token}`)
+        .query({
+          limit: 10,
+          page: 1,
+          filter: {
+            showChildren: 'false'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
+    })
+
+    it('Should return 200 Success when an owner successfully retrieves all products with price filter.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Price',
+            email: 'test@company10productbltprice.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/products`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: '123sw',
+            merchantSku: '123sw',
+            type: 'generic',
+            productGroup: 'beverage',
+            netRetailPrice: {
+              amount: 100,
+              currency: 'EUR',
+              discount: 0
+            }
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/products`)
+        .query({
+          limit: 10,
+          page: 1,
+          filter: {
+            minPrice: 50,
+            maxPrice: 100
+          }
+        })
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf.above(0)
+      expect(res.body.meta.total).to.equal(1)
+    })
+
+    it('Should return 200 Success when an owner successfully retrieves all products with property params filter.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Property',
+            email: 'test@company10productbltproperty.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/products`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          product: {
+            name: 'Shoes',
+            jfsku: '123sw1',
+            merchantSku: '123sw1',
+            type: 'generic',
+            productGroup: 'clothing',
+            properties: {
+              color: 'black',
+              material: 'leather',
+              size: '44'
+            }
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/products`)
+        .query({
+          limit: 10,
+          page: 1,
+          filter: {
+            color: 'black',
+            material: 'leather',
+            size: '44'
+          }
+        })
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf.above(0)
+      expect(res.body.meta.total).to.equal(1)
+    })
+
+    it('Should return 200 Success when an owner successfully retrieves all products with product category filter.', async () => {
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'clothing'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Category',
+            email: 'test@company10productbltcategory.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/products`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          product: {
+            name: 'Shoes',
+            jfsku: '123sw1',
+            merchantSku: '123sw1',
+            type: 'generic',
+            productGroup: 'clothing',
+            productCategoryId
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/products`)
+        .query({
+          limit: 10,
+          page: 1,
+          filter: {
+            category: 'clothing'
+          }
+        })
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf.above(0)
+      expect(res.body.meta.total).to.equal(1)
+    })
+
     it('Should return 200 Success when an owner successfully retrieves all products without products where isVisible is set to false.', async () => {
       const resCompany = await chai
         .request(app)

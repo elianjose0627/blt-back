@@ -176,7 +176,19 @@ const validateQueryParams = Joi.object({
     company: Joi.string().optional(),
     companyId: Joi.string().uuid(),
     type: Joi.string().optional(),
-    isParent: Joi.string().trim().valid(...['true', 'false', 'true,false', 'false,true', 'true, false', 'false, true'])
+    isParent: Joi.string().trim().lowercase()
+      .valid(...['true', 'false', 'true,false', 'false,true', 'true, false', 'false, true']),
+    category: Joi.string().optional(),
+    minPrice: Joi.number().min(0).optional(),
+    maxPrice: Joi.number().min(0).optional(),
+    color: Joi.string().optional(),
+    material: Joi.string().optional(),
+    size: Joi.string().optional(),
+    tags: Joi.string()
+      .lowercase()
+      .pattern(/^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12},?)+$/i)
+      .optional(),
+    showChildren: Joi.string().trim().lowercase().valid(...['true', 'false'])
   }).optional()
 }).required()
 
@@ -558,8 +570,8 @@ const commonPendingOrderSchema = {
   orderNo: Joi.string(),
   inetorderno: Joi.number(),
   shippingId: Joi.number(),
-  shipped: Joi.date(),
-  deliverydate: Joi.date(),
+  shipped: Joi.date().min(dayjs().utc().subtract(1, 'day').toDate()),
+  deliverydate: Joi.date().min(Joi.ref('shipped')),
   note: Joi.string().allow('').allow(null),
   description: Joi.string().allow('').allow(null),
   costCenter: Joi.string().allow('').allow(null),

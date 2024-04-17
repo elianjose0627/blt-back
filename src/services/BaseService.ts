@@ -3,6 +3,7 @@ import { Op } from 'sequelize'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import db from '../models'
+import { FilterOperator } from '../types'
 
 dayjs.extend(utc)
 
@@ -240,13 +241,18 @@ export function generateShippingAddressFilterQuery (filter: object): object {
   return filterQuery
 }
 
-export function generateFilterQuery (filter: object): object {
+export function generateFilterQuery (filter: object, operator: FilterOperator = 'equals'): object {
   const filterQuery: Record<string, unknown> = {}
+  const operators: any = {
+    equals: Op.eq,
+    in: Op.in
+  }
 
   Object.entries(filter).forEach(([key, value]) => {
     if (value !== undefined && value !== '') {
+      const op = operators[operator]
       filterQuery[key] = {
-        [Op.eq]: value
+        [op]: operator === 'in' ? value.split(',') : value
       }
     }
   })

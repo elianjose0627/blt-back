@@ -216,7 +216,7 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
       allowNull: true
     },
     trackingId: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: true
     }
   }, {

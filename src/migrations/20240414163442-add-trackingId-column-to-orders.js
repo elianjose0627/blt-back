@@ -4,7 +4,7 @@ module.exports = {
     return Promise.all([
       queryInterface.addColumn('Orders', 'trackingId', {
         allowNull: true,
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       })
     ])
   },

@@ -20,6 +20,8 @@ export interface StatusCode {
 
 export type Environment = 'development' | 'test' | 'staging' | 'production'
 
+export type FilterOperator = 'equals' | 'in'
+
 export interface DbConfig {
   use_env_variable: string
   dialect: string
