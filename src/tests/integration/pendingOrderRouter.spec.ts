@@ -1,5 +1,6 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
+import dayjs from 'dayjs'
 import app from '../../app'
 import {
   deleteTestUser,
@@ -78,8 +79,15 @@ describe('Pending Orders actions', () => {
         .post('/api/pending-orders/duplicate')
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          postedOrderIds: [
-            '17064477727948800', '17064460270206976'
+          postedOrders: [
+            {
+              orderId: '17064477727948800',
+              shipped: dayjs.utc().add(1, 'day')
+            },
+            {
+              orderId: '17064460270206976',
+              shipped: dayjs.utc().add(1, 'day')
+            }
           ]
         })
 
@@ -94,8 +102,15 @@ describe('Pending Orders actions', () => {
         .post('/api/pending-orders/duplicate')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          postedOrderIds: [
-            '17064477727948800', '17064460270206976'
+          postedOrders: [
+            {
+              orderId: '17064477727948800',
+              shipped: dayjs.utc().add(1, 'day')
+            },
+            {
+              orderId: '17064460270206976',
+              shipped: dayjs.utc().add(1, 'day')
+            }
           ]
         })
 
@@ -150,8 +165,15 @@ describe('Pending Orders actions', () => {
         .post('/api/pending-orders/duplicate')
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          postedOrderIds: [
-            '20064477727948800', '20064460270206976'
+          postedOrders: [
+            {
+              orderId: '20064477727948800',
+              shipped: dayjs.utc().add(1, 'day')
+            },
+            {
+              orderId: '20064460270206976',
+              shipped: dayjs.utc().add(1, 'day')
+            }
           ]
         })
 
@@ -214,8 +236,15 @@ describe('Pending Orders actions', () => {
         .post('/api/pending-orders/duplicate')
         .set('Authorization', `Bearer ${String(tokenCompanyAdmin)}`)
         .send({
-          postedOrderIds: [
-            '20064477727948800', '20064460270206976'
+          postedOrders: [
+            {
+              orderId: '20064477727948800',
+              shipped: dayjs.utc().add(1, 'day')
+            },
+            {
+              orderId: '20064460270206976',
+              shipped: dayjs.utc().add(1, 'day')
+            }
           ]
         })
 
