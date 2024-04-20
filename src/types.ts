@@ -68,6 +68,10 @@ export interface IUser {
   addresses: Array<Partial<IAddress>>
 }
 
+export interface IUserExtended extends IUser {
+  companyId: string
+}
+
 export interface IToken {
   id: string
   accessToken: string
@@ -796,6 +800,11 @@ export interface IPendingOrder {
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
+}
+
+export interface IDuplicatePostedOrder {
+  orderId: string
+  shipped: Date
 }
 
 export interface ICardTemplate {

@@ -72,7 +72,7 @@ const CampaignRoutes = (): Router => {
       asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
       asyncHandler(CampaignController.checkIsNotActive),
       celebrate({
-        [Segments.BODY]: validator.validatePendingOrder
+        [Segments.BODY]: validator.validatePendingOrders
       }), asyncHandler(PendingOrderController.insert))
   campaignRouter.route('/campaigns/:id/card-templates')
     .post(asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee),

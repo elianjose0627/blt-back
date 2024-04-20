@@ -629,20 +629,9 @@ const commonPendingOrderSchema = {
     })
   )
 }
-const validatePendingOrder = Joi.object({
+const validatePendingOrders = Joi.object({
   pendingOrders: Joi.array().items(
     Joi.object({ ...commonPendingOrderSchema })
-  ).min(1).required()
-}).required()
-
-const validatePendingOrderAdmin = Joi.object({
-  pendingOrders: Joi.array().items(
-    Joi.object({
-      ...commonPendingOrderSchema,
-      customerId: Joi.number().optional().allow('').allow(null),
-      campaignId: Joi.string().uuid(),
-      companyId: Joi.string().uuid()
-    })
   ).min(1).required()
 }).required()
 
@@ -686,8 +675,11 @@ const validateGreetingCard = Joi.object({
   }).required()
 }).required()
 
-const validatePostedOrderIds = Joi.object().keys({
-  postedOrderIds: Joi.array().items(Joi.string().min(17)).min(1).required()
+const validatePostedOrders = Joi.object().keys({
+  postedOrders: Joi.array().items(Joi.object({
+    orderId: Joi.string().min(17).required(),
+    shipped: Joi.date().min(dayjs().utc().subtract(1, 'day').toDate()).required()
+  })).min(1).required()
 }).required()
 
 const validateAuthToken = Joi.object({
@@ -901,12 +893,11 @@ export default {
   validatePrivacyRule,
   validateRegistrationQueryParams,
   validateShippingMethod,
-  validatePendingOrder,
-  validatePendingOrderAdmin,
+  validatePendingOrders,
   validateCardTemplate,
   validateCardSetting,
   validateGreetingCard,
-  validatePostedOrderIds,
+  validatePostedOrders,
   validateProductId,
   validateAuthToken,
   validateCampaignOrderLimit,

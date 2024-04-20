@@ -6,7 +6,7 @@ import dayjs from 'dayjs'
 import triggerPubSub from '../utils/triggerPubSub'
 import * as userRoles from '../utils/userRoles'
 import * as statusCodes from '../constants/statusCodes'
-import { IPendingOrder } from '../types'
+import { IDuplicatePostedOrder, IPendingOrder, IUserExtended } from '../types'
 
 dayjs.extend(utc)
 
@@ -70,14 +70,16 @@ class PendingOrderService extends BaseService {
   }
 
   async duplicate (data: any): Promise<any> {
-    const { postedOrderIds, currentUser } = data
+    const { postedOrders, currentUser }: { postedOrders: IDuplicatePostedOrder[], currentUser: IUserExtended } = data
     const { role } = currentUser
     const allowedRoles = [userRoles.ADMIN, userRoles.CAMPAIGNMANAGER, userRoles.COMPANYADMINISTRATOR]
+
+    const postedOrderIds = postedOrders.map((postedOrder) => postedOrder.orderId)
     const foundPendingOrders = await db.PendingOrder.findAndCountAll({
       where: {
         postedOrderId: postedOrderIds
       },
-      attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'postedOrderId', 'isPosted', 'isGreetingCardSent'] },
+      attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isPosted', 'isGreetingCardSent'] },
       raw: true
     })
 
@@ -103,25 +105,43 @@ class PendingOrderService extends BaseService {
       }
     }
 
-    const bulkInsertData = foundPendingOrders.rows.map((pendingOrder: any) => ({
-      ...pendingOrder,
-      id: uuidv1(),
-      shipped: dayjs.utc().add(3, 'days').add(1, 'hour').format(),
-      deliverydate: dayjs.utc().add(3, 'days').add(1, 'hour').format(),
-      userId: currentUser.id,
-      created: dayjs.utc().format(),
-      createdBy: currentUser.email,
-      updatedBy: currentUser.email,
-      createdByFullName: `${String(currentUser.firstName)} ${String(currentUser.lastName)}`
-    }))
+    const bulkInsertData = foundPendingOrders.rows.map((pendingOrder: any) => {
+      const [foundPostedOrderShipped] = postedOrders
+        .filter((postedOrder) => postedOrder.orderId === pendingOrder.postedOrderId)
+        .map((postedOrder) => postedOrder.shipped)
+
+      const shipped = dayjs(foundPostedOrderShipped).utc().add(1, 'hour').format()
+      return ({
+        ...pendingOrder,
+        id: uuidv1(),
+        shipped,
+        deliverydate: shipped,
+        userId: currentUser.id,
+        created: dayjs.utc().format(),
+        createdBy: currentUser.email,
+        updatedBy: currentUser.email,
+        createdByFullName: `${String(currentUser.firstName)} ${String(currentUser.lastName)}`,
+        postedOrderId: null
+      })
+    })
 
     const topicId = 'pending-orders'
     const environment = String(process.env.ENVIRONMENT)
     const attributes = { environment }
 
-    await triggerPubSub(topicId, 'postPendingOrders', attributes)
-
     const response = await db.PendingOrder.bulkCreate(bulkInsertData, { returning: true })
+
+    const campaignIds: Set<string> = new Set(response.map((data: any) => data.campaignId))
+
+    const promises = Array.from(campaignIds).map(async (campaignId) => {
+      // Recalculate Quota
+      const quotaTopicId = 'campaign-quota'
+      const campaignAttributes = { campaignId, environment }
+      await triggerPubSub(quotaTopicId, 'updateCorrectionQuotaPerCampaign', campaignAttributes)
+    })
+    await Promise.all(promises)
+
+    await triggerPubSub(topicId, 'postPendingOrders', attributes)
 
     return response
   }

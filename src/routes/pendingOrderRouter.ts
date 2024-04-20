@@ -18,7 +18,7 @@ const pendingOrderRoutes = (): any => {
     }), asyncHandler(paginate), asyncHandler(PendingOrderController.getAll))
   pendingOrderRouter.route('/pending-orders/duplicate')
     .post(celebrate({
-      [Segments.BODY]: validator.validatePostedOrderIds
+      [Segments.BODY]: validator.validatePostedOrders
     }), asyncHandler(PendingOrderController.duplicate))
 
   return pendingOrderRouter
