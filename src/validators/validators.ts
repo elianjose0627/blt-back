@@ -176,7 +176,19 @@ const validateQueryParams = Joi.object({
     company: Joi.string().optional(),
     companyId: Joi.string().uuid(),
     type: Joi.string().optional(),
-    isParent: Joi.string().trim().valid(...['true', 'false', 'true,false', 'false,true', 'true, false', 'false, true'])
+    isParent: Joi.string().trim().lowercase()
+      .valid(...['true', 'false', 'true,false', 'false,true', 'true, false', 'false, true']),
+    category: Joi.string().optional(),
+    minPrice: Joi.number().min(0).optional(),
+    maxPrice: Joi.number().min(0).optional(),
+    color: Joi.string().optional(),
+    material: Joi.string().optional(),
+    size: Joi.string().optional(),
+    tags: Joi.string()
+      .lowercase()
+      .pattern(/^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12},?)+$/i)
+      .optional(),
+    showChildren: Joi.string().trim().lowercase().valid(...['true', 'false'])
   }).optional()
 }).required()
 
@@ -558,8 +570,8 @@ const commonPendingOrderSchema = {
   orderNo: Joi.string(),
   inetorderno: Joi.number(),
   shippingId: Joi.number(),
-  shipped: Joi.date(),
-  deliverydate: Joi.date(),
+  shipped: Joi.date().min(dayjs().utc().subtract(1, 'day').toDate()),
+  deliverydate: Joi.date().min(Joi.ref('shipped')),
   note: Joi.string().allow('').allow(null),
   description: Joi.string().allow('').allow(null),
   costCenter: Joi.string().allow('').allow(null),
@@ -617,20 +629,9 @@ const commonPendingOrderSchema = {
     })
   )
 }
-const validatePendingOrder = Joi.object({
+const validatePendingOrders = Joi.object({
   pendingOrders: Joi.array().items(
     Joi.object({ ...commonPendingOrderSchema })
-  ).min(1).required()
-}).required()
-
-const validatePendingOrderAdmin = Joi.object({
-  pendingOrders: Joi.array().items(
-    Joi.object({
-      ...commonPendingOrderSchema,
-      customerId: Joi.number().optional().allow('').allow(null),
-      campaignId: Joi.string().uuid(),
-      companyId: Joi.string().uuid()
-    })
   ).min(1).required()
 }).required()
 
@@ -674,8 +675,11 @@ const validateGreetingCard = Joi.object({
   }).required()
 }).required()
 
-const validatePostedOrderIds = Joi.object().keys({
-  postedOrderIds: Joi.array().items(Joi.string().min(17)).min(1).required()
+const validatePostedOrders = Joi.object().keys({
+  postedOrders: Joi.array().items(Joi.object({
+    orderId: Joi.string().min(17).required(),
+    shipped: Joi.date().min(dayjs().utc().subtract(1, 'day').toDate()).required()
+  })).min(1).required()
 }).required()
 
 const validateAuthToken = Joi.object({
@@ -889,12 +893,11 @@ export default {
   validatePrivacyRule,
   validateRegistrationQueryParams,
   validateShippingMethod,
-  validatePendingOrder,
-  validatePendingOrderAdmin,
+  validatePendingOrders,
   validateCardTemplate,
   validateCardSetting,
   validateGreetingCard,
-  validatePostedOrderIds,
+  validatePostedOrders,
   validateProductId,
   validateAuthToken,
   validateCampaignOrderLimit,

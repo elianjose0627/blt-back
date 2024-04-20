@@ -92,9 +92,9 @@ class PendingOrderController extends BaseController {
   }
 
   async duplicate (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { body: { postedOrderIds }, user: currentUser } = req
+    const { body: { postedOrders }, user: currentUser } = req
 
-    const response = await pendingOrderService.duplicate({ postedOrderIds, currentUser })
+    const response = await pendingOrderService.duplicate({ postedOrders, currentUser })
 
     if (response.message !== undefined) {
       return res.status(response.statusCode).send({

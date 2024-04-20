@@ -1,7 +1,7 @@
 import { v1 as uuidv1 } from 'uuid'
 import { Op } from 'sequelize'
 import { Joi } from 'celebrate'
-import BaseService, { generateInclude } from './BaseService'
+import BaseService, { generateFilterQuery, generateInclude } from './BaseService'
 import db from '../models'
 import axios from 'axios'
 import { IProduct } from '../types'
@@ -19,38 +19,46 @@ const apiClient: any = axios.create({
 })
 
 const order = [['createdAt', 'DESC']]
-const includeCategoryTagProduct = [
-  {
-    model: db.ProductCategory,
-    attributes: {
-      exclude: ['deletedAt']
-    },
-    as: 'productCategory'
-  },
-  {
-    model: db.ProductTag,
-    include: [
+const generateIncludeCategoryTagProduct = (filterCategory: object, filterTag: object): object[] => {
+  return (
+    [
       {
-        model: db.ProductCategoryTag,
+        model: db.ProductCategory,
         attributes: {
-          exclude: ['deletedAt', 'productCategoryId']
+          exclude: ['deletedAt']
         },
-        as: 'productCategoryTag'
+        as: 'productCategory',
+        where: filterCategory,
+        required: Object.keys(filterCategory).length > 0 // Added so as to use a LEFT OUTER JOIN when filter is empty otherwise INNER JOIN
+      },
+      {
+        model: db.ProductTag,
+        include: [
+          {
+            model: db.ProductCategoryTag,
+            attributes: {
+              exclude: ['deletedAt', 'productCategoryId']
+            },
+            as: 'productCategoryTag'
+          }
+        ],
+        where: filterTag,
+        required: Object.keys(filterTag).length > 0,
+        attributes: {
+          exclude: ['deletedAt', 'productId', 'productCategoryTagId']
+        },
+        as: 'productTags'
+      },
+      {
+        model: db.Product,
+        attributes: {
+          exclude: ['deletedAt', 'parentId', 'productCategoryId', 'companyId']
+        },
+        as: 'children'
       }
-    ],
-    attributes: {
-      exclude: ['deletedAt', 'productId', 'productCategoryTagId']
-    },
-    as: 'productTags'
-  },
-  {
-    model: db.Product,
-    attributes: {
-      exclude: ['deletedAt', 'parentId', 'productCategoryId', 'companyId']
-    },
-    as: 'children'
-  }
-]
+    ]
+  )
+}
 
 class ProductService extends BaseService {
   async insert (data: any): Promise<any> {
@@ -79,14 +87,29 @@ class ProductService extends BaseService {
     return { response: response.toJSONFor(company), status: 201 }
   }
 
-  async getAllForCompany (limit: number, offset: number, companyId: string, search: string = '', filter = { isParent: false }): Promise<any> {
+  async getAllForCompany (
+    limit: number, offset: number, companyId: string, search: string = '',
+    filter = { isParent: false, category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tags: '', showChildren: 'true' }
+  ): Promise<any> {
+    const { category, minPrice = 0, maxPrice = 0, color, material, size, tags, showChildren } = filter
+
+    const whereFilterCategory = generateFilterQuery({ name: category })
+    const whereFilterTags = generateFilterQuery({ productCategoryTagId: tags }, 'in')
+    let whereFilterPrice: any = {}
     const where: any = {
       companyId,
       isVisible: true
     }
+    const wherePropertiesFilter = generateFilterQuery({
+      'properties.color': color,
+      'properties.material': material,
+      'properties.size': size
+    })
+    const whereFilterShowChildren = showChildren === 'false' ? { parentId: { [Op.eq]: null } } : {}
+
     const attributes: any = { exclude: [] }
     const include: any[] = [
-      ...includeCategoryTagProduct
+      ...generateIncludeCategoryTagProduct(whereFilterCategory, whereFilterTags)
     ]
 
     if (search !== '') {
@@ -101,10 +124,19 @@ class ProductService extends BaseService {
       ]
     }
 
+    if (maxPrice > 0) {
+      whereFilterPrice = { 'netRetailPrice.amount': { [Op.between]: [minPrice, maxPrice] } }
+    }
+
     const records = await db[this.model].findAndCountAll({
       attributes,
       include,
-      where,
+      where: {
+        ...where,
+        ...whereFilterPrice,
+        ...wherePropertiesFilter,
+        ...whereFilterShowChildren
+      },
       limit,
       offset,
       order,
@@ -117,8 +149,23 @@ class ProductService extends BaseService {
     }
   }
 
-  async getAll (limit: number, offset: number, search: string = '', filter = { isParent: 'true, false' }): Promise<any> {
-    const where: any = {}
+  async getAll (
+    limit: number, offset: number, search: string = '',
+    filter = { isParent: 'true, false', category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tags: '', showChildren: 'true' }
+  ): Promise<any> {
+    const { isParent = 'true, false', category, minPrice = 0, maxPrice = 0, color, material, size, tags, showChildren } = filter
+
+    const whereSearch: any = {}
+    const whereFilterCategory = generateFilterQuery({ name: category })
+    const whereFilterTags = generateFilterQuery({ productCategoryTagId: tags }, 'in')
+    let whereFilterPrice: any = {}
+    const wherePropertiesFilter = generateFilterQuery({
+      'properties.color': color,
+      'properties.material': material,
+      'properties.size': size
+    })
+    const whereFilterShowChildren = showChildren === 'false' ? { parentId: { [Op.eq]: null } } : {}
+
     const attributes: any = { exclude: [] }
     const include: any[] = [
       {
@@ -126,25 +173,32 @@ class ProductService extends BaseService {
         attributes: ['id', 'name', 'suffix', 'email', 'phone', 'vat', 'domain'],
         as: 'company'
       },
-      ...includeCategoryTagProduct
+      ...generateIncludeCategoryTagProduct(whereFilterCategory, whereFilterTags)
     ]
 
     if (search !== '') {
-      where[Op.or] = [
+      whereSearch[Op.or] = [
         { name: { [Op.iLike]: `%${search}%` } },
         { jfsku: { [Op.iLike]: `%${search}%` } },
         { merchantSku: { [Op.iLike]: `%${search}%` } }
       ]
     }
 
+    if (maxPrice > 0) {
+      whereFilterPrice = { 'netRetailPrice.amount': { [Op.between]: [minPrice, maxPrice] } }
+    }
+
     const records = await db[this.model].findAndCountAll({
       attributes,
       include,
       where: {
-        ...where,
+        ...whereSearch,
         isParent: {
-          [Op.in]: filter.isParent.split(',')
-        }
+          [Op.in]: isParent.split(',')
+        },
+        ...whereFilterPrice,
+        ...wherePropertiesFilter,
+        ...whereFilterShowChildren
       },
       limit,
       offset,

@@ -20,6 +20,8 @@ export interface StatusCode {
 
 export type Environment = 'development' | 'test' | 'staging' | 'production'
 
+export type FilterOperator = 'equals' | 'in'
+
 export interface DbConfig {
   use_env_variable: string
   dialect: string
@@ -64,6 +66,10 @@ export interface IUser {
   logoutTime?: Nullable<Date>
   company: Partial<ICompany> | null
   addresses: Array<Partial<IAddress>>
+}
+
+export interface IUserExtended extends IUser {
+  companyId: string
 }
 
 export interface IToken {
@@ -794,6 +800,11 @@ export interface IPendingOrder {
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
+}
+
+export interface IDuplicatePostedOrder {
+  orderId: string
+  shipped: Date
 }
 
 export interface ICardTemplate {
