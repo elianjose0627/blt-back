@@ -2796,7 +2796,7 @@ describe('Company actions', () => {
           limit: 10,
           page: 1,
           filter: {
-            price: '800-810, 700-701'
+            price: '800-810,700-701'
           }
         })
         .set('Authorization', `Bearer ${token}`)
