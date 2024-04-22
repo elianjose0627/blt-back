@@ -246,6 +246,56 @@ describe('Product actions', () => {
       expect(res.body.meta.total).to.equal(1)
     })
 
+    it('Should return 200 Success when an admin successfully retrieves all products with price range params.', async () => {
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'clothing'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Sweater',
+            jfsku: '1231sw',
+            merchantSku: '1231sw',
+            type: 'generic',
+            productGroup: 'clothing',
+            productCategoryId,
+            netRetailPrice: {
+              amount: 710,
+              currency: 'EUR',
+              discount: 0
+            }
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get('/api/products')
+        .query({
+          limit: 10,
+          page: 1,
+          filter: {
+            price: '700-710'
+          }
+        })
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
+      expect(res.body.meta.total).to.equal(1)
+    })
+
     it('Should return 200 Success when an admin successfully retrieves all products with properties params.', async () => {
       const resProductCategory = await chai
         .request(app)
