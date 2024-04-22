@@ -187,8 +187,15 @@ const validateQueryParams = Joi.object({
     tags: Joi.string()
       .lowercase()
       .pattern(/^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12},?)+$/i)
+      .messages({
+        'string.pattern.base': '{#label} must be valid uuids separated by commas'
+      })
       .optional(),
-    showChildren: Joi.string().trim().lowercase().valid(...['true', 'false'])
+    showChildren: Joi.string().trim().lowercase().valid(...['true', 'false']),
+    price: Joi.string().pattern(/^\d+-\d+(?:,\d+-\d+)*$/)
+      .messages({
+        'string.pattern.base': '{#label} must contain valid ranges separated by commas'
+      }).optional()
   }).optional()
 }).required()
 
