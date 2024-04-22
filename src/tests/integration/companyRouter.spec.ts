@@ -2756,6 +2756,57 @@ describe('Company actions', () => {
       expect(res.body.meta.total).to.equal(1)
     })
 
+    it('Should return 200 Success when an owner successfully retrieves all products with price range filter.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Price Range',
+            email: 'test@company10productbltpricerange.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/products`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          product: {
+            name: 'Soda Water',
+            jfsku: '123sw',
+            merchantSku: '123sw',
+            type: 'generic',
+            productGroup: 'beverage',
+            netRetailPrice: {
+              amount: 810,
+              currency: 'EUR',
+              discount: 0
+            }
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/products`)
+        .query({
+          limit: 10,
+          page: 1,
+          filter: {
+            price: '800-810, 700-701'
+          }
+        })
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
+      expect(res.body.meta.total).to.equal(1)
+    })
+
     it('Should return 200 Success when an owner successfully retrieves all products with property params filter.', async () => {
       const resCompany = await chai
         .request(app)
