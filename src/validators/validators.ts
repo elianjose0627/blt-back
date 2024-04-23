@@ -444,7 +444,8 @@ const validateProduct = Joi.object({
       color: Joi.string().required().allow(null).allow(''),
       material: Joi.string().required().allow(null).allow(''),
       size: Joi.string().required().allow(null).allow('')
-    })
+    }),
+    description: Joi.string().allow(null).allow('').optional()
   }).required()
 }).required()
 
@@ -468,7 +469,8 @@ const validateProductAdmin = Joi.object({
       color: Joi.string().required().allow(null).allow(''),
       material: Joi.string().required().allow(null).allow(''),
       size: Joi.string().required().allow(null).allow('')
-    })
+    }),
+    description: Joi.string().allow(null).allow('').optional()
   }).required()
 }).required()
 
