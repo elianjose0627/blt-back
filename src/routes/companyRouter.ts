@@ -81,7 +81,7 @@ const companyRoutes = (): Router => {
     .get(ProductController.setModule, asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions),
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
-        [Segments.QUERY]: validator.validateQueryParams
+        [Segments.QUERY]: validator.validateProductQueryParams
       }), asyncHandler(paginate), asyncHandler(ProductController.getAllForCompany))
   companyRouter.route('/companies/:id/secondary-domains')
     .post(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
