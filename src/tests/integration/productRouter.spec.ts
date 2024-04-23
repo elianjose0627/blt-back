@@ -85,6 +85,11 @@ describe('Product actions', () => {
           search: '123',
           filter: {
             isParent: 'false'
+          },
+          orderBy: {
+            createdAt: 'asc',
+            name: 'asc',
+            price: 'asc'
           }
         })
         .set('Authorization', `Bearer ${tokenAdmin}`)
