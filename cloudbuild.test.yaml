@@ -45,3 +45,6 @@ steps:
   env:
     - 'CODECOV_TOKEN=${_CODECOV_TOKEN}'
   timeout: '600s'
+options:
+  pool:
+    name: 'projects/$PROJECT_ID/locations/$_DEPLOY_REGION/workerPools/cloud-build-private-pool'

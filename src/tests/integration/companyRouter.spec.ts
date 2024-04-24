@@ -2746,6 +2746,11 @@ describe('Company actions', () => {
           filter: {
             minPrice: 50,
             maxPrice: 100
+          },
+          orderBy: {
+            createdAt: 'asc',
+            name: 'asc',
+            price: 'asc'
           }
         })
         .set('Authorization', `Bearer ${token}`)

@@ -1,10 +1,11 @@
 import { v1 as uuidv1 } from 'uuid'
-import { Op } from 'sequelize'
+import { Op, Sequelize } from 'sequelize'
 import { Joi } from 'celebrate'
 import BaseService, { generateFilterQuery, generateInclude } from './BaseService'
 import db from '../models'
 import axios from 'axios'
 import { IProduct } from '../types'
+import { Literal } from 'sequelize/types/utils'
 
 const baseURL = process.env.JTL_API_URL as string
 
@@ -26,6 +27,24 @@ const generatePriceRangesQuery = (priceRanges: string[]): any[] => priceRanges.m
     }
   }
 })
+
+const generateOrderBy = (orderBy: {[key: string]: string | number | undefined}): Array<[string | Literal, string]> => {
+  const order: Array<[string | Literal, string]> = []
+  Object.entries(orderBy).forEach(([key, value]) => {
+    if (value !== undefined && value !== '') {
+      const ascOrDesc = (orderBy[key] as string).toUpperCase()
+      if (key === 'price') {
+        order.push([Sequelize.literal("CAST((\"Product\".\"netRetailPrice\"->>'amount') AS DOUBLE PRECISION)"), ascOrDesc])
+      } else {
+        order.push([key, ascOrDesc])
+      }
+    }
+  })
+  if (order.length === 0) {
+    order.push(['createdAt', 'DESC'])
+  }
+  return order
+}
 
 const order = [['createdAt', 'DESC']]
 const generateIncludeCategoryTagProduct = (filterCategory: object, filterTag: object): object[] => {
@@ -98,9 +117,12 @@ class ProductService extends BaseService {
 
   async getAllForCompany (
     limit: number, offset: number, companyId: string, search: string = '',
-    filter = { isParent: false, category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tags: '', showChildren: 'true', price: '' }
+    filter = { isParent: false, category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tags: '', showChildren: 'true', price: '' },
+    orderBy = { name: '', createdAt: '', price: '' }
   ): Promise<any> {
     const { category, minPrice = 0, maxPrice = 0, color, material, size, tags, showChildren, price = '' } = filter
+
+    const order = generateOrderBy(orderBy)
 
     const whereFilterCategory = generateFilterQuery({ name: category })
     const whereFilterTags = generateFilterQuery({ productCategoryTagId: tags }, 'in')
@@ -167,12 +189,15 @@ class ProductService extends BaseService {
 
   async getAll (
     limit: number, offset: number, search: string = '',
-    filter = { isParent: 'true, false', category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tags: '', showChildren: 'true', price: '' }
+    filter = { isParent: 'true, false', category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tags: '', showChildren: 'true', price: '' },
+    orderBy = { name: '', createdAt: '', price: '' }
   ): Promise<any> {
     const {
       isParent = 'true, false', category, minPrice = 0, maxPrice = 0,
       color, material, size, tags, showChildren, price = ''
     } = filter
+
+    const order = generateOrderBy(orderBy)
 
     const whereSearch: any = {}
     const whereFilterCategory = generateFilterQuery({ name: category }, 'in')
