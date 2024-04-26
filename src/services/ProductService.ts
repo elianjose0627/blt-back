@@ -35,6 +35,8 @@ const generateOrderBy = (orderBy: {[key: string]: string | number | undefined}):
       const ascOrDesc = (orderBy[key] as string).toUpperCase()
       if (key === 'price') {
         order.push([Sequelize.literal("CAST((\"Product\".\"netRetailPrice\"->>'amount') AS DOUBLE PRECISION)"), ascOrDesc])
+      } else if (key === 'name') {
+        order.push([Sequelize.literal('LOWER("Product"."name")'), ascOrDesc])
       } else {
         order.push([key, ascOrDesc])
       }
