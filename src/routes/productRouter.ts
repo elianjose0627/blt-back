@@ -19,7 +19,7 @@ const ProductRoutes = (): Router => {
       [Segments.BODY]: validator.validateProductAdmin
     }), asyncHandler(ProductController.checkProductCategory), asyncHandler(ProductController.insert))
     .get(asyncHandler(checkAdmin), celebrate({
-      [Segments.QUERY]: validator.validateQueryParams
+      [Segments.QUERY]: validator.validateProductQueryParams
     }), asyncHandler(paginate), asyncHandler(ProductController.getAll))
   productRouter.use('/products/:id', celebrate({
     [Segments.PARAMS]: validator.validateProductId

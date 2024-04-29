@@ -370,6 +370,7 @@ export interface IProduct {
   id: string
   jfsku: string
   name: string
+  description: string
   merchantSku: string
   productGroup: string
   type: ProductType

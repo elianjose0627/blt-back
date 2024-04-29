@@ -116,8 +116,8 @@ class ProductController extends BaseController {
   }
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { limit, page, offset, search, filter } = req.query
-    const records = await productService.getAll(limit, offset, search, filter)
+    const { limit, page, offset, search, filter, orderBy } = req.query
+    const records = await productService.getAll(limit, offset, search, filter, orderBy)
 
     const meta = {
       total: records.count,
@@ -135,9 +135,9 @@ class ProductController extends BaseController {
   }
 
   async getAllForCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { limit, page, offset, search, filter } = req.query
+    const { limit, page, offset, search, filter, orderBy } = req.query
     const { id } = req.params
-    const records = await productService.getAllForCompany(limit, offset, id, search, filter)
+    const records = await productService.getAllForCompany(limit, offset, id, search, filter, orderBy)
 
     const meta = {
       total: records.count,

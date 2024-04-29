@@ -6,6 +6,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     id: string
     jfsku: string
     name: string
+    description: string
     merchantSku: string
     productGroup: string
     type: ProductType
@@ -20,6 +21,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     private readonly id: string
     private readonly jfsku: string
     private readonly name: string
+    private readonly description: string
     private readonly merchantSku: string
     private readonly productGroup: string
     private readonly type: ProductType
@@ -62,6 +64,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         id: this.id,
         jfsku: this.jfsku,
         name: this.name,
+        description: this.description,
         merchantSku: this.merchantSku,
         productGroup: this.productGroup,
         type: this.type,
@@ -92,6 +95,10 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     name: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true
     },
     merchantSku: {
       type: DataTypes.STRING,

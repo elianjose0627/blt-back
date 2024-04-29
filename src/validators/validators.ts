@@ -161,7 +161,7 @@ const validateProductId = Joi.object().keys({
   id: Joi.alternatives().try(Joi.string().uuid(), Joi.string().length(11))
 }).required()
 
-const validateQueryParams = Joi.object({
+const commonQueryParams = {
   limit: Joi.number().optional(),
   page: Joi.number().optional(),
   offset: Joi.number().optional(),
@@ -197,7 +197,17 @@ const validateQueryParams = Joi.object({
         'string.pattern.base': '{#label} must contain valid ranges separated by commas'
       }).optional()
   }).optional()
-}).required()
+}
+const validateQueryParams = Joi.object({ ...commonQueryParams }).required()
+
+const validateProductQueryParams = Joi.object({
+  ...commonQueryParams,
+  orderBy: Joi.object({
+    name: Joi.string().valid(...['asc', 'desc']),
+    price: Joi.string().valid(...['asc', 'desc']),
+    createdAt: Joi.string().valid(...['asc', 'desc'])
+  }).optional()
+})
 
 const validateNotifications = Joi.object({
   user: Joi.object({
@@ -444,7 +454,8 @@ const validateProduct = Joi.object({
       color: Joi.string().required().allow(null).allow(''),
       material: Joi.string().required().allow(null).allow(''),
       size: Joi.string().required().allow(null).allow('')
-    })
+    }),
+    description: Joi.string().allow(null).allow('').optional()
   }).required()
 }).required()
 
@@ -468,7 +479,8 @@ const validateProductAdmin = Joi.object({
       color: Joi.string().required().allow(null).allow(''),
       material: Joi.string().required().allow(null).allow(''),
       size: Joi.string().required().allow(null).allow('')
-    })
+    }),
+    description: Joi.string().allow(null).allow('').optional()
   }).required()
 }).required()
 
@@ -922,5 +934,6 @@ export default {
   validateProductCategoryTag,
   validateProductTag,
   validateChild,
-  validateChildren
+  validateChildren,
+  validateProductQueryParams
 }
