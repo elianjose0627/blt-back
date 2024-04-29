@@ -36,7 +36,8 @@ class OrderService extends BaseService {
         offset,
         order: [['createdAt', 'DESC']],
         attributes: { exclude: [] },
-        where
+        where,
+        distinct: true
       })
     } else if (allowedCompanyRoles.includes(user.role)) {
       records = await db[this.model].findAndCountAll({
@@ -48,7 +49,8 @@ class OrderService extends BaseService {
         where: {
           ...where,
           companyId: user.company.id
-        }
+        },
+        distinct: true
       })
     } else {
       records = await db[this.model].findAndCountAll({
@@ -60,7 +62,8 @@ class OrderService extends BaseService {
         where: {
           ...where,
           'shippingAddress.email': user.email
-        }
+        },
+        distinct: true
       })
     }
 
