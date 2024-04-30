@@ -1930,4 +1930,83 @@ describe('Product actions', () => {
       expect(res.body.errors.message).to.equal('Parent product not found')
     })
   })
+
+  describe('Product Graduated Prices', () => {
+    it('Should return 201 Created when an admin adds a graduated price to a product', async () => {
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Bitter Lemon',
+            jfsku: 'J1244371',
+            merchantSku: '1234471',
+            type: 'generic',
+            productGroup: 'beverage'
+          }
+        })
+
+      const productId = resProduct.body.product.id
+
+      const res = await chai
+        .request(app)
+        .post(`/api/products/${String(productId)}/graduated-prices`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productGraduatedPrice: {
+            quantity: 150,
+            price: 15.12
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productGraduatedPrice')
+      expect(res.body.productGraduatedPrice).to.be.an('object')
+    })
+
+    it('Should return 200 OK when an admin adds the same graduated price to a product', async () => {
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Macbook Pro M1',
+            jfsku: 'J34971M1',
+            merchantSku: '42721M1',
+            type: 'generic',
+            productGroup: 'laptop'
+          }
+        })
+
+      const productId = resProduct.body.product.id
+
+      await chai
+        .request(app)
+        .post(`/api/products/${String(productId)}/graduated-prices`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productGraduatedPrice: {
+            quantity: 100,
+            price: 15.12
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .post(`/api/products/${String(productId)}/graduated-prices`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productGraduatedPrice: {
+            quantity: 100,
+            price: 15.12
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productGraduatedPrice')
+      expect(res.body.productGraduatedPrice).to.be.an('object')
+    })
+  })
 })

@@ -50,6 +50,7 @@ export interface Database {
   ProductCategoryTag?: any
   ProductTag?: any
   JtlShippingMethod?: any
+  ProductGraduatedPrice?: any
   [key: string]: any
 }
 
