@@ -4,13 +4,15 @@ import type { IProductGraduatedPrice } from '../types'
 const ProductGraduatedPriceModel = (sequelize: any, DataTypes: any): any => {
   interface ProductGraduatedPriceAttributes {
     id: string
-    quantity: number
+    firstUnit: number
+    lastUnit: number
     price: number
   }
 
   class ProductGraduatedPrice extends Model<ProductGraduatedPriceAttributes> {
     private readonly id: string
-    private readonly quantity: number
+    private readonly firstUnit: number
+    private readonly lastUnit: number
     private readonly price: number
     private readonly createdAt: Date
     private readonly updatedAt: Date
@@ -22,7 +24,8 @@ const ProductGraduatedPriceModel = (sequelize: any, DataTypes: any): any => {
     toJSONFor (): IProductGraduatedPrice {
       return {
         id: this.id,
-        quantity: this.quantity,
+        firstUnit: this.firstUnit,
+        lastUnit: this.lastUnit,
         price: this.price,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
@@ -36,7 +39,11 @@ const ProductGraduatedPriceModel = (sequelize: any, DataTypes: any): any => {
       primaryKey: true,
       allowNull: false
     },
-    quantity: {
+    firstUnit: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    lastUnit: {
       type: DataTypes.INTEGER,
       allowNull: false
     },

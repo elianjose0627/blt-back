@@ -67,7 +67,8 @@ describe('Product Graduated Price actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productGraduatedPrice: {
-            quantity: 100,
+            firstUnit: 1,
+            lastUnit: 100,
             price: 15.12
           }
         })
@@ -116,7 +117,8 @@ describe('Product Graduated Price actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productGraduatedPrice: {
-            quantity: 100,
+            firstUnit: 1,
+            lastUnit: 100,
             price: 15.12
           }
         })
@@ -130,7 +132,7 @@ describe('Product Graduated Price actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'productGraduatedPrice')
       expect(res.body.productGraduatedPrice).to.be.an('object')
-      expect(res.body.productGraduatedPrice).to.include.keys('id', 'quantity', 'price', 'createdAt', 'updatedAt')
+      expect(res.body.productGraduatedPrice).to.include.keys('id', 'firstUnit', 'lastUnit', 'price', 'createdAt', 'updatedAt')
     })
 
     it('Should return 200 OK when an administrator updates a graduated price by id.', async () => {
@@ -156,7 +158,8 @@ describe('Product Graduated Price actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productGraduatedPrice: {
-            quantity: 100,
+            firstUnit: 1,
+            lastUnit: 100,
             price: 15.12
           }
         })
@@ -169,7 +172,8 @@ describe('Product Graduated Price actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productGraduatedPrice: {
-            quantity: 100,
+            firstUnit: 1,
+            lastUnit: 100,
             price: 15.13
           }
         })
@@ -177,7 +181,7 @@ describe('Product Graduated Price actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'productGraduatedPrice')
       expect(res.body.productGraduatedPrice).to.be.an('object')
-      expect(res.body.productGraduatedPrice).to.include.keys('id', 'price', 'quantity', 'createdAt', 'updatedAt')
+      expect(res.body.productGraduatedPrice).to.include.keys('id', 'price', 'firstUnit', 'lastUnit', 'createdAt', 'updatedAt')
       expect(res.body.productGraduatedPrice.price).to.equal(15.13)
     })
 
@@ -204,7 +208,8 @@ describe('Product Graduated Price actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productGraduatedPrice: {
-            quantity: 100,
+            firstUnit: 1,
+            lastUnit: 100,
             price: 15.12
           }
         })
@@ -217,7 +222,8 @@ describe('Product Graduated Price actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           productGraduatedPrice: {
-            quantity: 100,
+            firstUnit: 1,
+            lastUnit: 100,
             price: 15.12
           }
         })
@@ -250,7 +256,8 @@ describe('Product Graduated Price actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productGraduatedPrice: {
-            quantity: 100,
+            firstUnit: 1,
+            lastUnit: 100,
             price: 15.12
           }
         })

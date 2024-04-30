@@ -369,7 +369,8 @@ export interface IProductCategory {
 
 export interface IProductGraduatedPrice {
   id: string
-  quantity: number
+  firstUnit: number
+  lastUnit: number
   price: number
   createdAt: Date
   updatedAt: Date

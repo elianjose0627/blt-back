@@ -7,7 +7,11 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.UUID
       },
-      quantity: {
+      firstUnit: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      lastUnit: {
         type: Sequelize.INTEGER,
         allowNull: false
       },

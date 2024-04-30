@@ -1955,7 +1955,8 @@ describe('Product actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productGraduatedPrice: {
-            quantity: 150,
+            firstUnit: 1,
+            lastUnit: 150,
             price: 15.12
           }
         })
@@ -1988,7 +1989,8 @@ describe('Product actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productGraduatedPrice: {
-            quantity: 100,
+            firstUnit: 1,
+            lastUnit: 100,
             price: 15.12
           }
         })
@@ -1999,7 +2001,8 @@ describe('Product actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productGraduatedPrice: {
-            quantity: 100,
+            firstUnit: 1,
+            lastUnit: 100,
             price: 15.12
           }
         })

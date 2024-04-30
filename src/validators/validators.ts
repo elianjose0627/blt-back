@@ -872,7 +872,11 @@ const validateChildren = Joi.object({
 
 const validateGraduatedPrice = Joi.object({
   productGraduatedPrice: Joi.object({
-    quantity: Joi.number().required().min(1),
+    firstUnit: Joi.number().required().min(1),
+    lastUnit: Joi.number().required().min(Joi.ref('firstUnit'))
+      .not(Joi.ref('firstUnit')).messages({
+        'any.invalid': 'Last unit must not be equal to first unit'
+      }),
     price: Joi.number().min(0)
   }).required()
 })
