@@ -870,6 +870,13 @@ const validateChildren = Joi.object({
   }).required()
 })
 
+const validateGraduatedPrice = Joi.object({
+  productGraduatedPrice: Joi.object({
+    quantity: Joi.number().required().min(1),
+    price: Joi.number().min(0)
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -935,5 +942,6 @@ export default {
   validateProductTag,
   validateChild,
   validateChildren,
-  validateProductQueryParams
+  validateProductQueryParams,
+  validateGraduatedPrice
 }

@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { ICompany, IProduct, IProductCategory, IProductCategoryTag, IProductPicture, NetRetailPrice, ProductType } from '../types'
+import type { ICompany, IProduct, IProductCategory, IProductCategoryTag, IProductGraduatedPrice, IProductPicture, NetRetailPrice, ProductType } from '../types'
 
 const ProductModel = (sequelize: any, DataTypes: any): any => {
   interface ProductAttributes {
@@ -35,6 +35,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     private readonly properties: { [key: string]: [string] }
     private readonly isParent: boolean
     private readonly children: IProduct[]
+    private readonly graduatedPrices: IProductGraduatedPrice[]
 
     static associate (models: any): any {
       Product.belongsTo(models.Company, {
@@ -57,6 +58,11 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         as: 'children',
         onDelete: 'CASCADE'
       })
+      Product.hasMany(models.ProductGraduatedPrice, {
+        foreignKey: 'productId',
+        as: 'graduatedPrices',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): IProduct {
@@ -77,7 +83,8 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         productTags: this.productTags,
         properties: this.properties,
         isParent: this.isParent,
-        children: this.children
+        children: this.children,
+        graduatedPrices: this.graduatedPrices
       }
     }
   };

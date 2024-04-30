@@ -69,6 +69,7 @@ app.use(apiPrefix, routers.campaignAddressRouter())
 app.use(apiPrefix, routers.maintenanceModeRouter())
 app.use(apiPrefix, routers.productCategoryRouter())
 app.use(apiPrefix, routers.productCategoryTagRouter())
+app.use(apiPrefix, routers.productGraduatedPriceRouter())
 
 // Add validation middleware
 app.use(joiErrors)
