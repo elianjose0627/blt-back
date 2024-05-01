@@ -717,9 +717,7 @@ const validateCampaignOrderLimit = Joi.object({
 }).required()
 
 const validateCampaignShippingDestination = Joi.object({
-  campaignShippingDestination: Joi.object({
-    country: Joi.string().required().valid(...countryList.countries)
-  }).required()
+  campaignShippingDestinations: Joi.array().items(Joi.string().required().valid(...countryList.countries)).min(1)
 }).required()
 
 const validatePasswordResetAdmin = Joi.object({

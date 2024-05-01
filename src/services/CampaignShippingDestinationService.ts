@@ -1,30 +1,49 @@
 import { v1 as uuidv1 } from 'uuid'
+import { Op } from 'sequelize'
 import BaseService from './BaseService'
 import db from '../models'
+import { ICampaignShippingDestination } from '../types'
 
 class CampaignShippingDestinationService extends BaseService {
   async insert (data: any): Promise<any> {
-    const { campaign, campaignShippingDestination } = data
+    const { campaign, campaignShippingDestinations } = data
+    let updated = []
+    let added = []
 
-    let response: any
-
-    response = await db[this.model].findOne({
+    const foundCampaignShippingDestinationsResponse = await db[this.model].findAndCountAll({
       where: {
         campaignId: campaign.id,
-        country: campaignShippingDestination.country
+        country: campaignShippingDestinations
       },
       paranoid: false // To get soft deleted record
     })
 
-    if (response !== null) {
-      await response.restore()
-      const updatedResponse = await response.update({ ...campaignShippingDestination })
-      return { response: updatedResponse.toJSONFor(), status: 200 }
+    const newCampaignShippingDestinations = campaignShippingDestinations.filter((country: string) => foundCampaignShippingDestinationsResponse.rows.map((row: ICampaignShippingDestination) => row.country).includes(country) === false)
+    const existingCampaignShippingDestinations = campaignShippingDestinations.filter((country: string) => foundCampaignShippingDestinationsResponse.rows.map((row: ICampaignShippingDestination) => row.country).includes(country))
+
+    if (existingCampaignShippingDestinations.length > 0) {
+      const updatedResponse = await db[this.model].restore({
+        where: {
+          id: {
+            [Op.in]: foundCampaignShippingDestinationsResponse.rows.map((country: ICampaignShippingDestination) => country.id)
+          }
+        },
+        returning: true
+      })
+      updated = updatedResponse.map((response: any) => response.toJSONFor())
     }
 
-    response = await db[this.model].create({ ...campaignShippingDestination, id: uuidv1(), campaignId: campaign.id })
+    if (newCampaignShippingDestinations.length > 0) {
+      const bulkInsertData = newCampaignShippingDestinations.map((country: string) => ({
+        country,
+        id: uuidv1(),
+        campaignId: campaign.id
+      }))
 
-    return { response: response.toJSONFor(), status: 201 }
+      const addedResponse = await db[this.model].bulkCreate(bulkInsertData, { returning: true })
+      added = addedResponse.map((response: any) => response.toJSONFor())
+    }
+    return { response: { updated, added }, status: 200 }
   }
 }
 
