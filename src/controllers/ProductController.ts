@@ -2,6 +2,7 @@ import BaseController from './BaseController'
 import ProductService from '../services/ProductService'
 import CompanyService from '../services/CompanyService'
 import ProductCategoryService from '../services/ProductCategoryService'
+import ProductGraduatedPriceService from '../services/ProductGraduatedPriceService'
 import type { CustomNext, CustomRequest, CustomResponse, IProduct, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
@@ -10,6 +11,7 @@ import * as userRoles from '../utils/userRoles'
 const productService = new ProductService('Product')
 const companyService = new CompanyService('Company')
 const productCategoryService = new ProductCategoryService('ProductCategory')
+const productGraduatedPriceService = new ProductGraduatedPriceService('ProductGraduatedPrice')
 
 class ProductController extends BaseController {
   async checkRecord (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
@@ -301,6 +303,25 @@ class ProductController extends BaseController {
         added: { addedChildrenTotal, addedChildren },
         removed: { removedChildrenTotal, removedChildren }
       }
+    })
+  }
+
+  async addGraduatedPrice (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record: product, body: { productGraduatedPrice } } = req
+
+    const { response, status } = await productGraduatedPriceService.insert({ product, productGraduatedPrice })
+
+    io.emit(`${String(productGraduatedPriceService.recordName())}`, { message: `${String(productGraduatedPriceService.recordName())} created` })
+
+    const statusCode: StatusCode = {
+      200: statusCodes.OK,
+      201: statusCodes.CREATED
+    }
+
+    return res.status(statusCode[status]).send({
+      statusCode: statusCode[status],
+      success: true,
+      [productGraduatedPriceService.singleRecord()]: response
     })
   }
 }

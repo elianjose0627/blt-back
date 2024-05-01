@@ -31,6 +31,7 @@ import campaignAddressRouter from './campaignAddressRouter'
 import maintenanceModeRouter from './maintenanceRouter'
 import productCategoryRouter from './productCategoryRouter'
 import productCategoryTagRouter from './productCategoryTagRouter'
+import productGraduatedPriceRouter from './productGraduatedPriceRouter'
 
 const routers = {
   authRouter,
@@ -65,7 +66,8 @@ const routers = {
   campaignAddressRouter,
   maintenanceModeRouter,
   productCategoryRouter,
-  productCategoryTagRouter
+  productCategoryTagRouter,
+  productGraduatedPriceRouter
 }
 
 export default routers

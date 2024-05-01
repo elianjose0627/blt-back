@@ -366,6 +366,15 @@ export interface IProductCategory {
   updatedAt: Date
   productCategoryTags?: IProductCategoryTag[]
 }
+
+export interface IProductGraduatedPrice {
+  id: string
+  firstUnit: number
+  lastUnit: number
+  price: number
+  createdAt: Date
+  updatedAt: Date
+}
 export interface IProduct {
   id: string
   jfsku: string
@@ -386,6 +395,7 @@ export interface IProduct {
   properties: { [key: string]: [string] }
   isParent: boolean
   children: Array<Pick<IProduct, 'id' | 'jfsku' | 'name' | 'merchantSku' | 'pictures' | 'properties' | 'createdAt' | 'updatedAt'>>
+  graduatedPrices: IProductGraduatedPrice[]
 }
 
 export interface ICampaignOrderLimit {

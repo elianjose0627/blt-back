@@ -49,7 +49,7 @@ const generateOrderBy = (orderBy: {[key: string]: string | number | undefined}):
 }
 
 const order = [['createdAt', 'DESC']]
-const generateIncludeCategoryTagProduct = (filterCategory: object, filterTag: object): object[] => {
+const generateIncludeCategoryAndTagAndProductAndGraduatedPrice = (filterCategory: object, filterTag: object): object[] => {
   return (
     [
       {
@@ -85,6 +85,13 @@ const generateIncludeCategoryTagProduct = (filterCategory: object, filterTag: ob
           exclude: ['deletedAt', 'parentId', 'productCategoryId', 'companyId']
         },
         as: 'children'
+      },
+      {
+        model: db.ProductGraduatedPrice,
+        attributes: {
+          exclude: ['deletedAt', 'productId']
+        },
+        as: 'graduatedPrices'
       }
     ]
   )
@@ -142,7 +149,7 @@ class ProductService extends BaseService {
 
     const attributes: any = { exclude: [] }
     const include: any[] = [
-      ...generateIncludeCategoryTagProduct(whereFilterCategory, whereFilterTags)
+      ...generateIncludeCategoryAndTagAndProductAndGraduatedPrice(whereFilterCategory, whereFilterTags)
     ]
 
     if (search !== '') {
@@ -219,7 +226,7 @@ class ProductService extends BaseService {
         attributes: ['id', 'name', 'suffix', 'email', 'phone', 'vat', 'domain'],
         as: 'company'
       },
-      ...generateIncludeCategoryTagProduct(whereFilterCategory, whereFilterTags)
+      ...generateIncludeCategoryAndTagAndProductAndGraduatedPrice(whereFilterCategory, whereFilterTags)
     ]
 
     if (search !== '') {
