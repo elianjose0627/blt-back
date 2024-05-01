@@ -93,14 +93,12 @@ describe('Campaign Shipping Destination actions', () => {
         .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/shipping-destinations`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignShippingDestination: {
-            country: 'Kenya'
-          }
+          campaignShippingDestinations: ['Germany']
         })
 
       const res = await chai
         .request(app)
-        .delete(`/api/campaign-shipping-destinations/${String(resShippingDestination.body.campaignShippingDestination.id)}`)
+        .delete(`/api/campaign-shipping-destinations/${String(resShippingDestination.body.campaignShippingDestinations.added[0].id)}`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(204)
@@ -149,14 +147,12 @@ describe('Campaign Shipping Destination actions', () => {
         .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/shipping-destinations`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignShippingDestination: {
-            country: 'Kenya'
-          }
+          campaignShippingDestinations: ['Uganda']
         })
 
       const res = await chai
         .request(app)
-        .delete(`/api/campaign-shipping-destinations/${String(resShippingDestination.body.campaignShippingDestination.id)}`)
+        .delete(`/api/campaign-shipping-destinations/${String(resShippingDestination.body.campaignShippingDestinations.added[0].id)}`)
         .set('Authorization', `Bearer ${tokenCampaignManager}`)
 
       expect(res).to.have.status(403)
@@ -217,14 +213,12 @@ describe('Campaign Shipping Destination actions', () => {
         .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/shipping-destinations`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignShippingDestination: {
-            country: 'Kenya'
-          }
+          campaignShippingDestinations: ['Algeria']
         })
 
       const res = await chai
         .request(app)
-        .delete(`/api/campaign-shipping-destinations/${String(resShippingDestination.body.campaignShippingDestination.id)}`)
+        .delete(`/api/campaign-shipping-destinations/${String(resShippingDestination.body.campaignShippingDestinations.added[0].id)}`)
         .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
 
       expect(res).to.have.status(403)
@@ -285,14 +279,12 @@ describe('Campaign Shipping Destination actions', () => {
         .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/shipping-destinations`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignShippingDestination: {
-            country: 'Kenya'
-          }
+          campaignShippingDestinations: ['Italy']
         })
 
       const res = await chai
         .request(app)
-        .delete(`/api/campaign-shipping-destinations/${String(resShippingDestination.body.campaignShippingDestination.id)}`)
+        .delete(`/api/campaign-shipping-destinations/${String(resShippingDestination.body.campaignShippingDestinations.added[0].id)}`)
         .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
 
       expect(res).to.have.status(403)
@@ -331,14 +323,12 @@ describe('Campaign Shipping Destination actions', () => {
         .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/shipping-destinations`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignShippingDestination: {
-            country: 'Kenya'
-          }
+          campaignShippingDestinations: ['Rwanda']
         })
 
       const res = await chai
         .request(app)
-        .delete(`/api/campaign-shipping-destinations/${String(resShippingDestination.body.campaignShippingDestination.id)}`)
+        .delete(`/api/campaign-shipping-destinations/${String(resShippingDestination.body.campaignShippingDestinations.added[0].id)}`)
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(403)

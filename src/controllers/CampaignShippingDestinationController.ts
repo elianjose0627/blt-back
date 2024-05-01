@@ -6,13 +6,13 @@ import * as statusCodes from '../constants/statusCodes'
 
 const campaignShippingDestinationService = new CampaignShippingDestinationService('CampaignShippingDestination')
 
-class CampaignOrderLimitController extends BaseController {
+class CampaignShippingDestinationController extends BaseController {
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { record: campaign, body: { campaignShippingDestination } } = req
+    const { record: campaign, body: { campaignShippingDestinations } } = req
 
-    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
+    io.emit(`${String(campaignShippingDestinationService.manyRecords())}`, { message: `${String(campaignShippingDestinationService.manyRecords())} created` })
 
-    const { response, status } = await campaignShippingDestinationService.insert({ campaign, campaignShippingDestination })
+    const { response, status } = await campaignShippingDestinationService.insert({ campaign, campaignShippingDestinations })
 
     const statusCode: StatusCode = {
       200: statusCodes.OK,
@@ -22,9 +22,9 @@ class CampaignOrderLimitController extends BaseController {
     return res.status(statusCode[status]).send({
       statusCode: statusCode[status],
       success: true,
-      [this.recordName()]: response
+      [campaignShippingDestinationService.manyRecords()]: response
     })
   }
 }
 
-export default new CampaignOrderLimitController(campaignShippingDestinationService)
+export default new CampaignShippingDestinationController(campaignShippingDestinationService)

@@ -3593,14 +3593,12 @@ describe('Campaign actions', () => {
         .post(`/api/campaigns/${campaignId}/shipping-destinations`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignShippingDestination: {
-            country: 'Kenya'
-          }
+          campaignShippingDestinations: ['Kenya']
         })
 
-      expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('statusCode', 'success', 'campaignShippingDestination')
-      expect(res.body.campaignShippingDestination).to.be.an('object')
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignShippingDestinations')
+      expect(res.body.campaignShippingDestinations).to.be.an('object')
     })
 
     it('Should return 200 OK when an admin successfully creates a shipping destination for a campaign twice.', async () => {
@@ -3638,9 +3636,7 @@ describe('Campaign actions', () => {
         .post(`/api/campaigns/${campaignId}/shipping-destinations`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignShippingDestination: {
-            country: 'Kenya'
-          }
+          campaignShippingDestinations: ['Kenya']
         })
 
       const res = await chai
@@ -3648,14 +3644,12 @@ describe('Campaign actions', () => {
         .post(`/api/campaigns/${campaignId}/shipping-destinations`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignShippingDestination: {
-            country: 'Kenya'
-          }
+          campaignShippingDestinations: ['Kenya']
         })
 
       expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'campaignShippingDestination')
-      expect(res.body.campaignShippingDestination).to.be.an('object')
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignShippingDestinations')
+      expect(res.body.campaignShippingDestinations).to.be.an('object')
     })
 
     it('Should return 201 Created when an admin successfully creates a shipping destination for a campaign.', async () => {
@@ -3693,14 +3687,12 @@ describe('Campaign actions', () => {
         .post(`/api/campaigns/${campaignId}/shipping-destinations`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          campaignShippingDestination: {
-            country: 'Great Britain'
-          }
+          campaignShippingDestinations: ['Great Britain']
         })
 
-      expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('statusCode', 'success', 'campaignShippingDestination')
-      expect(res.body.campaignShippingDestination).to.be.an('object')
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignShippingDestinations')
+      expect(res.body.campaignShippingDestinations).to.be.an('object')
     })
 
     it('Should return 403 Forbidden when a non-admin tries to create a shipping destination for a campaign.', async () => {
@@ -3738,9 +3730,7 @@ describe('Campaign actions', () => {
         .post(`/api/campaigns/${campaignId}/shipping-destinations`)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          campaignShippingDestination: {
-            country: 'Kenya'
-          }
+          campaignShippingDestinations: ['Kenya']
         })
 
       expect(res).to.have.status(403)

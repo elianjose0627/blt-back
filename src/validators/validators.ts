@@ -717,9 +717,7 @@ const validateCampaignOrderLimit = Joi.object({
 }).required()
 
 const validateCampaignShippingDestination = Joi.object({
-  campaignShippingDestination: Joi.object({
-    country: Joi.string().required().valid(...countryList.countries)
-  }).required()
+  campaignShippingDestinations: Joi.array().items(Joi.string().required().valid(...countryList.countries)).min(1)
 }).required()
 
 const validatePasswordResetAdmin = Joi.object({
@@ -870,6 +868,17 @@ const validateChildren = Joi.object({
   }).required()
 })
 
+const validateGraduatedPrice = Joi.object({
+  productGraduatedPrice: Joi.object({
+    firstUnit: Joi.number().required().min(1),
+    lastUnit: Joi.number().required().min(Joi.ref('firstUnit'))
+      .not(Joi.ref('firstUnit')).messages({
+        'any.invalid': 'Last unit must not be equal to first unit'
+      }),
+    price: Joi.number().min(0)
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -935,5 +944,6 @@ export default {
   validateProductTag,
   validateChild,
   validateChildren,
-  validateProductQueryParams
+  validateProductQueryParams,
+  validateGraduatedPrice
 }
