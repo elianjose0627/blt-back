@@ -534,8 +534,8 @@ class UserService extends BaseService {
 
     return {
       updatedResponse: updatedRecord.toJSONFor(),
-      addressResponse: addressResponse.toJSONFor(),
-      userResponse: userResponse.toJSONFor()
+      addressResponse: addressResponse !== undefined ? addressResponse.toJSONFor() : addressResponse,
+      userResponse
     }
   }
 }
