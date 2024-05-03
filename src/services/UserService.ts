@@ -502,6 +502,7 @@ class UserService extends BaseService {
 
   async updateUserAndAddress (record: any, data: any): Promise<any> {
     const { address } = data
+    let addressPromise = Promise.resolve(null)
 
     if (address !== null) {
       const foundAddress = await db.Address.findOne({
@@ -511,16 +512,19 @@ class UserService extends BaseService {
             { id: address.id },
             { type: address.type }
           ]
-        }
+        },
+        paranoid: false // To get soft deleted record
       })
 
       if (foundAddress !== null) {
-        await foundAddress.update(address)
+        await foundAddress.restore()
+        addressPromise = foundAddress.update(address)
       } else {
-        await db.Address.create({ ...address, id: uuidv1(), userId: record.id })
+        addressPromise = db.Address.create({ ...address, id: uuidv1(), userId: record.id })
       }
     }
-    await record.update(data)
+    await Promise.all([addressPromise, record.update(data)])
+
     const updatedRecord = await db[this.model].findOne({
       where: {
         id: record.id
