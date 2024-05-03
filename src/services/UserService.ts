@@ -499,6 +499,37 @@ class UserService extends BaseService {
       rows: users.rows.map((record: any) => record.toJSONFor())
     }
   }
+
+  async updateUserAndAddress (record: any, data: any): Promise<any> {
+    const { address } = data
+
+    if (address !== null) {
+      const foundAddress = await db.Address.findOne({
+        where: {
+          userId: record.id,
+          [Op.or]: [
+            { id: address.id },
+            { type: address.type }
+          ]
+        }
+      })
+
+      if (foundAddress !== null) {
+        await foundAddress.update(address)
+      } else {
+        await db.Address.create({ ...address, id: uuidv1(), userId: record.id })
+      }
+    }
+    await record.update(data)
+    const updatedRecord = await db[this.model].findOne({
+      where: {
+        id: record.id
+      },
+      include
+    })
+
+    return updatedRecord.toJSONFor()
+  }
 }
 
 export default UserService
