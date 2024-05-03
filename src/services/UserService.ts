@@ -502,7 +502,7 @@ class UserService extends BaseService {
 
   async updateUserAndAddress (record: any, data: any): Promise<any> {
     const { address } = data
-    let addressPromise = Promise.resolve(null)
+    let addressPromise
 
     if (address !== null) {
       const foundAddress = await db.Address.findOne({
@@ -523,16 +523,20 @@ class UserService extends BaseService {
         addressPromise = db.Address.create({ ...address, id: uuidv1(), userId: record.id })
       }
     }
-    const updatedRecord: any = await Promise.all([addressPromise, record.update(data)]).then(async () => {
-      return db[this.model].findOne({
-        where: {
-          id: record.id
-        },
-        include
-      })
+    const [addressResponse, userResponse] = await Promise.all([addressPromise, record.update(data)])
+
+    const updatedRecord = await db[this.model].findOne({
+      where: {
+        id: record.id
+      },
+      include
     })
 
-    return updatedRecord.toJSONFor()
+    return {
+      updatedResponse: updatedRecord.toJSONFor(),
+      addressResponse: addressResponse.toJSONFor(),
+      userResponse: userResponse.toJSONFor()
+    }
   }
 }
 

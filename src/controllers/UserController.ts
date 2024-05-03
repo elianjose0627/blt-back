@@ -639,14 +639,15 @@ class UserController extends BaseController {
   async updateUserAndAddress (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { record, body: { user } } = req
 
-    const response = await userService.updateUserAndAddress(record, user)
+    const { updatedResponse, addressResponse } = await userService.updateUserAndAddress(record, user)
 
     io.emit(`${String(userService.recordName())}`, { message: `${String(userService.recordName())} updated` })
 
     return res.status(statusCodes.OK).send({
       statusCode: statusCodes.OK,
       success: true,
-      [userService.singleRecord()]: response
+      [userService.singleRecord()]: updatedResponse,
+      address: addressResponse
     })
   }
 }
