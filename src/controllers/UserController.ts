@@ -635,6 +635,21 @@ class UserController extends BaseController {
       [userService.singleRecord()]: record
     })
   }
+
+  async updateUserAndAddress (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record, body: { user } } = req
+
+    const { updatedResponse, addressResponse } = await userService.updateUserAndAddress(record, user)
+
+    io.emit(`${String(userService.recordName())}`, { message: `${String(userService.recordName())} updated` })
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      [userService.singleRecord()]: updatedResponse,
+      address: addressResponse
+    })
+  }
 }
 
 export default new UserController(userService)

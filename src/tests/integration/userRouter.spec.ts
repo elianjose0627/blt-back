@@ -414,6 +414,74 @@ describe('A user', () => {
     })
   })
 
+  describe('Update a user as an admin including user address', () => {
+    it('Should return 200 OK when an admin user tries to update the data of another user.', async () => {
+      const res = await chai
+        .request(app)
+        .put(`/api/users/${userId}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            firstName: 'Ryan',
+            username: null,
+            address: {
+              id: null,
+              country: 'Kenya',
+              city: 'Nairobi',
+              zip: '123456'
+            }
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.user).to.not.have.any.keys('password', 'otp', 'isDeleted')
+    })
+
+    it('Should return 200 OK when an admin user tries to update the data of another user with an existing address.', async () => {
+      await chai
+        .request(app)
+        .put(`/api/users/${userId}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            firstName: 'Ryan',
+            username: null,
+            address: {
+              id: null,
+              country: 'Kenya',
+              city: 'Nairobi',
+              zip: '123456',
+              type: 'delivery'
+            }
+          }
+        })
+      const res = await chai
+        .request(app)
+        .put(`/api/users/${userId}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            firstName: 'Ryan',
+            username: null,
+            address: {
+              id: null,
+              country: 'Kenya',
+              city: 'Nairobi',
+              zip: '123456',
+              type: 'delivery'
+            }
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.user).to.not.have.any.keys('password', 'otp', 'isDeleted')
+    })
+  })
+
   describe('Update a role as an admin', () => {
     it('Should return 200 OK when an admin user tries to update the role of another user.', async () => {
       const res = await chai
@@ -526,7 +594,7 @@ describe('A user', () => {
       expect(res.body.user.isActive).to.equal(false)
     })
 
-    it('Should return 403 Forbidden when an admin tries to update theri active state.', async () => {
+    it('Should return 403 Forbidden when an admin tries to update their active state.', async () => {
       const res = await chai
         .request(app)
         .patch(`/api/users/${userIdAdmin}/activate`)
