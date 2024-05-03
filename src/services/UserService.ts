@@ -523,13 +523,13 @@ class UserService extends BaseService {
         addressPromise = db.Address.create({ ...address, id: uuidv1(), userId: record.id })
       }
     }
-    await Promise.all([addressPromise, record.update(data)])
-
-    const updatedRecord = await db[this.model].findOne({
-      where: {
-        id: record.id
-      },
-      include
+    const updatedRecord: any = await Promise.all([addressPromise, record.update(data)]).then(async () => {
+      return db[this.model].findOne({
+        where: {
+          id: record.id
+        },
+        include
+      })
     })
 
     return updatedRecord.toJSONFor()
