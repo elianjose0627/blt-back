@@ -912,6 +912,16 @@ describe('A user', () => {
     })
 
     it('Should return 200 Success when a user tries to create an address that exists.', async () => {
+      await chai
+        .request(app)
+        .post(`/api/users/${String(userId)}/address`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          address: {
+            country: 'Kenya',
+            city: 'Nakuru'
+          }
+        })
       const res = await chai
         .request(app)
         .post(`/api/users/${String(userId)}/address`)
@@ -963,6 +973,69 @@ describe('A user', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('Only the owner or admin can perform this action')
       expect(res.body.success).to.equal(false)
+    })
+  })
+
+  describe('Get all addresses of a user', () => {
+    it('Should return 200 when a user fetches their own addresses with search and filter params', async () => {
+      await chai
+        .request(app)
+        .post(`/api/users/${String(userId)}/addresses`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          address: {
+            country: 'Kenya',
+            city: 'Nairobi',
+            firstName: 'Test',
+            lastName: 'User',
+            type: 'delivery'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/users/${String(userId)}/addresses`)
+        .set('Authorization', `Bearer ${token}`)
+        .query({
+          limit: 10,
+          page: 1,
+          search: 'Test',
+          filter: {
+            type: 'delivery'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'addresses')
+      expect(res.body.addresses).to.be.an('array').lengthOf.above(0)
+    })
+    it('Should return 200 when a user fetches their own addresses', async () => {
+      await chai
+        .request(app)
+        .post(`/api/users/${String(userId)}/addresses`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          address: {
+            country: 'Kenya',
+            city: 'Nairobi',
+            firstName: 'Test',
+            lastName: 'User',
+            type: 'delivery'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/users/${String(userId)}/addresses`)
+        .set('Authorization', `Bearer ${token}`)
+        .query({
+          limit: 10,
+          page: 1
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'addresses')
+      expect(res.body.addresses).to.be.an('array').lengthOf.above(0)
     })
   })
 

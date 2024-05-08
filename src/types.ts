@@ -224,6 +224,9 @@ export type AddressType = 'billing' | 'delivery' | 'billingAndDelivery' | 'retur
 export interface IAddress {
   id: string
   companyName?: string
+  salutation?: Nullable<string>
+  firstName?: Nullable<string>
+  lastName?: Nullable<string>
   email?: string
   costCenter?: string
   country: string

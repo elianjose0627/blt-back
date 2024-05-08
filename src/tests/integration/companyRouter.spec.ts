@@ -989,7 +989,7 @@ describe('Company actions', () => {
       expect(res).to.have.status(201)
       expect(res.body).to.include.keys('statusCode', 'success', 'address')
       expect(res.body.address).to.be.an('object')
-      expect(res.body.address).to.have.keys('id', 'companyName', 'costCenter', 'email', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'vat', 'type', 'createdAt', 'updatedAt')
+      expect(res.body.address).to.have.keys('id', 'companyName', 'firstName', 'lastName', 'salutation', 'costCenter', 'email', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'vat', 'type', 'createdAt', 'updatedAt')
     })
 
     it('Should return 403 Forbidden when a company owner updates the address of an non-employee.', async () => {
@@ -1396,7 +1396,7 @@ describe('Company actions', () => {
       expect(res.body.address).to.include.keys('id', 'country', 'city', 'street', 'zip', 'createdAt', 'updatedAt')
     })
 
-    it('Should return 200 Success when a company owner gets company addresses.', async () => {
+    it('Should return 200 Success when a company owner gets company addresses with search and filter params.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -1416,6 +1416,7 @@ describe('Company actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           address: {
+            firstName: 'Test',
             country: 'Kenya',
             city: 'Nairobi'
           }
@@ -1425,6 +1426,54 @@ describe('Company actions', () => {
         .request(app)
         .get(`/api/companies/${String(resCompany.body.company.id)}/addresses`)
         .set('Authorization', `Bearer ${token}`)
+        .query({
+          limit: 10,
+          page: 1,
+          search: 'Test',
+          filter: {
+            type: 'delivery'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'addresses', 'meta')
+      expect(res.body.addresses).to.be.an('array')
+    })
+
+    it('Should return 200 Success when a company owner gets company addresses.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company1724454.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/addresses`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          address: {
+            firstName: 'Test',
+            country: 'Kenya',
+            city: 'Nairobi'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(resCompany.body.company.id)}/addresses`)
+        .set('Authorization', `Bearer ${token}`)
+        .query({
+          limit: 10,
+          page: 1
+        })
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'addresses', 'meta')

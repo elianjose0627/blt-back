@@ -650,6 +650,26 @@ class UserController extends BaseController {
       address: addressResponse
     })
   }
+
+  async getAddresses (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { params: { id }, query: { limit, page, offset, search, filter } } = req
+
+    const records = await addressService.getAllForUser(limit, offset, id, search, filter)
+
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / limit),
+      perPage: limit,
+      page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      [addressService.manyRecords()]: records.rows
+    })
+  }
 }
 
 export default new UserController(userService)

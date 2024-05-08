@@ -525,15 +525,10 @@ class UserService extends BaseService {
     }
     const [addressResponse, userResponse] = await Promise.all([addressPromise, record.update(data)])
 
-    const updatedRecord = await db[this.model].findOne({
-      where: {
-        id: record.id
-      },
-      include
-    })
+    await record.reload()
 
     return {
-      updatedResponse: updatedRecord.toJSONFor(),
+      updatedResponse: record.toJSONFor(),
       addressResponse: addressResponse !== undefined ? addressResponse.toJSONFor() : addressResponse,
       userResponse
     }
