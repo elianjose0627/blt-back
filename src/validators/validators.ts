@@ -274,6 +274,9 @@ const validateDomain = Joi.object({
 
 const validateCreatedAddress = Joi.object({
   address: Joi.object({
+    salutation: Joi.string().optional().allow('').allow(null).max(8),
+    firstName: Joi.string().optional().allow('').allow(null).max(64),
+    lastName: Joi.string().optional().allow('').allow(null).max(64),
     companyName: Joi.string().allow(null),
     email: Joi.string().email().allow(null),
     costCenter: Joi.string().allow(null),
@@ -287,12 +290,15 @@ const validateCreatedAddress = Joi.object({
       }),
     addressAddition: Joi.string().allow('').allow(null).max(256),
     vat: Joi.string().allow('').allow(null).max(24),
-    type: Joi.string().valid(...['billing', 'delivery', 'billingAndDelivery']).allow(null)
+    type: Joi.string().valid(...['billing', 'delivery', 'billingAndDelivery']).allow(null).default('delivery')
   }).required()
 }).required()
 
 const validateUpdatedAddress = Joi.object({
   address: Joi.object({
+    salutation: Joi.string().optional().allow('').allow(null).max(8),
+    firstName: Joi.string().optional().allow('').allow(null).max(64),
+    lastName: Joi.string().optional().allow('').allow(null).max(64),
     companyName: Joi.string().allow(null),
     email: Joi.string().email().allow(null),
     costCenter: Joi.string().allow(null),
@@ -306,7 +312,7 @@ const validateUpdatedAddress = Joi.object({
       }),
     addressAddition: Joi.string().allow('').allow(null).max(256),
     vat: Joi.string().allow('').allow(null).max(24),
-    type: Joi.string().valid(...['billing', 'delivery', 'billingAndDelivery']).allow(null)
+    type: Joi.string().valid(...['billing', 'delivery', 'billingAndDelivery']).allow(null).default('delivery')
   }).required()
 }).required()
 

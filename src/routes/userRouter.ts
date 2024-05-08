@@ -65,10 +65,19 @@ const userRoutes = (): any => {
     .patch(asyncHandler(UserController.checkOwner), celebrate({
       [Segments.BODY]: validator.validateNotifications
     }), asyncHandler(UserController.updateNotifications))
+    // Start DEPRECATED: /users/:id/address
   userRouter.route('/users/:id/address')
     .post(asyncHandler(UserController.checkOwnerOrAdmin), celebrate({
       [Segments.BODY]: validator.validateCreatedAddress
     }, { abortEarly: false }), asyncHandler(UserController.createAddress))
+    // End DEPRECATED
+  userRouter.route('/users/:id/addresses')
+    .post(asyncHandler(UserController.checkOwnerOrAdmin), celebrate({
+      [Segments.BODY]: validator.validateCreatedAddress
+    }, { abortEarly: false }), asyncHandler(UserController.createAddress))
+    .get(asyncHandler(UserController.checkOwnerOrAdmin), celebrate({
+      [Segments.QUERY]: validator.validateQueryParams
+    }), asyncHandler(paginate), asyncHandler(UserController.getAddresses))
   userRouter.route('/users/:id/company')
     .patch(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateUserCompany
