@@ -27,8 +27,15 @@ const passportAuth = (passport: PassportStatic): any => {
         include: [
           {
             model: db.Address,
-            attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type'],
-            as: 'addresses'
+            attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt', 'userId', 'companyId'] },
+            as: 'addresses',
+            where: {
+              [Op.or]: [
+                { affiliation: { [Op.eq]: null } },
+                { affiliation: 'company' }
+              ]
+            },
+            required: false
           },
           {
             model: db.User,
@@ -60,8 +67,15 @@ const passportAuth = (passport: PassportStatic): any => {
       },
       {
         model: db.Address,
-        attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type'],
-        as: 'addresses'
+        attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt', 'userId', 'companyId'] },
+        as: 'addresses',
+        where: {
+          [Op.or]: [
+            { affiliation: { [Op.eq]: null } },
+            { affiliation: 'personal' }
+          ]
+        },
+        required: false
       }
     ],
     where: {

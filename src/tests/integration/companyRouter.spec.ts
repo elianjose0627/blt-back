@@ -989,7 +989,7 @@ describe('Company actions', () => {
       expect(res).to.have.status(201)
       expect(res.body).to.include.keys('statusCode', 'success', 'address')
       expect(res.body.address).to.be.an('object')
-      expect(res.body.address).to.have.keys('id', 'companyName', 'firstName', 'lastName', 'salutation', 'costCenter', 'email', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'vat', 'type', 'createdAt', 'updatedAt')
+      expect(res.body.address).to.have.keys('id', 'companyName', 'firstName', 'lastName', 'salutation', 'costCenter', 'email', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'affiliation', 'vat', 'type', 'createdAt', 'updatedAt')
     })
 
     it('Should return 403 Forbidden when a company owner updates the address of an non-employee.', async () => {
@@ -1418,7 +1418,8 @@ describe('Company actions', () => {
           address: {
             firstName: 'Test',
             country: 'Kenya',
-            city: 'Nairobi'
+            city: 'Nairobi',
+            affiliation: 'company'
           }
         })
 
@@ -1431,7 +1432,8 @@ describe('Company actions', () => {
           page: 1,
           search: 'Test',
           filter: {
-            type: 'delivery'
+            type: 'delivery',
+            affiliation: 'company'
           }
         })
 

@@ -212,7 +212,8 @@ const commonQueryParams = {
     price: Joi.string().pattern(/^\d+-\d+(?:,\d+-\d+)*$/)
       .messages({
         'string.pattern.base': '{#label} must contain valid ranges separated by commas'
-      }).optional()
+      }).optional(),
+    affiliation: Joi.string().optional()
   }).optional()
 }
 const validateQueryParams = Joi.object({ ...commonQueryParams }).required()
@@ -290,7 +291,8 @@ const validateCreatedAddress = Joi.object({
       }),
     addressAddition: Joi.string().allow('').allow(null).max(256),
     vat: Joi.string().allow('').allow(null).max(24),
-    type: Joi.string().valid(...['billing', 'delivery', 'billingAndDelivery']).allow(null).default('delivery')
+    type: Joi.string().valid(...['billing', 'delivery', 'billingAndDelivery']).allow(null).default('delivery'),
+    affiliation: Joi.string().optional().valid(...['personal', 'company', 'other']).allow(null)
   }).required()
 }).required()
 
@@ -312,7 +314,8 @@ const validateUpdatedAddress = Joi.object({
       }),
     addressAddition: Joi.string().allow('').allow(null).max(256),
     vat: Joi.string().allow('').allow(null).max(24),
-    type: Joi.string().valid(...['billing', 'delivery', 'billingAndDelivery']).allow(null).default('delivery')
+    type: Joi.string().valid(...['billing', 'delivery', 'billingAndDelivery']).allow(null).default('delivery'),
+    affiliation: Joi.string().optional().valid(...['personal', 'company', 'other']).allow(null)
   }).required()
 }).required()
 

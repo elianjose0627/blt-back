@@ -988,7 +988,8 @@ describe('A user', () => {
             city: 'Nairobi',
             firstName: 'Test',
             lastName: 'User',
-            type: 'delivery'
+            type: 'delivery',
+            affiliation: 'personal'
           }
         })
 
@@ -1001,7 +1002,8 @@ describe('A user', () => {
           page: 1,
           search: 'Test',
           filter: {
-            type: 'delivery'
+            type: 'delivery',
+            affiliation: 'personal'
           }
         })
 
