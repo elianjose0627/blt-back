@@ -220,6 +220,7 @@ export interface ICompany {
 }
 
 export type AddressType = 'billing' | 'delivery' | 'billingAndDelivery' | 'return'
+export type AddressAffiliation = 'personal' | 'company' | 'other' | null
 
 export interface IAddress {
   id: string
@@ -239,6 +240,7 @@ export interface IAddress {
   createdAt?: Date
   updatedAt?: Date
   type: AddressType
+  affiliation?: AddressAffiliation
   owner?: IUser
   company?: ICompany
   campaign?: ICampaign

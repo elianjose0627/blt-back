@@ -43,9 +43,9 @@ class AddressService extends BaseService {
     return { response: response.toJSONFor(user), status: 201 }
   }
 
-  async getAllForCompany (limit: number, offset: number, companyId: string, search: string, filter = { type: 'billing,delivery,billingAndDelivery,return' }): Promise<any> {
+  async getAllForCompany (limit: number, offset: number, companyId: string, search: string, filter = { type: 'billing,delivery,billingAndDelivery,return', affiliation: '' }): Promise<any> {
     let where
-    const { type } = filter
+    const { type, affiliation } = filter
     if (search !== undefined) {
       where = {
         [Op.or]: [
@@ -61,6 +61,8 @@ class AddressService extends BaseService {
       }
     }
     const whereFilterTypes = generateFilterQuery({ type }, 'in')
+    const whereFilterAffiliations = generateFilterQuery({ affiliation }, 'in')
+
     const records = await db[this.model].findAndCountAll({
       limit,
       offset,
@@ -70,7 +72,8 @@ class AddressService extends BaseService {
         companyId,
         type: type.split(','),
         ...where,
-        ...whereFilterTypes
+        ...whereFilterTypes,
+        ...whereFilterAffiliations
       }
     })
 
@@ -80,9 +83,9 @@ class AddressService extends BaseService {
     }
   }
 
-  async getAllForUser (limit: number, offset: number, userId: string, search: string, filter = { type: 'billing,delivery,billingAndDelivery,return' }): Promise<any> {
+  async getAllForUser (limit: number, offset: number, userId: string, search: string, filter = { type: 'billing,delivery,billingAndDelivery,return', affiliation: '' }): Promise<any> {
     let where
-    const { type } = filter
+    const { type, affiliation } = filter
     if (search !== undefined) {
       where = {
         [Op.or]: [
@@ -98,6 +101,8 @@ class AddressService extends BaseService {
       }
     }
     const whereFilterTypes = generateFilterQuery({ type }, 'in')
+    const whereFilterAffiliations = generateFilterQuery({ affiliation }, 'in')
+
     const records = await db[this.model].findAndCountAll({
       limit,
       offset,
@@ -107,7 +112,8 @@ class AddressService extends BaseService {
         userId,
         type: type.split(','),
         ...where,
-        ...whereFilterTypes
+        ...whereFilterTypes,
+        ...whereFilterAffiliations
       }
     })
 
