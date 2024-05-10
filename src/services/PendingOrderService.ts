@@ -69,6 +69,34 @@ class PendingOrderService extends BaseService {
     return { response: response.map((response: any) => response.toJSONFor()), status: 201 }
   }
 
+  async insertCataloguePendingOrders (data: any): Promise<any> {
+    const { pendingOrders, currentUser } = data
+    const { company } = currentUser
+
+    const bulkInsertData = pendingOrders.map((pendingOrder: any) => ({
+      ...pendingOrder,
+      id: uuidv1(),
+      userId: currentUser.id,
+      campaignId: null,
+      customerId: company?.customerId ?? 0,
+      companyId: company?.id,
+      created: dayjs.utc().format(),
+      createdBy: currentUser.email,
+      updatedBy: currentUser.email,
+      createdByFullName: `${String(currentUser.firstName)} ${String(currentUser.lastName)}`
+    }))
+
+    const response = await db.PendingOrder.bulkCreate(bulkInsertData, { returning: true })
+
+    const pendingOrdersTopicId = 'pending-orders'
+    const environment = String(process.env.ENVIRONMENT)
+    const pendingOrdersAttributes = { environment }
+
+    await triggerPubSub(pendingOrdersTopicId, 'postPendingOrders', pendingOrdersAttributes)
+
+    return { response: response.map((response: any) => response.toJSONFor()), status: 201 }
+  }
+
   async duplicate (data: any): Promise<any> {
     const { postedOrders, currentUser }: { postedOrders: IDuplicatePostedOrder[], currentUser: IUserExtended } = data
     const { role } = currentUser

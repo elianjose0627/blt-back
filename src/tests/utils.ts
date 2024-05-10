@@ -156,7 +156,7 @@ export const createCompanyAdministrator = async (email = 'nickfury@starkindustri
   }
 }
 
-export const createCompanyAdministratorWithCompany = async (email = 'sharoncarter@starkindustriesmarvel.com', password = 'thepowerbroker'): Promise<any> => {
+export const createCompanyAdministratorWithCompany = async (email = 'sharoncarter@starkindustriesmarvel.com', password = 'thepowerbroker', customerId: string | null = null): Promise<any> => {
   const user = await db.User.findOne({
     attributes: ['id', 'email'],
     where: {
@@ -181,7 +181,8 @@ export const createCompanyAdministratorWithCompany = async (email = 'sharoncarte
         id: uuidv1(),
         name: 'Test Company',
         userId: user.id,
-        email
+        email,
+        customerId
       })
 
       await user.update({ companyId: company.id })
@@ -326,14 +327,15 @@ export const createVerifiedAdminUser = async (): Promise<any> => {
   }
 }
 
-export const createVerifiedCompany = async (userId: string, isDomainVerified = true): Promise<any> => {
+export const createVerifiedCompany = async (userId: string, isDomainVerified = true, customerId: string | null = null): Promise<any> => {
   const company = await db.Company.create({
     id: uuidv1(),
     name: 'Stark Industries',
     email: 'admin@starkindustriesmarvel.com',
     domain: 'starkindustriesmarvel.com',
     isDomainVerified,
-    userId
+    userId,
+    customerId
   })
 
   const updatedCompany = company.update({ isDomainVerified })

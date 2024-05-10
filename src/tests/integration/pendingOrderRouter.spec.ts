@@ -9,7 +9,9 @@ import {
   verifyCompanyDomain,
   pendingOrders,
   updatePendingOrderWithPostedOrderId,
-  createCompanyAdministrator
+  createCompanyAdministrator,
+  createVerifiedUser,
+  createCompanyAdministratorWithCompany
 } from '../utils'
 
 const { expect } = chai
@@ -69,6 +71,81 @@ describe('Pending Orders actions', () => {
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('Only an admin can perform this action')
+    })
+  })
+
+  describe('Create a pending order', () => {
+    it('Should return 201 Created when a user creates an order', async () => {
+      await createVerifiedUser('mantis101@gotg.com', 'woooooow')
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'mantis101@gotg.com', password: 'woooooow' } })
+
+      const tokenUser = resUser.body.token
+
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(tokenUser)}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+      expect(res.body.pendingOrders).to.have.lengthOf.above(0)
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+    })
+
+    it('Should return 201 Created when a company admin with company that has a customerId creates an order', async () => {
+      await createCompanyAdministratorWithCompany('mantis102@gotg.com', 'woooooow', '040')
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'mantis102@gotg.com', password: 'woooooow' } })
+
+      const tokenUser = resUser.body.token
+
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(tokenUser)}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+      expect(res.body.pendingOrders).to.have.lengthOf.above(0)
+    })
+
+    it('Should return 201 Created when a company admin with company that has no customerId creates an order', async () => {
+      await createCompanyAdministratorWithCompany('mantis103@gotg.com', 'woooooow')
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'mantis103@gotg.com', password: 'woooooow' } })
+
+      const tokenUser = resUser.body.token
+
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(tokenUser)}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+      expect(res.body.pendingOrders).to.have.lengthOf.above(0)
     })
   })
 

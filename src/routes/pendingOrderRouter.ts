@@ -16,6 +16,10 @@ const pendingOrderRoutes = (): any => {
     .get(asyncHandler(checkAdmin), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(PendingOrderController.getAll))
+    .post(PendingOrderController.setModule,
+      celebrate({
+        [Segments.BODY]: validator.validatePendingOrders
+      }), asyncHandler(PendingOrderController.insertCataloguePendingOrders))
   pendingOrderRouter.route('/pending-orders/duplicate')
     .post(celebrate({
       [Segments.BODY]: validator.validatePostedOrders
