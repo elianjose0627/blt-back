@@ -82,9 +82,32 @@ const generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties = (f
       {
         model: db.Product,
         attributes: {
-          exclude: ['deletedAt', 'parentId', 'productCategoryId', 'companyId']
+          exclude: ['deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId']
         },
-        as: 'children'
+        as: 'children',
+        include: [
+          {
+            model: db.ProductColor,
+            attributes: {
+              exclude: ['createdAt', 'updatedAt', 'deletedAt']
+            },
+            as: 'productColor'
+          },
+          {
+            model: db.ProductMaterial,
+            attributes: {
+              exclude: ['createdAt', 'updatedAt', 'deletedAt']
+            },
+            as: 'productMaterial'
+          },
+          {
+            model: db.ProductSize,
+            attributes: {
+              exclude: ['createdAt', 'updatedAt', 'deletedAt']
+            },
+            as: 'productSize'
+          }
+        ]
       },
       {
         model: db.ProductGraduatedPrice,
