@@ -32,6 +32,9 @@ import maintenanceModeRouter from './maintenanceRouter'
 import productCategoryRouter from './productCategoryRouter'
 import productCategoryTagRouter from './productCategoryTagRouter'
 import productGraduatedPriceRouter from './productGraduatedPriceRouter'
+import productColorRouter from './productColorRouter'
+import productMaterialRouter from './productMaterialRouter'
+import productSizeRouter from './productSizeRouter'
 
 const routers = {
   authRouter,
@@ -67,7 +70,10 @@ const routers = {
   maintenanceModeRouter,
   productCategoryRouter,
   productCategoryTagRouter,
-  productGraduatedPriceRouter
+  productGraduatedPriceRouter,
+  productColorRouter,
+  productMaterialRouter,
+  productSizeRouter
 }
 
 export default routers

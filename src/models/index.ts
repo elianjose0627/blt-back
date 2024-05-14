@@ -51,6 +51,9 @@ export interface Database {
   ProductTag?: any
   JtlShippingMethod?: any
   ProductGraduatedPrice?: any
+  ProductColor?: any
+  ProductMaterial?: any
+  ProductSize?: any
   [key: string]: any
 }
 

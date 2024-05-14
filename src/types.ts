@@ -380,6 +380,26 @@ export interface IProductGraduatedPrice {
   createdAt: Date
   updatedAt: Date
 }
+export interface IProductColor {
+  id: string
+  name: string
+  hexCode: string
+  rgb: string
+  createdAt: Date
+  updatedAt: Date
+}
+export interface IProductMaterial {
+  id: string
+  name: string
+  createdAt: Date
+  updatedAt: Date
+}
+export interface IProductSize {
+  id: string
+  name: string
+  createdAt: Date
+  updatedAt: Date
+}
 export interface IProduct {
   id: string
   jfsku: string
@@ -397,10 +417,12 @@ export interface IProduct {
   isVisible?: boolean
   productCategory?: IProductCategory
   productTags?: IProductCategoryTag[]
-  properties: { [key: string]: [string] }
   isParent: boolean
-  children: Array<Pick<IProduct, 'id' | 'jfsku' | 'name' | 'merchantSku' | 'pictures' | 'properties' | 'createdAt' | 'updatedAt'>>
+  children: Array<Pick<IProduct, 'id' | 'jfsku' | 'name' | 'merchantSku' | 'pictures' | 'createdAt' | 'updatedAt' | 'productColor' | 'productMaterial' | 'productSize'>>
   graduatedPrices: IProductGraduatedPrice[]
+  productColor: IProductColor
+  productMaterial: IProductMaterial
+  productSize: IProductSize
 }
 
 export interface ICampaignOrderLimit {

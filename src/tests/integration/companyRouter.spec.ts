@@ -2877,6 +2877,43 @@ describe('Company actions', () => {
       const companyId = String(resCompany.body.company.id)
       await verifyCompanyDomain(String(companyId))
 
+      const resProductColor = await chai
+        .request(app)
+        .post('/api/product-colors')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productColor: {
+            name: 'black',
+            hexCode: '#000000'
+          }
+        })
+
+      const productColorId = resProductColor.body.productColor.id
+
+      const resProductMaterial = await chai
+        .request(app)
+        .post('/api/product-materials')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productMaterial: {
+            name: 'leather'
+          }
+        })
+
+      const productMaterialId = resProductMaterial.body.productMaterial.id
+
+      const resProductSize = await chai
+        .request(app)
+        .post('/api/product-sizes')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productSize: {
+            name: '44'
+          }
+        })
+
+      const productSizeId = resProductSize.body.productSize.id
+
       await chai
         .request(app)
         .post(`/api/companies/${String(companyId)}/products`)
@@ -2888,11 +2925,9 @@ describe('Company actions', () => {
             merchantSku: '123sw1',
             type: 'generic',
             productGroup: 'clothing',
-            properties: {
-              color: 'black',
-              material: 'leather',
-              size: '44'
-            }
+            productColorId,
+            productMaterialId,
+            productSizeId
           }
         })
 

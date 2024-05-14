@@ -49,7 +49,7 @@ const generateOrderBy = (orderBy: {[key: string]: string | number | undefined}):
 }
 
 const order = [['createdAt', 'DESC']]
-const generateIncludeCategoryAndTagAndProductAndGraduatedPrice = (filterCategory: object, filterTag: object): object[] => {
+const generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties = (filterCategory: object, filterTag: object, filterColor: object, filterMaterial: object, filterSize: object): object[] => {
   return (
     [
       {
@@ -92,6 +92,33 @@ const generateIncludeCategoryAndTagAndProductAndGraduatedPrice = (filterCategory
           exclude: ['deletedAt', 'productId']
         },
         as: 'graduatedPrices'
+      },
+      {
+        model: db.ProductColor,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt', 'deletedAt']
+        },
+        as: 'productColor',
+        where: filterColor,
+        required: Object.keys(filterColor).length > 0
+      },
+      {
+        model: db.ProductMaterial,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt', 'deletedAt']
+        },
+        as: 'productMaterial',
+        where: filterMaterial,
+        required: Object.keys(filterMaterial).length > 0
+      },
+      {
+        model: db.ProductSize,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt', 'deletedAt']
+        },
+        as: 'productSize',
+        where: filterSize,
+        required: Object.keys(filterSize).length > 0
       }
     ]
   )
@@ -135,21 +162,19 @@ class ProductService extends BaseService {
 
     const whereFilterCategory = generateFilterQuery({ name: category })
     const whereFilterTags = generateFilterQuery({ productCategoryTagId: tags }, 'in')
+    const whereFilterColor = generateFilterQuery({ name: color })
+    const whereFilterMaterial = generateFilterQuery({ name: material })
+    const whereFilterSize = generateFilterQuery({ name: size })
     let whereFilterPrice: any = {}
     const where: any = {
       companyId,
       isVisible: true
     }
-    const wherePropertiesFilter = generateFilterQuery({
-      'properties.color': color,
-      'properties.material': material,
-      'properties.size': size
-    })
     const whereFilterShowChildren = showChildren === 'false' ? { parentId: { [Op.eq]: null } } : {}
 
     const attributes: any = { exclude: [] }
     const include: any[] = [
-      ...generateIncludeCategoryAndTagAndProductAndGraduatedPrice(whereFilterCategory, whereFilterTags)
+      ...generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties(whereFilterCategory, whereFilterTags, whereFilterColor, whereFilterMaterial, whereFilterSize)
     ]
 
     if (search !== '') {
@@ -181,7 +206,6 @@ class ProductService extends BaseService {
       where: {
         ...where,
         ...whereFilterPrice,
-        ...wherePropertiesFilter,
         ...whereFilterShowChildren
       },
       limit,
@@ -211,12 +235,10 @@ class ProductService extends BaseService {
     const whereSearch: any = {}
     const whereFilterCategory = generateFilterQuery({ name: category }, 'in')
     const whereFilterTags = generateFilterQuery({ productCategoryTagId: tags }, 'in')
+    const whereFilterColor = generateFilterQuery({ name: color })
+    const whereFilterMaterial = generateFilterQuery({ name: material })
+    const whereFilterSize = generateFilterQuery({ name: size })
     let whereFilterPrice: any = {}
-    const wherePropertiesFilter = generateFilterQuery({
-      'properties.color': color,
-      'properties.material': material,
-      'properties.size': size
-    })
     const whereFilterShowChildren = showChildren === 'false' ? { parentId: { [Op.eq]: null } } : {}
 
     const attributes: any = { exclude: [] }
@@ -226,7 +248,7 @@ class ProductService extends BaseService {
         attributes: ['id', 'name', 'suffix', 'email', 'phone', 'vat', 'domain'],
         as: 'company'
       },
-      ...generateIncludeCategoryAndTagAndProductAndGraduatedPrice(whereFilterCategory, whereFilterTags)
+      ...generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties(whereFilterCategory, whereFilterTags, whereFilterColor, whereFilterMaterial, whereFilterSize)
     ]
 
     if (search !== '') {
@@ -257,7 +279,6 @@ class ProductService extends BaseService {
           [Op.in]: isParent.split(',')
         },
         ...whereFilterPrice,
-        ...wherePropertiesFilter,
         ...whereFilterShowChildren
       },
       limit,
