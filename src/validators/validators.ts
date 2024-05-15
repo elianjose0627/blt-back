@@ -198,9 +198,9 @@ const commonQueryParams = {
     category: Joi.string().optional(),
     minPrice: Joi.number().min(0).optional(),
     maxPrice: Joi.number().min(0).optional(),
-    color: Joi.string().optional(),
-    material: Joi.string().optional(),
-    size: Joi.string().optional(),
+    color: Joi.string().optional().lowercase(),
+    material: Joi.string().optional().lowercase(),
+    size: Joi.string().optional().lowercase(),
     tags: Joi.string()
       .lowercase()
       .pattern(/^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12},?)+$/i)
@@ -476,11 +476,9 @@ const validateProduct = Joi.object({
     }),
     productCategoryId: Joi.string().uuid().allow(null).default(null),
     isParent: Joi.boolean(),
-    properties: Joi.object({
-      color: Joi.string().required().allow(null).allow(''),
-      material: Joi.string().required().allow(null).allow(''),
-      size: Joi.string().required().allow(null).allow('')
-    }),
+    productColorId: Joi.string().uuid().allow(null),
+    productMaterialId: Joi.string().uuid().allow(null),
+    productSizeId: Joi.string().uuid().allow(null),
     description: Joi.string().allow(null).allow('').optional()
   }).required()
 }).required()
@@ -501,11 +499,9 @@ const validateProductAdmin = Joi.object({
     }),
     productCategoryId: Joi.string().uuid().allow(null).default(null),
     isParent: Joi.boolean(),
-    properties: Joi.object({
-      color: Joi.string().required().allow(null).allow(''),
-      material: Joi.string().required().allow(null).allow(''),
-      size: Joi.string().required().allow(null).allow('')
-    }),
+    productColorId: Joi.string().uuid().allow(null),
+    productMaterialId: Joi.string().uuid().allow(null),
+    productSizeId: Joi.string().uuid().allow(null),
     description: Joi.string().allow(null).allow('').optional()
   }).required()
 }).required()
@@ -870,6 +866,28 @@ const validateProductCategory = Joi.object({
   }).required()
 })
 
+const validateProductColor = Joi.object({
+  productColor: Joi.object({
+    name: Joi.string().lowercase().required(),
+    hexCode: Joi.string().regex(/^#[A-Fa-f0-9]{6}$/).messages({
+      'string.pattern.base': '{#label} must be a valid hex color'
+    }).required(),
+    rgb: Joi.string().regex(/^rgb\(\s?\d{1,3}\s?,\s?\d{1,3}\s?,\s?\d{1,3}\s?\)$/).message('{#label} must be a valid RGB color').allow(null).default(null)
+  }).required()
+})
+
+const validateProductMaterial = Joi.object({
+  productMaterial: Joi.object({
+    name: Joi.string().lowercase().required()
+  }).required()
+})
+
+const validateProductSize = Joi.object({
+  productSize: Joi.object({
+    name: Joi.string().lowercase().required()
+  }).required()
+})
+
 const validateProductCategoryTag = Joi.object({
   productCategoryTag: Joi.object({
     name: Joi.string().lowercase().required()
@@ -971,5 +989,8 @@ export default {
   validateChild,
   validateChildren,
   validateProductQueryParams,
-  validateGraduatedPrice
+  validateGraduatedPrice,
+  validateProductColor,
+  validateProductMaterial,
+  validateProductSize
 }

@@ -70,6 +70,9 @@ app.use(apiPrefix, routers.maintenanceModeRouter())
 app.use(apiPrefix, routers.productCategoryRouter())
 app.use(apiPrefix, routers.productCategoryTagRouter())
 app.use(apiPrefix, routers.productGraduatedPriceRouter())
+app.use(apiPrefix, routers.productColorRouter())
+app.use(apiPrefix, routers.productMaterialRouter())
+app.use(apiPrefix, routers.productSizeRouter())
 
 // Add validation middleware
 app.use(joiErrors)

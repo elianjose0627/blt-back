@@ -314,6 +314,43 @@ describe('Product actions', () => {
 
       const productCategoryId = resProductCategory.body.productCategory.id
 
+      const resProductColor = await chai
+        .request(app)
+        .post('/api/product-colors')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productColor: {
+            name: 'black',
+            hexCode: '#000000'
+          }
+        })
+
+      const productColorId = resProductColor.body.productColor.id
+
+      const resProductMaterial = await chai
+        .request(app)
+        .post('/api/product-materials')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productMaterial: {
+            name: 'suede'
+          }
+        })
+
+      const productMaterialId = resProductMaterial.body.productMaterial.id
+
+      const resProductSize = await chai
+        .request(app)
+        .post('/api/product-sizes')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productSize: {
+            name: '46'
+          }
+        })
+
+      const productSizeId = resProductSize.body.productSize.id
+
       await chai
         .request(app)
         .post('/api/products')
@@ -326,11 +363,9 @@ describe('Product actions', () => {
             type: 'generic',
             productGroup: 'shoes',
             productCategoryId,
-            properties: {
-              color: 'black',
-              material: 'suede',
-              size: '46'
-            }
+            productColorId,
+            productMaterialId,
+            productSizeId
           }
         })
       const res = await chai
@@ -399,12 +434,7 @@ describe('Product actions', () => {
             merchantSku: '1231ph',
             type: 'generic',
             productGroup: 'phones',
-            productCategoryId,
-            properties: {
-              color: 'black',
-              material: 'glass',
-              size: 'candybar'
-            }
+            productCategoryId
           }
         })
 
