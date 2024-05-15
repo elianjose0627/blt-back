@@ -164,15 +164,26 @@ export const generateInclude = (model: string): any => {
         include: [
           {
             model: db.ProductCategoryTag,
-            attributes: {
-              exclude: ['deletedAt', 'productCategoryId']
-            },
-            as: 'productCategoryTag'
+            attributes: ['id', 'name'],
+            as: 'productCategoryTag',
+            include: [
+              {
+                model: db.ProductTag,
+                attributes: ['id', 'productId'],
+                as: 'relatedProducts',
+                limit: 6,
+                include: [
+                  {
+                    model: db.Product,
+                    attributes: ['name', 'pictures'],
+                    as: 'product'
+                  }
+                ]
+              }
+            ]
           }
         ],
-        attributes: {
-          exclude: ['deletedAt', 'productId', 'productCategoryTagId']
-        },
+        attributes: ['id'],
         as: 'productTags'
       },
       {
