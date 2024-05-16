@@ -66,6 +66,7 @@ export interface IUser {
   logoutTime?: Nullable<Date>
   company: Partial<ICompany> | null
   addresses: Array<Partial<IAddress>>
+  productAccessControlGroups: IProductAccessControlGroup[]
 }
 
 export interface IUserExtended extends IUser {
@@ -351,6 +352,7 @@ export interface IStock {
 export interface IProductCategoryTag {
   id: string
   name: string
+  type: string
   createdAt: Date
   updatedAt: Date
 }
@@ -397,6 +399,37 @@ export interface IProductMaterial {
 export interface IProductSize {
   id: string
   name: string
+  createdAt: Date
+  updatedAt: Date
+}
+export interface IProductAccessControlGroup {
+  id: string
+  name: string
+  description: string
+  createdAt: Date
+  updatedAt: Date
+  productCategoryTags: Array<Pick<IProductCategoryTag, 'id' | 'name'>>
+  users: Array<Pick<IUser, 'id' | 'firstName' | 'lastName' | 'email'>>
+  companies: Array<Pick<ICompany, 'id' | 'name'>>
+}
+export interface IUserProductAccessControlGroup {
+  id: string
+  productAccessControlGroupId?: string
+  userId?: string
+  createdAt: Date
+  updatedAt: Date
+}
+export interface ICompanyProductAccessControlGroup {
+  id: string
+  productAccessControlGroupId?: string
+  companyId?: string
+  createdAt: Date
+  updatedAt: Date
+}
+export interface IProductCategoryTagProductAccessControlGroup {
+  id: string
+  productAccessControlGroupId?: string
+  productCategoryTagId?: string
   createdAt: Date
   updatedAt: Date
 }

@@ -18,7 +18,9 @@ const withoutUser = [
   'EmailTemplate', 'EmailTemplateType', 'BlockedDomain',
   'CampaignAddress', 'MaintenanceMode', 'CompanySubscription',
   'ProductCategory', 'ProductCategoryTag', 'ProductTag', 'ProductGraduatedPrice',
-  'ProductColor', 'ProductMaterial', 'ProductSize'
+  'ProductColor', 'ProductMaterial', 'ProductSize',
+  'ProductAccessControlGroup', 'ProductCategoryTagProductAccessControlGroup', 'UserProductAccessControlGroup',
+  'CompanyProductAccessControlGroup'
 ]
 
 const includeCompanyAndOwner = {
@@ -265,6 +267,36 @@ export const generateInclude = (model: string): any => {
           model: db.Shipment,
           as: 'shipments',
           attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt', 'orderId'] }
+        }
+      ]
+    )
+  }
+  if (model === 'ProductAccessControlGroup') {
+    return (
+      [
+        {
+          model: db.ProductCategoryTag,
+          as: 'productCategoryTags',
+          attributes: ['id', 'name', 'type'],
+          through: {
+            attributes: []
+          }
+        },
+        {
+          model: db.User,
+          as: 'users',
+          attributes: ['id', 'firstName', 'lastName', 'email'],
+          through: {
+            attributes: []
+          }
+        },
+        {
+          model: db.Company,
+          as: 'companies',
+          attributes: ['id', 'name', 'email', 'domain'],
+          through: {
+            attributes: []
+          }
         }
       ]
     )

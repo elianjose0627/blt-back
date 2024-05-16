@@ -95,6 +95,11 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         as: 'subscriptions',
         onDelete: 'CASCADE'
       })
+      Company.belongsToMany(models.ProductAccessControlGroup, {
+        foreignKey: 'companyId',
+        through: models.CompanyProductAccessControlGroup,
+        as: 'productAccessControlGroups'
+      })
     }
 
     toJSONFor (): ICompany {
