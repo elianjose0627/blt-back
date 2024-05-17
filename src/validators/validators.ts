@@ -895,7 +895,8 @@ const validateProductSize = Joi.object({
 
 const validateProductCategoryTag = Joi.object({
   productCategoryTag: Joi.object({
-    name: Joi.string().lowercase().required()
+    name: Joi.string().lowercase().required(),
+    type: Joi.string().lowercase().optional().default('category')
   }).required()
 })
 

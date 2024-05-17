@@ -76,6 +76,9 @@ app.use(apiPrefix, routers.productColorRouter())
 app.use(apiPrefix, routers.productMaterialRouter())
 app.use(apiPrefix, routers.productSizeRouter())
 app.use(apiPrefix, routers.productAccessControlGroupRouter())
+app.use(apiPrefix, routers.companyProductAccessControlGroupRouter())
+app.use(apiPrefix, routers.userProductAccessControlGroupRouter())
+app.use(apiPrefix, routers.productCategoryTagProductAccessControlGroupRouter())
 
 // Add validation middleware
 app.use(joiErrors)

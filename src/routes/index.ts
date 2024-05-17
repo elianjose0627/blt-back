@@ -36,6 +36,9 @@ import productColorRouter from './productColorRouter'
 import productMaterialRouter from './productMaterialRouter'
 import productSizeRouter from './productSizeRouter'
 import productAccessControlGroupRouter from './productAccessControlGroupRouter'
+import companyProductAccessControlGroupRouter from './companyProductAccessControlGroupRouter'
+import userProductAccessControlGroupRouter from './userProductAccessControlGroupRouter'
+import productCategoryTagProductAccessControlGroupRouter from './productCategoryTagProductAccessControlGroupRouter'
 
 const routers = {
   authRouter,
@@ -75,7 +78,10 @@ const routers = {
   productColorRouter,
   productMaterialRouter,
   productSizeRouter,
-  productAccessControlGroupRouter
+  productAccessControlGroupRouter,
+  companyProductAccessControlGroupRouter,
+  userProductAccessControlGroupRouter,
+  productCategoryTagProductAccessControlGroupRouter
 }
 
 export default routers

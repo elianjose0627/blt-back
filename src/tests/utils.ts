@@ -327,12 +327,12 @@ export const createVerifiedAdminUser = async (): Promise<any> => {
   }
 }
 
-export const createVerifiedCompany = async (userId: string, isDomainVerified = true, customerId: string | null = null): Promise<any> => {
+export const createVerifiedCompany = async (userId: string, isDomainVerified = true, customerId: string | null = null, name = 'Stark Industries', email = 'admin@starkindustriesmarvel.com', domain = 'starkindustriesmarvel.com'): Promise<any> => {
   const company = await db.Company.create({
     id: uuidv1(),
-    name: 'Stark Industries',
-    email: 'admin@starkindustriesmarvel.com',
-    domain: 'starkindustriesmarvel.com',
+    name,
+    email,
+    domain,
     isDomainVerified,
     userId,
     customerId

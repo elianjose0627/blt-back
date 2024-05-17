@@ -171,7 +171,7 @@ export const generateInclude = (model: string): any => {
             include: [
               {
                 model: db.ProductTag,
-                attributes: ['id', 'productId'],
+                attributes: ['productId'],
                 as: 'relatedProducts',
                 limit: 6,
                 include: [

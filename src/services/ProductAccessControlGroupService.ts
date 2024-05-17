@@ -17,6 +17,7 @@ class ProductAccessControlGroupService extends BaseService {
       offset,
       order: [['createdAt', 'DESC']],
       attributes: { exclude: [] },
+      distinct: true,
       include: [
         {
           model: db.ProductCategoryTag,

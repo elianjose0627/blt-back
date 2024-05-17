@@ -5,14 +5,6 @@ import db from '../models'
 import { IProductCategoryTag, IProductCategoryTagProductAccessControlGroup } from '../types'
 
 class ProductCategoryTagProductAccessControlGroupService extends BaseService {
-  manyRecords (): string {
-    return 'productCategoryTagProductAccessControlGroups'
-  }
-
-  recordName (): string {
-    return 'Product Category Tag Product Access Control Group'
-  }
-
   async insert (data: any): Promise<any> {
     const { productCategoryTagIds, productAccessControlGroupId } = data
     let updated = []
