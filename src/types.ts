@@ -67,6 +67,7 @@ export interface IUser {
   company: Partial<ICompany> | null
   addresses: Array<Partial<IAddress>>
   productAccessControlGroups: IProductAccessControlGroup[]
+  companyUserGroups: ICompanyUserGroup[]
 }
 
 export interface IUserExtended extends IUser {
@@ -408,11 +409,36 @@ export interface IProductAccessControlGroup {
   description: string
   createdAt: Date
   updatedAt: Date
+  company: ICompany | null
   productCategoryTags: Array<Pick<IProductCategoryTag, 'id' | 'name'>>
   users: Array<Pick<IUser, 'id' | 'firstName' | 'lastName' | 'email'>>
   companies: Array<Pick<ICompany, 'id' | 'name'>>
+  companyUserGroups: Array<Pick<ICompanyUserGroup, 'id' | 'name'>>
 }
-export interface IUserProductAccessControlGroup {
+export interface ICompanyUserGroup {
+  id: string
+  name: string
+  description: string
+  company: ICompany
+  users: IUser[]
+  createdAt: Date
+  updatedAt: Date
+}
+export interface IUserCompanyUserGroup {
+  id: string
+  userCompanyUserGroupId?: string
+  userId?: string
+  createdAt: Date
+  updatedAt: Date
+}
+export interface ICompanyUserGroupInProductAccessControlGroup {
+  id: string
+  productAccessControlGroupId?: string
+  companyUserGroupId?: string
+  createdAt: Date
+  updatedAt: Date
+}
+export interface IUserInProductAccessControlGroup {
   id: string
   productAccessControlGroupId?: string
   userId?: string
@@ -426,7 +452,7 @@ export interface ICompanyProductAccessControlGroup {
   createdAt: Date
   updatedAt: Date
 }
-export interface IProductCategoryTagProductAccessControlGroup {
+export interface IProductCategoryTagInProductAccessControlGroup {
   id: string
   productAccessControlGroupId?: string
   productCategoryTagId?: string

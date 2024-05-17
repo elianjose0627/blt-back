@@ -58,6 +58,9 @@ export interface Database {
   UserProductAccessControlGroup?: any
   ProductCategoryTagProductAccessControlGroup?: any
   CompanyProductAccessControlGroup?: any
+  CompanyUserGroup?: any
+  UserCompanyUserGroup?: any
+  CompanyUserGroupProductAccessControlGroup?: any
   [key: string]: any
 }
 

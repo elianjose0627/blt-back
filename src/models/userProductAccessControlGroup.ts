@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { IUserProductAccessControlGroup } from '../types'
+import type { IUserInProductAccessControlGroup } from '../types'
 
 const UserProductAccessControlGroupModel = (sequelize: any, DataTypes: any): any => {
   interface UserProductAccessControlGroupAttributes {
@@ -15,7 +15,7 @@ const UserProductAccessControlGroupModel = (sequelize: any, DataTypes: any): any
 
     }
 
-    toJSONFor (): IUserProductAccessControlGroup {
+    toJSONFor (): IUserInProductAccessControlGroup {
       return {
         id: this.id,
         createdAt: this.createdAt,

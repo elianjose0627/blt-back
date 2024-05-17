@@ -2,9 +2,9 @@ import { v1 as uuidv1 } from 'uuid'
 import { Op } from 'sequelize'
 import BaseService from './BaseService'
 import db from '../models'
-import { IProductCategoryTag, IProductCategoryTagProductAccessControlGroup } from '../types'
+import { IProductCategoryTag, IProductCategoryTagInProductAccessControlGroup } from '../types'
 
-class ProductCategoryTagProductAccessControlGroupService extends BaseService {
+class ProductCategoryTagInProductAccessControlGroupService extends BaseService {
   async insert (data: any): Promise<any> {
     const { productCategoryTagIds, productAccessControlGroupId } = data
     let updated = []
@@ -17,7 +17,7 @@ class ProductCategoryTagProductAccessControlGroupService extends BaseService {
     })
 
     const foundProductCategoryTagIds = foundProductCategoryTags.rows.map((tag: IProductCategoryTag) => tag.id)
-    const foundProductCategoryTagProductAccessControlGroups = await db[this.model].findAndCountAll({
+    const foundProductCategoryTagInProductAccessControlGroups = await db[this.model].findAndCountAll({
       where: {
         productAccessControlGroupId,
         productCategoryTagId: foundProductCategoryTagIds
@@ -26,12 +26,12 @@ class ProductCategoryTagProductAccessControlGroupService extends BaseService {
     })
 
     const newProductCategoryTagIds = foundProductCategoryTagIds
-      .filter((productCategorytagId: string) => foundProductCategoryTagProductAccessControlGroups.rows
-        .map((row: IProductCategoryTagProductAccessControlGroup) => row.productCategoryTagId)
+      .filter((productCategorytagId: string) => foundProductCategoryTagInProductAccessControlGroups.rows
+        .map((row: IProductCategoryTagInProductAccessControlGroup) => row.productCategoryTagId)
         .includes(productCategorytagId) === false)
     const existingProductCategoryTagIds = foundProductCategoryTagIds
-      .filter((productCategorytagId: string) => foundProductCategoryTagProductAccessControlGroups.rows
-        .map((row: IProductCategoryTagProductAccessControlGroup) => row.productCategoryTagId)
+      .filter((productCategorytagId: string) => foundProductCategoryTagInProductAccessControlGroups.rows
+        .map((row: IProductCategoryTagInProductAccessControlGroup) => row.productCategoryTagId)
         .includes(productCategorytagId))
 
     if (existingProductCategoryTagIds.length > 0) {
@@ -62,4 +62,4 @@ class ProductCategoryTagProductAccessControlGroupService extends BaseService {
   }
 }
 
-export default ProductCategoryTagProductAccessControlGroupService
+export default ProductCategoryTagInProductAccessControlGroupService

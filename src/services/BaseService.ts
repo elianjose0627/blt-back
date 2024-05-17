@@ -20,7 +20,8 @@ const withoutUser = [
   'ProductCategory', 'ProductCategoryTag', 'ProductTag', 'ProductGraduatedPrice',
   'ProductColor', 'ProductMaterial', 'ProductSize',
   'ProductAccessControlGroup', 'ProductCategoryTagProductAccessControlGroup', 'UserProductAccessControlGroup',
-  'CompanyProductAccessControlGroup'
+  'CompanyProductAccessControlGroup', 'CompanyUserGroup', 'UserCompanyUserGroup',
+  'CompanyUserGroupProductAccessControlGroup'
 ]
 
 const includeCompanyAndOwner = {
@@ -279,7 +280,8 @@ export const generateInclude = (model: string): any => {
           as: 'productCategoryTags',
           attributes: ['id', 'name', 'type'],
           through: {
-            attributes: []
+            as: 'categoryTagProductAccessControlGroup',
+            attributes: ['id']
           }
         },
         {
@@ -287,7 +289,8 @@ export const generateInclude = (model: string): any => {
           as: 'users',
           attributes: ['id', 'firstName', 'lastName', 'email'],
           through: {
-            attributes: []
+            as: 'userProductAccessControlGroup',
+            attributes: ['id']
           }
         },
         {
@@ -295,11 +298,39 @@ export const generateInclude = (model: string): any => {
           as: 'companies',
           attributes: ['id', 'name', 'email', 'domain'],
           through: {
-            attributes: []
+            as: 'companyProductAccessControlGroup',
+            attributes: ['id']
+          }
+        },
+        {
+          model: db.CompanyUserGroup,
+          as: 'companyUserGroups',
+          attributes: ['id', 'name'],
+          through: {
+            as: 'companyUserGroupProductAccessControlGroup',
+            attributes: ['id']
           }
         }
       ]
     )
+  }
+  if (model === 'CompanyUserGroup') {
+    return [
+      {
+        model: db.User,
+        as: 'users',
+        attributes: ['id', 'firstName', 'lastName', 'email'],
+        through: {
+          as: 'userCompanyUserGroup',
+          attributes: ['id']
+        }
+      },
+      {
+        model: db.Company,
+        as: 'company',
+        attributes: ['id', 'name', 'email', 'domain']
+      }
+    ]
   }
   if (withoutUser.includes(model)) {
     return ([])

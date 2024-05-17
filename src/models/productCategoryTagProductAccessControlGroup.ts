@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { IProductCategoryTagProductAccessControlGroup } from '../types'
+import type { IProductCategoryTagInProductAccessControlGroup } from '../types'
 
 const ProductCategoryTagProductAccessControlGroupModel = (sequelize: any, DataTypes: any): any => {
   interface ProductCategoryTagProductAccessControlGroupAttributes {
@@ -15,7 +15,7 @@ const ProductCategoryTagProductAccessControlGroupModel = (sequelize: any, DataTy
 
     }
 
-    toJSONFor (): IProductCategoryTagProductAccessControlGroup {
+    toJSONFor (): IProductCategoryTagInProductAccessControlGroup {
       return {
         id: this.id,
         createdAt: this.createdAt,

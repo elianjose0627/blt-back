@@ -1,7 +1,7 @@
 import { Model } from 'sequelize'
 import bcrypt from 'bcrypt'
 import capitalize from '../utils/capitalize'
-import type { LoginTime, MediaData, INotifications, Nullable, Role, IUser, ICompany, IAddress, IProductAccessControlGroup } from '../types'
+import type { LoginTime, MediaData, INotifications, Nullable, Role, IUser, ICompany, IAddress, IProductAccessControlGroup, ICompanyUserGroup } from '../types'
 import * as userRoles from '../utils/userRoles'
 
 const UserModel = (sequelize: any, DataTypes: any): any => {
@@ -48,6 +48,7 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
     private readonly company: ICompany
     private readonly addresses: IAddress[]
     private readonly productAccessControlGroups: IProductAccessControlGroup[]
+    private readonly companyUserGroups: ICompanyUserGroup[]
 
     static associate (models: any): any {
       User.belongsTo(models.Company, {
@@ -68,6 +69,11 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
         foreignKey: 'userId',
         through: models.UserProductAccessControlGroup,
         as: 'productAccessControlGroups'
+      })
+      User.belongsToMany(models.CompanyUserGroup, {
+        foreignKey: 'userId',
+        through: models.UserCompanyUserGroup,
+        as: 'companyUserGroups'
       })
     }
 
@@ -93,7 +99,8 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
         loginTime: this.loginTime,
         company: this.company,
         addresses: this.addresses,
-        productAccessControlGroups: this.productAccessControlGroups
+        productAccessControlGroups: this.productAccessControlGroups,
+        companyUserGroups: this.companyUserGroups
       }
     }
 

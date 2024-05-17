@@ -1,7 +1,7 @@
 'use strict'
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('ProductAccessControlGroups', {
+    await queryInterface.createTable('CompanyUserGroups', {
       id: {
         allowNull: false,
         primaryKey: true,
@@ -26,10 +26,19 @@ module.exports = {
       deletedAt: {
         allowNull: true,
         type: Sequelize.DATE
+      },
+      companyId: {
+        allowNull: false,
+        type: Sequelize.UUID,
+        references: {
+          model: 'Companies',
+          key: 'id',
+          as: 'companyId'
+        }
       }
     })
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('ProductAccessControlGroups')
+    await queryInterface.dropTable('CompanyUserGroups')
   }
 }

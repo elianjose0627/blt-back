@@ -20,11 +20,17 @@ class ProductAccessControlGroupService extends BaseService {
       distinct: true,
       include: [
         {
+          model: db.Company,
+          attributes: ['id', 'name', 'suffix', 'email', 'domain'],
+          as: 'company'
+        },
+        {
           model: db.ProductCategoryTag,
           as: 'productCategoryTags',
           attributes: ['id', 'name', 'type'],
           through: {
-            attributes: []
+            as: 'categoryTagProductAccessControlGroup',
+            attributes: ['id']
           }
         },
         {
@@ -32,7 +38,8 @@ class ProductAccessControlGroupService extends BaseService {
           as: 'users',
           attributes: ['id', 'firstName', 'lastName', 'email'],
           through: {
-            attributes: []
+            as: 'userProductAccessControlGroup',
+            attributes: ['id']
           }
         },
         {
@@ -40,7 +47,17 @@ class ProductAccessControlGroupService extends BaseService {
           as: 'companies',
           attributes: ['id', 'name', 'email', 'domain'],
           through: {
-            attributes: []
+            as: 'companyProductAccessControlGroup',
+            attributes: ['id']
+          }
+        },
+        {
+          model: db.CompanyUserGroup,
+          as: 'companyUserGroups',
+          attributes: ['id', 'name'],
+          through: {
+            as: 'companyUserGroupProductAccessControlGroup',
+            attributes: ['id']
           }
         }
       ]
@@ -58,7 +75,8 @@ class ProductAccessControlGroupService extends BaseService {
 
     response = await db[this.model].findOne({
       where: {
-        name: productAccessControlGroup.name
+        name: productAccessControlGroup.name,
+        companyId: productAccessControlGroup.companyId
       },
       paranoid: false // To get soft deleted record
     })

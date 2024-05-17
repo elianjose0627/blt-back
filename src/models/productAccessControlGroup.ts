@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { ICompany, IProductAccessControlGroup, IProductCategoryTag, IUser } from '../types'
+import type { ICompany, ICompanyUserGroup, IProductAccessControlGroup, IProductCategoryTag, IUser } from '../types'
 
 const ProductAccessControlGroupModel = (sequelize: any, DataTypes: any): any => {
   interface ProductAccessControlGroupAttributes {
@@ -14,9 +14,11 @@ const ProductAccessControlGroupModel = (sequelize: any, DataTypes: any): any => 
     private readonly description: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
+    private readonly company: ICompany | null
     private readonly productCategoryTags: IProductCategoryTag[]
     private readonly users: IUser[]
     private readonly companies: ICompany[]
+    private readonly companyUserGroups: ICompanyUserGroup[]
 
     static associate (models: any): any {
       ProductAccessControlGroup.belongsToMany(models.User, {
@@ -34,6 +36,16 @@ const ProductAccessControlGroupModel = (sequelize: any, DataTypes: any): any => 
         through: models.CompanyProductAccessControlGroup,
         as: 'companies'
       })
+      ProductAccessControlGroup.belongsToMany(models.CompanyUserGroup, {
+        foreignKey: 'productAccessControlGroupId',
+        through: models.CompanyUserGroupProductAccessControlGroup,
+        as: 'companyUserGroups'
+      })
+      ProductAccessControlGroup.belongsTo(models.Company, {
+        foreignKey: 'companyId',
+        as: 'company',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): IProductAccessControlGroup {
@@ -43,9 +55,11 @@ const ProductAccessControlGroupModel = (sequelize: any, DataTypes: any): any => 
         description: this.description,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
+        company: this.company,
         productCategoryTags: this.productCategoryTags,
         users: this.users,
-        companies: this.companies
+        companies: this.companies,
+        companyUserGroups: this.companyUserGroups
       }
     }
   };

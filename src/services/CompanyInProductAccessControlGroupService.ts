@@ -4,7 +4,7 @@ import BaseService from './BaseService'
 import db from '../models'
 import { ICompany, ICompanyProductAccessControlGroup } from '../types'
 
-class CompanyProductAccessControlGroupService extends BaseService {
+class CompanyInProductAccessControlGroupService extends BaseService {
   async insert (data: any): Promise<any> {
     const { companyIds, productAccessControlGroupId } = data
     let updated = []
@@ -17,7 +17,7 @@ class CompanyProductAccessControlGroupService extends BaseService {
     })
 
     const foundCompanyIds = foundCompanies.rows.map((company: ICompany) => company.id)
-    const foundProductCategoryTagProductAccessControlGroups = await db[this.model].findAndCountAll({
+    const foundCompanyProductAccessControlGroups = await db[this.model].findAndCountAll({
       where: {
         productAccessControlGroupId,
         companyId: foundCompanyIds
@@ -26,11 +26,11 @@ class CompanyProductAccessControlGroupService extends BaseService {
     })
 
     const newCompanyIds = foundCompanyIds
-      .filter((companyId: string) => foundProductCategoryTagProductAccessControlGroups.rows
+      .filter((companyId: string) => foundCompanyProductAccessControlGroups.rows
         .map((row: ICompanyProductAccessControlGroup) => row.companyId)
         .includes(companyId) === false)
     const existingCompanyIds = foundCompanyIds
-      .filter((companyId: string) => foundProductCategoryTagProductAccessControlGroups.rows
+      .filter((companyId: string) => foundCompanyProductAccessControlGroups.rows
         .map((row: ICompanyProductAccessControlGroup) => row.companyId)
         .includes(companyId))
 
@@ -62,4 +62,4 @@ class CompanyProductAccessControlGroupService extends BaseService {
   }
 }
 
-export default CompanyProductAccessControlGroupService
+export default CompanyInProductAccessControlGroupService

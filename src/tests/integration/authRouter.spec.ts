@@ -287,6 +287,34 @@ describe('Auth Actions', () => {
     expect(res.body.user.message).to.equal('You have been logged out')
   })
 
+  it('should return 401 on attempting to logout with an expired token', async () => {
+    await chai
+      .request(app)
+      .post('/auth/signup')
+      .send({ user: { firstName: 'Mary', lastName: 'Jane', email: 'mj2@spiderteam.com', phone: '254720123456', password: 'petertingle' } })
+
+    const resLogin = await chai
+      .request(app)
+      .post('/auth/login')
+      .send({ user: { email: 'mj2@spiderteam.com', password: 'petertingle' } })
+
+    const token = resLogin.body.token
+
+    await chai
+      .request(app)
+      .patch('/auth/logout')
+      .set('Authorization', `Bearer ${String(token)}`)
+
+    const res = await chai
+      .request(app)
+      .patch('/auth/logout')
+      .set('Authorization', `Bearer ${String(token)}`)
+
+    expect(res).to.have.status(401)
+    expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+    expect(res.body.errors.message).to.equal('token invalid')
+  })
+
   it('should return a 401 when a blocked user tries to log in', async () => {
     const res = await chai
       .request(app)

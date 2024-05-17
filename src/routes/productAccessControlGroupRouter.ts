@@ -7,9 +7,10 @@ import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
-import ProductCategoryTagProductAccessControlGroupController from '../controllers/ProductCategoryTagProductAccessControlGroupController'
-import UserProductAccessControlGroupController from '../controllers/UserProductAccessControlGroupController'
-import CompanyProductAccessControlGroupController from '../controllers/CompanyProductAccessControlGroupController'
+import ProductCategoryTagInProductAccessControlGroupController from '../controllers/ProductCategoryTagProductAccessControlGroupController'
+import UserInProductAccessControlGroupController from '../controllers/UserInProductAccessControlGroupController'
+import CompanyInProductAccessControlGroupController from '../controllers/CompanyInProductAccessControlGroupController'
+import CompanyUserGroupProductAccessGroupController from '../controllers/CompanyUserGroupInProductAccessControlGroupController'
 
 const productAccessControlGroupRoutes = (): Router => {
   const productAccessControlGroupRouter = express.Router()
@@ -34,15 +35,19 @@ const productAccessControlGroupRoutes = (): Router => {
   productAccessControlGroupRouter.route('/product-access-control-groups/:id/product-category-tags')
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateProductCategoryTagProductAccessControlGroup
-    }), asyncHandler(ProductCategoryTagProductAccessControlGroupController.insert))
+    }), asyncHandler(ProductCategoryTagInProductAccessControlGroupController.insert))
   productAccessControlGroupRouter.route('/product-access-control-groups/:id/users')
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateUserProductAccessControlGroup
-    }), asyncHandler(UserProductAccessControlGroupController.insert))
+    }), asyncHandler(UserInProductAccessControlGroupController.insert))
   productAccessControlGroupRouter.route('/product-access-control-groups/:id/companies')
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateCompanyProductAccessControlGroup
-    }), asyncHandler(CompanyProductAccessControlGroupController.insert))
+    }), asyncHandler(CompanyInProductAccessControlGroupController.insert))
+  productAccessControlGroupRouter.route('/product-access-control-groups/:id/company-user-groups')
+    .post(asyncHandler(checkAdmin), celebrate({
+      [Segments.BODY]: validator.validateCompanyUserGroupProductAccessControlGroup
+    }), asyncHandler(CompanyUserGroupProductAccessGroupController.insert))
   return productAccessControlGroupRouter
 }
 

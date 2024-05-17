@@ -2,11 +2,15 @@ import { v1 as uuidv1 } from 'uuid'
 import { Op } from 'sequelize'
 import BaseService from './BaseService'
 import db from '../models'
-import { IUserProductAccessControlGroup, IUser } from '../types'
+import { IUserCompanyUserGroup, IUser } from '../types'
 
-class UserProductAccessControlGroupService extends BaseService {
+class UserInCompanyUserGroupService extends BaseService {
+  recordName (): string {
+    return 'User in Company User Group'
+  }
+
   async insert (data: any): Promise<any> {
-    const { userIds, productAccessControlGroupId } = data
+    const { userIds, companyUserGroupId } = data
     let updated = []
     let added = []
 
@@ -17,21 +21,21 @@ class UserProductAccessControlGroupService extends BaseService {
     })
 
     const foundUserIds = foundUsers.rows.map((user: IUser) => user.id)
-    const foundProductCategoryTagProductAccessControlGroups = await db[this.model].findAndCountAll({
+    const foundUserCompanyUserGroups = await db[this.model].findAndCountAll({
       where: {
-        productAccessControlGroupId,
+        companyUserGroupId,
         userId: foundUserIds
       },
       paranoid: false // To get soft deleted record
     })
 
     const newUserIds = foundUserIds
-      .filter((userId: string) => foundProductCategoryTagProductAccessControlGroups.rows
-        .map((row: IUserProductAccessControlGroup) => row.userId)
+      .filter((userId: string) => foundUserCompanyUserGroups.rows
+        .map((row: IUserCompanyUserGroup) => row.userId)
         .includes(userId) === false)
     const existingUserIds = foundUserIds
-      .filter((userId: string) => foundProductCategoryTagProductAccessControlGroups.rows
-        .map((row: IUserProductAccessControlGroup) => row.userId)
+      .filter((userId: string) => foundUserCompanyUserGroups.rows
+        .map((row: IUserCompanyUserGroup) => row.userId)
         .includes(userId))
 
     if (existingUserIds.length > 0) {
@@ -40,7 +44,7 @@ class UserProductAccessControlGroupService extends BaseService {
           userId: {
             [Op.in]: foundUserIds
           },
-          productAccessControlGroupId
+          companyUserGroupId
         },
         returning: true
       })
@@ -51,7 +55,7 @@ class UserProductAccessControlGroupService extends BaseService {
       const bulkInsertData = newUserIds.map((userId: string) => ({
         userId,
         id: uuidv1(),
-        productAccessControlGroupId
+        companyUserGroupId
       }))
 
       const addedResponse = await db[this.model].bulkCreate(bulkInsertData, { returning: true })
@@ -62,4 +66,4 @@ class UserProductAccessControlGroupService extends BaseService {
   }
 }
 
-export default UserProductAccessControlGroupService
+export default UserInCompanyUserGroupService

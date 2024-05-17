@@ -932,7 +932,8 @@ const validateGraduatedPrice = Joi.object({
 const validateProductAccessControlGroup = Joi.object({
   productAccessControlGroup: Joi.object({
     name: Joi.string().required().max(64),
-    description: Joi.string().optional().max(256).allow(null).allow('')
+    description: Joi.string().optional().max(256).allow(null).allow(''),
+    companyId: Joi.string().uuid().allow(null).default(null)
   }).required()
 })
 
@@ -951,6 +952,31 @@ const validateUserProductAccessControlGroup = Joi.object({
 const validateCompanyProductAccessControlGroup = Joi.object({
   companyProductAccessControlGroup: Joi.object({
     companyIds: Joi.array().items(Joi.string().uuid().required()).min(1)
+  }).required()
+})
+
+const validateCompanyUserGroup = Joi.object({
+  companyUserGroup: Joi.object({
+    name: Joi.string().required().max(64),
+    description: Joi.string().optional().max(256).allow(null).allow(''),
+    companyId: Joi.string().uuid().required()
+  }).required()
+})
+const validateUpdatedCompanyUserGroup = Joi.object({
+  companyUserGroup: Joi.object({
+    name: Joi.string().required().max(64),
+    description: Joi.string().optional().max(256).allow(null).allow('')
+  }).required()
+})
+
+const validateUserCompanyUserGroup = Joi.object({
+  userCompanyUserGroup: Joi.object({
+    userIds: Joi.array().items(Joi.string().uuid().required()).min(1)
+  }).required()
+})
+const validateCompanyUserGroupProductAccessControlGroup = Joi.object({
+  companyUserGroupProductAccessControlGroup: Joi.object({
+    companyUserGroupIds: Joi.array().items(Joi.string().uuid().required()).min(1)
   }).required()
 })
 
@@ -1027,5 +1053,9 @@ export default {
   validateProductAccessControlGroup,
   validateProductCategoryTagProductAccessControlGroup,
   validateUserProductAccessControlGroup,
-  validateCompanyProductAccessControlGroup
+  validateCompanyProductAccessControlGroup,
+  validateCompanyUserGroup,
+  validateUpdatedCompanyUserGroup,
+  validateUserCompanyUserGroup,
+  validateCompanyUserGroupProductAccessControlGroup
 }

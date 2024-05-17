@@ -84,6 +84,14 @@ const passportAuth = (passport: PassportStatic): any => {
         through: {
           attributes: []
         }
+      },
+      {
+        model: db.CompanyUserGroup,
+        as: 'companyUserGroups',
+        attributes: ['id', 'name', 'description', 'createdAt', 'updatedAt'],
+        through: {
+          attributes: []
+        }
       }
     ],
     where: {

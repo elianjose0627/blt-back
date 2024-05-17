@@ -1,17 +1,17 @@
 import BaseController from './BaseController'
-import CompanyProductAccessControlGroupService from '../services/CompanyProductAccessControlGroupService'
+import UserInProductAccessControlGroupService from '../services/UserInProductAccessControlGroupService'
 import { CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 
-const companyProductAccessControlGroupService = new CompanyProductAccessControlGroupService('CompanyProductAccessControlGroup')
+const userInProductAccessControlGroupService = new UserInProductAccessControlGroupService('UserProductAccessControlGroup')
 
-class CompanyProductAccessControlGroupController extends BaseController {
+class UserInProductAccessControlGroupController extends BaseController {
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { body: { companyProductAccessControlGroup: { companyIds } }, params: { id } } = req
+    const { body: { userProductAccessControlGroup: { userIds } }, params: { id } } = req
 
-    const { response, status } = await companyProductAccessControlGroupService.insert({
-      companyIds,
+    const { response, status } = await userInProductAccessControlGroupService.insert({
+      userIds,
       productAccessControlGroupId: id
     })
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
@@ -29,4 +29,4 @@ class CompanyProductAccessControlGroupController extends BaseController {
   }
 }
 
-export default new CompanyProductAccessControlGroupController(companyProductAccessControlGroupService)
+export default new UserInProductAccessControlGroupController(userInProductAccessControlGroupService)

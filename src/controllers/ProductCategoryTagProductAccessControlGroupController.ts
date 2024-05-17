@@ -1,19 +1,19 @@
 import BaseController from './BaseController'
-import ProductCategoryTagProductAccessControlGroupService from '../services/ProductCategoryTagProductAccessControlGroupService'
+import ProductCategoryTagInProductAccessControlGroupService from '../services/ProductCategoryTagInProductAccessControlGroupService'
 import { CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 
-const productCategoryTagProductAccessControlGroupService = new ProductCategoryTagProductAccessControlGroupService('ProductCategoryTagProductAccessControlGroup')
+const productCategoryTagInProductAccessControlGroupService = new ProductCategoryTagInProductAccessControlGroupService('ProductCategoryTagProductAccessControlGroup')
 
-class ProductCategoryTagProductAccessControlGroupController extends BaseController {
+class ProductCategoryTagInProductAccessControlGroupController extends BaseController {
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
     const {
       body: { productCategoryTagProductAccessControlGroup: { productCategoryTagIds } },
       params: { id }
     } = req
 
-    const { response, status } = await productCategoryTagProductAccessControlGroupService.insert({
+    const { response, status } = await productCategoryTagInProductAccessControlGroupService.insert({
       productCategoryTagIds,
       productAccessControlGroupId: id
     })
@@ -32,4 +32,4 @@ class ProductCategoryTagProductAccessControlGroupController extends BaseControll
   }
 }
 
-export default new ProductCategoryTagProductAccessControlGroupController(productCategoryTagProductAccessControlGroupService)
+export default new ProductCategoryTagInProductAccessControlGroupController(productCategoryTagInProductAccessControlGroupService)
