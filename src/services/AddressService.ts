@@ -14,7 +14,8 @@ class AddressService extends BaseService {
 
     const addressConditions = []
 
-    Object.keys(address).forEach(key => {
+    const { id, ...addressWithoutId } = address
+    Object.keys(addressWithoutId).forEach(key => {
       addressConditions.push({ [key]: address[key] })
     })
 
@@ -23,7 +24,10 @@ class AddressService extends BaseService {
 
     response = await db[this.model].findOne({
       where: {
-        [Op.and]: addressConditions
+        [Op.or]: [
+          { id },
+          { [Op.and]: addressConditions }
+        ]
       },
       paranoid: false
     })

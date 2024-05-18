@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import UserController from '../controllers/UserController'
@@ -9,7 +9,7 @@ import paginate from '../middlewares/pagination'
 import checkOtp from '../middlewares/checkOtp'
 import checkBlockedDomain from '../middlewares/checkBlockedDomain'
 
-const userRoutes = (): any => {
+const userRoutes = (): Router => {
   const userRouter = express.Router()
 
   userRouter.use('/users', checkAuth, UserController.setModule)

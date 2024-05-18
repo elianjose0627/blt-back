@@ -275,6 +275,7 @@ const validateDomain = Joi.object({
 
 const validateCreatedAddress = Joi.object({
   address: Joi.object({
+    id: Joi.string().uuid().optional().default(null).allow(null),
     salutation: Joi.string().optional().allow('').allow(null).max(8),
     firstName: Joi.string().optional().allow('').allow(null).max(64),
     lastName: Joi.string().optional().allow('').allow(null).max(64),
