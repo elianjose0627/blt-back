@@ -795,7 +795,11 @@ const validateMaintenanceMode = Joi.object({
   maintenanceMode: Joi.object({
     isActive: Joi.boolean().required(),
     reason: Joi.string().required(),
-    startDate: Joi.date().min(dayjs().toDate()).required(),
+    startDate: Joi.date().when('isActive', {
+      is: true,
+      then: Joi.date().min(dayjs().toDate()),
+      otherwise: Joi.date()
+    }).required(),
     endDate: Joi.date()
       .min(Joi.ref('startDate'))
       .not(Joi.ref('startDate')).messages({
