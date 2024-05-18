@@ -5,6 +5,10 @@ import db from '../models'
 import { ICompany, ICompanyProductAccessControlGroup } from '../types'
 
 class CompanyInProductAccessControlGroupService extends BaseService {
+  recordName (): string {
+    return 'Company in Product Access Control Group'
+  }
+
   async insert (data: any): Promise<any> {
     const { companyIds, productAccessControlGroupId } = data
     let updated = []
