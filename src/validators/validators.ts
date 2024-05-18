@@ -275,6 +275,7 @@ const validateDomain = Joi.object({
 
 const validateCreatedAddress = Joi.object({
   address: Joi.object({
+    id: Joi.string().uuid().optional().default(null).allow(null),
     salutation: Joi.string().optional().allow('').allow(null).max(8),
     firstName: Joi.string().optional().allow('').allow(null).max(64),
     lastName: Joi.string().optional().allow('').allow(null).max(64),
@@ -795,7 +796,11 @@ const validateMaintenanceMode = Joi.object({
   maintenanceMode: Joi.object({
     isActive: Joi.boolean().required(),
     reason: Joi.string().required(),
-    startDate: Joi.date().min(dayjs().toDate()).required(),
+    startDate: Joi.date().when('isActive', {
+      is: true,
+      then: Joi.date().min(dayjs().toDate()),
+      otherwise: Joi.date()
+    }).required(),
     endDate: Joi.date()
       .min(Joi.ref('startDate'))
       .not(Joi.ref('startDate')).messages({
