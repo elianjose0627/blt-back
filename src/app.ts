@@ -32,12 +32,15 @@ app.use(logger('dev'))
 app.use(express.json({ limit }))
 app.use(express.urlencoded({ extended: false, limit, parameterLimit: 2000000 }))
 
+// Routes that bypass maintenance mode
+app.use(apiPrefix, routers.maintenanceModeRouter())
+app.use(authPrefix, routers.authRouter())
+
 // Middleware to check for maintenance mode
 app.use(checkMaintenanceMode)
 
 // Add routes to the app
 app.use(apiPrefix, routers.userRouter())
-app.use(authPrefix, routers.authRouter())
 app.use(apiPrefix, routers.profileRouter())
 app.use(apiPrefix, routers.companyRouter())
 app.use(apiPrefix, routers.addressRouter())
@@ -66,7 +69,6 @@ app.use(apiPrefix, routers.campaignOrderLimitRouter())
 app.use(apiPrefix, routers.emailTemplateRouter())
 app.use(apiPrefix, routers.emailTempleTypeRouter())
 app.use(apiPrefix, routers.campaignAddressRouter())
-app.use(apiPrefix, routers.maintenanceModeRouter())
 app.use(apiPrefix, routers.productCategoryRouter())
 app.use(apiPrefix, routers.productCategoryTagRouter())
 app.use(apiPrefix, routers.productGraduatedPriceRouter())
