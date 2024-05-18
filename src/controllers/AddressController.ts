@@ -27,9 +27,9 @@ class AddressController extends BaseController {
   }
 
   async getAllForCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { limit, page, offset } = req.query
+    const { query: { limit, page, offset, search, filter } } = req
     const { id } = req.params
-    const records = await addressService.getAllForCompany(limit, offset, id)
+    const records = await addressService.getAllForCompany(limit, offset, id, search, filter)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),

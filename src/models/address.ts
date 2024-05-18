@@ -1,10 +1,13 @@
 import { Model } from 'sequelize'
-import type { AddressType, IAddress, ICompany } from '../types'
+import type { AddressAffiliation, AddressType, IAddress, ICompany } from '../types'
 
 const AddressModel = (sequelize: any, DataTypes: any): any => {
   interface AddressAttributes {
     id: string
     companyName: string
+    salutation: string
+    firstName: string
+    lastName: string
     email: string
     costCenter: string
     country: string
@@ -15,11 +18,15 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
     addressAddition: string
     vat: string
     type: AddressType
+    affiliation: AddressAffiliation
   }
 
   class Address extends Model<AddressAttributes> {
     private readonly id: string
     private readonly companyName: string
+    private readonly salutation: string
+    private readonly firstName: string
+    private readonly lastName: string
     private readonly email: string
     private readonly costCenter: string
     private readonly country: string
@@ -30,6 +37,7 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
     private readonly addressAddition: string
     private readonly vat: string
     private readonly type: AddressType
+    private readonly affiliation: AddressAffiliation
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany
@@ -51,6 +59,9 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
       return {
         id: this.id,
         companyName: this.companyName,
+        salutation: this.salutation,
+        firstName: this.firstName,
+        lastName: this.lastName,
         email: this.email,
         costCenter: this.costCenter,
         country: this.country,
@@ -61,6 +72,7 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
         addressAddition: this.addressAddition,
         vat: this.vat,
         type: this.type,
+        affiliation: this.affiliation,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         company: this.company
@@ -73,6 +85,18 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
       type: DataTypes.UUID,
       primaryKey: true,
       allowNull: false
+    },
+    salutation: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    firstName: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    lastName: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     country: {
       type: DataTypes.STRING,
@@ -115,6 +139,10 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
       allowNull: true
     },
     costCenter: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    affiliation: {
       type: DataTypes.STRING,
       allowNull: true
     }

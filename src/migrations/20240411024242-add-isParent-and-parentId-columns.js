@@ -4,27 +4,24 @@ module.exports = {
     return Promise.all([
       queryInterface.addColumn('Products', 'parentId', {
         type: Sequelize.UUID,
-        allowNull: true
+        allowNull: true,
+        onDelete: 'CASCADE',
+        references: {
+          model: 'Products',
+          key: 'id',
+          as: 'parentId'
+        }
       }),
       queryInterface.addColumn('Products', 'isParent', {
         type: Sequelize.BOOLEAN,
         defaultValue: false
-      }),
-      queryInterface.addColumn('Products', 'properties', {
-        type: Sequelize.JSON,
-        defaultValue: {
-          color: null,
-          material: null,
-          size: null
-        }
       })
     ])
   },
   down: (queryInterface, Sequelize) => {
     return Promise.all([
       queryInterface.removeColumn('Products', 'parentId'),
-      queryInterface.removeColumn('Products', 'isParent'),
-      queryInterface.removeColumn('Products', 'properties')
+      queryInterface.removeColumn('Products', 'isParent')
     ])
   }
 }

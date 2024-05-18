@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { ICompany, IProduct, IProductCategory, IProductCategoryTag, IProductGraduatedPrice, IProductPicture, NetRetailPrice, ProductType } from '../types'
+import type { ICompany, IProduct, IProductCategory, IProductCategoryTag, IProductColor, IProductGraduatedPrice, IProductMaterial, IProductPicture, IProductSize, NetRetailPrice, ProductType } from '../types'
 
 const ProductModel = (sequelize: any, DataTypes: any): any => {
   interface ProductAttributes {
@@ -13,7 +13,6 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     netRetailPrice: NetRetailPrice
     pictures: IProductPicture[]
     isVisible: boolean
-    properties: { [key: string]: [string] }
     isParent: boolean
   }
 
@@ -32,10 +31,12 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     private readonly company: ICompany
     private readonly productCategory: IProductCategory
     private readonly productTags: IProductCategoryTag[]
-    private readonly properties: { [key: string]: [string] }
     private readonly isParent: boolean
     private readonly children: IProduct[]
     private readonly graduatedPrices: IProductGraduatedPrice[]
+    private readonly productColor: IProductColor
+    private readonly productMaterial: IProductMaterial
+    private readonly productSize: IProductSize
 
     static associate (models: any): any {
       Product.belongsTo(models.Company, {
@@ -63,6 +64,21 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         as: 'graduatedPrices',
         onDelete: 'CASCADE'
       })
+      Product.belongsTo(models.ProductColor, {
+        foreignKey: 'productColorId',
+        as: 'productColor',
+        onDelete: 'SET NULL'
+      })
+      Product.belongsTo(models.ProductMaterial, {
+        foreignKey: 'productMaterialId',
+        as: 'productMaterial',
+        onDelete: 'SET NULL'
+      })
+      Product.belongsTo(models.ProductSize, {
+        foreignKey: 'productSizeId',
+        as: 'productSize',
+        onDelete: 'SET NULL'
+      })
     }
 
     toJSONFor (): IProduct {
@@ -81,10 +97,12 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         company: this.company,
         productCategory: this.productCategory,
         productTags: this.productTags,
-        properties: this.properties,
         isParent: this.isParent,
         children: this.children,
-        graduatedPrices: this.graduatedPrices
+        graduatedPrices: this.graduatedPrices,
+        productColor: this.productColor,
+        productMaterial: this.productMaterial,
+        productSize: this.productSize
       }
     }
   };
@@ -131,14 +149,6 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     pictures: {
       type: DataTypes.JSON,
       defaultValue: []
-    },
-    properties: {
-      type: DataTypes.JSON,
-      defaultValue: {
-        color: null,
-        material: null,
-        size: null
-      }
     },
     isVisible: {
       type: DataTypes.BOOLEAN,

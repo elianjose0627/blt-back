@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import MaintenanceModeController from '../controllers/MaintenanceModeController'
@@ -7,7 +7,7 @@ import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
 
-const maintenanceModeRoutes = (): any => {
+const maintenanceModeRoutes = (): Router => {
   const maintenanceModeRouter = express.Router()
 
   maintenanceModeRouter.use('/maintenance-modes', checkAuth)

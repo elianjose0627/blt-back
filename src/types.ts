@@ -220,10 +220,14 @@ export interface ICompany {
 }
 
 export type AddressType = 'billing' | 'delivery' | 'billingAndDelivery' | 'return'
+export type AddressAffiliation = 'personal' | 'company' | 'other' | null
 
 export interface IAddress {
   id: string
   companyName?: string
+  salutation?: Nullable<string>
+  firstName?: Nullable<string>
+  lastName?: Nullable<string>
   email?: string
   costCenter?: string
   country: string
@@ -236,6 +240,7 @@ export interface IAddress {
   createdAt?: Date
   updatedAt?: Date
   type: AddressType
+  affiliation?: AddressAffiliation
   owner?: IUser
   company?: ICompany
   campaign?: ICampaign
@@ -375,6 +380,26 @@ export interface IProductGraduatedPrice {
   createdAt: Date
   updatedAt: Date
 }
+export interface IProductColor {
+  id: string
+  name: string
+  hexCode: string
+  rgb: string
+  createdAt: Date
+  updatedAt: Date
+}
+export interface IProductMaterial {
+  id: string
+  name: string
+  createdAt: Date
+  updatedAt: Date
+}
+export interface IProductSize {
+  id: string
+  name: string
+  createdAt: Date
+  updatedAt: Date
+}
 export interface IProduct {
   id: string
   jfsku: string
@@ -392,10 +417,12 @@ export interface IProduct {
   isVisible?: boolean
   productCategory?: IProductCategory
   productTags?: IProductCategoryTag[]
-  properties: { [key: string]: [string] }
   isParent: boolean
-  children: Array<Pick<IProduct, 'id' | 'jfsku' | 'name' | 'merchantSku' | 'pictures' | 'properties' | 'createdAt' | 'updatedAt'>>
+  children: Array<Pick<IProduct, 'id' | 'jfsku' | 'name' | 'merchantSku' | 'pictures' | 'createdAt' | 'updatedAt' | 'productColor' | 'productMaterial' | 'productSize'>>
   graduatedPrices: IProductGraduatedPrice[]
+  productColor: IProductColor
+  productMaterial: IProductMaterial
+  productSize: IProductSize
 }
 
 export interface ICampaignOrderLimit {

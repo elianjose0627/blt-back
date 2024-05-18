@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import UserController from '../controllers/UserController'
@@ -9,7 +9,7 @@ import paginate from '../middlewares/pagination'
 import checkOtp from '../middlewares/checkOtp'
 import checkBlockedDomain from '../middlewares/checkBlockedDomain'
 
-const userRoutes = (): any => {
+const userRoutes = (): Router => {
   const userRouter = express.Router()
 
   userRouter.use('/users', checkAuth, UserController.setModule)
@@ -65,10 +65,19 @@ const userRoutes = (): any => {
     .patch(asyncHandler(UserController.checkOwner), celebrate({
       [Segments.BODY]: validator.validateNotifications
     }), asyncHandler(UserController.updateNotifications))
+    // Start DEPRECATED: /users/:id/address
   userRouter.route('/users/:id/address')
     .post(asyncHandler(UserController.checkOwnerOrAdmin), celebrate({
       [Segments.BODY]: validator.validateCreatedAddress
     }, { abortEarly: false }), asyncHandler(UserController.createAddress))
+    // End DEPRECATED
+  userRouter.route('/users/:id/addresses')
+    .post(asyncHandler(UserController.checkOwnerOrAdmin), celebrate({
+      [Segments.BODY]: validator.validateCreatedAddress
+    }, { abortEarly: false }), asyncHandler(UserController.createAddress))
+    .get(asyncHandler(UserController.checkOwnerOrAdmin), celebrate({
+      [Segments.QUERY]: validator.validateQueryParams
+    }), asyncHandler(paginate), asyncHandler(UserController.getAddresses))
   userRouter.route('/users/:id/company')
     .patch(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateUserCompany

@@ -91,6 +91,24 @@ class PendingOrderController extends BaseController {
     })
   }
 
+  async insertCataloguePendingOrders (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { body: { pendingOrders }, user: currentUser } = req
+
+    const { response, status } = await pendingOrderService.insertCataloguePendingOrders({ pendingOrders, currentUser })
+    io.emit(`${String(pendingOrderService.recordName())}`, { message: `${String(pendingOrderService.recordName())} created` })
+
+    const statusCode: StatusCode = {
+      200: statusCodes.OK,
+      201: statusCodes.CREATED
+    }
+
+    return res.status(statusCode[status]).send({
+      statusCode: statusCode[status],
+      success: true,
+      [pendingOrderService.manyRecords()]: response
+    })
+  }
+
   async duplicate (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { body: { postedOrders }, user: currentUser } = req
 

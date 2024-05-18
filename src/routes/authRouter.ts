@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import UserController from '../controllers/UserController'
@@ -8,7 +8,7 @@ import checkResetToken from '../middlewares/checkResetToken'
 import TokenController from '../controllers/TokenController'
 import checkBlockedDomain from '../middlewares/checkBlockedDomain'
 
-const authRoutes = (): any => {
+const authRoutes = (): Router => {
   const authRouter = express.Router()
 
   authRouter.route('/signup')

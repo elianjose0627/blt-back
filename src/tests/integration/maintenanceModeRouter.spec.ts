@@ -324,14 +324,13 @@ describe('Maintenance mode actions', () => {
       await createMaintenanceMode(startDate, endDate, 'A new module is being set up')
       const res = await chai
         .request(app)
-        .post('/api/maintenance-modes')
+        .post('/api/companies')
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          maintenanceMode: {
-            isActive: true,
-            reason: 'A new module has been set up',
-            startDate,
-            endDate
+          company: {
+            name: 'Test Company',
+            email: 'test@testcompany.com',
+            domain: 'testcompany.com'
           }
         })
 

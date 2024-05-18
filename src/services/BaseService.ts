@@ -17,7 +17,8 @@ const withoutUser = [
   'GreetingCard', 'CampaignShippingDestination', 'CampaignOrderLimit',
   'EmailTemplate', 'EmailTemplateType', 'BlockedDomain',
   'CampaignAddress', 'MaintenanceMode', 'CompanySubscription',
-  'ProductCategory', 'ProductCategoryTag', 'ProductTag', 'ProductGraduatedPrice'
+  'ProductCategory', 'ProductCategoryTag', 'ProductTag', 'ProductGraduatedPrice',
+  'ProductColor', 'ProductMaterial', 'ProductSize'
 ]
 
 const includeCompanyAndOwner = {
@@ -163,23 +164,57 @@ export const generateInclude = (model: string): any => {
         include: [
           {
             model: db.ProductCategoryTag,
-            attributes: {
-              exclude: ['deletedAt', 'productCategoryId']
-            },
-            as: 'productCategoryTag'
+            attributes: ['id', 'name'],
+            as: 'productCategoryTag',
+            include: [
+              {
+                model: db.ProductTag,
+                attributes: ['id', 'productId'],
+                as: 'relatedProducts',
+                limit: 6,
+                include: [
+                  {
+                    model: db.Product,
+                    attributes: ['name', 'pictures'],
+                    as: 'product'
+                  }
+                ]
+              }
+            ]
           }
         ],
-        attributes: {
-          exclude: ['deletedAt', 'productId', 'productCategoryTagId']
-        },
+        attributes: ['id'],
         as: 'productTags'
       },
       {
         model: db.Product,
         attributes: {
-          exclude: ['deletedAt', 'parentId', 'productCategoryId', 'companyId']
+          exclude: ['deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId']
         },
-        as: 'children'
+        as: 'children',
+        include: [
+          {
+            model: db.ProductColor,
+            attributes: {
+              exclude: ['createdAt', 'updatedAt', 'deletedAt']
+            },
+            as: 'productColor'
+          },
+          {
+            model: db.ProductMaterial,
+            attributes: {
+              exclude: ['createdAt', 'updatedAt', 'deletedAt']
+            },
+            as: 'productMaterial'
+          },
+          {
+            model: db.ProductSize,
+            attributes: {
+              exclude: ['createdAt', 'updatedAt', 'deletedAt']
+            },
+            as: 'productSize'
+          }
+        ]
       },
       {
         model: db.ProductGraduatedPrice,
@@ -187,6 +222,27 @@ export const generateInclude = (model: string): any => {
           exclude: ['deletedAt', 'productId']
         },
         as: 'graduatedPrices'
+      },
+      {
+        model: db.ProductColor,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt', 'deletedAt']
+        },
+        as: 'productColor'
+      },
+      {
+        model: db.ProductMaterial,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt', 'deletedAt']
+        },
+        as: 'productMaterial'
+      },
+      {
+        model: db.ProductSize,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt', 'deletedAt']
+        },
+        as: 'productSize'
       }
     ])
   }
