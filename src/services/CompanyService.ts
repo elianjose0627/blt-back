@@ -39,7 +39,7 @@ class CompanyService extends BaseService {
       },
       {
         model: db.AccessPermission,
-        attributes: { exclude: ['companyId', 'deletedAt'] },
+        attributes: { exclude: ['companyId', 'deletedAt', 'createdAt', 'updatedAt', 'isEnabled'] },
         as: 'accessPermissions'
       },
       {

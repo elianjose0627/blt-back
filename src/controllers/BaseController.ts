@@ -29,7 +29,7 @@ class BaseController {
   async setModule (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
     const permissions = await db.AccessPermission.findAll({
       attributes: {
-        exclude: ['deletedAt', 'companyId']
+        exclude: ['deletedAt', 'companyId', 'createdAt', 'updatedAt', 'isEnabled']
       },
       where: {
         companyId: null,

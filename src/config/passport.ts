@@ -44,7 +44,7 @@ const passportAuth = (passport: PassportStatic): any => {
           },
           {
             model: db.AccessPermission,
-            attributes: { exclude: ['companyId', 'deletedAt'] },
+            attributes: { exclude: ['companyId', 'deletedAt', 'createdAt', 'updatedAt', 'isEnabled'] },
             as: 'accessPermissions',
             where: {
               isEnabled: true
@@ -76,22 +76,6 @@ const passportAuth = (passport: PassportStatic): any => {
           ]
         },
         required: false
-      },
-      {
-        model: db.ProductAccessControlGroup,
-        as: 'productAccessControlGroups',
-        attributes: ['id', 'name', 'description', 'createdAt', 'updatedAt'],
-        through: {
-          attributes: []
-        }
-      },
-      {
-        model: db.CompanyUserGroup,
-        as: 'companyUserGroups',
-        attributes: ['id', 'name', 'description', 'createdAt', 'updatedAt'],
-        through: {
-          attributes: []
-        }
       }
     ],
     where: {

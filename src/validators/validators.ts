@@ -931,7 +931,7 @@ const validateGraduatedPrice = Joi.object({
 
 const validateProductAccessControlGroup = Joi.object({
   productAccessControlGroup: Joi.object({
-    name: Joi.string().required().max(64),
+    name: Joi.string().required().max(256),
     description: Joi.string().optional().max(256).allow(null).allow(''),
     companyId: Joi.string().uuid().allow(null).default(null)
   }).required()
@@ -957,14 +957,14 @@ const validateCompanyProductAccessControlGroup = Joi.object({
 
 const validateCompanyUserGroup = Joi.object({
   companyUserGroup: Joi.object({
-    name: Joi.string().required().max(64),
+    name: Joi.string().required().max(256),
     description: Joi.string().optional().max(256).allow(null).allow(''),
     companyId: Joi.string().uuid().required()
   }).required()
 })
 const validateUpdatedCompanyUserGroup = Joi.object({
   companyUserGroup: Joi.object({
-    name: Joi.string().required().max(64),
+    name: Joi.string().required().max(256),
     description: Joi.string().optional().max(256).allow(null).allow('')
   }).required()
 })

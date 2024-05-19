@@ -1,5 +1,8 @@
 import { Model } from 'sequelize'
-import type { IAccessPermission, IAddress, ICompany, ICompanySubscription, ISecondaryDomain, IUser, MediaData, Nullable, Theme } from '../types'
+import type {
+  IAccessPermission, IAddress, ICompany, ICompanySubscription,
+  ICompanyUserGroup, IProductAccessControlGroup, ISecondaryDomain, IUser, MediaData, Nullable, Theme
+} from '../types'
 
 const CompanyModel = (sequelize: any, DataTypes: any): any => {
   interface CompanyAttributes {
@@ -38,6 +41,8 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     private readonly theme: Nullable<Theme>
     private readonly logo: Nullable<MediaData>
     private readonly subscriptions: ICompanySubscription[]
+    private readonly productAccessControlGroups: IProductAccessControlGroup[]
+    private readonly companyUserGroups: ICompanyUserGroup[]
 
     static associate (models: any): any {
       Company.belongsTo(models.User, {
@@ -132,7 +137,9 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         accessPermissions: this.accessPermissions,
         theme: this.theme,
         logo: this.logo,
-        subscriptions: this.subscriptions
+        subscriptions: this.subscriptions,
+        productAccessControlGroups: this.productAccessControlGroups,
+        companyUserGroups: this.companyUserGroups
       }
     }
   };

@@ -136,6 +136,25 @@ class ProductController extends BaseController {
     })
   }
 
+  async getCatalogue (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { query: { limit, page, offset, search, filter, orderBy }, accessProductCategoryTags = [], user } = req
+    const records = await productService.getCatalogue(accessProductCategoryTags, user, limit, offset, search, filter, orderBy)
+
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / limit),
+      perPage: limit,
+      page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      [productService.manyRecords()]: records.rows
+    })
+  }
+
   async getAllForCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { limit, page, offset, search, filter, orderBy } = req.query
     const { id } = req.params

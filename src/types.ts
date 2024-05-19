@@ -219,6 +219,8 @@ export interface ICompany {
   theme: Nullable<Theme>
   logo: Nullable<MediaData>
   subscriptions: ICompanySubscription[]
+  productAccessControlGroups: IProductAccessControlGroup[]
+  companyUserGroups: ICompanyUserGroup[]
 }
 
 export type AddressType = 'billing' | 'delivery' | 'billingAndDelivery' | 'return'
@@ -421,6 +423,7 @@ export interface ICompanyUserGroup {
   description: string
   company: ICompany
   users: IUser[]
+  accessControlGroups: IProductAccessControlGroup[]
   createdAt: Date
   updatedAt: Date
 }
@@ -674,6 +677,7 @@ export interface CustomRequest extends Request {
   isOwnerOrAdmin?: boolean
   isOwner?: boolean
   accessPermissions?: IAccessPermission[]
+  accessProductCategoryTags?: string[]
 }
 
 export interface TokenUser {

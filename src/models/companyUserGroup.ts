@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { ICompany, IUser, ICompanyUserGroup } from '../types'
+import type { ICompany, IUser, ICompanyUserGroup, IProductAccessControlGroup } from '../types'
 
 const CompanyUserGroupModel = (sequelize: any, DataTypes: any): any => {
   interface CompanyUserGroupAttributes {
@@ -14,6 +14,7 @@ const CompanyUserGroupModel = (sequelize: any, DataTypes: any): any => {
     private readonly description: string
     private readonly company: ICompany
     private readonly users: IUser[]
+    private readonly accessControlGroups: IProductAccessControlGroup[]
     private readonly createdAt: Date
     private readonly updatedAt: Date
 
@@ -31,7 +32,7 @@ const CompanyUserGroupModel = (sequelize: any, DataTypes: any): any => {
       CompanyUserGroup.belongsToMany(models.ProductAccessControlGroup, {
         foreignKey: 'companyUserGroupId',
         through: models.CompanyUserGroupProductAccessControlGroup,
-        as: 'companyUserGroups'
+        as: 'accessControlGroups'
       })
     }
 
@@ -42,6 +43,7 @@ const CompanyUserGroupModel = (sequelize: any, DataTypes: any): any => {
         description: this.description,
         company: this.company,
         users: this.users,
+        accessControlGroups: this.accessControlGroups,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       }

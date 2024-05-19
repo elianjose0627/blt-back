@@ -32,6 +32,14 @@ class CompanyUserGroupService extends BaseService {
           model: db.Company,
           as: 'company',
           attributes: ['id', 'name', 'email', 'domain']
+        },
+        {
+          model: db.ProductAccessControlGroup,
+          as: 'accessControlGroups',
+          attributes: ['id', 'name'],
+          through: {
+            attributes: []
+          }
         }
       ]
     })

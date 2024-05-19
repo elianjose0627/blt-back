@@ -59,7 +59,7 @@ export const generateInclude = (model: string): any => {
         },
         {
           model: db.AccessPermission,
-          attributes: { exclude: ['companyId', 'deletedAt'] },
+          attributes: { exclude: ['companyId', 'deletedAt', 'createdAt', 'updatedAt', 'isEnabled'] },
           as: 'accessPermissions'
         },
         {
