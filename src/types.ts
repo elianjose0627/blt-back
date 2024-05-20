@@ -478,7 +478,7 @@ export interface IProduct {
   stock?: IStock
   isVisible?: boolean
   productCategory?: IProductCategory
-  productTags?: IProductCategoryTag[]
+  productTags?: IProductTag[]
   isParent: boolean
   children: Array<Pick<IProduct, 'id' | 'jfsku' | 'name' | 'merchantSku' | 'pictures' | 'createdAt' | 'updatedAt' | 'productColor' | 'productMaterial' | 'productSize'>>
   graduatedPrices: IProductGraduatedPrice[]
