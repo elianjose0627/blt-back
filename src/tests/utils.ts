@@ -1246,3 +1246,47 @@ export const createJTLShippingMethod = async (): Promise<any> => {
   })
   return jtlShippingMethod
 }
+
+export const deleteCompanyFromProductAccessControlGroup = async (companyProductAccessControlGroupId: string): Promise<any> => {
+  const companyProductAccessControlGroup = await db.CompanyProductAccessControlGroup.findOne({
+    where: {
+      id: companyProductAccessControlGroupId
+    }
+  })
+  if (companyProductAccessControlGroup !== null) {
+    await companyProductAccessControlGroup.destroy({ force: true })
+  }
+}
+
+export const deleteCompanyUserGroupFromProductAccessControlGroup = async (companyUserGroupProductAccessControlGroupId: string): Promise<any> => {
+  const companyUserGroupProductAccessControlGroup = await db.CompanyUserGroupProductAccessControlGroup.findOne({
+    where: {
+      id: companyUserGroupProductAccessControlGroupId
+    }
+  })
+  if (companyUserGroupProductAccessControlGroup !== null) {
+    await companyUserGroupProductAccessControlGroup.destroy({ force: true })
+  }
+}
+
+export const deleteCompanyUserGroup = async (companyUserGroupId: string): Promise<any> => {
+  const companyUserGroup = await db.CompanyUserGroup.findOne({
+    where: {
+      id: companyUserGroupId
+    }
+  })
+  if (companyUserGroup !== null) {
+    await companyUserGroup.destroy({ force: true })
+  }
+}
+
+export const deleteUserCompanyUserGroup = async (userCompanyUserGroupId: string): Promise<any> => {
+  const userCompanyUserGroup = await db.UserCompanyUserGroup.findOne({
+    where: {
+      id: userCompanyUserGroupId
+    }
+  })
+  if (userCompanyUserGroup !== null) {
+    await userCompanyUserGroup.destroy({ force: true })
+  }
+}

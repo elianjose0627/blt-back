@@ -9,7 +9,11 @@ import {
   verifyCompanyDomain,
   createCompanyAdministratorWithCompany,
   createCampaignManager,
-  createVerifiedUser
+  createVerifiedUser,
+  deleteCompanyFromProductAccessControlGroup,
+  deleteCompanyUserGroupFromProductAccessControlGroup,
+  deleteCompanyUserGroup,
+  deleteUserCompanyUserGroup
 } from '../utils'
 
 const { expect } = chai
@@ -20,6 +24,10 @@ let tokenAdmin: string
 let token: string
 let tokenCompanyAdminTwo: string
 let tokenCampaignManager: string
+let companyProductAccessControlGroupId: string
+let companyUserGroupProductAccessControlGroupId: string
+let companyUserGroupId2: string
+let userCompanyUserGroupId: string
 
 describe('Product actions', () => {
   before(async () => {
@@ -62,6 +70,10 @@ describe('Product actions', () => {
 
   after(async () => {
     await deleteTestUser('drstrange@starkindustriesmarvel.com')
+    await deleteCompanyFromProductAccessControlGroup(companyProductAccessControlGroupId)
+    await deleteCompanyUserGroupFromProductAccessControlGroup(companyUserGroupProductAccessControlGroupId)
+    await deleteUserCompanyUserGroup(userCompanyUserGroupId)
+    await deleteCompanyUserGroup(companyUserGroupId2)
   })
 
   describe('Get all products', () => {
@@ -2177,8 +2189,8 @@ describe('Product actions', () => {
         .send({
           product: {
             name: 'Tractor',
-            jfsku: '1231tr1',
-            merchantSku: '1231tr1',
+            jfsku: '1231tr10',
+            merchantSku: '1231tr10',
             type: 'generic',
             productGroup: 'technology',
             productCategoryId
@@ -2348,7 +2360,7 @@ describe('Product actions', () => {
       const productAccessControlGroupId = resProductAccessControlGroup.body.productAccessControlGroup.id
 
       // Add tag and company to the product access control group
-      await chai
+      const resCompanyProductAccessControlGroup = await chai
         .request(app)
         .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/companies`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
@@ -2359,6 +2371,8 @@ describe('Product actions', () => {
             ]
           }
         })
+
+      companyProductAccessControlGroupId = resCompanyProductAccessControlGroup.body.companyProductAccessControlGroup.added[0].id
       await chai
         .request(app)
         .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/product-category-tags`)
@@ -2498,8 +2512,9 @@ describe('Product actions', () => {
         })
 
       const companyUserGroupId = String(resCompanyUserGroup.body.companyUserGroup.id)
+      companyUserGroupId2 = companyUserGroupId
 
-      await chai
+      const resUserCompanyUserGroup = await chai
         .request(app)
         .post(`/api/company-user-groups/${companyUserGroupId}/users`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
@@ -2509,8 +2524,10 @@ describe('Product actions', () => {
           }
         })
 
+      userCompanyUserGroupId = resUserCompanyUserGroup.body.userCompanyUserGroup.added[0].id
+
       // Add tag and user group to the product access control group
-      await chai
+      const resCompanyUserGroupProductAccessControlGroup = await chai
         .request(app)
         .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/company-user-groups`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
@@ -2521,6 +2538,7 @@ describe('Product actions', () => {
             ]
           }
         })
+      companyUserGroupProductAccessControlGroupId = resCompanyUserGroupProductAccessControlGroup.body.companyUserGroupProductAccessControlGroup.added[0].id
       await chai
         .request(app)
         .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/product-category-tags`)
