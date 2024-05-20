@@ -2328,7 +2328,7 @@ describe('Product actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productAccessControlGroup: {
-            name: 'Test Access Control Group'
+            name: 'Test Access Control Group Search'
           }
         })
 
@@ -2374,7 +2374,7 @@ describe('Product actions', () => {
       expect(res.body.products[0].name).to.equal('Nokia 3310')
     })
 
-    it('Should return 200 OK when a user in a product access control group filters by price for an item in the product catalogue', async () => {
+    it('Should return 200 OK when a user in a product access control group filters by price in the product catalogue', async () => {
       await createVerifiedUser('ivers9190@kreeprotectedproducts.kr', '1234567890')
       const resUser = await chai
         .request(app)
@@ -2446,7 +2446,7 @@ describe('Product actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productAccessControlGroup: {
-            name: 'Test Access Control Group'
+            name: 'Test Access Control Group Price'
           }
         })
 
@@ -2495,7 +2495,7 @@ describe('Product actions', () => {
       expect(res.body.products[0].name).to.equal('OnePlus Nord CE')
     })
 
-    it('Should return 200 OK when a user in a product access control group filters by price range for an item in the product catalogue', async () => {
+    it('Should return 200 OK when a user in a product access control group filters by price range in the product catalogue', async () => {
       await createVerifiedUser('ivers9191@kreeprotectedproducts.kr', '1234567890')
       const resUser = await chai
         .request(app)
@@ -2567,7 +2567,7 @@ describe('Product actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productAccessControlGroup: {
-            name: 'Test Access Control Group'
+            name: 'Test Access Control Group Price Range'
           }
         })
 
@@ -2613,6 +2613,170 @@ describe('Product actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'products')
       expect(res.body.products).to.be.an('array').lengthOf(1)
       expect(res.body.products[0].name).to.equal('LG Fridge')
+    })
+
+    it('Should return 200 OK when a user in a product access control group filters by show children in the product catalogue', async () => {
+      await createVerifiedUser('ivers1990@kreeprotectedproducts.kr', '1234567890')
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ivers1990@kreeprotectedproducts.kr', password: '1234567890' } })
+
+      const tokenUser = String(resUser.body.token)
+      const userId = String(resUser.body.user.id)
+
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'technology'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      const resProductCategoryTag = await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'sony'
+          }
+        })
+      const productCategoryTagId = resProductCategoryTag.body.productCategoryTag.id
+
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Sony Xperia',
+            jfsku: '1231snxp',
+            merchantSku: '1231snxp',
+            type: 'generic',
+            productGroup: 'technology',
+            productCategoryId,
+            isParent: true,
+            netRetailPrice: {
+              amount: 500,
+              currency: 'EUR',
+              discount: 0
+            }
+          }
+        })
+
+      const productId = String(resProduct.body.product.id)
+
+      const resProductChild = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Sony Xperia 2',
+            jfsku: '1231snxp2',
+            merchantSku: '1231snxp2',
+            type: 'generic',
+            productGroup: 'technology',
+            productCategoryId,
+            netRetailPrice: {
+              amount: 500,
+              currency: 'EUR',
+              discount: 0
+            }
+          }
+        })
+
+      const productChildId = String(resProductChild.body.product.id)
+
+      await chai
+        .request(app)
+        .patch(`/api/products/${String(productId)}/children`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            childIds: [productChildId]
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/products/${String(productId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productTag: {
+            productCategoryTagIds: [productCategoryTagId]
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/products/${String(productChildId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productTag: {
+            productCategoryTagIds: [productCategoryTagId]
+          }
+        })
+
+      // Create a product access control group
+      const resProductAccessControlGroup = await chai
+        .request(app)
+        .post('/api/product-access-control-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productAccessControlGroup: {
+            name: 'Test Access Control Group Show Children'
+          }
+        })
+
+      const productAccessControlGroupId = resProductAccessControlGroup.body.productAccessControlGroup.id
+
+      // Add tag and user to the product access control group
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          userProductAccessControlGroup: {
+            userIds: [
+              userId
+            ]
+          }
+        })
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/product-category-tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTagProductAccessControlGroup: {
+            productCategoryTagIds: [
+              productCategoryTagId
+            ]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/products/catalogue')
+        .query({
+          limit: 10,
+          page: 1,
+          filter: {
+            showChildren: 'false'
+          }
+        })
+        .set('Authorization', `Bearer ${tokenUser}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
+      expect(res.body.products[0].name).to.equal('Sony Xperia')
+      expect(res.body.products[0].isParent).to.equal(true)
     })
 
     it('Should return 200 OK when an employee whose company is in a product access control group gets the product catalogue', async () => {

@@ -27,7 +27,7 @@ const ProductRoutes = (): Router => {
       [Segments.QUERY]: validator.validateProductQueryParams
     }), asyncHandler(paginate),
     asyncHandler(setCatalogueAccess),
-    asyncHandler(ProductController.getCatalogue))
+    asyncHandler(ProductController.getAll))
   productRouter.use('/products/:id', celebrate({
     [Segments.PARAMS]: validator.validateProductId
   }, { abortEarly: false }), asyncHandler(ProductController.checkRecord))
