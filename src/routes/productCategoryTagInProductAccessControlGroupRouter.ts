@@ -5,7 +5,7 @@ import asyncHandler from '../middlewares/asyncHandler'
 import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
-import ProductCategoryTagInProductAccessControlGroupController from '../controllers/ProductCategoryTagProductAccessControlGroupController'
+import ProductCategoryTagInProductAccessControlGroupController from '../controllers/ProductCategoryTagInProductAccessControlGroupController'
 
 const productCategoryTagInProductAccessControlGroupRoutes = (): Router => {
   const productCategoryTagInProductAccessControlGroupRouter = express.Router()
