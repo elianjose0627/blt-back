@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import BundleController from '../controllers/BundleController'
@@ -7,8 +7,9 @@ import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import PictureController from '../controllers/PictureController'
+import ProductController from '../controllers/ProductController'
 
-const bundleRoutes = (): any => {
+const bundleRoutes = (): Router => {
   const bundleRouter = express.Router()
 
   bundleRouter.use('/bundles', checkAuth, checkUserIsVerifiedStatus, BundleController.setModule)
@@ -25,6 +26,8 @@ const bundleRoutes = (): any => {
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validatePicture
     }), asyncHandler(PictureController.insert))
+  bundleRouter.route('/bundles/:id/stocks')
+    .get(asyncHandler(ProductController.getProductStock))
   return bundleRouter
 }
 
