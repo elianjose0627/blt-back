@@ -5,11 +5,13 @@ const ProductCategoryTagModel = (sequelize: any, DataTypes: any): any => {
   interface ProductCategoryTagAttributes {
     id: string
     name: string
+    type: string
   }
 
   class ProductCategoryTag extends Model<ProductCategoryTagAttributes> {
     private readonly id: string
     private readonly name: string
+    private readonly type: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
 
@@ -24,12 +26,18 @@ const ProductCategoryTagModel = (sequelize: any, DataTypes: any): any => {
         as: 'relatedProducts',
         onDelete: 'CASCADE'
       })
+      ProductCategoryTag.belongsToMany(models.ProductAccessControlGroup, {
+        foreignKey: 'productCategoryTagId',
+        through: models.ProductCategoryTagProductAccessControlGroup,
+        as: 'productAccessControlGroups'
+      })
     }
 
     toJSONFor (): IProductCategoryTag {
       return {
         id: this.id,
         name: this.name,
+        type: this.type,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       }
@@ -45,6 +53,11 @@ const ProductCategoryTagModel = (sequelize: any, DataTypes: any): any => {
     name: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    type: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: 'category'
     }
   }, {
     sequelize,

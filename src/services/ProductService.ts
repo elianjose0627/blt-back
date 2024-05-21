@@ -4,8 +4,9 @@ import { Joi } from 'celebrate'
 import BaseService, { generateFilterQuery, generateInclude } from './BaseService'
 import db from '../models'
 import axios from 'axios'
-import { IProduct } from '../types'
+import { IProduct, IUser } from '../types'
 import { Literal } from 'sequelize/types/utils'
+import * as userRoles from '../utils/userRoles'
 
 const baseURL = process.env.JTL_API_URL as string
 
@@ -49,7 +50,7 @@ const generateOrderBy = (orderBy: {[key: string]: string | number | undefined}):
 }
 
 const order = [['createdAt', 'DESC']]
-const generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties = (filterCategory: object, filterTag: object, filterColor: object, filterMaterial: object, filterSize: object): object[] => {
+const generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties = (filterCategory: object, filterColor: object, filterMaterial: object, filterSize: object): object[] => {
   return (
     [
       {
@@ -60,24 +61,6 @@ const generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties = (f
         as: 'productCategory',
         where: filterCategory,
         required: Object.keys(filterCategory).length > 0 // Added so as to use a LEFT OUTER JOIN when filter is empty otherwise INNER JOIN
-      },
-      {
-        model: db.ProductTag,
-        include: [
-          {
-            model: db.ProductCategoryTag,
-            attributes: {
-              exclude: ['deletedAt', 'productCategoryId']
-            },
-            as: 'productCategoryTag'
-          }
-        ],
-        where: filterTag,
-        required: Object.keys(filterTag).length > 0,
-        attributes: {
-          exclude: ['deletedAt', 'productId', 'productCategoryTagId']
-        },
-        as: 'productTags'
       },
       {
         model: db.Product,
@@ -197,7 +180,25 @@ class ProductService extends BaseService {
 
     const attributes: any = { exclude: [] }
     const include: any[] = [
-      ...generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties(whereFilterCategory, whereFilterTags, whereFilterColor, whereFilterMaterial, whereFilterSize)
+      ...generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties(whereFilterCategory, whereFilterColor, whereFilterMaterial, whereFilterSize),
+      {
+        model: db.ProductTag,
+        include: [
+          {
+            model: db.ProductCategoryTag,
+            attributes: {
+              exclude: ['deletedAt', 'productCategoryId']
+            },
+            as: 'productCategoryTag'
+          }
+        ],
+        whereFilterTags,
+        required: Object.keys(whereFilterTags).length > 0,
+        attributes: {
+          exclude: ['deletedAt', 'productId', 'productCategoryTagId']
+        },
+        as: 'productTags'
+      }
     ]
 
     if (search !== '') {
@@ -271,7 +272,131 @@ class ProductService extends BaseService {
         attributes: ['id', 'name', 'suffix', 'email', 'phone', 'vat', 'domain'],
         as: 'company'
       },
-      ...generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties(whereFilterCategory, whereFilterTags, whereFilterColor, whereFilterMaterial, whereFilterSize)
+      ...generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties(whereFilterCategory, whereFilterColor, whereFilterMaterial, whereFilterSize),
+      {
+        model: db.ProductTag,
+        include: [
+          {
+            model: db.ProductCategoryTag,
+            attributes: {
+              exclude: ['deletedAt', 'productCategoryId']
+            },
+            as: 'productCategoryTag'
+          }
+        ],
+        whereFilterTags,
+        required: Object.keys(whereFilterTags).length > 0,
+        attributes: {
+          exclude: ['deletedAt', 'productId', 'productCategoryTagId']
+        },
+        as: 'productTags'
+      }
+    ]
+
+    if (search !== '') {
+      whereSearch[Op.or] = [
+        { name: { [Op.iLike]: `%${search}%` } },
+        { jfsku: { [Op.iLike]: `%${search}%` } },
+        { merchantSku: { [Op.iLike]: `%${search}%` } }
+      ]
+    }
+
+    if (maxPrice > 0) {
+      whereFilterPrice = { 'netRetailPrice.amount': { [Op.between]: [minPrice, maxPrice] } }
+    }
+
+    if (price !== '') {
+      const priceRanges = price.split(',')
+
+      const filterQueries = generatePriceRangesQuery(priceRanges)
+      whereFilterPrice[Op.or] = filterQueries
+    }
+
+    const records = await db[this.model].findAndCountAll({
+      attributes,
+      include,
+      where: {
+        ...whereSearch,
+        isParent: {
+          [Op.in]: isParent.split(',')
+        },
+        ...whereFilterPrice,
+        ...whereFilterShowChildren
+      },
+      limit,
+      offset,
+      order,
+      distinct: true
+    })
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
+  }
+
+  async getCatalogue (
+    accessProductCategoryTags: string[],
+    user: IUser,
+    limit: number, offset: number, search: string = '',
+    filter = { isParent: 'true, false', category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tags: '', showChildren: 'true', price: '' },
+    orderBy = { name: '', createdAt: '', price: '' }
+  ): Promise<any> {
+    const {
+      isParent = 'true, false', category, minPrice = 0, maxPrice = 0,
+      color, material, size, tags, showChildren, price = ''
+    } = filter
+
+    const role = user.role
+
+    const order = generateOrderBy(orderBy)
+
+    const whereSearch: any = {}
+    const whereFilterCategory = generateFilterQuery({ name: category }, 'in')
+    const whereFilterTags = generateFilterQuery({ productCategoryTagId: tags }, 'in')
+    const whereFilterColor = generateFilterQuery({ name: color })
+    const whereFilterMaterial = generateFilterQuery({ name: material })
+    const whereFilterSize = generateFilterQuery({ name: size })
+    let whereFilterPrice: any = {}
+    const whereFilterShowChildren = showChildren === 'false' ? { parentId: { [Op.eq]: null } } : {}
+
+    const attributes: any = { exclude: [] }
+    const extrafilterTag = {
+      [Op.and]: [
+        whereFilterTags,
+        {
+          productCategoryTagId: {
+            [Op.in]: accessProductCategoryTags
+          }
+        }
+      ]
+    }
+
+    const include: any[] = [
+      {
+        model: db.Company,
+        attributes: ['id', 'name', 'suffix', 'email', 'phone', 'vat', 'domain'],
+        as: 'company'
+      },
+      ...generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties(whereFilterCategory, whereFilterColor, whereFilterMaterial, whereFilterSize),
+      {
+        model: db.ProductTag,
+        include: [
+          {
+            model: db.ProductCategoryTag,
+            attributes: {
+              exclude: ['deletedAt', 'productCategoryId']
+            },
+            as: 'productCategoryTag'
+          }
+        ],
+        where: role === userRoles.ADMIN ? whereFilterTags : extrafilterTag,
+        required: role === userRoles.ADMIN ? (Object.keys(whereFilterTags).length > 0) : true,
+        attributes: {
+          exclude: ['deletedAt', 'productId', 'productCategoryTagId']
+        },
+        as: 'productTags'
+      }
     ]
 
     if (search !== '') {

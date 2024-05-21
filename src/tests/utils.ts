@@ -327,12 +327,12 @@ export const createVerifiedAdminUser = async (): Promise<any> => {
   }
 }
 
-export const createVerifiedCompany = async (userId: string, isDomainVerified = true, customerId: string | null = null): Promise<any> => {
+export const createVerifiedCompany = async (userId: string, isDomainVerified = true, customerId: string | null = null, name = 'Stark Industries', email = 'admin@starkindustriesmarvel.com', domain = 'starkindustriesmarvel.com'): Promise<any> => {
   const company = await db.Company.create({
     id: uuidv1(),
-    name: 'Stark Industries',
-    email: 'admin@starkindustriesmarvel.com',
-    domain: 'starkindustriesmarvel.com',
+    name,
+    email,
+    domain,
     isDomainVerified,
     userId,
     customerId
@@ -1245,4 +1245,48 @@ export const createJTLShippingMethod = async (): Promise<any> => {
     updatedAt: '2024-04-12T20:52:17.000Z'
   })
   return jtlShippingMethod
+}
+
+export const deleteCompanyFromProductAccessControlGroup = async (companyProductAccessControlGroupId: string): Promise<any> => {
+  const companyProductAccessControlGroup = await db.CompanyProductAccessControlGroup.findOne({
+    where: {
+      id: companyProductAccessControlGroupId
+    }
+  })
+  if (companyProductAccessControlGroup !== null) {
+    await companyProductAccessControlGroup.destroy({ force: true })
+  }
+}
+
+export const deleteCompanyUserGroupFromProductAccessControlGroup = async (companyUserGroupProductAccessControlGroupId: string): Promise<any> => {
+  const companyUserGroupProductAccessControlGroup = await db.CompanyUserGroupProductAccessControlGroup.findOne({
+    where: {
+      id: companyUserGroupProductAccessControlGroupId
+    }
+  })
+  if (companyUserGroupProductAccessControlGroup !== null) {
+    await companyUserGroupProductAccessControlGroup.destroy({ force: true })
+  }
+}
+
+export const deleteCompanyUserGroup = async (companyUserGroupId: string): Promise<any> => {
+  const companyUserGroup = await db.CompanyUserGroup.findOne({
+    where: {
+      id: companyUserGroupId
+    }
+  })
+  if (companyUserGroup !== null) {
+    await companyUserGroup.destroy({ force: true })
+  }
+}
+
+export const deleteUserCompanyUserGroup = async (userCompanyUserGroupId: string): Promise<any> => {
+  const userCompanyUserGroup = await db.UserCompanyUserGroup.findOne({
+    where: {
+      id: userCompanyUserGroupId
+    }
+  })
+  if (userCompanyUserGroup !== null) {
+    await userCompanyUserGroup.destroy({ force: true })
+  }
 }

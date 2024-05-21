@@ -44,7 +44,7 @@ const passportAuth = (passport: PassportStatic): any => {
           },
           {
             model: db.AccessPermission,
-            attributes: { exclude: ['companyId', 'deletedAt'] },
+            attributes: { exclude: ['companyId', 'deletedAt', 'createdAt', 'updatedAt', 'isEnabled'] },
             as: 'accessPermissions',
             where: {
               isEnabled: true
@@ -83,22 +83,28 @@ const passportAuth = (passport: PassportStatic): any => {
     }
   })
 
-  const strategy = new JwtStrategy(jwtOptions, async (jwtPayload, next) => {
-    const user = await getUser(jwtPayload.email)
-    if (user !== null) {
-      const tokenDate = new Date(jwtPayload.logoutTime)
-      const type = jwtPayload.type
-      const userDate = new Date(user.logoutTime)
-      // Check if token is valid by comparing logoutTime time from the user and in the token
-      if (tokenDate.toUTCString() === userDate.toUTCString()) {
-        next(null, user, { type })
+  const strategy = new JwtStrategy(jwtOptions, (jwtPayload, next) => {
+    (async () => {
+      const user = await getUser(jwtPayload.email)
+      if (user !== null) {
+        const tokenDate = new Date(jwtPayload.logoutTime)
+        const type = jwtPayload.type
+        const userDate = new Date(user.logoutTime)
+
+        // Check if token is valid by comparing logoutTime time from the user and in the token
+        if (tokenDate.toUTCString() === userDate.toUTCString()) {
+          next(null, user, { type })
+        } else {
+          next(null, false, { message: 'token invalid' })
+        }
       } else {
-        next(null, false, { message: 'token invalid' })
+        next({ message: 'user not found' }, false, null)
       }
-    } else {
-      next({ message: 'user not found' }, false, null)
-    }
+    })().catch((error) => {
+      next(error)
+    })
   })
+
   passport.use(strategy)
 }
 

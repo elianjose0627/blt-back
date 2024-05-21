@@ -75,6 +75,13 @@ app.use(apiPrefix, routers.productGraduatedPriceRouter())
 app.use(apiPrefix, routers.productColorRouter())
 app.use(apiPrefix, routers.productMaterialRouter())
 app.use(apiPrefix, routers.productSizeRouter())
+app.use(apiPrefix, routers.productAccessControlGroupRouter())
+app.use(apiPrefix, routers.companyInProductAccessControlGroupRouter())
+app.use(apiPrefix, routers.userInProductAccessControlGroupRouter())
+app.use(apiPrefix, routers.productCategoryTagInProductAccessControlGroupRouter())
+app.use(apiPrefix, routers.companyUserGroupRouter())
+app.use(apiPrefix, routers.userInCompanyUserGroupRouter())
+app.use(apiPrefix, routers.companyUserGroupInProductAccessControlGroupRouter())
 
 // Add validation middleware
 app.use(joiErrors)

@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { ICompany, IProduct, IProductCategory, IProductCategoryTag, IProductColor, IProductGraduatedPrice, IProductMaterial, IProductPicture, IProductSize, NetRetailPrice, ProductType } from '../types'
+import type { ICompany, IProduct, IProductCategory, IProductTag, IProductColor, IProductGraduatedPrice, IProductMaterial, IProductPicture, IProductSize, NetRetailPrice, ProductType } from '../types'
 
 const ProductModel = (sequelize: any, DataTypes: any): any => {
   interface ProductAttributes {
@@ -30,7 +30,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     private readonly updatedAt: Date
     private readonly company: ICompany
     private readonly productCategory: IProductCategory
-    private readonly productTags: IProductCategoryTag[]
+    private readonly productTags: IProductTag[]
     private readonly isParent: boolean
     private readonly children: IProduct[]
     private readonly graduatedPrices: IProductGraduatedPrice[]
