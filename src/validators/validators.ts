@@ -862,7 +862,7 @@ const validateCompanySubscription = Joi.object({
 
 const validateProductCategory = Joi.object({
   productCategory: Joi.object({
-    name: Joi.string().lowercase().required(),
+    name: Joi.string().lowercase().required().max(64),
     description: Joi.string().max(256),
     picture: Joi.object({
       url: Joi.string().uri().required(),
@@ -895,7 +895,8 @@ const validateProductSize = Joi.object({
 
 const validateProductCategoryTag = Joi.object({
   productCategoryTag: Joi.object({
-    name: Joi.string().lowercase().required()
+    name: Joi.string().lowercase().required(),
+    type: Joi.string().lowercase().optional().default('category')
   }).required()
 })
 
@@ -925,6 +926,57 @@ const validateGraduatedPrice = Joi.object({
         'any.invalid': 'Last unit must not be equal to first unit'
       }),
     price: Joi.number().min(0)
+  }).required()
+})
+
+const validateProductAccessControlGroup = Joi.object({
+  productAccessControlGroup: Joi.object({
+    name: Joi.string().required().max(256),
+    description: Joi.string().optional().max(256).allow(null).allow(''),
+    companyId: Joi.string().uuid().allow(null).default(null)
+  }).required()
+})
+
+const validateProductCategoryTagProductAccessControlGroup = Joi.object({
+  productCategoryTagProductAccessControlGroup: Joi.object({
+    productCategoryTagIds: Joi.array().items(Joi.string().uuid().required()).min(1)
+  }).required()
+})
+
+const validateUserProductAccessControlGroup = Joi.object({
+  userProductAccessControlGroup: Joi.object({
+    userIds: Joi.array().items(Joi.string().uuid().required()).min(1)
+  }).required()
+})
+
+const validateCompanyProductAccessControlGroup = Joi.object({
+  companyProductAccessControlGroup: Joi.object({
+    companyIds: Joi.array().items(Joi.string().uuid().required()).min(1)
+  }).required()
+})
+
+const validateCompanyUserGroup = Joi.object({
+  companyUserGroup: Joi.object({
+    name: Joi.string().required().max(256),
+    description: Joi.string().optional().max(256).allow(null).allow(''),
+    companyId: Joi.string().uuid().required()
+  }).required()
+})
+const validateUpdatedCompanyUserGroup = Joi.object({
+  companyUserGroup: Joi.object({
+    name: Joi.string().required().max(256),
+    description: Joi.string().optional().max(256).allow(null).allow('')
+  }).required()
+})
+
+const validateUserCompanyUserGroup = Joi.object({
+  userCompanyUserGroup: Joi.object({
+    userIds: Joi.array().items(Joi.string().uuid().required()).min(1)
+  }).required()
+})
+const validateCompanyUserGroupProductAccessControlGroup = Joi.object({
+  companyUserGroupProductAccessControlGroup: Joi.object({
+    companyUserGroupIds: Joi.array().items(Joi.string().uuid().required()).min(1)
   }).required()
 })
 
@@ -997,5 +1049,13 @@ export default {
   validateGraduatedPrice,
   validateProductColor,
   validateProductMaterial,
-  validateProductSize
+  validateProductSize,
+  validateProductAccessControlGroup,
+  validateProductCategoryTagProductAccessControlGroup,
+  validateUserProductAccessControlGroup,
+  validateCompanyProductAccessControlGroup,
+  validateCompanyUserGroup,
+  validateUpdatedCompanyUserGroup,
+  validateUserCompanyUserGroup,
+  validateCompanyUserGroupProductAccessControlGroup
 }

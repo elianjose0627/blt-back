@@ -54,6 +54,13 @@ export interface Database {
   ProductColor?: any
   ProductMaterial?: any
   ProductSize?: any
+  ProductAccessControlGroup?: any
+  UserProductAccessControlGroup?: any
+  ProductCategoryTagProductAccessControlGroup?: any
+  CompanyProductAccessControlGroup?: any
+  CompanyUserGroup?: any
+  UserCompanyUserGroup?: any
+  CompanyUserGroupProductAccessControlGroup?: any
   [key: string]: any
 }
 

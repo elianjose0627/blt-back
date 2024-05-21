@@ -35,6 +35,13 @@ import productGraduatedPriceRouter from './productGraduatedPriceRouter'
 import productColorRouter from './productColorRouter'
 import productMaterialRouter from './productMaterialRouter'
 import productSizeRouter from './productSizeRouter'
+import productAccessControlGroupRouter from './productAccessControlGroupRouter'
+import companyInProductAccessControlGroupRouter from './companyInProductAccessControlGroupRouter'
+import userInProductAccessControlGroupRouter from './userInProductAccessControlGroupRouter'
+import productCategoryTagInProductAccessControlGroupRouter from './productCategoryTagInProductAccessControlGroupRouter'
+import companyUserGroupRouter from './companyUserGroupRouter'
+import userInCompanyUserGroupRouter from './userInCompanyUserGroupRouter'
+import companyUserGroupInProductAccessControlGroupRouter from './companyUserGroupInProductAccessControlGroupRouter'
 
 const routers = {
   authRouter,
@@ -73,7 +80,14 @@ const routers = {
   productGraduatedPriceRouter,
   productColorRouter,
   productMaterialRouter,
-  productSizeRouter
+  productSizeRouter,
+  productAccessControlGroupRouter,
+  companyInProductAccessControlGroupRouter,
+  userInProductAccessControlGroupRouter,
+  productCategoryTagInProductAccessControlGroupRouter,
+  companyUserGroupRouter,
+  userInCompanyUserGroupRouter,
+  companyUserGroupInProductAccessControlGroupRouter
 }
 
 export default routers

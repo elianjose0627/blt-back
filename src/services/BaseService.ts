@@ -18,7 +18,10 @@ const withoutUser = [
   'EmailTemplate', 'EmailTemplateType', 'BlockedDomain',
   'CampaignAddress', 'MaintenanceMode', 'CompanySubscription',
   'ProductCategory', 'ProductCategoryTag', 'ProductTag', 'ProductGraduatedPrice',
-  'ProductColor', 'ProductMaterial', 'ProductSize'
+  'ProductColor', 'ProductMaterial', 'ProductSize',
+  'ProductAccessControlGroup', 'ProductCategoryTagProductAccessControlGroup', 'UserProductAccessControlGroup',
+  'CompanyProductAccessControlGroup', 'CompanyUserGroup', 'UserCompanyUserGroup',
+  'CompanyUserGroupProductAccessControlGroup'
 ]
 
 const includeCompanyAndOwner = {
@@ -56,7 +59,7 @@ export const generateInclude = (model: string): any => {
         },
         {
           model: db.AccessPermission,
-          attributes: { exclude: ['companyId', 'deletedAt'] },
+          attributes: { exclude: ['companyId', 'deletedAt', 'createdAt', 'updatedAt', 'isEnabled'] },
           as: 'accessPermissions'
         },
         {
@@ -169,7 +172,7 @@ export const generateInclude = (model: string): any => {
             include: [
               {
                 model: db.ProductTag,
-                attributes: ['id', 'productId'],
+                attributes: ['productId'],
                 as: 'relatedProducts',
                 limit: 6,
                 include: [
@@ -268,6 +271,66 @@ export const generateInclude = (model: string): any => {
         }
       ]
     )
+  }
+  if (model === 'ProductAccessControlGroup') {
+    return (
+      [
+        {
+          model: db.ProductCategoryTag,
+          as: 'productCategoryTags',
+          attributes: ['id', 'name', 'type'],
+          through: {
+            as: 'categoryTagProductAccessControlGroup',
+            attributes: ['id']
+          }
+        },
+        {
+          model: db.User,
+          as: 'users',
+          attributes: ['id', 'firstName', 'lastName', 'email'],
+          through: {
+            as: 'userProductAccessControlGroup',
+            attributes: ['id']
+          }
+        },
+        {
+          model: db.Company,
+          as: 'companies',
+          attributes: ['id', 'name', 'email', 'domain'],
+          through: {
+            as: 'companyProductAccessControlGroup',
+            attributes: ['id']
+          }
+        },
+        {
+          model: db.CompanyUserGroup,
+          as: 'companyUserGroups',
+          attributes: ['id', 'name'],
+          through: {
+            as: 'companyUserGroupProductAccessControlGroup',
+            attributes: ['id']
+          }
+        }
+      ]
+    )
+  }
+  if (model === 'CompanyUserGroup') {
+    return [
+      {
+        model: db.User,
+        as: 'users',
+        attributes: ['id', 'firstName', 'lastName', 'email'],
+        through: {
+          as: 'userCompanyUserGroup',
+          attributes: ['id']
+        }
+      },
+      {
+        model: db.Company,
+        as: 'company',
+        attributes: ['id', 'name', 'email', 'domain']
+      }
+    ]
   }
   if (withoutUser.includes(model)) {
     return ([])

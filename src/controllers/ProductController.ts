@@ -3,7 +3,7 @@ import ProductService from '../services/ProductService'
 import CompanyService from '../services/CompanyService'
 import ProductCategoryService from '../services/ProductCategoryService'
 import ProductGraduatedPriceService from '../services/ProductGraduatedPriceService'
-import type { CustomNext, CustomRequest, CustomResponse, IProduct, StatusCode } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse, IProduct, IProductTag, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
@@ -107,8 +107,24 @@ class ProductController extends BaseController {
   }
 
   async get (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { id } = req.params
+    const { params: { id }, accessProductCategoryTags, user } = req
+
     const record = await productService.get(id)
+    if (accessProductCategoryTags !== undefined) {
+      const { productTags }: { productTags: IProductTag[] } = record
+      const productCategoryTags = productTags.map(tag => tag.productCategoryTag.id)
+
+      const hasAccess = productCategoryTags.some(tag => accessProductCategoryTags.includes(tag))
+      if (user.role !== userRoles.ADMIN && !hasAccess) {
+        return res.status(statusCodes.FORBIDDEN).send({
+          statusCode: statusCodes.FORBIDDEN,
+          success: false,
+          errors: {
+            message: 'You do not have access to this product in the catalogue'
+          }
+        })
+      }
+    }
 
     return res.status(statusCodes.OK).send({
       statusCode: statusCodes.OK,
@@ -118,8 +134,14 @@ class ProductController extends BaseController {
   }
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { limit, page, offset, search, filter, orderBy } = req.query
-    const records = await productService.getAll(limit, offset, search, filter, orderBy)
+    const { query: { limit, page, offset, search, filter, orderBy }, accessProductCategoryTags, user } = req
+    let records
+
+    if (accessProductCategoryTags === undefined) {
+      records = await productService.getAll(limit, offset, search, filter, orderBy)
+    } else {
+      records = await productService.getCatalogue(accessProductCategoryTags, user, limit, offset, search, filter, orderBy)
+    }
 
     const meta = {
       total: records.count,

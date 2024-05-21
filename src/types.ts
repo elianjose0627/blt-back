@@ -66,6 +66,8 @@ export interface IUser {
   logoutTime?: Nullable<Date>
   company: Partial<ICompany> | null
   addresses: Array<Partial<IAddress>>
+  productAccessControlGroups: IProductAccessControlGroup[]
+  companyUserGroups: ICompanyUserGroup[]
 }
 
 export interface IUserExtended extends IUser {
@@ -217,6 +219,8 @@ export interface ICompany {
   theme: Nullable<Theme>
   logo: Nullable<MediaData>
   subscriptions: ICompanySubscription[]
+  productAccessControlGroups: IProductAccessControlGroup[]
+  companyUserGroups: ICompanyUserGroup[]
 }
 
 export type AddressType = 'billing' | 'delivery' | 'billingAndDelivery' | 'return'
@@ -351,6 +355,7 @@ export interface IStock {
 export interface IProductCategoryTag {
   id: string
   name: string
+  type: string
   createdAt: Date
   updatedAt: Date
 }
@@ -400,6 +405,63 @@ export interface IProductSize {
   createdAt: Date
   updatedAt: Date
 }
+export interface IProductAccessControlGroup {
+  id: string
+  name: string
+  description: string
+  createdAt: Date
+  updatedAt: Date
+  company: ICompany | null
+  productCategoryTags: Array<Pick<IProductCategoryTag, 'id' | 'name'>>
+  users: Array<Pick<IUser, 'id' | 'firstName' | 'lastName' | 'email'>>
+  companies: Array<Pick<ICompany, 'id' | 'name'>>
+  companyUserGroups: Array<Pick<ICompanyUserGroup, 'id' | 'name'>>
+}
+export interface ICompanyUserGroup {
+  id: string
+  name: string
+  description: string
+  company: ICompany
+  users: IUser[]
+  accessControlGroups: IProductAccessControlGroup[]
+  createdAt: Date
+  updatedAt: Date
+}
+export interface IUserCompanyUserGroup {
+  id: string
+  userCompanyUserGroupId?: string
+  userId?: string
+  createdAt: Date
+  updatedAt: Date
+}
+export interface ICompanyUserGroupInProductAccessControlGroup {
+  id: string
+  productAccessControlGroupId?: string
+  companyUserGroupId?: string
+  createdAt: Date
+  updatedAt: Date
+}
+export interface IUserInProductAccessControlGroup {
+  id: string
+  productAccessControlGroupId?: string
+  userId?: string
+  createdAt: Date
+  updatedAt: Date
+}
+export interface ICompanyProductAccessControlGroup {
+  id: string
+  productAccessControlGroupId?: string
+  companyId?: string
+  createdAt: Date
+  updatedAt: Date
+}
+export interface IProductCategoryTagInProductAccessControlGroup {
+  id: string
+  productAccessControlGroupId?: string
+  productCategoryTagId?: string
+  createdAt: Date
+  updatedAt: Date
+}
 export interface IProduct {
   id: string
   jfsku: string
@@ -416,7 +478,7 @@ export interface IProduct {
   stock?: IStock
   isVisible?: boolean
   productCategory?: IProductCategory
-  productTags?: IProductCategoryTag[]
+  productTags?: IProductTag[]
   isParent: boolean
   children: Array<Pick<IProduct, 'id' | 'jfsku' | 'name' | 'merchantSku' | 'pictures' | 'createdAt' | 'updatedAt' | 'productColor' | 'productMaterial' | 'productSize'>>
   graduatedPrices: IProductGraduatedPrice[]
@@ -615,6 +677,7 @@ export interface CustomRequest extends Request {
   isOwnerOrAdmin?: boolean
   isOwner?: boolean
   accessPermissions?: IAccessPermission[]
+  accessProductCategoryTags?: string[]
 }
 
 export interface TokenUser {
