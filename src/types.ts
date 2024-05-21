@@ -294,6 +294,7 @@ export interface ICampaign {
   lastQuotaResetDate: Nullable<Date>
   isQuotaEnabled: boolean
   isExceedQuotaEnabled: boolean
+  isExceedStockEnabled: boolean
   isNoteEnabled: boolean
   isActive: boolean
   isHidden: boolean
