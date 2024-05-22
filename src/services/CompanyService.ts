@@ -126,9 +126,17 @@ class CompanyService extends BaseService {
         {
           model: db.Address,
           attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition'],
-          as: 'addresses'
+          as: 'addresses',
+          where: {
+            [Op.or]: [
+              { affiliation: { [Op.eq]: null } },
+              { affiliation: 'personal' }
+            ]
+          },
+          required: false
         }
-      ]
+      ],
+      distinct: true
     })
 
     const privacyRule = await db.PrivacyRule.findOne({
