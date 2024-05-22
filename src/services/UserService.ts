@@ -490,14 +490,16 @@ class UserService extends BaseService {
         offset,
         order: [
           ['createdAt', 'DESC']
-        ]
+        ],
+        distinct: true
       })
     } else {
       users = await db[this.model].findAndCountAll({
         limit,
         offset,
         order: [['createdAt', 'DESC']],
-        include
+        include,
+        distinct: true
       })
     }
 
