@@ -125,7 +125,7 @@ class CompanyService extends BaseService {
       include: [
         {
           model: db.Address,
-          attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition'],
+          attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type'],
           as: 'addresses',
           where: {
             [Op.or]: [

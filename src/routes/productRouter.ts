@@ -42,7 +42,7 @@ const ProductRoutes = (): Router => {
       asyncHandler(checkAdmin), asyncHandler(ProductController.delete))
   productRouter.route('/products/:id/stocks')
     .get(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
-      asyncHandler(checkPermissions), asyncHandler(ProductController.getProductStock))
+      asyncHandler(ProductController.getProductStock))
   productRouter.route('/products/:id/outbounds')
     .get(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions), celebrate({
