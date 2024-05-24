@@ -89,7 +89,8 @@ const validateUpdatedUser = Joi.object({
         }),
       addressAddition: Joi.string().allow('').allow(null).max(256),
       vat: Joi.string().allow('').allow(null).max(24),
-      type: Joi.string().valid(...['billing', 'delivery', 'billingAndDelivery']).allow(null).default(null)
+      type: Joi.string().valid(...['billing', 'delivery', 'billingAndDelivery']).allow(null).default(null),
+      affiliation: Joi.string().optional().valid(...['personal', 'company', 'other']).allow(null).default('personal')
     }).optional().allow(null).default(null)
   }).required()
 }).required()

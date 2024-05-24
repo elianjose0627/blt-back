@@ -520,7 +520,8 @@ class UserService extends BaseService {
           [Op.or]: [
             { id: address.id },
             { type: address.type }
-          ]
+          ],
+          affiliation: address.affiliation
         },
         paranoid: false // To get soft deleted record
       })
