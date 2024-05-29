@@ -449,7 +449,7 @@ const validateBundle = Joi.object({
           name: Joi.string().required().max(128),
           jfsku: Joi.string().required().max(20),
           merchantSku: Joi.string().required().max(40),
-          quantity: Joi.number().default(1)
+          quantity: Joi.number().positive().default(1)
         })
       ).min(1).required()
     }).default(null)
@@ -538,9 +538,9 @@ const validateOrder = Joi.object({
         outboundItemId: Joi.string().required(),
         name: Joi.string().required().max(128),
         merchantSku: Joi.string().required().max(40),
-        quantity: Joi.number(),
+        quantity: Joi.number().positive(),
         itemType: Joi.string().required().valid(...['BillOfMaterials', 'Product']),
-        quantityOpen: Joi.number(),
+        quantityOpen: Joi.number().positive(),
         externalNumber: Joi.string().allow('').allow(null),
         price: Joi.number(),
         vat: Joi.number(),
@@ -623,14 +623,14 @@ const commonPendingOrderSchema = {
   paymentTarget: Joi.number(),
   discount: Joi.number(),
   orderStatus: Joi.number(),
-  quantity: Joi.number().default(1),
+  quantity: Joi.number().positive().default(1),
   orderLineRequests: Joi.array().items(
     Joi.object({
       itemName: Joi.string(),
       articleNumber: Joi.string(),
       itemNetSale: Joi.number(),
       itemVAT: Joi.number(),
-      quantity: Joi.number(),
+      quantity: Joi.number().positive(),
       type: Joi.number(),
       discount: Joi.number(),
       netPurchasePrice: Joi.number()
@@ -686,7 +686,8 @@ const validateCardTemplate = Joi.object({
     front: Joi.string().allow('').max(5000).allow(null).required(),
     back: Joi.string().allow('').max(5000).allow(null).required(),
     frontOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape']),
-    backOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape'])
+    backOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape']),
+    isDraft: Joi.boolean().optional().default(true)
   }).required()
 }).required()
 
