@@ -43,7 +43,11 @@ class ProductCategoryService extends BaseService {
           attributes: {
             exclude: ['deletedAt', 'productCategoryId']
           },
-          as: 'productCategoryTags'
+          as: 'productCategoryTags',
+          where: {
+            type: 'category'
+          },
+          required: false
         }
       ],
       order: [['createdAt', 'DESC']],

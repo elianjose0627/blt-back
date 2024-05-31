@@ -89,7 +89,8 @@ const validateUpdatedUser = Joi.object({
         }),
       addressAddition: Joi.string().allow('').allow(null).max(256),
       vat: Joi.string().allow('').allow(null).max(24),
-      type: Joi.string().valid(...['billing', 'delivery', 'billingAndDelivery']).allow(null).default(null)
+      type: Joi.string().valid(...['billing', 'delivery', 'billingAndDelivery']).allow(null).default(null),
+      affiliation: Joi.string().optional().valid(...['personal', 'company', 'other']).allow(null).default('personal')
     }).optional().allow(null).default(null)
   }).required()
 }).required()
@@ -381,6 +382,7 @@ const validateCampaignAdmin = Joi.object({
     lastQuotaResetDate: Joi.date().allow(null),
     isQuotaEnabled: Joi.boolean(),
     isExceedQuotaEnabled: Joi.boolean(),
+    isExceedStockEnabled: Joi.boolean(),
     isNoteEnabled: Joi.boolean(),
     isActive: Joi.boolean(),
     isHidden: Joi.boolean(),
@@ -447,7 +449,7 @@ const validateBundle = Joi.object({
           name: Joi.string().required().max(128),
           jfsku: Joi.string().required().max(20),
           merchantSku: Joi.string().required().max(40),
-          quantity: Joi.number().default(1)
+          quantity: Joi.number().positive().default(1)
         })
       ).min(1).required()
     }).default(null)
@@ -536,9 +538,9 @@ const validateOrder = Joi.object({
         outboundItemId: Joi.string().required(),
         name: Joi.string().required().max(128),
         merchantSku: Joi.string().required().max(40),
-        quantity: Joi.number(),
+        quantity: Joi.number().positive(),
         itemType: Joi.string().required().valid(...['BillOfMaterials', 'Product']),
-        quantityOpen: Joi.number(),
+        quantityOpen: Joi.number().positive(),
         externalNumber: Joi.string().allow('').allow(null),
         price: Joi.number(),
         vat: Joi.number(),
@@ -621,14 +623,14 @@ const commonPendingOrderSchema = {
   paymentTarget: Joi.number(),
   discount: Joi.number(),
   orderStatus: Joi.number(),
-  quantity: Joi.number().default(1),
+  quantity: Joi.number().positive().default(1),
   orderLineRequests: Joi.array().items(
     Joi.object({
       itemName: Joi.string(),
       articleNumber: Joi.string(),
       itemNetSale: Joi.number(),
       itemVAT: Joi.number(),
-      quantity: Joi.number(),
+      quantity: Joi.number().positive(),
       type: Joi.number(),
       discount: Joi.number(),
       netPurchasePrice: Joi.number()
@@ -684,7 +686,8 @@ const validateCardTemplate = Joi.object({
     front: Joi.string().allow('').max(5000).allow(null).required(),
     back: Joi.string().allow('').max(5000).allow(null).required(),
     frontOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape']),
-    backOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape'])
+    backOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape']),
+    isDraft: Joi.boolean().optional().default(true)
   }).required()
 }).required()
 
@@ -862,7 +865,7 @@ const validateCompanySubscription = Joi.object({
 
 const validateProductCategory = Joi.object({
   productCategory: Joi.object({
-    name: Joi.string().lowercase().required(),
+    name: Joi.string().lowercase().required().max(64),
     description: Joi.string().max(256),
     picture: Joi.object({
       url: Joi.string().uri().required(),
@@ -895,7 +898,8 @@ const validateProductSize = Joi.object({
 
 const validateProductCategoryTag = Joi.object({
   productCategoryTag: Joi.object({
-    name: Joi.string().lowercase().required()
+    name: Joi.string().lowercase().required(),
+    type: Joi.string().lowercase().optional().default('category')
   }).required()
 })
 
@@ -925,6 +929,57 @@ const validateGraduatedPrice = Joi.object({
         'any.invalid': 'Last unit must not be equal to first unit'
       }),
     price: Joi.number().min(0)
+  }).required()
+})
+
+const validateProductAccessControlGroup = Joi.object({
+  productAccessControlGroup: Joi.object({
+    name: Joi.string().required().max(256),
+    description: Joi.string().optional().max(256).allow(null).allow(''),
+    companyId: Joi.string().uuid().allow(null).default(null)
+  }).required()
+})
+
+const validateProductCategoryTagProductAccessControlGroup = Joi.object({
+  productCategoryTagProductAccessControlGroup: Joi.object({
+    productCategoryTagIds: Joi.array().items(Joi.string().uuid().required()).min(1)
+  }).required()
+})
+
+const validateUserProductAccessControlGroup = Joi.object({
+  userProductAccessControlGroup: Joi.object({
+    userIds: Joi.array().items(Joi.string().uuid().required()).min(1)
+  }).required()
+})
+
+const validateCompanyProductAccessControlGroup = Joi.object({
+  companyProductAccessControlGroup: Joi.object({
+    companyIds: Joi.array().items(Joi.string().uuid().required()).min(1)
+  }).required()
+})
+
+const validateCompanyUserGroup = Joi.object({
+  companyUserGroup: Joi.object({
+    name: Joi.string().required().max(256),
+    description: Joi.string().optional().max(256).allow(null).allow(''),
+    companyId: Joi.string().uuid().required()
+  }).required()
+})
+const validateUpdatedCompanyUserGroup = Joi.object({
+  companyUserGroup: Joi.object({
+    name: Joi.string().required().max(256),
+    description: Joi.string().optional().max(256).allow(null).allow('')
+  }).required()
+})
+
+const validateUserCompanyUserGroup = Joi.object({
+  userCompanyUserGroup: Joi.object({
+    userIds: Joi.array().items(Joi.string().uuid().required()).min(1)
+  }).required()
+})
+const validateCompanyUserGroupProductAccessControlGroup = Joi.object({
+  companyUserGroupProductAccessControlGroup: Joi.object({
+    companyUserGroupIds: Joi.array().items(Joi.string().uuid().required()).min(1)
   }).required()
 })
 
@@ -997,5 +1052,13 @@ export default {
   validateGraduatedPrice,
   validateProductColor,
   validateProductMaterial,
-  validateProductSize
+  validateProductSize,
+  validateProductAccessControlGroup,
+  validateProductCategoryTagProductAccessControlGroup,
+  validateUserProductAccessControlGroup,
+  validateCompanyProductAccessControlGroup,
+  validateCompanyUserGroup,
+  validateUpdatedCompanyUserGroup,
+  validateUserCompanyUserGroup,
+  validateCompanyUserGroupProductAccessControlGroup
 }

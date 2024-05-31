@@ -9,6 +9,7 @@ import checkAdmin from '../middlewares/checkAdmin'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import checkPermissions from '../middlewares/checkPermissions'
 import ProductTagController from '../controllers/ProductTagController'
+import setCatalogueAccess from '../middlewares/setCatalogueAccess'
 
 const ProductRoutes = (): Router => {
   const productRouter = express.Router()
@@ -21,6 +22,12 @@ const ProductRoutes = (): Router => {
     .get(asyncHandler(checkAdmin), celebrate({
       [Segments.QUERY]: validator.validateProductQueryParams
     }), asyncHandler(paginate), asyncHandler(ProductController.getAll))
+  productRouter.route('/products/catalogue')
+    .get(celebrate({
+      [Segments.QUERY]: validator.validateProductQueryParams
+    }), asyncHandler(paginate),
+    asyncHandler(setCatalogueAccess),
+    asyncHandler(ProductController.getAll))
   productRouter.use('/products/:id', celebrate({
     [Segments.PARAMS]: validator.validateProductId
   }, { abortEarly: false }), asyncHandler(ProductController.checkRecord))
@@ -34,8 +41,7 @@ const ProductRoutes = (): Router => {
     .delete(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkAdmin), asyncHandler(ProductController.delete))
   productRouter.route('/products/:id/stocks')
-    .get(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
-      asyncHandler(checkPermissions), asyncHandler(ProductController.getProductStock))
+    .get(asyncHandler(ProductController.getProductStock))
   productRouter.route('/products/:id/outbounds')
     .get(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions), celebrate({
@@ -67,6 +73,8 @@ const ProductRoutes = (): Router => {
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateGraduatedPrice
     }, { abortEarly: false }), asyncHandler(ProductController.addGraduatedPrice))
+  productRouter.route('/products/:id/catalogue')
+    .get(asyncHandler(setCatalogueAccess), asyncHandler(ProductController.get))
   return productRouter
 }
 

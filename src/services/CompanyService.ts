@@ -39,7 +39,7 @@ class CompanyService extends BaseService {
       },
       {
         model: db.AccessPermission,
-        attributes: { exclude: ['companyId', 'deletedAt'] },
+        attributes: { exclude: ['companyId', 'deletedAt', 'createdAt', 'updatedAt', 'isEnabled'] },
         as: 'accessPermissions'
       },
       {
@@ -125,10 +125,18 @@ class CompanyService extends BaseService {
       include: [
         {
           model: db.Address,
-          attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition'],
-          as: 'addresses'
+          attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type'],
+          as: 'addresses',
+          where: {
+            [Op.or]: [
+              { affiliation: { [Op.eq]: null } },
+              { affiliation: 'personal' }
+            ]
+          },
+          required: false
         }
-      ]
+      ],
+      distinct: true
     })
 
     const privacyRule = await db.PrivacyRule.findOne({

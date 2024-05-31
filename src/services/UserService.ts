@@ -46,7 +46,14 @@ const include = [
   {
     model: db.Address,
     attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type'],
-    as: 'addresses'
+    as: 'addresses',
+    where: {
+      [Op.or]: [
+        { affiliation: { [Op.eq]: null } },
+        { affiliation: 'personal' }
+      ]
+    },
+    required: false
   }
 ]
 
@@ -483,14 +490,16 @@ class UserService extends BaseService {
         offset,
         order: [
           ['createdAt', 'DESC']
-        ]
+        ],
+        distinct: true
       })
     } else {
       users = await db[this.model].findAndCountAll({
         limit,
         offset,
         order: [['createdAt', 'DESC']],
-        include
+        include,
+        distinct: true
       })
     }
 
@@ -511,7 +520,8 @@ class UserService extends BaseService {
           [Op.or]: [
             { id: address.id },
             { type: address.type }
-          ]
+          ],
+          affiliation: address.affiliation
         },
         paranoid: false // To get soft deleted record
       })

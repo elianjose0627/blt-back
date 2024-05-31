@@ -8,7 +8,12 @@ import {
   verifyUser,
   verifyCompanyDomain,
   createCompanyAdministratorWithCompany,
-  createCampaignManager
+  createCampaignManager,
+  createVerifiedUser,
+  deleteCompanyFromProductAccessControlGroup,
+  deleteCompanyUserGroupFromProductAccessControlGroup,
+  deleteCompanyUserGroup,
+  deleteUserCompanyUserGroup
 } from '../utils'
 
 const { expect } = chai
@@ -19,6 +24,10 @@ let tokenAdmin: string
 let token: string
 let tokenCompanyAdminTwo: string
 let tokenCampaignManager: string
+let companyProductAccessControlGroupId: string
+let companyUserGroupProductAccessControlGroupId: string
+let companyUserGroupId2: string
+let userCompanyUserGroupId: string
 
 describe('Product actions', () => {
   before(async () => {
@@ -61,6 +70,10 @@ describe('Product actions', () => {
 
   after(async () => {
     await deleteTestUser('drstrange@starkindustriesmarvel.com')
+    await deleteCompanyFromProductAccessControlGroup(companyProductAccessControlGroupId)
+    await deleteCompanyUserGroupFromProductAccessControlGroup(companyUserGroupProductAccessControlGroupId)
+    await deleteUserCompanyUserGroup(userCompanyUserGroupId)
+    await deleteCompanyUserGroup(companyUserGroupId2)
   })
 
   describe('Get all products', () => {
@@ -2040,6 +2053,1186 @@ describe('Product actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'productGraduatedPrice')
       expect(res.body.productGraduatedPrice).to.be.an('object')
+    })
+  })
+
+  describe('Product Catalogue', () => {
+    it('Should return 200 OK when an admin gets the product catalogue', async () => {
+      await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Tractor',
+            jfsku: '1231tr1',
+            merchantSku: '1231tr1',
+            type: 'generic',
+            productGroup: 'technology'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/products/catalogue')
+        .query({
+          limit: 10,
+          page: 1
+        })
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf.above(1)
+    })
+
+    it('Should return 200 OK when a user gets the product catalogue', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/products/catalogue')
+        .query({
+          limit: 10,
+          page: 1
+        })
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(0)
+    })
+
+    it('Should return 200 OK when an employee gets the product catalogue', async () => {
+      await createVerifiedUser('ivers2@kreeprotectedproducts.kr', '1234567890')
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Protected Company',
+            email: 'ivers2@kreeprotectedproducts.kr',
+            domain: 'kreeprotectedproducts.kr'
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(companyId)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'ivers2@kreeprotectedproducts.kr',
+            actionType: 'add'
+          }
+        })
+
+      const resEmployee = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ivers2@kreeprotectedproducts.kr', password: '1234567890' } })
+
+      const tokenEmployee = String(resEmployee.body.token)
+      const res = await chai
+        .request(app)
+        .get('/api/products/catalogue')
+        .query({
+          limit: 10,
+          page: 1
+        })
+        .set('Authorization', `Bearer ${tokenEmployee}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(0)
+    })
+
+    it('Should return 200 OK when a user in a product access control group gets the product catalogue', async () => {
+      await createVerifiedUser('ivers99@kreeprotectedproducts.kr', '1234567890')
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ivers99@kreeprotectedproducts.kr', password: '1234567890' } })
+
+      const tokenUser = String(resUser.body.token)
+      const userId = String(resUser.body.user.id)
+
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'technology'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      const resProductCategoryTag = await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'samsung'
+          }
+        })
+      const productCategoryTagId = resProductCategoryTag.body.productCategoryTag.id
+
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Tractor',
+            jfsku: '1231tr10',
+            merchantSku: '1231tr10',
+            type: 'generic',
+            productGroup: 'technology',
+            productCategoryId
+          }
+        })
+
+      const productId = String(resProduct.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/products/${String(productId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productTag: {
+            productCategoryTagIds: [productCategoryTagId]
+          }
+        })
+
+      // Create a product access control group
+      const resProductAccessControlGroup = await chai
+        .request(app)
+        .post('/api/product-access-control-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productAccessControlGroup: {
+            name: 'Test Access Control Group'
+          }
+        })
+
+      const productAccessControlGroupId = resProductAccessControlGroup.body.productAccessControlGroup.id
+
+      // Add tag and user to the product access control group
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          userProductAccessControlGroup: {
+            userIds: [
+              userId
+            ]
+          }
+        })
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/product-category-tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTagProductAccessControlGroup: {
+            productCategoryTagIds: [
+              productCategoryTagId
+            ]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/products/catalogue')
+        .query({
+          limit: 10,
+          page: 1
+        })
+        .set('Authorization', `Bearer ${tokenUser}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
+      expect(res.body.products[0].name).to.equal('Tractor')
+    })
+
+    it('Should return 200 OK when a user in a product access control group searches for an item in the product catalogue', async () => {
+      await createVerifiedUser('ivers919@kreeprotectedproducts.kr', '1234567890')
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ivers919@kreeprotectedproducts.kr', password: '1234567890' } })
+
+      const tokenUser = String(resUser.body.token)
+      const userId = String(resUser.body.user.id)
+
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'technology'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      const resProductCategoryTag = await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'nokia'
+          }
+        })
+      const productCategoryTagId = resProductCategoryTag.body.productCategoryTag.id
+
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Nokia 3310',
+            jfsku: '1231nk3310',
+            merchantSku: '1231nk3310',
+            type: 'generic',
+            productGroup: 'technology',
+            productCategoryId
+          }
+        })
+
+      const productId = String(resProduct.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/products/${String(productId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productTag: {
+            productCategoryTagIds: [productCategoryTagId]
+          }
+        })
+
+      // Create a product access control group
+      const resProductAccessControlGroup = await chai
+        .request(app)
+        .post('/api/product-access-control-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productAccessControlGroup: {
+            name: 'Test Access Control Group Search'
+          }
+        })
+
+      const productAccessControlGroupId = resProductAccessControlGroup.body.productAccessControlGroup.id
+
+      // Add tag and user to the product access control group
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          userProductAccessControlGroup: {
+            userIds: [
+              userId
+            ]
+          }
+        })
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/product-category-tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTagProductAccessControlGroup: {
+            productCategoryTagIds: [
+              productCategoryTagId
+            ]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/products/catalogue')
+        .query({
+          limit: 10,
+          page: 1,
+          search: 'Nokia 3310'
+        })
+        .set('Authorization', `Bearer ${tokenUser}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
+      expect(res.body.products[0].name).to.equal('Nokia 3310')
+    })
+
+    it('Should return 200 OK when a user in a product access control group filters by price in the product catalogue', async () => {
+      await createVerifiedUser('ivers9190@kreeprotectedproducts.kr', '1234567890')
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ivers9190@kreeprotectedproducts.kr', password: '1234567890' } })
+
+      const tokenUser = String(resUser.body.token)
+      const userId = String(resUser.body.user.id)
+
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'technology'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      const resProductCategoryTag = await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'oneplus'
+          }
+        })
+      const productCategoryTagId = resProductCategoryTag.body.productCategoryTag.id
+
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'OnePlus Nord CE',
+            jfsku: '1231opnce',
+            merchantSku: '1231opnce',
+            type: 'generic',
+            productGroup: 'technology',
+            productCategoryId,
+            netRetailPrice: {
+              amount: 200,
+              currency: 'EUR',
+              discount: 0
+            }
+          }
+        })
+
+      const productId = String(resProduct.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/products/${String(productId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productTag: {
+            productCategoryTagIds: [productCategoryTagId]
+          }
+        })
+
+      // Create a product access control group
+      const resProductAccessControlGroup = await chai
+        .request(app)
+        .post('/api/product-access-control-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productAccessControlGroup: {
+            name: 'Test Access Control Group Price'
+          }
+        })
+
+      const productAccessControlGroupId = resProductAccessControlGroup.body.productAccessControlGroup.id
+
+      // Add tag and user to the product access control group
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          userProductAccessControlGroup: {
+            userIds: [
+              userId
+            ]
+          }
+        })
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/product-category-tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTagProductAccessControlGroup: {
+            productCategoryTagIds: [
+              productCategoryTagId
+            ]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/products/catalogue')
+        .query({
+          limit: 10,
+          page: 1,
+          filter: {
+            minPrice: 199,
+            maxPrice: 200
+          }
+        })
+        .set('Authorization', `Bearer ${tokenUser}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
+      expect(res.body.products[0].name).to.equal('OnePlus Nord CE')
+    })
+
+    it('Should return 200 OK when a user in a product access control group filters by price range in the product catalogue', async () => {
+      await createVerifiedUser('ivers9191@kreeprotectedproducts.kr', '1234567890')
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ivers9191@kreeprotectedproducts.kr', password: '1234567890' } })
+
+      const tokenUser = String(resUser.body.token)
+      const userId = String(resUser.body.user.id)
+
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'technology'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      const resProductCategoryTag = await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'lg'
+          }
+        })
+      const productCategoryTagId = resProductCategoryTag.body.productCategoryTag.id
+
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'LG Fridge',
+            jfsku: '1231lg',
+            merchantSku: '1231lg',
+            type: 'generic',
+            productGroup: 'technology',
+            productCategoryId,
+            netRetailPrice: {
+              amount: 500,
+              currency: 'EUR',
+              discount: 0
+            }
+          }
+        })
+
+      const productId = String(resProduct.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/products/${String(productId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productTag: {
+            productCategoryTagIds: [productCategoryTagId]
+          }
+        })
+
+      // Create a product access control group
+      const resProductAccessControlGroup = await chai
+        .request(app)
+        .post('/api/product-access-control-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productAccessControlGroup: {
+            name: 'Test Access Control Group Price Range'
+          }
+        })
+
+      const productAccessControlGroupId = resProductAccessControlGroup.body.productAccessControlGroup.id
+
+      // Add tag and user to the product access control group
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          userProductAccessControlGroup: {
+            userIds: [
+              userId
+            ]
+          }
+        })
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/product-category-tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTagProductAccessControlGroup: {
+            productCategoryTagIds: [
+              productCategoryTagId
+            ]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/products/catalogue')
+        .query({
+          limit: 10,
+          page: 1,
+          filter: {
+            price: '400-500'
+          }
+        })
+        .set('Authorization', `Bearer ${tokenUser}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
+      expect(res.body.products[0].name).to.equal('LG Fridge')
+    })
+
+    it('Should return 200 OK when a user in a product access control group filters by show children in the product catalogue', async () => {
+      await createVerifiedUser('ivers1990@kreeprotectedproducts.kr', '1234567890')
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ivers1990@kreeprotectedproducts.kr', password: '1234567890' } })
+
+      const tokenUser = String(resUser.body.token)
+      const userId = String(resUser.body.user.id)
+
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'technology'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      const resProductCategoryTag = await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'sony'
+          }
+        })
+      const productCategoryTagId = resProductCategoryTag.body.productCategoryTag.id
+
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Sony Xperia',
+            jfsku: '1231snxp',
+            merchantSku: '1231snxp',
+            type: 'generic',
+            productGroup: 'technology',
+            productCategoryId,
+            isParent: true,
+            netRetailPrice: {
+              amount: 500,
+              currency: 'EUR',
+              discount: 0
+            }
+          }
+        })
+
+      const productId = String(resProduct.body.product.id)
+
+      const resProductChild = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Sony Xperia 2',
+            jfsku: '1231snxp2',
+            merchantSku: '1231snxp2',
+            type: 'generic',
+            productGroup: 'technology',
+            productCategoryId,
+            netRetailPrice: {
+              amount: 500,
+              currency: 'EUR',
+              discount: 0
+            }
+          }
+        })
+
+      const productChildId = String(resProductChild.body.product.id)
+
+      await chai
+        .request(app)
+        .patch(`/api/products/${String(productId)}/children`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            childIds: [productChildId]
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/products/${String(productId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productTag: {
+            productCategoryTagIds: [productCategoryTagId]
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/products/${String(productChildId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productTag: {
+            productCategoryTagIds: [productCategoryTagId]
+          }
+        })
+
+      // Create a product access control group
+      const resProductAccessControlGroup = await chai
+        .request(app)
+        .post('/api/product-access-control-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productAccessControlGroup: {
+            name: 'Test Access Control Group Show Children'
+          }
+        })
+
+      const productAccessControlGroupId = resProductAccessControlGroup.body.productAccessControlGroup.id
+
+      // Add tag and user to the product access control group
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          userProductAccessControlGroup: {
+            userIds: [
+              userId
+            ]
+          }
+        })
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/product-category-tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTagProductAccessControlGroup: {
+            productCategoryTagIds: [
+              productCategoryTagId
+            ]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/products/catalogue')
+        .query({
+          limit: 10,
+          page: 1,
+          filter: {
+            showChildren: 'false'
+          }
+        })
+        .set('Authorization', `Bearer ${tokenUser}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
+      expect(res.body.products[0].name).to.equal('Sony Xperia')
+      expect(res.body.products[0].isParent).to.equal(true)
+    })
+
+    it('Should return 200 OK when an employee whose company is in a product access control group gets the product catalogue', async () => {
+      await createVerifiedUser('ivers88@kreeprotectedproducts.kr', '1234567890')
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Protected Company Three',
+            email: 'ivers88@kreeprotectedproducts.kr',
+            domain: 'kreeprotectedproducts.kr'
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(companyId)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'ivers88@kreeprotectedproducts.kr',
+            actionType: 'add'
+          }
+        })
+
+      const resEmployee = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ivers88@kreeprotectedproducts.kr', password: '1234567890' } })
+
+      const tokenEmployee = String(resEmployee.body.token)
+
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'technology'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      const resProductCategoryTag = await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'galaxy'
+          }
+        })
+      const productCategoryTagId = resProductCategoryTag.body.productCategoryTag.id
+
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Galaxy Note',
+            jfsku: '1231gxn1',
+            merchantSku: '1231gxn1',
+            type: 'generic',
+            productGroup: 'technology',
+            productCategoryId
+          }
+        })
+
+      const productId = String(resProduct.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/products/${String(productId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productTag: {
+            productCategoryTagIds: [productCategoryTagId]
+          }
+        })
+
+      // Create a product access control group
+      const resProductAccessControlGroup = await chai
+        .request(app)
+        .post('/api/product-access-control-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productAccessControlGroup: {
+            name: 'Test Access Control Group Eighty Eight'
+          }
+        })
+
+      const productAccessControlGroupId = resProductAccessControlGroup.body.productAccessControlGroup.id
+
+      // Add tag and company to the product access control group
+      const resCompanyProductAccessControlGroup = await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/companies`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          companyProductAccessControlGroup: {
+            companyIds: [
+              companyId
+            ]
+          }
+        })
+
+      companyProductAccessControlGroupId = resCompanyProductAccessControlGroup.body.companyProductAccessControlGroup.added[0].id
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/product-category-tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTagProductAccessControlGroup: {
+            productCategoryTagIds: [
+              productCategoryTagId
+            ]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/products/catalogue')
+        .query({
+          limit: 10,
+          page: 1
+        })
+        .set('Authorization', `Bearer ${tokenEmployee}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
+      expect(res.body.products[0].name).to.equal('Galaxy Note')
+    })
+
+    it('Should return 200 OK when an employee in a company user group gets the product catalogue', async () => {
+      await createVerifiedUser('ivers8@kreeprotectedproducts.kr', '1234567890')
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Captain Marvel Protected Company Two',
+            email: 'ivers8@kreeprotectedproducts.kr',
+            domain: 'kreeprotectedproducts.kr'
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+      await verifyCompanyDomain(companyId)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'ivers8@kreeprotectedproducts.kr',
+            actionType: 'add'
+          }
+        })
+
+      const resEmployee = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ivers8@kreeprotectedproducts.kr', password: '1234567890' } })
+
+      const tokenEmployee = String(resEmployee.body.token)
+      const userId = String(resEmployee.body.user.id)
+
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'technology'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      const resProductCategoryTag = await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'corby'
+          }
+        })
+      const productCategoryTagId = resProductCategoryTag.body.productCategoryTag.id
+
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Samsung Corby',
+            jfsku: '1231smcb1',
+            merchantSku: '1231smcb1',
+            type: 'generic',
+            productGroup: 'technology',
+            productCategoryId
+          }
+        })
+
+      const productId = String(resProduct.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/products/${String(productId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productTag: {
+            productCategoryTagIds: [productCategoryTagId]
+          }
+        })
+
+      // Create a product access control group
+      const resProductAccessControlGroup = await chai
+        .request(app)
+        .post('/api/product-access-control-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productAccessControlGroup: {
+            name: 'Captain Marvel Protected Company Two Product Access Control Group'
+          }
+        })
+
+      const productAccessControlGroupId = resProductAccessControlGroup.body.productAccessControlGroup.id
+
+      // Create a company user group and add employee
+      const resCompanyUserGroup = await chai
+        .request(app)
+        .post('/api/company-user-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          companyUserGroup: {
+            name: 'Captain Marvel Protected Company Two User Group',
+            companyId
+          }
+        })
+
+      const companyUserGroupId = String(resCompanyUserGroup.body.companyUserGroup.id)
+      companyUserGroupId2 = companyUserGroupId
+
+      const resUserCompanyUserGroup = await chai
+        .request(app)
+        .post(`/api/company-user-groups/${companyUserGroupId}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          userCompanyUserGroup: {
+            userIds: [userId]
+          }
+        })
+
+      userCompanyUserGroupId = resUserCompanyUserGroup.body.userCompanyUserGroup.added[0].id
+
+      // Add tag and user group to the product access control group
+      const resCompanyUserGroupProductAccessControlGroup = await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/company-user-groups`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          companyUserGroupProductAccessControlGroup: {
+            companyUserGroupIds: [
+              companyUserGroupId
+            ]
+          }
+        })
+      companyUserGroupProductAccessControlGroupId = resCompanyUserGroupProductAccessControlGroup.body.companyUserGroupProductAccessControlGroup.added[0].id
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/product-category-tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTagProductAccessControlGroup: {
+            productCategoryTagIds: [
+              productCategoryTagId
+            ]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/products/catalogue')
+        .query({
+          limit: 10,
+          page: 1
+        })
+        .set('Authorization', `Bearer ${tokenEmployee}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
+      expect(res.body.products[0].name).to.equal('Samsung Corby')
+    })
+
+    it('Should return 200 OK when a user in a product access control group gets a product in the catalogue', async () => {
+      await createVerifiedUser('ivers97@kreeprotectedproducts.kr', '1234567890')
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ivers97@kreeprotectedproducts.kr', password: '1234567890' } })
+
+      const tokenUser = String(resUser.body.token)
+      const userId = String(resUser.body.user.id)
+
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'technology'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      const resProductCategoryTag = await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'apple'
+          }
+        })
+      const productCategoryTagId = resProductCategoryTag.body.productCategoryTag.id
+
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'iPhone',
+            jfsku: '1231iph10',
+            merchantSku: '1231iph10',
+            type: 'generic',
+            productGroup: 'technology',
+            productCategoryId
+          }
+        })
+
+      const productId = String(resProduct.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/products/${String(productId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productTag: {
+            productCategoryTagIds: [productCategoryTagId]
+          }
+        })
+
+      // Create a product access control group
+      const resProductAccessControlGroup = await chai
+        .request(app)
+        .post('/api/product-access-control-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productAccessControlGroup: {
+            name: 'Test Access Control Group Apple'
+          }
+        })
+
+      const productAccessControlGroupId = resProductAccessControlGroup.body.productAccessControlGroup.id
+
+      // Add tag and user to the product access control group
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          userProductAccessControlGroup: {
+            userIds: [
+              userId
+            ]
+          }
+        })
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/product-category-tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTagProductAccessControlGroup: {
+            productCategoryTagIds: [
+              productCategoryTagId
+            ]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${productId}/catalogue`)
+        .query({
+          limit: 10,
+          page: 1
+        })
+        .set('Authorization', `Bearer ${tokenUser}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product.name).to.equal('iPhone')
+    })
+
+    it('Should return 403 Forbidden when a user not in a product access control group tries to get a product in the catalogue', async () => {
+      await createVerifiedUser('ivers974@kreeprotectedproducts.kr', '1234567890')
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ivers974@kreeprotectedproducts.kr', password: '1234567890' } })
+
+      const tokenUser = String(resUser.body.token)
+
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'iPhone 5',
+            jfsku: '1231iph5',
+            merchantSku: '1231iph5',
+            type: 'generic',
+            productGroup: 'technology'
+          }
+        })
+
+      const productId = String(resProduct.body.product.id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${productId}/catalogue`)
+        .query({
+          limit: 10,
+          page: 1
+        })
+        .set('Authorization', `Bearer ${tokenUser}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have access to this product in the catalogue')
     })
   })
 })
