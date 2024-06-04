@@ -1,4 +1,5 @@
 import { v1 as uuidv1 } from 'uuid'
+import { Op } from 'sequelize'
 import BaseService from './BaseService'
 import db from '../models'
 
@@ -11,13 +12,24 @@ class CompanyUserGroupService extends BaseService {
     return 'Company User Group'
   }
 
-  async getAll (limit: number, offset: number): Promise<any> {
+  async getAll (limit: number, offset: number, search?: string): Promise<any> {
+    let where
+
+    if (search !== undefined) {
+      where = {
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${search}%` } }
+        ]
+      }
+    }
+
     const records = await db[this.model].findAndCountAll({
       limit,
       offset,
       order: [['createdAt', 'DESC']],
       attributes: { exclude: [] },
       distinct: true,
+      where,
       include: [
         {
           model: db.User,
