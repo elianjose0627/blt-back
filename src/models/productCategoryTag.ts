@@ -14,6 +14,10 @@ const ProductCategoryTagModel = (sequelize: any, DataTypes: any): any => {
     private readonly type: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
+    private readonly productCategory: {
+      id: string
+      name: string
+    }
 
     static associate (models: any): any {
       ProductCategoryTag.belongsTo(models.ProductCategory, {
@@ -39,7 +43,8 @@ const ProductCategoryTagModel = (sequelize: any, DataTypes: any): any => {
         name: this.name,
         type: this.type,
         createdAt: this.createdAt,
-        updatedAt: this.updatedAt
+        updatedAt: this.updatedAt,
+        productCategory: this.productCategory
       }
     }
   };
