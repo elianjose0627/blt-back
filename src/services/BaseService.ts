@@ -276,6 +276,11 @@ export const generateInclude = (model: string): any => {
     return (
       [
         {
+          model: db.Company,
+          attributes: ['id', 'name', 'suffix', 'email', 'domain'],
+          as: 'company'
+        },
+        {
           model: db.ProductCategoryTag,
           as: 'productCategoryTags',
           attributes: ['id', 'name', 'type'],
@@ -309,7 +314,14 @@ export const generateInclude = (model: string): any => {
           through: {
             as: 'companyUserGroupProductAccessControlGroup',
             attributes: ['id']
-          }
+          },
+          include: [
+            {
+              model: db.Company,
+              attributes: ['name', 'domain'],
+              as: 'company'
+            }
+          ]
         }
       ]
     )

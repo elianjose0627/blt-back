@@ -359,6 +359,10 @@ export interface IProductCategoryTag {
   type: string
   createdAt: Date
   updatedAt: Date
+  productCategory: {
+    id: string
+    name: string
+  }
 }
 
 export interface IProductTag {
