@@ -66,6 +66,41 @@ describe('Product Category Tag actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'productCategoryTags')
       expect(res.body.productCategoryTags).to.be.an('array')
     })
+
+    it('Should return 200 when a non-admin retrieves all product category tags with search params.', async () => {
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'Camera'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'dslr'
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get('/api/product-category-tags')
+        .set('Authorization', `Bearer ${token}`)
+        .query({
+          search: 'dslr'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCategoryTags')
+      expect(res.body.productCategoryTags).to.be.an('array')
+    })
   })
 
   describe('Get, update and delete a product category tag', () => {

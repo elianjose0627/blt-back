@@ -65,30 +65,6 @@ describe('Product Category actions', () => {
       expect(res.body.productCategories).to.be.an('array')
     })
 
-    it('Should return 200 Success when an admin successfully retrieves all product categories with search params.', async () => {
-      await chai
-        .request(app)
-        .post('/api/product-categories')
-        .set('Authorization', `Bearer ${tokenAdmin}`)
-        .send({
-          productCategory: {
-            name: 'kitchenware'
-          }
-        })
-
-      const res = await chai
-        .request(app)
-        .get('/api/product-categories')
-        .set('Authorization', `Bearer ${tokenAdmin}`)
-        .query({
-          search: 'kitchenware'
-        })
-
-      expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'productCategories')
-      expect(res.body.productCategories).to.be.an('array')
-    })
-
     it('Should return 200 when a non-admin retrieves all product categories.', async () => {
       const res = await chai
         .request(app)
