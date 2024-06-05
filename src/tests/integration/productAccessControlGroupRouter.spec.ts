@@ -440,6 +440,127 @@ describe('Product Access Control Group actions', () => {
       expect(res.body.productCategoryTagProductAccessControlGroup.added).to.be.an('array').lengthOf(0)
       expect(res.body.productCategoryTagProductAccessControlGroup.updated).to.be.an('array').lengthOf(1)
     })
+
+    it('Should return 200 OK when all product category tags of a product access control group are fetched by an admin', async () => {
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'chocolates'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      const resProductCategoryTag = await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'brown',
+            type: 'category'
+          }
+        })
+
+      const productCategoryTagId = resProductCategoryTag.body.productCategoryTag.id
+
+      const resProductAccessControlGroup = await chai
+        .request(app)
+        .post('/api/product-access-control-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productAccessControlGroup: {
+            name: 'Test Access Control Group Nine Nine Nine'
+          }
+        })
+      const productAccessControlGroupId = resProductAccessControlGroup.body.productAccessControlGroup.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/product-category-tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTagProductAccessControlGroup: {
+            productCategoryTagIds: [
+              productCategoryTagId
+            ]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/product-category-tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productAccessControlGroupProductCategoryTags')
+      expect(res.body.productAccessControlGroupProductCategoryTags).to.be.an('array').lengthOf(1)
+    })
+
+    it('Should return 200 OK when all product category tags of a product access control group with search params are fetched by an admin', async () => {
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'chocolates'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      const resProductCategoryTag = await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'white',
+            type: 'category'
+          }
+        })
+
+      const productCategoryTagId = resProductCategoryTag.body.productCategoryTag.id
+
+      const resProductAccessControlGroup = await chai
+        .request(app)
+        .post('/api/product-access-control-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productAccessControlGroup: {
+            name: 'Test Access Control Group Ninety Nine'
+          }
+        })
+      const productAccessControlGroupId = resProductAccessControlGroup.body.productAccessControlGroup.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/product-category-tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTagProductAccessControlGroup: {
+            productCategoryTagIds: [
+              productCategoryTagId
+            ]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/product-category-tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .query({
+          search: 'white'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productAccessControlGroupProductCategoryTags')
+      expect(res.body.productAccessControlGroupProductCategoryTags).to.be.an('array').lengthOf(1)
+    })
   })
 
   describe('Product Access Control Group User actions', () => {

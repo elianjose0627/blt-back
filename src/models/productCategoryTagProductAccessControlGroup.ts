@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { IProductCategoryTagInProductAccessControlGroup } from '../types'
+import type { IProductCategoryTag, IProductCategoryTagInProductAccessControlGroup } from '../types'
 
 const ProductCategoryTagProductAccessControlGroupModel = (sequelize: any, DataTypes: any): any => {
   interface ProductCategoryTagProductAccessControlGroupAttributes {
@@ -10,16 +10,22 @@ const ProductCategoryTagProductAccessControlGroupModel = (sequelize: any, DataTy
     private readonly id: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
+    private readonly productCategoryTag: Pick<IProductCategoryTag, 'id' | 'name' | 'type'> & { productCategory: { id: string, name: string }}
 
     static associate (models: any): any {
-
+      ProductCategoryTagProductAccessControlGroup.belongsTo(models.ProductCategoryTag, {
+        foreignKey: 'productCategoryTagId',
+        as: 'productCategoryTag',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): IProductCategoryTagInProductAccessControlGroup {
       return {
         id: this.id,
         createdAt: this.createdAt,
-        updatedAt: this.updatedAt
+        updatedAt: this.updatedAt,
+        productCategoryTag: this.productCategoryTag
       }
     }
   };

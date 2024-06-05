@@ -467,6 +467,7 @@ export interface IProductCategoryTagInProductAccessControlGroup {
   productCategoryTagId?: string
   createdAt: Date
   updatedAt: Date
+  productCategoryTag: Pick<IProductCategoryTag, 'id' | 'name' | 'type'> & { productCategory: { id: string, name: string }}
 }
 export interface IProduct {
   id: string

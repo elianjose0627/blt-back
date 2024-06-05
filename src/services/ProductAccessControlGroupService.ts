@@ -25,15 +25,6 @@ class ProductAccessControlGroupService extends BaseService {
           as: 'company'
         },
         {
-          model: db.ProductCategoryTag,
-          as: 'productCategoryTags',
-          attributes: ['id', 'name', 'type'],
-          through: {
-            as: 'categoryTagProductAccessControlGroup',
-            attributes: ['id']
-          }
-        },
-        {
           model: db.User,
           as: 'users',
           attributes: ['id', 'firstName', 'lastName', 'email'],

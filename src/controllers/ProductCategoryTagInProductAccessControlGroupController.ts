@@ -30,6 +30,24 @@ class ProductCategoryTagInProductAccessControlGroupController extends BaseContro
       [this.recordName()]: response
     })
   }
+
+  async getAllInProductAccessControlGroup (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { query: { limit, page, offset, search }, params: { id } } = req
+    const records = await productCategoryTagInProductAccessControlGroupService.getAllInProductAccessControlGroup(limit, offset, id, search)
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / limit),
+      perPage: limit,
+      page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      [productCategoryTagInProductAccessControlGroupService.manyRecords()]: records.rows
+    })
+  }
 }
 
 export default new ProductCategoryTagInProductAccessControlGroupController(productCategoryTagInProductAccessControlGroupService)
