@@ -31,9 +31,9 @@ class ProductCategoryTagInProductAccessControlGroupController extends BaseContro
     })
   }
 
-  async getAllInProductAccessControlGroup (req: CustomRequest, res: CustomResponse): Promise<any> {
+  async getAllProductCategoryTagsInProductAccessControlGroup (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { query: { limit, page, offset, search }, params: { id } } = req
-    const records = await productCategoryTagInProductAccessControlGroupService.getAllInProductAccessControlGroup(limit, offset, id, search)
+    const records = await productCategoryTagInProductAccessControlGroupService.getAllProductCategoryTagsInProductAccessControlGroup(limit, offset, id, search)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),

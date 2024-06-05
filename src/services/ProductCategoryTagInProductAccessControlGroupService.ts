@@ -69,7 +69,7 @@ class ProductCategoryTagInProductAccessControlGroupService extends BaseService {
     return { response: { updated, added }, status: 200 }
   }
 
-  async getAllInProductAccessControlGroup (limit: number, offset: number, productAccessControlGroupId: string, search?: string): Promise<any> {
+  async getAllProductCategoryTagsInProductAccessControlGroup (limit: number, offset: number, productAccessControlGroupId: string, search?: string): Promise<any> {
     let where
 
     if (search !== undefined) {

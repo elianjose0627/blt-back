@@ -446,6 +446,7 @@ export interface ICompanyUserGroupInProductAccessControlGroup {
   companyUserGroupId?: string
   createdAt: Date
   updatedAt: Date
+  companyUserGroup: Pick<ICompanyUserGroup, 'id' | 'name' & { company: { id: string, name: string, domain: string }}>
 }
 export interface IUserInProductAccessControlGroup {
   id: string

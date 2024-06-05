@@ -39,7 +39,7 @@ const productAccessControlGroupRoutes = (): Router => {
     .get(asyncHandler(checkAdmin), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate),
-    asyncHandler(ProductCategoryTagInProductAccessControlGroupController.getAllInProductAccessControlGroup))
+    asyncHandler(ProductCategoryTagInProductAccessControlGroupController.getAllProductCategoryTagsInProductAccessControlGroup))
   productAccessControlGroupRouter.route('/product-access-control-groups/:id/users')
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateUserProductAccessControlGroup
@@ -60,6 +60,10 @@ const productAccessControlGroupRoutes = (): Router => {
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateCompanyUserGroupProductAccessControlGroup
     }), asyncHandler(CompanyUserGroupProductAccessGroupController.insert))
+    .get(asyncHandler(checkAdmin), celebrate({
+      [Segments.QUERY]: validator.validateQueryParams
+    }), asyncHandler(paginate),
+    asyncHandler(CompanyUserGroupProductAccessGroupController.getAllCompanyUserGroupsInProductAccessControlGroup))
   return productAccessControlGroupRouter
 }
 

@@ -66,6 +66,29 @@ describe('Product Access Control Group actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'productAccessControlGroups')
       expect(res.body.productAccessControlGroups).to.be.an('array').lengthOf.above(0)
     })
+    it('Should return 200 Success when an admin successfully retrieves all product access control groups with search params.', async () => {
+      await chai
+        .request(app)
+        .post('/api/product-access-control-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productAccessControlGroup: {
+            name: 'Test Access Control Group Two Twenty Three'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/product-access-control-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .query({
+          search: 'Test Access Control Group Two Twenty Three'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productAccessControlGroups')
+      expect(res.body.productAccessControlGroups).to.be.an('array').lengthOf(1)
+    })
   })
 
   describe('Create a product access control group', () => {
@@ -1015,6 +1038,111 @@ describe('Product Access Control Group actions', () => {
       expect(res.body.companyUserGroupProductAccessControlGroup).to.include.keys('updated', 'added')
       expect(res.body.companyUserGroupProductAccessControlGroup.added).to.be.an('array').lengthOf(0)
       expect(res.body.companyUserGroupProductAccessControlGroup.updated).to.be.an('array').lengthOf(1)
+    })
+
+    it('Should return 200 OK when all company user groups of a product access control group are fetched by an admin', async () => {
+      const resNewUser = await createVerifiedUser('user5151@accesscontrol.com', '1234567890')
+      const userId = resNewUser.id
+
+      const resNewCompany = await createVerifiedCompany(userId, true, null, 'Access Control', 'user5151@accesscontrol.com', 'accesscontrol.com')
+      const companyId = resNewCompany.id
+
+      const resNewCompanyUserGroup = await chai
+        .request(app)
+        .post('/api/company-user-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          companyUserGroup: {
+            name: 'Test Company User Group 5151',
+            companyId
+          }
+        })
+      const companyUserGroupId = resNewCompanyUserGroup.body.companyUserGroup.id
+
+      const resProductAccessControlGroup = await chai
+        .request(app)
+        .post('/api/product-access-control-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productAccessControlGroup: {
+            name: 'Test Access Control Group Fourteen 5151'
+          }
+        })
+      const productAccessControlGroupId = resProductAccessControlGroup.body.productAccessControlGroup.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/company-user-groups`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          companyUserGroupProductAccessControlGroup: {
+            companyUserGroupIds: [
+              companyUserGroupId
+            ]
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/company-user-groups`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productAccessControlGroupCompanyUserGroups')
+      expect(res.body.productAccessControlGroupCompanyUserGroups).to.be.an('array').lengthOf(1)
+    })
+
+    it('Should return 200 OK when all company user groups of a product access control group are fetched with search params by an admin', async () => {
+      const resNewUser = await createVerifiedUser('user5152@accesscontrol.com', '1234567890')
+      const userId = resNewUser.id
+
+      const resNewCompany = await createVerifiedCompany(userId, true, null, 'Access Control', 'user5152@accesscontrol.com', 'accesscontrol.com')
+      const companyId = resNewCompany.id
+
+      const resNewCompanyUserGroup = await chai
+        .request(app)
+        .post('/api/company-user-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          companyUserGroup: {
+            name: 'Test Company User Group 5152',
+            companyId
+          }
+        })
+      const companyUserGroupId = resNewCompanyUserGroup.body.companyUserGroup.id
+
+      const resProductAccessControlGroup = await chai
+        .request(app)
+        .post('/api/product-access-control-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productAccessControlGroup: {
+            name: 'Test Access Control Group Fourteen 5152'
+          }
+        })
+      const productAccessControlGroupId = resProductAccessControlGroup.body.productAccessControlGroup.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/company-user-groups`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          companyUserGroupProductAccessControlGroup: {
+            companyUserGroupIds: [
+              companyUserGroupId
+            ]
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/company-user-groups`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .query({
+          search: 'Test Company User Group 5152'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productAccessControlGroupCompanyUserGroups')
+      expect(res.body.productAccessControlGroupCompanyUserGroups).to.be.an('array').lengthOf(1)
     })
   })
 })

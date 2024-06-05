@@ -279,22 +279,6 @@ export const generateInclude = (model: string): any => {
           model: db.Company,
           attributes: ['id', 'name', 'suffix', 'email', 'domain'],
           as: 'company'
-        },
-        {
-          model: db.CompanyUserGroup,
-          as: 'companyUserGroups',
-          attributes: ['id', 'name'],
-          through: {
-            as: 'companyUserGroupProductAccessControlGroup',
-            attributes: ['id']
-          },
-          include: [
-            {
-              model: db.Company,
-              attributes: ['name', 'domain'],
-              as: 'company'
-            }
-          ]
         }
       ]
     )
