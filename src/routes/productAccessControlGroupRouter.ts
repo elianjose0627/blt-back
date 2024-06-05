@@ -44,6 +44,10 @@ const productAccessControlGroupRoutes = (): Router => {
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateUserProductAccessControlGroup
     }), asyncHandler(UserInProductAccessControlGroupController.insert))
+    .get(asyncHandler(checkAdmin), celebrate({
+      [Segments.QUERY]: validator.validateQueryParams
+    }), asyncHandler(paginate),
+    asyncHandler(UserInProductAccessControlGroupController.getAllUsersInProductAccessControlGroup))
   productAccessControlGroupRouter.route('/product-access-control-groups/:id/companies')
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateCompanyProductAccessControlGroup

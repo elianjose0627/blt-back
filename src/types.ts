@@ -453,6 +453,7 @@ export interface IUserInProductAccessControlGroup {
   userId?: string
   createdAt: Date
   updatedAt: Date
+  user: Pick<IUser, 'id' | 'firstName' | 'lastName' | 'email'>
 }
 export interface ICompanyProductAccessControlGroup {
   id: string
