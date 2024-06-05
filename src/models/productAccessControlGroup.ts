@@ -15,7 +15,6 @@ const ProductAccessControlGroupModel = (sequelize: any, DataTypes: any): any => 
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany | null
-    private readonly companies: ICompany[]
     private readonly companyUserGroups: ICompanyUserGroup[]
 
     static associate (models: any): any {
@@ -46,7 +45,7 @@ const ProductAccessControlGroupModel = (sequelize: any, DataTypes: any): any => 
       })
     }
 
-    toJSONFor (): Omit<IProductAccessControlGroup, 'productCategoryTags' | 'users'> {
+    toJSONFor (): Omit<IProductAccessControlGroup, 'productCategoryTags' | 'users' | 'companies'> {
       return {
         id: this.id,
         name: this.name,
@@ -54,7 +53,6 @@ const ProductAccessControlGroupModel = (sequelize: any, DataTypes: any): any => 
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         company: this.company,
-        companies: this.companies,
         companyUserGroups: this.companyUserGroups
       }
     }

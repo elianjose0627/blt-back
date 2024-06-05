@@ -461,6 +461,7 @@ export interface ICompanyProductAccessControlGroup {
   companyId?: string
   createdAt: Date
   updatedAt: Date
+  company: Pick<ICompany, 'id' | 'name' | 'domain' | 'email'>
 }
 export interface IProductCategoryTagInProductAccessControlGroup {
   id: string

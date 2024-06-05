@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { ICompanyProductAccessControlGroup } from '../types'
+import type { ICompany, ICompanyProductAccessControlGroup } from '../types'
 
 const CompanyProductAccessControlGroupModel = (sequelize: any, DataTypes: any): any => {
   interface CompanyProductAccessControlGroupAttributes {
@@ -10,16 +10,22 @@ const CompanyProductAccessControlGroupModel = (sequelize: any, DataTypes: any): 
     private readonly id: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
+    private readonly company: Pick<ICompany, 'id' | 'name' | 'domain' | 'email'>
 
     static associate (models: any): any {
-
+      CompanyProductAccessControlGroup.belongsTo(models.Company, {
+        foreignKey: 'companyId',
+        as: 'company',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): ICompanyProductAccessControlGroup {
       return {
         id: this.id,
         createdAt: this.createdAt,
-        updatedAt: this.updatedAt
+        updatedAt: this.updatedAt,
+        company: this.company
       }
     }
   };
