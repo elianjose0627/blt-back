@@ -33,6 +33,9 @@ const companyUserGroupRoutes = (): Router => {
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateUserCompanyUserGroup
     }), asyncHandler(UserInCompanyUserGroupController.insert))
+    .get(asyncHandler(checkAdmin), celebrate({
+      [Segments.QUERY]: validator.validateQueryParams
+    }), asyncHandler(paginate), asyncHandler(UserInCompanyUserGroupController.getAllInCompanyUserGroup))
   return companyUserGroupRouter
 }
 

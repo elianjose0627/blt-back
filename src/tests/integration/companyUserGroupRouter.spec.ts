@@ -427,4 +427,87 @@ describe('Product Access Control Group actions', () => {
       expect(res.body.userCompanyUserGroup.updated).to.be.an('array').lengthOf(1)
     })
   })
+
+  describe('Get all users from a company user group', () => {
+    it('Should return 200 OK when an administrator gets all users of a company user group by id.', async () => {
+      const resNewUser = await createVerifiedUser('user444@accesscontrolusergroup4.com', '1234567890')
+      const userId = resNewUser.id
+
+      const resNewCompany = await createVerifiedCompany(userId, true, null, 'Access Control', 'user444@accesscontrolusergroup4.com', 'accesscontrolusergroup.com')
+      const companyId = resNewCompany.id
+      const resCompanyUserGroup = await chai
+        .request(app)
+        .post('/api/company-user-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          companyUserGroup: {
+            name: 'Test Company Prime User Group Forty Four Four',
+            companyId
+          }
+        })
+
+      const companyUserGroupId = String(resCompanyUserGroup.body.companyUserGroup.id)
+
+      await chai
+        .request(app)
+        .post(`/api/company-user-groups/${companyUserGroupId}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          userCompanyUserGroup: {
+            userIds: [userId]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/company-user-groups/${String(companyUserGroupId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'companyUserGroupUsers')
+      expect(res.body.companyUserGroupUsers).to.be.an('array').lengthOf(1)
+    })
+
+    it('Should return 200 OK when an administrator gets all users of a company user group by id with search params.', async () => {
+      const resNewUser = await createVerifiedUser('user4442@accesscontrolusergroup4.com', '1234567890')
+      const userId = resNewUser.id
+
+      const resNewCompany = await createVerifiedCompany(userId, true, null, 'Access Control', 'user4442@accesscontrolusergroup4.com', 'accesscontrolusergroup.com')
+      const companyId = resNewCompany.id
+      const resCompanyUserGroup = await chai
+        .request(app)
+        .post('/api/company-user-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          companyUserGroup: {
+            name: 'Test Company Prime User Group Forty Four Four 2',
+            companyId
+          }
+        })
+
+      const companyUserGroupId = String(resCompanyUserGroup.body.companyUserGroup.id)
+
+      await chai
+        .request(app)
+        .post(`/api/company-user-groups/${companyUserGroupId}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          userCompanyUserGroup: {
+            userIds: [userId]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/company-user-groups/${String(companyUserGroupId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .query({
+          search: 'user4442@accesscontrolusergroup4.com'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'companyUserGroupUsers')
+      expect(res.body.companyUserGroupUsers).to.be.an('array').lengthOf(1)
+    })
+  })
 })

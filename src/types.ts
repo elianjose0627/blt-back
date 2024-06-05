@@ -427,7 +427,7 @@ export interface ICompanyUserGroup {
   name: string
   description: string
   company: ICompany
-  users: IUser[]
+  users?: IUser[]
   accessControlGroups: IProductAccessControlGroup[]
   createdAt: Date
   updatedAt: Date
@@ -438,6 +438,7 @@ export interface IUserCompanyUserGroup {
   userId?: string
   createdAt: Date
   updatedAt: Date
+  user: Pick<IUser, 'id' | 'firstName' | 'lastName' | 'email'>
 }
 export interface ICompanyUserGroupInProductAccessControlGroup {
   id: string

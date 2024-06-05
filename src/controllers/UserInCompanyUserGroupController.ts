@@ -27,6 +27,24 @@ class UserInCompanyUserGroupController extends BaseController {
       [this.recordName()]: response
     })
   }
+
+  async getAllInCompanyUserGroup (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { query: { limit, page, offset, search }, params: { id } } = req
+    const records = await userInCompanyUserGroupService.getAllInCompanyUserGroup(limit, offset, id, search)
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / limit),
+      perPage: limit,
+      page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      [userInCompanyUserGroupService.manyRecords()]: records.rows
+    })
+  }
 }
 
 export default new UserInCompanyUserGroupController(userInCompanyUserGroupService)

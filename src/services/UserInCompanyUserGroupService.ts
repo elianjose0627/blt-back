@@ -9,6 +9,10 @@ class UserInCompanyUserGroupService extends BaseService {
     return 'User in Company User Group'
   }
 
+  manyRecords (): string {
+    return 'companyUserGroupUsers'
+  }
+
   async insert (data: any): Promise<any> {
     const { userIds, companyUserGroupId } = data
     let updated = []
@@ -63,6 +67,44 @@ class UserInCompanyUserGroupService extends BaseService {
     }
 
     return { response: { updated, added }, status: 200 }
+  }
+
+  async getAllInCompanyUserGroup (limit: number, offset: number, companyUserGroupId: string, search?: string): Promise<any> {
+    let where
+
+    if (search !== undefined) {
+      where = {
+        [Op.or]: [
+          { firstName: { [Op.iLike]: `%${search}%` } },
+          { lastName: { [Op.iLike]: `%${search}%` } },
+          { email: { [Op.iLike]: `%${search}%` } }
+        ]
+      }
+    }
+
+    const records = await db[this.model].findAndCountAll({
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+      attributes: { exclude: [] },
+      where: {
+        companyUserGroupId
+      },
+      include: [
+        {
+          model: db.User,
+          as: 'user',
+          attributes: ['id', 'firstName', 'lastName', 'email'],
+          where
+        }
+      ],
+      distinct: true
+    })
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
   }
 }
 
