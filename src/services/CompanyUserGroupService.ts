@@ -32,26 +32,9 @@ class CompanyUserGroupService extends BaseService {
       where,
       include: [
         {
-          model: db.User,
-          as: 'users',
-          attributes: ['id', 'firstName', 'lastName', 'email'],
-          through: {
-            as: 'userCompanyUserGroup',
-            attributes: ['id']
-          }
-        },
-        {
           model: db.Company,
           as: 'company',
           attributes: ['id', 'name', 'email', 'domain']
-        },
-        {
-          model: db.ProductAccessControlGroup,
-          as: 'accessControlGroups',
-          attributes: ['id', 'name'],
-          through: {
-            attributes: []
-          }
         }
       ]
     })

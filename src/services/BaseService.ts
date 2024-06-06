@@ -279,49 +279,6 @@ export const generateInclude = (model: string): any => {
           model: db.Company,
           attributes: ['id', 'name', 'suffix', 'email', 'domain'],
           as: 'company'
-        },
-        {
-          model: db.ProductCategoryTag,
-          as: 'productCategoryTags',
-          attributes: ['id', 'name', 'type'],
-          through: {
-            as: 'categoryTagProductAccessControlGroup',
-            attributes: ['id']
-          }
-        },
-        {
-          model: db.User,
-          as: 'users',
-          attributes: ['id', 'firstName', 'lastName', 'email'],
-          through: {
-            as: 'userProductAccessControlGroup',
-            attributes: ['id']
-          }
-        },
-        {
-          model: db.Company,
-          as: 'companies',
-          attributes: ['id', 'name', 'email', 'domain'],
-          through: {
-            as: 'companyProductAccessControlGroup',
-            attributes: ['id']
-          }
-        },
-        {
-          model: db.CompanyUserGroup,
-          as: 'companyUserGroups',
-          attributes: ['id', 'name'],
-          through: {
-            as: 'companyUserGroupProductAccessControlGroup',
-            attributes: ['id']
-          },
-          include: [
-            {
-              model: db.Company,
-              attributes: ['name', 'domain'],
-              as: 'company'
-            }
-          ]
         }
       ]
     )
@@ -329,18 +286,17 @@ export const generateInclude = (model: string): any => {
   if (model === 'CompanyUserGroup') {
     return [
       {
-        model: db.User,
-        as: 'users',
-        attributes: ['id', 'firstName', 'lastName', 'email'],
-        through: {
-          as: 'userCompanyUserGroup',
-          attributes: ['id']
-        }
-      },
-      {
         model: db.Company,
         as: 'company',
         attributes: ['id', 'name', 'email', 'domain']
+      },
+      {
+        model: db.ProductAccessControlGroup,
+        as: 'accessControlGroups',
+        attributes: ['id', 'name'],
+        through: {
+          attributes: []
+        }
       }
     ]
   }
