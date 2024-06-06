@@ -9,6 +9,10 @@ class CompanyInProductAccessControlGroupService extends BaseService {
     return 'Company in Product Access Control Group'
   }
 
+  manyRecords (): string {
+    return 'productAccessControlGroupCompanies'
+  }
+
   async insert (data: any): Promise<any> {
     const { companyIds, productAccessControlGroupId } = data
     let updated = []
@@ -63,6 +67,44 @@ class CompanyInProductAccessControlGroupService extends BaseService {
     }
 
     return { response: { updated, added }, status: 200 }
+  }
+
+  async getAllCompaniesInProductAccessControlGroup (limit: number, offset: number, productAccessControlGroupId: string, search?: string): Promise<any> {
+    let where
+
+    if (search !== undefined) {
+      where = {
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${search}%` } },
+          { domain: { [Op.iLike]: `%${search}%` } },
+          { email: { [Op.iLike]: `%${search}%` } }
+        ]
+      }
+    }
+
+    const records = await db[this.model].findAndCountAll({
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+      attributes: { exclude: [] },
+      where: {
+        productAccessControlGroupId
+      },
+      include: [
+        {
+          model: db.Company,
+          as: 'company',
+          attributes: ['id', 'name', 'domain', 'email'],
+          where
+        }
+      ],
+      distinct: true
+    })
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
   }
 }
 

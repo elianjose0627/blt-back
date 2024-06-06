@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { ICompany, ICompanyUserGroup, IProductAccessControlGroup, IProductCategoryTag, IUser } from '../types'
+import type { ICompany, IProductAccessControlGroup } from '../types'
 
 const ProductAccessControlGroupModel = (sequelize: any, DataTypes: any): any => {
   interface ProductAccessControlGroupAttributes {
@@ -15,10 +15,6 @@ const ProductAccessControlGroupModel = (sequelize: any, DataTypes: any): any => 
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany | null
-    private readonly productCategoryTags: IProductCategoryTag[]
-    private readonly users: IUser[]
-    private readonly companies: ICompany[]
-    private readonly companyUserGroups: ICompanyUserGroup[]
 
     static associate (models: any): any {
       ProductAccessControlGroup.belongsToMany(models.User, {
@@ -48,18 +44,14 @@ const ProductAccessControlGroupModel = (sequelize: any, DataTypes: any): any => 
       })
     }
 
-    toJSONFor (): IProductAccessControlGroup {
+    toJSONFor (): Omit<IProductAccessControlGroup, 'productCategoryTags' | 'users' | 'companies' | 'companyUserGroups'> {
       return {
         id: this.id,
         name: this.name,
         description: this.description,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
-        company: this.company,
-        productCategoryTags: this.productCategoryTags,
-        users: this.users,
-        companies: this.companies,
-        companyUserGroups: this.companyUserGroups
+        company: this.company
       }
     }
   };

@@ -687,7 +687,10 @@ const validateCardTemplate = Joi.object({
     back: Joi.string().allow('').max(5000).allow(null).required(),
     frontOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape']),
     backOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape']),
-    isDraft: Joi.boolean().optional().default(true)
+    isDraft: Joi.boolean().optional().default(true),
+    articleId: Joi.string().allow('').allow(null),
+    eanBarcode: Joi.string().regex(/^\d{8}(\d{4}|\d{5}|\d{6})?$/).allow('').allow(null),
+    upcBarcode: Joi.string().regex(/^\d{8}(\d{4}|\d{5}|\d{6})?$/).allow('').allow(null)
   }).required()
 }).required()
 
@@ -703,7 +706,9 @@ const validateCardSetting = Joi.object({
     exportOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape']),
     exportSides: Joi.string().allow('').allow(null).valid('both', 'front', 'back'),
     supplierEmail: Joi.string().email().allow(null),
-    articleId: Joi.string().allow('').allow(null)
+    articleId: Joi.string().allow('').allow(null),
+    eanBarcode: Joi.string().regex(/^\d{8}(\d{4}|\d{5}|\d{6})?$/).allow('').allow(null),
+    upcBarcode: Joi.string().regex(/^\d{8}(\d{4}|\d{5}|\d{6})?$/).allow('').allow(null)
   }).required()
 }).required()
 

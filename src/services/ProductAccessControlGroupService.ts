@@ -1,4 +1,5 @@
 import { v1 as uuidv1 } from 'uuid'
+import { Op } from 'sequelize'
 import BaseService from './BaseService'
 import db from '../models'
 
@@ -11,61 +12,28 @@ class ProductAccessControlGroupService extends BaseService {
     return 'Product Access Control Group'
   }
 
-  async getAll (limit: number, offset: number): Promise<any> {
+  async getAll (limit: number, offset: number, search?: string): Promise<any> {
+    let where
+
+    if (search !== undefined) {
+      where = {
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${search}%` } }
+        ]
+      }
+    }
     const records = await db[this.model].findAndCountAll({
       limit,
       offset,
       order: [['createdAt', 'DESC']],
       attributes: { exclude: [] },
+      where,
       distinct: true,
       include: [
         {
           model: db.Company,
           attributes: ['id', 'name', 'suffix', 'email', 'domain'],
           as: 'company'
-        },
-        {
-          model: db.ProductCategoryTag,
-          as: 'productCategoryTags',
-          attributes: ['id', 'name', 'type'],
-          through: {
-            as: 'categoryTagProductAccessControlGroup',
-            attributes: ['id']
-          }
-        },
-        {
-          model: db.User,
-          as: 'users',
-          attributes: ['id', 'firstName', 'lastName', 'email'],
-          through: {
-            as: 'userProductAccessControlGroup',
-            attributes: ['id']
-          }
-        },
-        {
-          model: db.Company,
-          as: 'companies',
-          attributes: ['id', 'name', 'email', 'domain'],
-          through: {
-            as: 'companyProductAccessControlGroup',
-            attributes: ['id']
-          }
-        },
-        {
-          model: db.CompanyUserGroup,
-          as: 'companyUserGroups',
-          attributes: ['id', 'name'],
-          through: {
-            as: 'companyUserGroupProductAccessControlGroup',
-            attributes: ['id']
-          },
-          include: [
-            {
-              model: db.Company,
-              attributes: ['name', 'domain'],
-              as: 'company'
-            }
-          ]
         }
       ]
     })

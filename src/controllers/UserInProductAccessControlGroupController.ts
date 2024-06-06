@@ -27,6 +27,24 @@ class UserInProductAccessControlGroupController extends BaseController {
       [this.recordName()]: response
     })
   }
+
+  async getAllUsersInProductAccessControlGroup (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { query: { limit, page, offset, search }, params: { id } } = req
+    const records = await userInProductAccessControlGroupService.getAllUsersInProductAccessControlGroup(limit, offset, id, search)
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / limit),
+      perPage: limit,
+      page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      [userInProductAccessControlGroupService.manyRecords()]: records.rows
+    })
+  }
 }
 
 export default new UserInProductAccessControlGroupController(userInProductAccessControlGroupService)

@@ -427,7 +427,7 @@ export interface ICompanyUserGroup {
   name: string
   description: string
   company: ICompany
-  users: IUser[]
+  users?: IUser[]
   accessControlGroups: IProductAccessControlGroup[]
   createdAt: Date
   updatedAt: Date
@@ -438,6 +438,7 @@ export interface IUserCompanyUserGroup {
   userId?: string
   createdAt: Date
   updatedAt: Date
+  user: Pick<IUser, 'id' | 'firstName' | 'lastName' | 'email'>
 }
 export interface ICompanyUserGroupInProductAccessControlGroup {
   id: string
@@ -445,6 +446,7 @@ export interface ICompanyUserGroupInProductAccessControlGroup {
   companyUserGroupId?: string
   createdAt: Date
   updatedAt: Date
+  companyUserGroup: Pick<ICompanyUserGroup, 'id' | 'name' & { company: { id: string, name: string, domain: string }}>
 }
 export interface IUserInProductAccessControlGroup {
   id: string
@@ -452,6 +454,7 @@ export interface IUserInProductAccessControlGroup {
   userId?: string
   createdAt: Date
   updatedAt: Date
+  user: Pick<IUser, 'id' | 'firstName' | 'lastName' | 'email'>
 }
 export interface ICompanyProductAccessControlGroup {
   id: string
@@ -459,6 +462,7 @@ export interface ICompanyProductAccessControlGroup {
   companyId?: string
   createdAt: Date
   updatedAt: Date
+  company: Pick<ICompany, 'id' | 'name' | 'domain' | 'email'>
 }
 export interface IProductCategoryTagInProductAccessControlGroup {
   id: string
@@ -466,6 +470,7 @@ export interface IProductCategoryTagInProductAccessControlGroup {
   productCategoryTagId?: string
   createdAt: Date
   updatedAt: Date
+  productCategoryTag: Pick<IProductCategoryTag, 'id' | 'name' | 'type'> & { productCategory: { id: string, name: string }}
 }
 export interface IProduct {
   id: string
@@ -922,6 +927,9 @@ export interface ICardTemplate {
   back: string
   frontOrientation: string
   backOrientation: string
+  articleId: string | null
+  eanBarcode: string | null
+  upcBarcode: string | null
   createdAt: Date
   updatedAt: Date
 }
@@ -938,7 +946,9 @@ export interface ICardSetting {
   exportOrientation: 'portrait' | 'landscape'
   exportSides: 'both' | 'front' | 'back'
   supplierEmail: string
-  articleId: string
+  articleId: string | null
+  eanBarcode: string | null
+  upcBarcode: string | null
   createdAt: Date
   updatedAt: Date
 }

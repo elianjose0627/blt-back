@@ -9,6 +9,10 @@ class ProductCategoryTagInProductAccessControlGroupService extends BaseService {
     return 'Product Category Tag in Product Access Control Group'
   }
 
+  manyRecords (): string {
+    return 'productAccessControlGroupProductCategoryTags'
+  }
+
   async insert (data: any): Promise<any> {
     const { productCategoryTagIds, productAccessControlGroupId } = data
     let updated = []
@@ -63,6 +67,50 @@ class ProductCategoryTagInProductAccessControlGroupService extends BaseService {
     }
 
     return { response: { updated, added }, status: 200 }
+  }
+
+  async getAllProductCategoryTagsInProductAccessControlGroup (limit: number, offset: number, productAccessControlGroupId: string, search?: string): Promise<any> {
+    let where
+
+    if (search !== undefined) {
+      where = {
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${search}%` } },
+          { type: { [Op.iLike]: `%${search}%` } }
+        ]
+      }
+    }
+
+    const records = await db[this.model].findAndCountAll({
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+      attributes: { exclude: [] },
+      where: {
+        productAccessControlGroupId
+      },
+      include: [
+        {
+          model: db.ProductCategoryTag,
+          as: 'productCategoryTag',
+          attributes: ['id', 'name', 'type'],
+          where,
+          include: [
+            {
+              model: db.ProductCategory,
+              attributes: ['id', 'name'],
+              as: 'productCategory'
+            }
+          ]
+        }
+      ],
+      distinct: true
+    })
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
   }
 }
 
