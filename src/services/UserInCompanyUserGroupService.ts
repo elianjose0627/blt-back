@@ -69,7 +69,7 @@ class UserInCompanyUserGroupService extends BaseService {
     return { response: { updated, added }, status: 200 }
   }
 
-  async getAllInCompanyUserGroup (limit: number, offset: number, companyUserGroupId: string, search?: string): Promise<any> {
+  async getAllUsersInCompanyUserGroup (limit: number, offset: number, companyUserGroupId: string, search?: string): Promise<any> {
     let where
 
     if (search !== undefined) {

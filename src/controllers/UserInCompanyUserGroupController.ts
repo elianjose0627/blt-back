@@ -28,9 +28,9 @@ class UserInCompanyUserGroupController extends BaseController {
     })
   }
 
-  async getAllInCompanyUserGroup (req: CustomRequest, res: CustomResponse): Promise<any> {
+  async getAllUsersInCompanyUserGroup (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { query: { limit, page, offset, search }, params: { id } } = req
-    const records = await userInCompanyUserGroupService.getAllInCompanyUserGroup(limit, offset, id, search)
+    const records = await userInCompanyUserGroupService.getAllUsersInCompanyUserGroup(limit, offset, id, search)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),
