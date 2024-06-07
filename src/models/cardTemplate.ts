@@ -12,8 +12,7 @@ const CardTemplateModel = (sequelize: any, DataTypes: any): any => {
     frontOrientation: string
     backOrientation: string
     articleId: string | null
-    eanBarcode: string | null
-    upcBarcode: string | null
+    isBarcodeEnabled: boolean
   }
 
   class CardTemplate extends Model<CardTemplateAttributes> {
@@ -26,8 +25,7 @@ const CardTemplateModel = (sequelize: any, DataTypes: any): any => {
     private readonly backOrientation: string
     private readonly isDraft: boolean
     private readonly articleId: string | null
-    private readonly eanBarcode: string | null
-    private readonly upcBarcode: string | null
+    private readonly isBarcodeEnabled: boolean
     private readonly createdAt: Date
     private readonly updatedAt: Date
 
@@ -50,8 +48,7 @@ const CardTemplateModel = (sequelize: any, DataTypes: any): any => {
         backOrientation: this.backOrientation,
         isDraft: this.isDraft,
         articleId: this.articleId,
-        eanBarcode: this.eanBarcode,
-        upcBarcode: this.upcBarcode,
+        isBarcodeEnabled: this.isBarcodeEnabled,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       }
@@ -96,13 +93,10 @@ const CardTemplateModel = (sequelize: any, DataTypes: any): any => {
       type: DataTypes.STRING,
       allowNull: true
     },
-    eanBarcode: {
-      type: DataTypes.STRING,
-      allowNull: true
-    },
-    upcBarcode: {
-      type: DataTypes.STRING,
-      allowNull: true
+    isBarcodeEnabled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
     }
   }, {
     sequelize,
