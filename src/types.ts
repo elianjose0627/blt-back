@@ -929,6 +929,8 @@ export interface ICardTemplate {
   backOrientation: string
   articleId: string | null
   isBarcodeEnabled: boolean
+  eanBarcode: string | null
+  upcBarcode: string | null
   createdAt: Date
   updatedAt: Date
 }
@@ -947,6 +949,8 @@ export interface ICardSetting {
   supplierEmail: string
   articleId: string | null
   isBarcodeEnabled: boolean
+  eanBarcode: string | null
+  upcBarcode: string | null
   createdAt: Date
   updatedAt: Date
 }
