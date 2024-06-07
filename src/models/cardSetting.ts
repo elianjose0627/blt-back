@@ -15,8 +15,7 @@ const CardSettingModel = (sequelize: any, DataTypes: any): any => {
     exportSides: 'both' | 'front' | 'back'
     supplierEmail: string
     articleId: string | null
-    eanBarcode: string | null
-    upcBarcode: string | null
+    isBarcodeEnabled: boolean
   }
 
   class CardSetting extends Model<CardSettingAttributes> {
@@ -32,8 +31,7 @@ const CardSettingModel = (sequelize: any, DataTypes: any): any => {
     private readonly exportSides: 'both' | 'front' | 'back'
     private readonly supplierEmail: string
     private readonly articleId: string | null
-    private readonly eanBarcode: string | null
-    private readonly upcBarcode: string | null
+    private readonly isBarcodeEnabled: boolean
     private readonly createdAt: Date
     private readonly updatedAt: Date
 
@@ -59,8 +57,7 @@ const CardSettingModel = (sequelize: any, DataTypes: any): any => {
         exportSides: this.exportSides,
         supplierEmail: this.supplierEmail,
         articleId: this.articleId,
-        eanBarcode: this.eanBarcode,
-        upcBarcode: this.upcBarcode,
+        isBarcodeEnabled: this.isBarcodeEnabled,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       }
@@ -117,13 +114,10 @@ const CardSettingModel = (sequelize: any, DataTypes: any): any => {
       type: DataTypes.STRING,
       allowNull: true
     },
-    eanBarcode: {
-      type: DataTypes.STRING,
-      allowNull: true
-    },
-    upcBarcode: {
-      type: DataTypes.STRING,
-      allowNull: true
+    isBarcodeEnabled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
     }
   }, {
     sequelize,
