@@ -690,8 +690,12 @@ const validateCardTemplate = Joi.object({
     isDraft: Joi.boolean().optional().default(true),
     articleId: Joi.string().allow('').allow(null),
     isBarcodeEnabled: Joi.boolean().optional().default(true),
-    eanBarcode: Joi.string().regex(/^\d{8}(\d{5}|\d{6})?$/).allow('').allow(null),
-    upcBarcode: Joi.string().regex(/^\d{8}(\d{4})?$/).allow('').allow(null)
+    eanBarcode: Joi.string().regex(/^\d{8}(\d{5}|\d{6})?$/).messages({
+      'string.pattern.base': '{#label} must be a valid EAN barcode'
+    }).allow('').allow(null),
+    upcBarcode: Joi.string().regex(/^\d{8}(\d{4})?$/).messages({
+      'string.pattern.base': '{#label} must be a valid UPC barcode'
+    }).allow('').allow(null)
   }).required()
 }).required()
 
@@ -709,8 +713,12 @@ const validateCardSetting = Joi.object({
     supplierEmail: Joi.string().email().allow(null),
     articleId: Joi.string().allow('').allow(null),
     isBarcodeEnabled: Joi.boolean().optional().default(true),
-    eanBarcode: Joi.string().regex(/^\d{8}(\d{5}|\d{6})?$/).allow('').allow(null),
-    upcBarcode: Joi.string().regex(/^\d{8}(\d{4})?$/).allow('').allow(null)
+    eanBarcode: Joi.string().regex(/^\d{8}(\d{5}|\d{6})?$/).messages({
+      'string.pattern.base': '{#label} must be a valid EAN barcode'
+    }).allow('').allow(null),
+    upcBarcode: Joi.string().regex(/^\d{8}(\d{4})?$/).allow('').messages({
+      'string.pattern.base': '{#label} must be a valid UPC barcode'
+    }).allow(null)
   }).required()
 }).required()
 
