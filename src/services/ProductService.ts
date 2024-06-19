@@ -7,6 +7,7 @@ import axios from 'axios'
 import { IProduct, IUser } from '../types'
 import { Literal } from 'sequelize/types/utils'
 import * as userRoles from '../utils/userRoles'
+import { productDefaultColumns, productSelectedColumns } from '../utils/selectOptions'
 
 const baseURL = process.env.JTL_API_URL as string
 
@@ -56,7 +57,7 @@ const generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties = (f
       {
         model: db.ProductCategory,
         attributes: {
-          exclude: ['deletedAt']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt']
         },
         as: 'productCategory',
         where: filterCategory,
@@ -65,7 +66,7 @@ const generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties = (f
       {
         model: db.Product,
         attributes: {
-          exclude: ['deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId']
         },
         as: 'children',
         include: [
@@ -95,7 +96,7 @@ const generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties = (f
       {
         model: db.ProductGraduatedPrice,
         attributes: {
-          exclude: ['deletedAt', 'productId']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId']
         },
         as: 'graduatedPrices'
       },
@@ -160,7 +161,8 @@ class ProductService extends BaseService {
   async getAllForCompany (
     limit: number, offset: number, companyId: string, search: string = '',
     filter = { isParent: false, category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tags: '', showChildren: 'true', price: '' },
-    orderBy = { name: '', createdAt: '', price: '' }
+    orderBy = { name: '', createdAt: '', price: '' },
+    select = productSelectedColumns
   ): Promise<any> {
     const { category, minPrice = 0, maxPrice = 0, color, material, size, tags, showChildren, price = '' } = filter
 
@@ -178,7 +180,7 @@ class ProductService extends BaseService {
     }
     const whereFilterShowChildren = showChildren === 'false' ? { parentId: { [Op.eq]: null } } : {}
 
-    const attributes: any = { exclude: [] }
+    const attributes = select.replace(/\s+/g, '').split(',').concat(productDefaultColumns)
     const include: any[] = [
       ...generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties(whereFilterCategory, whereFilterColor, whereFilterMaterial, whereFilterSize),
       {
@@ -247,7 +249,8 @@ class ProductService extends BaseService {
   async getAll (
     limit: number, offset: number, search: string = '',
     filter = { isParent: 'true, false', category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tags: '', showChildren: 'true', price: '' },
-    orderBy = { name: '', createdAt: '', price: '' }
+    orderBy = { name: '', createdAt: '', price: '' },
+    select = productSelectedColumns
   ): Promise<any> {
     const {
       isParent = 'true, false', category, minPrice = 0, maxPrice = 0,
@@ -265,7 +268,7 @@ class ProductService extends BaseService {
     let whereFilterPrice: any = {}
     const whereFilterShowChildren = showChildren === 'false' ? { parentId: { [Op.eq]: null } } : {}
 
-    const attributes: any = { exclude: [] }
+    const attributes = select.replace(/\s+/g, '').split(',').concat(productDefaultColumns)
     const include: any[] = [
       {
         model: db.Company,
@@ -279,7 +282,7 @@ class ProductService extends BaseService {
           {
             model: db.ProductCategoryTag,
             attributes: {
-              exclude: ['deletedAt', 'productCategoryId']
+              exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productCategoryId']
             },
             as: 'productCategoryTag'
           }
@@ -287,7 +290,7 @@ class ProductService extends BaseService {
         whereFilterTags,
         required: Object.keys(whereFilterTags).length > 0,
         attributes: {
-          exclude: ['deletedAt', 'productId', 'productCategoryTagId']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId', 'productCategoryTagId']
         },
         as: 'productTags'
       }
@@ -340,7 +343,8 @@ class ProductService extends BaseService {
     user: IUser,
     limit: number, offset: number, search: string = '',
     filter = { isParent: 'true, false', category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tags: '', showChildren: 'true', price: '' },
-    orderBy = { name: '', createdAt: '', price: '' }
+    orderBy = { name: '', createdAt: '', price: '' },
+    select = productSelectedColumns
   ): Promise<any> {
     const {
       isParent = 'true, false', category, minPrice = 0, maxPrice = 0,
@@ -360,7 +364,7 @@ class ProductService extends BaseService {
     let whereFilterPrice: any = {}
     const whereFilterShowChildren = showChildren === 'false' ? { parentId: { [Op.eq]: null } } : {}
 
-    const attributes: any = { exclude: [] }
+    const attributes = select.replace(/\s+/g, '').split(',').concat(productDefaultColumns)
     const extrafilterTag = {
       [Op.and]: [
         whereFilterTags,
@@ -385,7 +389,7 @@ class ProductService extends BaseService {
           {
             model: db.ProductCategoryTag,
             attributes: {
-              exclude: ['deletedAt', 'productCategoryId']
+              exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productCategoryId']
             },
             as: 'productCategoryTag'
           }
@@ -393,7 +397,7 @@ class ProductService extends BaseService {
         where: role === userRoles.ADMIN ? whereFilterTags : extrafilterTag,
         required: role === userRoles.ADMIN ? (Object.keys(whereFilterTags).length > 0) : true,
         attributes: {
-          exclude: ['deletedAt', 'productId', 'productCategoryTagId']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId', 'productCategoryTagId']
         },
         as: 'productTags'
       }

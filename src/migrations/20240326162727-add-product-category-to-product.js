@@ -4,7 +4,11 @@ module.exports = {
     return Promise.all([
       queryInterface.addColumn('Products', 'productCategoryId', {
         type: Sequelize.UUID,
-        allowNull: true
+        allowNull: true,
+        references: {
+          model: 'ProductCategories',
+          key: 'id'
+        }
       })
     ])
   },

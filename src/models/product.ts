@@ -1,5 +1,12 @@
 import { Model } from 'sequelize'
-import type { ICompany, IProduct, IProductCategory, IProductTag, IProductColor, IProductGraduatedPrice, IProductMaterial, IProductPicture, IProductSize, NetRetailPrice, ProductType } from '../types'
+import type {
+  ICompany, IProduct, IProductCategory,
+  IProductTag, IProductColor, IProductGraduatedPrice,
+  IProductMaterial, IProductPicture, IProductSize,
+  NetRetailPrice, ProductType, Nullable,
+  IMassUnit, ISalesUnit, ITaxRate,
+  IProductDetail
+} from '../types'
 
 const ProductModel = (sequelize: any, DataTypes: any): any => {
   interface ProductAttributes {
@@ -14,6 +21,18 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     pictures: IProductPicture[]
     isVisible: boolean
     isParent: boolean
+    recommendedNetSalePrice: number
+    shippingWeight: number
+    weight: number
+    barcode: Nullable<string>
+    upc: Nullable<string>
+    taric: Nullable<string>
+    originCountry: Nullable<string>
+    bestBeforeDate: Boolean
+    serialNumberTracking: Boolean
+    width: number
+    height: number
+    length: number
   }
 
   class Product extends Model<ProductAttributes> {
@@ -37,6 +56,22 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     private readonly productColor: IProductColor
     private readonly productMaterial: IProductMaterial
     private readonly productSize: IProductSize
+    private readonly recommendedNetSalePrice: number
+    private readonly shippingWeight: number
+    private readonly weight: number
+    private readonly barcode: Nullable<string>
+    private readonly upc: Nullable<string>
+    private readonly taric: Nullable<string>
+    private readonly originCountry: Nullable<string>
+    private readonly bestBeforeDate: Boolean
+    private readonly serialNumberTracking: Boolean
+    private readonly width: number
+    private readonly height: number
+    private readonly productLength: number
+    private readonly massUnit: IMassUnit
+    private readonly salesUnit: ISalesUnit
+    private readonly taxRate: ITaxRate
+    private readonly metadata: IProductDetail
 
     static associate (models: any): any {
       Product.belongsTo(models.Company, {
@@ -79,6 +114,26 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         as: 'productSize',
         onDelete: 'SET NULL'
       })
+      Product.belongsTo(models.MassUnit, {
+        foreignKey: 'massUnitId',
+        as: 'massUnit',
+        onDelete: 'SET NULL'
+      })
+      Product.belongsTo(models.SalesUnit, {
+        foreignKey: 'salesUnitId',
+        as: 'salesUnit',
+        onDelete: 'SET NULL'
+      })
+      Product.belongsTo(models.TaxRate, {
+        foreignKey: 'taxRateId',
+        as: 'taxRate',
+        onDelete: 'SET NULL'
+      })
+      Product.belongsTo(models.ProductDetail, {
+        foreignKey: 'productDetailId',
+        as: 'metadata',
+        onDelete: 'SET NULL'
+      })
     }
 
     toJSONFor (): IProduct {
@@ -92,8 +147,6 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         type: this.type,
         netRetailPrice: this.netRetailPrice,
         pictures: this.pictures,
-        createdAt: this.createdAt,
-        updatedAt: this.updatedAt,
         company: this.company,
         productCategory: this.productCategory,
         productTags: this.productTags,
@@ -102,7 +155,25 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         graduatedPrices: this.graduatedPrices,
         productColor: this.productColor,
         productMaterial: this.productMaterial,
-        productSize: this.productSize
+        productSize: this.productSize,
+        recommendedNetSalePrice: this.recommendedNetSalePrice,
+        shippingWeight: this.shippingWeight,
+        weight: this.weight,
+        barcode: this.barcode,
+        upc: this.upc,
+        taric: this.taric,
+        originCountry: this.originCountry,
+        bestBeforeDate: this.bestBeforeDate,
+        serialNumberTracking: this.serialNumberTracking,
+        width: this.width,
+        height: this.height,
+        length: this.productLength,
+        massUnit: this.massUnit,
+        salesUnit: this.salesUnit,
+        taxRate: this.taxRate,
+        metadata: this.metadata,
+        createdAt: this.createdAt,
+        updatedAt: this.updatedAt
       }
     }
   };
@@ -157,6 +228,60 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     isParent: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
+    },
+    recommendedNetSalePrice: {
+      allowNull: false,
+      defaultValue: 0.00,
+      type: DataTypes.DOUBLE
+    },
+    shippingWeight: {
+      allowNull: false,
+      defaultValue: 0.00,
+      type: DataTypes.DOUBLE
+    },
+    weight: {
+      allowNull: false,
+      defaultValue: 0.00,
+      type: DataTypes.DOUBLE
+    },
+    barcode: {
+      allowNull: true,
+      type: DataTypes.STRING
+    },
+    upc: {
+      allowNull: true,
+      type: DataTypes.STRING
+    },
+    taric: {
+      allowNull: true,
+      type: DataTypes.STRING
+    },
+    originCountry: {
+      allowNull: true,
+      type: DataTypes.STRING
+    },
+    bestBeforeDate: {
+      defaultValue: false,
+      type: DataTypes.BOOLEAN
+    },
+    serialNumberTracking: {
+      defaultValue: false,
+      type: DataTypes.BOOLEAN
+    },
+    width: {
+      allowNull: false,
+      defaultValue: 0.00,
+      type: DataTypes.DOUBLE
+    },
+    height: {
+      allowNull: false,
+      defaultValue: 0.00,
+      type: DataTypes.DOUBLE
+    },
+    length: {
+      allowNull: false,
+      defaultValue: 0.00,
+      type: DataTypes.DOUBLE
     }
   }, {
     sequelize,

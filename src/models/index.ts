@@ -61,6 +61,10 @@ export interface Database {
   CompanyUserGroup?: any
   UserCompanyUserGroup?: any
   CompanyUserGroupProductAccessControlGroup?: any
+  MassUnit?: any
+  SalesUnit?: any
+  TaxRate?: any
+  ProductDetail?: any
   [key: string]: any
 }
 

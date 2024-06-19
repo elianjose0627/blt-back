@@ -134,13 +134,13 @@ class ProductController extends BaseController {
   }
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { query: { limit, page, offset, search, filter, orderBy }, accessProductCategoryTags, user } = req
+    const { query: { limit, page, offset, search, filter, orderBy, select }, accessProductCategoryTags, user } = req
     let records
 
     if (accessProductCategoryTags === undefined) {
-      records = await productService.getAll(limit, offset, search, filter, orderBy)
+      records = await productService.getAll(limit, offset, search, filter, orderBy, select)
     } else {
-      records = await productService.getCatalogue(accessProductCategoryTags, user, limit, offset, search, filter, orderBy)
+      records = await productService.getCatalogue(accessProductCategoryTags, user, limit, offset, search, filter, orderBy, select)
     }
 
     const meta = {
@@ -159,9 +159,9 @@ class ProductController extends BaseController {
   }
 
   async getAllForCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { limit, page, offset, search, filter, orderBy } = req.query
+    const { query: { limit, page, offset, search, filter, orderBy, select } } = req
     const { id } = req.params
-    const records = await productService.getAllForCompany(limit, offset, id, search, filter, orderBy)
+    const records = await productService.getAllForCompany(limit, offset, id, search, filter, orderBy, select)
 
     const meta = {
       total: records.count,
