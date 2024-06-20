@@ -1065,6 +1065,12 @@ const validateSalesUnitUpdate = Joi.object({
   }).required()
 }).required()
 
+const validateProductCategoryProducts = Joi.object({
+  productCategory: Joi.object({
+    productIds: Joi.array().items(Joi.string().uuid().required()).min(1)
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1148,5 +1154,6 @@ export default {
   validateMassUnit,
   validateMassUnitUpdate,
   validateSalesUnit,
-  validateSalesUnitUpdate
+  validateSalesUnitUpdate,
+  validateProductCategoryProducts
 }

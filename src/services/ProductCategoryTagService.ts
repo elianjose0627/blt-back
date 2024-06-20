@@ -79,6 +79,36 @@ class ProductCategoryTagService extends BaseService {
 
     return response
   }
+
+  async getTagsOfProductCategory (limit: number, offset: number, productCategoryId: string, search?: string): Promise<any> {
+    let where
+
+    if (search !== undefined) {
+      where = {
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${search}%` } },
+          { type: { [Op.iLike]: `%${search}%` } }
+        ]
+      }
+    }
+
+    const records = await db[this.model].findAndCountAll({
+      limit,
+      offset,
+      where: {
+        ...where,
+        productCategoryId
+      },
+      order: [['createdAt', 'DESC']],
+      attributes: { exclude: [] },
+      distinct: true
+    })
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
+  }
 }
 
 export default ProductCategoryTagService

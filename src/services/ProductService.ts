@@ -528,6 +528,48 @@ class ProductService extends BaseService {
     })
     return response
   }
+
+  async updateCategoryOfProducts (ids: string[], productCategoryId: string): Promise<any> {
+    const response = await db.Product.update({ productCategoryId }, {
+      where: {
+        id: {
+          [Op.in]: ids
+        }
+      },
+      returning: ['id', 'name', 'jfsku']
+    })
+    return response
+  }
+
+  async getAllProductsOfCategory (limit: number, offset: number, productCategoryId: string, search?: string): Promise<any> {
+    let where
+
+    if (search !== undefined) {
+      where = {
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${search}%` } },
+          { jfsku: { [Op.iLike]: `%${search}%` } }
+        ]
+      }
+    }
+
+    const records = await db[this.model].findAndCountAll({
+      limit,
+      offset,
+      where: {
+        ...where,
+        productCategoryId
+      },
+      order: [['createdAt', 'DESC']],
+      attributes: ['id', 'jfsku', 'name', 'pictures'],
+      distinct: true
+    })
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
+  }
 }
 
 export default ProductService
