@@ -478,7 +478,7 @@ const validatePicture = Joi.object({
 
 const validateProduct = Joi.object({
   product: Joi.object({
-    name: Joi.string().required().max(64),
+    name: Joi.string().required().max(128),
     jfsku: Joi.string().required().max(64),
     merchantSku: Joi.string().required().max(64),
     productGroup: Joi.string().required().max(64),
@@ -493,7 +493,28 @@ const validateProduct = Joi.object({
     productColorId: Joi.string().uuid().allow(null),
     productMaterialId: Joi.string().uuid().allow(null),
     productSizeId: Joi.string().uuid().allow(null),
-    description: Joi.string().allow(null).allow('').optional()
+    description: Joi.string().max(256).allow(null).allow('').optional()
+  }).required()
+}).required()
+
+const validateProductUpdate = Joi.object({
+  product: Joi.object({
+    name: Joi.string().max(128),
+    jfsku: Joi.string().max(64),
+    merchantSku: Joi.string().max(64),
+    productGroup: Joi.string().max(64),
+    type: Joi.string().valid(...['generic', 'custom']),
+    netRetailPrice: Joi.object({
+      amount: Joi.number(),
+      currency: Joi.string().required().valid(...currencies.currencies),
+      discount: Joi.number()
+    }),
+    productCategoryId: Joi.string().uuid().allow(null).default(null),
+    isParent: Joi.boolean(),
+    productColorId: Joi.string().uuid().allow(null),
+    productMaterialId: Joi.string().uuid().allow(null),
+    productSizeId: Joi.string().uuid().allow(null),
+    description: Joi.string().max(256).allow(null).allow('').optional()
   }).required()
 }).required()
 
@@ -1106,6 +1127,7 @@ export default {
   validateTrackingId,
   validateProduct,
   validateProductAdmin,
+  validateProductUpdate,
   validateProductCompany,
   validateOrder,
   validateSecondaryDomain,

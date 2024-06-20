@@ -443,6 +443,7 @@ class BaseService {
 
   async update (record: any, data: any): Promise<any> {
     const updatedRecord = await record.update(data)
+    await updatedRecord.reload()
 
     return updatedRecord.toJSONFor()
   }

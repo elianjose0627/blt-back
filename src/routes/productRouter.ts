@@ -36,7 +36,7 @@ const ProductRoutes = (): Router => {
       asyncHandler(checkPermissions), asyncHandler(ProductController.get))
     .put(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkAdmin), celebrate({
-        [Segments.BODY]: validator.validateProduct
+        [Segments.BODY]: validator.validateProductUpdate
       }), asyncHandler(ProductController.checkProductCategory), asyncHandler(ProductController.update))
     .delete(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkAdmin), asyncHandler(ProductController.delete))
