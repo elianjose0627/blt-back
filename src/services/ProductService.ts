@@ -560,8 +560,26 @@ class ProductService extends BaseService {
         ...where,
         productCategoryId
       },
+      include: [
+        {
+          model: db.ProductTag,
+          include: [
+            {
+              model: db.ProductCategoryTag,
+              attributes: {
+                exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productCategoryId']
+              },
+              as: 'productCategoryTag'
+            }
+          ],
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId', 'productCategoryTagId']
+          },
+          as: 'productTags'
+        }
+      ],
       order: [['createdAt', 'DESC']],
-      attributes: ['id', 'jfsku', 'name', 'pictures'],
+      attributes: ['id', 'jfsku', 'name', 'pictures', 'createdAt'],
       distinct: true
     })
 
