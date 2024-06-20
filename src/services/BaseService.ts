@@ -21,7 +21,8 @@ const withoutUser = [
   'ProductColor', 'ProductMaterial', 'ProductSize',
   'ProductAccessControlGroup', 'ProductCategoryTagProductAccessControlGroup', 'UserProductAccessControlGroup',
   'CompanyProductAccessControlGroup', 'CompanyUserGroup', 'UserCompanyUserGroup',
-  'CompanyUserGroupProductAccessControlGroup'
+  'CompanyUserGroupProductAccessControlGroup', 'TaxRate', 'MassUnit',
+  'SalesUnit', 'ProductDetail'
 ]
 
 const includeCompanyAndOwner = {
@@ -158,7 +159,7 @@ export const generateInclude = (model: string): any => {
       {
         model: db.ProductCategory,
         attributes: {
-          exclude: ['deletedAt']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt']
         },
         as: 'productCategory'
       },
@@ -192,7 +193,7 @@ export const generateInclude = (model: string): any => {
       {
         model: db.Product,
         attributes: {
-          exclude: ['deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId']
         },
         as: 'children',
         include: [
@@ -222,7 +223,7 @@ export const generateInclude = (model: string): any => {
       {
         model: db.ProductGraduatedPrice,
         attributes: {
-          exclude: ['deletedAt', 'productId']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId']
         },
         as: 'graduatedPrices'
       },

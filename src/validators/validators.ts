@@ -6,6 +6,7 @@ import * as countryList from '../utils/countries'
 import * as userRoles from '../utils/userRoles'
 import * as currencies from '../utils/currencies'
 import * as appModules from '../utils/appModules'
+import { productSelectedColumns } from '../utils/selectOptions'
 
 dayjs.extend(utc)
 
@@ -225,7 +226,17 @@ const validateProductQueryParams = Joi.object({
     name: Joi.string().valid(...['asc', 'desc']),
     price: Joi.string().valid(...['asc', 'desc']),
     createdAt: Joi.string().valid(...['asc', 'desc'])
-  }).optional()
+  }).optional(),
+  select: Joi.string().custom((value, helpers) => {
+    const isValid = value.replace(/\s+/g, '').split(',')
+      .every((option: string) => productSelectedColumns.replace(/\s+/g, '').split(',').includes(option))
+
+    if (isValid === false) {
+      return helpers.error('any.invalid')
+    }
+
+    return value
+  }, 'Comma separated list validation').message(`select must be one of [${productSelectedColumns}]`)
 })
 
 const validateNotifications = Joi.object({
@@ -998,6 +1009,62 @@ const validateCompanyUserGroupProductAccessControlGroup = Joi.object({
   }).required()
 })
 
+const validateTaxRate = Joi.object({
+  taxRate: Joi.object({
+    publicId: Joi.number().required(),
+    name: Joi.string().required().max(64),
+    zone: Joi.string().required().max(64),
+    countryCode: Joi.string().length(2).allow(null),
+    rate: Joi.number().positive()
+  }).required()
+}).required()
+
+const validateTaxRateUpdate = Joi.object({
+  taxRate: Joi.object({
+    name: Joi.string().max(64),
+    zone: Joi.string().max(64),
+    countryCode: Joi.string().length(2).allow(null),
+    rate: Joi.number().positive()
+  }).required()
+}).required()
+
+const validateMassUnit = Joi.object({
+  massUnit: Joi.object({
+    publicId: Joi.number().required(),
+    name: Joi.string().required().max(64).allow(null),
+    code: Joi.string().required().max(64),
+    displayCode: Joi.string().max(64).allow(null),
+    referenceMassUnit: Joi.number(),
+    referenceMassUnitFactor: Joi.number()
+  }).required()
+}).required()
+
+const validateMassUnitUpdate = Joi.object({
+  massUnit: Joi.object({
+    name: Joi.string().max(64).allow(null),
+    code: Joi.string().max(64),
+    displayCode: Joi.string().max(64).allow(null),
+    referenceMassUnit: Joi.number(),
+    referenceMassUnitFactor: Joi.number()
+  }).required()
+}).required()
+
+const validateSalesUnit = Joi.object({
+  salesUnit: Joi.object({
+    publicId: Joi.number().required(),
+    name: Joi.string().required().max(64).allow(null),
+    unit: Joi.number().required().positive()
+  }).required()
+}).required()
+
+const validateSalesUnitUpdate = Joi.object({
+  salesUnit: Joi.object({
+    publicId: Joi.number(),
+    name: Joi.string().max(64).allow(null),
+    unit: Joi.number().positive()
+  }).required()
+}).required()
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1075,5 +1142,11 @@ export default {
   validateCompanyUserGroup,
   validateUpdatedCompanyUserGroup,
   validateUserCompanyUserGroup,
-  validateCompanyUserGroupProductAccessControlGroup
+  validateCompanyUserGroupProductAccessControlGroup,
+  validateTaxRate,
+  validateTaxRateUpdate,
+  validateMassUnit,
+  validateMassUnitUpdate,
+  validateSalesUnit,
+  validateSalesUnitUpdate
 }

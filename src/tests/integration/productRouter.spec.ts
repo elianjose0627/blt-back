@@ -112,7 +112,7 @@ describe('Product actions', () => {
       expect(res.body.products).to.be.an('array')
     })
 
-    it('Should return 200 Success when an admin successfully retrieves all products excluding chilren.', async () => {
+    it('Should return 200 Success when an admin successfully retrieves all products excluding children.', async () => {
       const resProductParent = await chai
         .request(app)
         .post('/api/products')
@@ -160,13 +160,18 @@ describe('Product actions', () => {
           search: 'Phone',
           filter: {
             showChildren: 'false'
-          }
+          },
+          select: 'type, description'
         })
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'products')
       expect(res.body.products).to.be.an('array').lengthOf(1)
+      expect(res.body.products[0]).to.not.include.keys('jfsku', 'merchantSku', 'productGroup', 'pictures', 'isVisible', 'isParent',
+        'recommendedNetSalePrice', 'shippingWeight', 'weight', 'barcode',
+        'upc', 'taric', 'originCountry', 'bestBeforeDate',
+        'serialNumberTracking', 'width', 'height', 'length')
     })
 
     it('Should return 200 Success when an admin successfully retrieves all products with category params.', async () => {
@@ -477,6 +482,21 @@ describe('Product actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'products')
       expect(res.body.products).to.be.an('array').lengthOf.above(0)
       expect(res.body.meta.total).to.equal(1)
+    })
+
+    it('Should return 422 Unprocessable Entity when an admin tries to retrieve all products with disallowed select options.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .query({
+          select: 'type1'
+        })
+
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.be.equal(false)
+      expect(res.body.errors.message).to.equal('A validation error has occured')
     })
 
     it('Should return 403 when a non-admin retrieves all products.', async () => {
@@ -2077,13 +2097,18 @@ describe('Product actions', () => {
         .get('/api/products/catalogue')
         .query({
           limit: 10,
-          page: 1
+          page: 1,
+          select: 'type, description'
         })
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'products')
       expect(res.body.products).to.be.an('array').lengthOf.above(1)
+      expect(res.body.products[0]).to.not.include.keys('jfsku', 'merchantSku', 'productGroup', 'pictures', 'isVisible', 'isParent',
+        'recommendedNetSalePrice', 'shippingWeight', 'weight', 'barcode',
+        'upc', 'taric', 'originCountry', 'bestBeforeDate',
+        'serialNumberTracking', 'width', 'height', 'length')
     })
 
     it('Should return 200 OK when a user gets the product catalogue', async () => {

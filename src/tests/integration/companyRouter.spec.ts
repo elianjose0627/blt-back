@@ -2679,10 +2679,17 @@ describe('Company actions', () => {
         .request(app)
         .get(`/api/companies/${companyId}/products`)
         .set('Authorization', `Bearer ${token}`)
+        .query({
+          select: 'type, description'
+        })
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'products')
       expect(res.body.products).to.be.an('array')
+      expect(res.body.products[0]).to.not.include.keys('jfsku', 'merchantSku', 'productGroup', 'pictures', 'isVisible', 'isParent',
+        'recommendedNetSalePrice', 'shippingWeight', 'weight', 'barcode',
+        'upc', 'taric', 'originCountry', 'bestBeforeDate',
+        'serialNumberTracking', 'width', 'height', 'length')
     })
 
     it('Should return 200 Success when an owner successfully retrieves all products excluding children.', async () => {

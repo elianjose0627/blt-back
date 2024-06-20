@@ -82,6 +82,9 @@ app.use(apiPrefix, routers.productCategoryTagInProductAccessControlGroupRouter()
 app.use(apiPrefix, routers.companyUserGroupRouter())
 app.use(apiPrefix, routers.userInCompanyUserGroupRouter())
 app.use(apiPrefix, routers.companyUserGroupInProductAccessControlGroupRouter())
+app.use(apiPrefix, routers.taxRateRouter())
+app.use(apiPrefix, routers.massUnitRouter())
+app.use(apiPrefix, routers.salesUnitRouter())
 
 // Add validation middleware
 app.use(joiErrors)
