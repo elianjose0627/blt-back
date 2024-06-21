@@ -15,7 +15,7 @@ const productInProductCategoryRoutes = (): Router => {
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(ProductInProductCategoryController.checkRecord))
   productInProductCategoryRouter.route('/product-product-categories/:id')
-    .delete(asyncHandler(checkAdmin), asyncHandler(ProductInProductCategoryController.delete))
+    .delete(asyncHandler(checkAdmin), asyncHandler(ProductInProductCategoryController.purge))
   return productInProductCategoryRouter
 }
 

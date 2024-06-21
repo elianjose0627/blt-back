@@ -15,7 +15,7 @@ const userInCompanyUserGroupRoutes = (): Router => {
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(UserInCompanyUserGroupController.checkRecord))
   userInCompanyUserGroupRouter.route('/user-company-user-groups/:id')
-    .delete(asyncHandler(checkAdmin), asyncHandler(UserInCompanyUserGroupController.delete))
+    .delete(asyncHandler(checkAdmin), asyncHandler(UserInCompanyUserGroupController.purge))
   return userInCompanyUserGroupRouter
 }
 

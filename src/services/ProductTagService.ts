@@ -28,6 +28,7 @@ class ProductTagService extends BaseService {
 
     if (productTagsToDelete.length > 0) {
       await db[this.model].destroy({
+        force: true,
         where: {
           id: {
             [Op.in]: productTagsToDelete.map((tag: any) => tag.id)

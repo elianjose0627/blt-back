@@ -173,7 +173,6 @@ export const generateInclude = (model: string): any => {
             model: db.ProductCategoryTag,
             attributes: ['id', 'name'],
             as: 'productCategoryTag',
-            required: true,
             include: [
               {
                 model: db.ProductTag,
