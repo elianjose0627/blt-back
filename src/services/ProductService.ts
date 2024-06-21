@@ -1,7 +1,7 @@
 import { v1 as uuidv1 } from 'uuid'
 import { Op, Sequelize } from 'sequelize'
 import { Joi } from 'celebrate'
-import BaseService, { generateFilterQuery, generateInclude } from './BaseService'
+import BaseService, { generateFilterQuery, generateInclude, includeCompanyAndOwner } from './BaseService'
 import db from '../models'
 import axios from 'axios'
 import { IProduct, IUser } from '../types'
@@ -142,7 +142,6 @@ class ProductService extends BaseService {
     const companyId = company?.id ?? product?.companyId ?? null
 
     response = await db[this.model].findOne({
-      include: generateInclude(this.model),
       where: {
         jfsku: product.jfsku,
         companyId
@@ -446,6 +445,115 @@ class ProductService extends BaseService {
       count: records.count,
       rows: records.rows.map((record: any) => record.toJSONFor())
     }
+  }
+
+  async getCatalogueSingle (id: string): Promise<any> {
+    const product = await db.Product.findOne({
+      include: [
+        includeCompanyAndOwner,
+        {
+          model: db.ProductCategory,
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt']
+          },
+          as: 'productCategories',
+          through: {
+            attributes: []
+          }
+        },
+        {
+          model: db.ProductTag,
+          include: [
+            {
+              model: db.ProductCategoryTag,
+              attributes: ['id', 'name'],
+              as: 'productCategoryTag',
+              required: true,
+              include: [
+                {
+                  model: db.ProductTag,
+                  attributes: ['productId'],
+                  as: 'relatedProducts',
+                  limit: 6,
+                  include: [
+                    {
+                      model: db.Product,
+                      attributes: ['name', 'pictures'],
+                      as: 'product'
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          attributes: ['id'],
+          as: 'productTags'
+        },
+        {
+          model: db.Product,
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId']
+          },
+          as: 'children',
+          include: [
+            {
+              model: db.ProductColor,
+              attributes: {
+                exclude: ['createdAt', 'updatedAt', 'deletedAt']
+              },
+              as: 'productColor'
+            },
+            {
+              model: db.ProductMaterial,
+              attributes: {
+                exclude: ['createdAt', 'updatedAt', 'deletedAt']
+              },
+              as: 'productMaterial'
+            },
+            {
+              model: db.ProductSize,
+              attributes: {
+                exclude: ['createdAt', 'updatedAt', 'deletedAt']
+              },
+              as: 'productSize'
+            }
+          ]
+        },
+        {
+          model: db.ProductGraduatedPrice,
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId']
+          },
+          as: 'graduatedPrices'
+        },
+        {
+          model: db.ProductColor,
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt']
+          },
+          as: 'productColor'
+        },
+        {
+          model: db.ProductMaterial,
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt']
+          },
+          as: 'productMaterial'
+        },
+        {
+          model: db.ProductSize,
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt']
+          },
+          as: 'productSize'
+        }
+      ],
+      where: {
+        id
+      }
+    })
+
+    return product
   }
 
   async getProductStock (product: IProduct): Promise<any> {

@@ -25,7 +25,7 @@ const withoutUser = [
   'SalesUnit', 'ProductDetail', 'ProductProductCategory'
 ]
 
-const includeCompanyAndOwner = {
+export const includeCompanyAndOwner = {
   model: db.Company,
   attributes: ['id', 'customerId', 'name', 'suffix', 'email', 'phone', 'vat', 'domain', 'isDomainVerified'],
   as: 'company',

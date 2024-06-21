@@ -84,9 +84,10 @@ class ProductController extends BaseController {
 
   async get (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { params: { id }, accessProductCategoryTags, user } = req
+    let record
 
-    const record = await productService.get(id)
     if (accessProductCategoryTags !== undefined) {
+      record = await productService.getCatalogueSingle(id)
       const { productTags }: { productTags: IProductTag[] } = record
       const productCategoryTags = productTags.map(tag => tag.productCategoryTag.id)
 
@@ -100,6 +101,8 @@ class ProductController extends BaseController {
           }
         })
       }
+    } else {
+      record = await productService.get(id)
     }
 
     return res.status(statusCodes.OK).send({
