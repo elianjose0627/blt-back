@@ -8,7 +8,7 @@ import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import ProductCategoryTagController from '../controllers/ProductCategoryTagController'
-import ProductController from '../controllers/ProductController'
+import ProductInProductCategoryController from '../controllers/ProductInProductCategoryController'
 
 const productCategoryRoutes = (): Router => {
   const productCategoryRouter = express.Router()
@@ -41,11 +41,11 @@ const productCategoryRoutes = (): Router => {
   productCategoryRouter.route('/product-categories/:id/products')
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateProductCategoryProducts
-    }), asyncHandler(ProductController.updateCategoryOfProducts))
+    }), asyncHandler(ProductInProductCategoryController.insert))
     .get(asyncHandler(checkAdmin), celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate),
-    asyncHandler(ProductController.getAllProductsOfCategory))
+    asyncHandler(ProductInProductCategoryController.getAllProductsInProductCategory))
   return productCategoryRouter
 }
 

@@ -59,14 +59,17 @@ const generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties = (f
         attributes: {
           exclude: ['createdAt', 'updatedAt', 'deletedAt']
         },
-        as: 'productCategory',
+        as: 'productCategories',
+        through: {
+          attributes: []
+        },
         where: filterCategory,
         required: Object.keys(filterCategory).length > 0 // Added so as to use a LEFT OUTER JOIN when filter is empty otherwise INNER JOIN
       },
       {
         model: db.Product,
         attributes: {
-          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'parentId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId']
         },
         as: 'children',
         include: [
@@ -527,66 +530,6 @@ class ProductService extends BaseService {
       returning: true
     })
     return response
-  }
-
-  async updateCategoryOfProducts (ids: string[], productCategoryId: string): Promise<any> {
-    const response = await db.Product.update({ productCategoryId }, {
-      where: {
-        id: {
-          [Op.in]: ids
-        }
-      },
-      returning: ['id', 'name', 'jfsku']
-    })
-    return response
-  }
-
-  async getAllProductsOfCategory (limit: number, offset: number, productCategoryId: string, search?: string): Promise<any> {
-    let where
-
-    if (search !== undefined) {
-      where = {
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${search}%` } },
-          { jfsku: { [Op.iLike]: `%${search}%` } }
-        ]
-      }
-    }
-
-    const records = await db[this.model].findAndCountAll({
-      limit,
-      offset,
-      where: {
-        ...where,
-        productCategoryId
-      },
-      include: [
-        {
-          model: db.ProductTag,
-          include: [
-            {
-              model: db.ProductCategoryTag,
-              attributes: {
-                exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productCategoryId']
-              },
-              as: 'productCategoryTag'
-            }
-          ],
-          attributes: {
-            exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId', 'productCategoryTagId']
-          },
-          as: 'productTags'
-        }
-      ],
-      order: [['createdAt', 'DESC']],
-      attributes: ['id', 'jfsku', 'name', 'pictures', 'createdAt'],
-      distinct: true
-    })
-
-    return {
-      count: records.count,
-      rows: records.rows.map((record: any) => record.toJSONFor())
-    }
   }
 }
 

@@ -472,6 +472,14 @@ export interface IProductCategoryTagInProductAccessControlGroup {
   updatedAt: Date
   productCategoryTag: Pick<IProductCategoryTag, 'id' | 'name' | 'type'> & { productCategory: { id: string, name: string }}
 }
+export interface IProductProductCategory {
+  id: string
+  productCategoryId?: string
+  productId?: string
+  createdAt: Date
+  updatedAt: Date
+  product: Pick<IProduct, 'id' | 'name'>
+}
 export interface IMassUnit {
   id: string
   publicId: string
@@ -522,7 +530,7 @@ export interface IProduct {
   company?: ICompany
   stock?: IStock
   isVisible?: boolean
-  productCategory?: IProductCategory
+  productCategories?: IProductCategory[]
   productTags?: IProductTag[]
   isParent: boolean
   children: Array<Pick<IProduct, 'id' | 'jfsku' | 'name' | 'merchantSku' | 'pictures' | 'createdAt' | 'updatedAt' | 'productColor' | 'productMaterial' | 'productSize'>>

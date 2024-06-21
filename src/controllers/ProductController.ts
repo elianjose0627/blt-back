@@ -1,7 +1,6 @@
 import BaseController from './BaseController'
 import ProductService from '../services/ProductService'
 import CompanyService from '../services/CompanyService'
-import ProductCategoryService from '../services/ProductCategoryService'
 import ProductGraduatedPriceService from '../services/ProductGraduatedPriceService'
 import type { CustomNext, CustomRequest, CustomResponse, IProduct, IProductTag, StatusCode } from '../types'
 import { io } from '../utils/socket'
@@ -10,7 +9,6 @@ import * as userRoles from '../utils/userRoles'
 
 const productService = new ProductService('Product')
 const companyService = new CompanyService('Company')
-const productCategoryService = new ProductCategoryService('ProductCategory')
 const productGraduatedPriceService = new ProductGraduatedPriceService('ProductGraduatedPrice')
 
 class ProductController extends BaseController {
@@ -46,28 +44,6 @@ class ProductController extends BaseController {
         success: false,
         errors: {
           message: 'Only the owner, admin or employee can perform this action'
-        }
-      })
-    }
-  }
-
-  async checkProductCategory (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
-    const { body: { product: { productCategoryId } } } = req
-
-    if (productCategoryId === null) {
-      return next()
-    }
-
-    const productCategory = await productCategoryService.findById(productCategoryId)
-
-    if (productCategory !== null) {
-      return next()
-    } else {
-      return res.status(statusCodes.NOT_FOUND).send({
-        statusCode: statusCodes.NOT_FOUND,
-        success: false,
-        errors: {
-          message: 'Product category not found'
         }
       })
     }
@@ -344,35 +320,6 @@ class ProductController extends BaseController {
       statusCode: statusCode[status],
       success: true,
       [productGraduatedPriceService.singleRecord()]: response
-    })
-  }
-
-  async updateCategoryOfProducts (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { body: { productCategory: { productIds } }, params: { id: productCategoryId } } = req
-    const [, updatedProducts] = await productService.updateCategoryOfProducts(productIds, productCategoryId)
-
-    return res.status(statusCodes.OK).send({
-      statusCode: statusCodes.OK,
-      success: true,
-      [productService.manyRecords()]: updatedProducts
-    })
-  }
-
-  async getAllProductsOfCategory (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { query: { limit, page, offset, search }, params: { id } } = req
-    const records = await productService.getAllProductsOfCategory(limit, offset, id, search)
-    const meta = {
-      total: records.count,
-      pageCount: Math.ceil(records.count / limit),
-      perPage: limit,
-      page
-    }
-
-    return res.status(statusCodes.OK).send({
-      statusCode: statusCodes.OK,
-      success: true,
-      meta,
-      [productService.manyRecords()]: records.rows
     })
   }
 }

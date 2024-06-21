@@ -445,7 +445,7 @@ describe('Product Category actions', () => {
   })
 
   describe('Product in Product Category actions', () => {
-    it('Should return 200 when an admin adds products to a product category', async () => {
+    it('Should return 201 when an admin adds products to a product category', async () => {
       const resProductCategory = await chai
         .request(app)
         .post('/api/product-categories')
@@ -483,9 +483,9 @@ describe('Product Category actions', () => {
           }
         })
 
-      expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'products')
-      expect(res.body.products).to.be.an('array').lengthOf.above(0)
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productProductCategory')
+      expect(res.body.productProductCategory).to.be.an('array').lengthOf.above(0)
     })
 
     it('Should return 200 when an admin gets all products of a product category', async () => {
@@ -531,8 +531,8 @@ describe('Product Category actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'products')
-      expect(res.body.products).to.be.an('array').lengthOf.above(0)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCategoryProducts')
+      expect(res.body.productCategoryProducts).to.be.an('array').lengthOf.above(0)
     })
     it('Should return 200 when an admin gets all products of a product category with search params', async () => {
       const resProductCategory = await chai
@@ -580,8 +580,8 @@ describe('Product Category actions', () => {
         })
 
       expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'products')
-      expect(res.body.products).to.be.an('array').lengthOf.above(0)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCategoryProducts')
+      expect(res.body.productCategoryProducts).to.be.an('array').lengthOf.above(0)
     })
   })
 })

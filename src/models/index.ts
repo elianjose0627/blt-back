@@ -65,6 +65,7 @@ export interface Database {
   SalesUnit?: any
   TaxRate?: any
   ProductDetail?: any
+  ProductProductCategory?: any
   [key: string]: any
 }
 
