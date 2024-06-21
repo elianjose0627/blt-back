@@ -910,7 +910,7 @@ const validateCompanySubscription = Joi.object({
 const validateProductCategory = Joi.object({
   productCategory: Joi.object({
     name: Joi.string().lowercase().required().max(64),
-    description: Joi.string().max(256),
+    description: Joi.string().max(256).allow(null).allow(''),
     picture: Joi.object({
       url: Joi.string().uri().required(),
       filename: Joi.string().required()
