@@ -48,7 +48,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany
-    private readonly productCategory: IProductCategory
+    private readonly productCategories: IProductCategory[]
     private readonly productTags: IProductTag[]
     private readonly isParent: boolean
     private readonly children: IProduct[]
@@ -79,10 +79,10 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         as: 'company',
         onDelete: 'CASCADE'
       })
-      Product.belongsTo(models.ProductCategory, {
-        foreignKey: 'productCategoryId',
-        as: 'productCategory',
-        onDelete: 'SET NULL'
+      Product.belongsToMany(models.ProductCategory, {
+        foreignKey: 'productId',
+        through: models.ProductProductCategory,
+        as: 'productCategories'
       })
       Product.hasMany(models.ProductTag, {
         foreignKey: 'productId',
@@ -148,7 +148,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         netRetailPrice: this.netRetailPrice,
         pictures: this.pictures,
         company: this.company,
-        productCategory: this.productCategory,
+        productCategories: this.productCategories,
         productTags: this.productTags,
         isParent: this.isParent,
         children: this.children,

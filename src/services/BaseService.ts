@@ -22,7 +22,7 @@ const withoutUser = [
   'ProductAccessControlGroup', 'ProductCategoryTagProductAccessControlGroup', 'UserProductAccessControlGroup',
   'CompanyProductAccessControlGroup', 'CompanyUserGroup', 'UserCompanyUserGroup',
   'CompanyUserGroupProductAccessControlGroup', 'TaxRate', 'MassUnit',
-  'SalesUnit', 'ProductDetail'
+  'SalesUnit', 'ProductDetail', 'ProductProductCategory'
 ]
 
 const includeCompanyAndOwner = {
@@ -161,7 +161,10 @@ export const generateInclude = (model: string): any => {
         attributes: {
           exclude: ['createdAt', 'updatedAt', 'deletedAt']
         },
-        as: 'productCategory'
+        as: 'productCategories',
+        through: {
+          attributes: []
+        }
       },
       {
         model: db.ProductTag,

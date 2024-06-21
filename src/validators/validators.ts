@@ -488,7 +488,6 @@ const validateProduct = Joi.object({
       currency: Joi.string().required().valid(...currencies.currencies),
       discount: Joi.number()
     }),
-    productCategoryId: Joi.string().uuid().allow(null).default(null),
     isParent: Joi.boolean(),
     productColorId: Joi.string().uuid().allow(null),
     productMaterialId: Joi.string().uuid().allow(null),
@@ -509,7 +508,6 @@ const validateProductUpdate = Joi.object({
       currency: Joi.string().required().valid(...currencies.currencies),
       discount: Joi.number()
     }),
-    productCategoryId: Joi.string().uuid().allow(null).default(null),
     isParent: Joi.boolean(),
     productColorId: Joi.string().uuid().allow(null),
     productMaterialId: Joi.string().uuid().allow(null),
@@ -532,7 +530,6 @@ const validateProductAdmin = Joi.object({
       currency: Joi.string().required().valid(...currencies.currencies),
       discount: Joi.number()
     }),
-    productCategoryId: Joi.string().uuid().allow(null).default(null),
     isParent: Joi.boolean(),
     productColorId: Joi.string().uuid().allow(null),
     productMaterialId: Joi.string().uuid().allow(null),

@@ -65,15 +65,14 @@ class ProductCategoryTagService extends BaseService {
     }
   }
 
-  async searchProductCategoryTagsByIds (productCategoryTagIds: string[], productCategoryId: string): Promise<any> {
+  async searchProductCategoryTagsByIds (productCategoryTagIds: string[]): Promise<any> {
     const response = await db[this.model].findAndCountAll({
       order: [['createdAt', 'DESC']],
       attributes: { exclude: [] },
       where: {
         id: {
           [Op.in]: productCategoryTagIds
-        },
-        productCategoryId
+        }
       }
     })
 

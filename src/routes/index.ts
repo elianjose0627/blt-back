@@ -45,6 +45,7 @@ import companyUserGroupInProductAccessControlGroupRouter from './companyUserGrou
 import taxRateRouter from './taxRateRouter'
 import massUnitRouter from './massUnitRouter'
 import salesUnitRouter from './salesUnitRouter'
+import productInProductCategoryRouter from './productInProductCategoryRouter'
 
 const routers = {
   authRouter,
@@ -93,7 +94,8 @@ const routers = {
   companyUserGroupInProductAccessControlGroupRouter,
   taxRateRouter,
   massUnitRouter,
-  salesUnitRouter
+  salesUnitRouter,
+  productInProductCategoryRouter
 }
 
 export default routers
