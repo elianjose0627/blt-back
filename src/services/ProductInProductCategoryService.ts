@@ -94,7 +94,7 @@ class ProductInProductCategoryService extends BaseService {
                 }
               ],
               attributes: {
-                exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId', 'productCategoryTagId']
+                exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId']
               },
               as: 'productTags'
             }
