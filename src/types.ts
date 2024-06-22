@@ -472,6 +472,49 @@ export interface IProductCategoryTagInProductAccessControlGroup {
   updatedAt: Date
   productCategoryTag: Pick<IProductCategoryTag, 'id' | 'name' | 'type'> & { productCategory: { id: string, name: string }}
 }
+export interface IProductProductCategory {
+  id: string
+  productCategoryId?: string
+  productId?: string
+  createdAt: Date
+  updatedAt: Date
+  product: Pick<IProduct, 'id' | 'name'>
+}
+export interface IMassUnit {
+  id: string
+  publicId: string
+  name: string
+  code: string
+  displayCode: string
+  referenceMassUnit: number
+  referenceMassUnitFactor: number
+  createdAt: Date
+  updatedAt: Date
+}
+export interface ISalesUnit {
+  id: string
+  publicId: string
+  name: string
+  unit: number
+  createdAt: Date
+  updatedAt: Date
+}
+export interface ITaxRate {
+  id: string
+  publicId: string
+  name: string
+  zone: string
+  countryCode: string
+  rate: number
+  createdAt: Date
+  updatedAt: Date
+}
+export interface IProductDetail {
+  id: string
+  metadata: object
+  createdAt: Date
+  updatedAt: Date
+}
 export interface IProduct {
   id: string
   jfsku: string
@@ -487,7 +530,7 @@ export interface IProduct {
   company?: ICompany
   stock?: IStock
   isVisible?: boolean
-  productCategory?: IProductCategory
+  productCategories?: IProductCategory[]
   productTags?: IProductTag[]
   isParent: boolean
   children: Array<Pick<IProduct, 'id' | 'jfsku' | 'name' | 'merchantSku' | 'pictures' | 'createdAt' | 'updatedAt' | 'productColor' | 'productMaterial' | 'productSize'>>
@@ -495,6 +538,22 @@ export interface IProduct {
   productColor: IProductColor
   productMaterial: IProductMaterial
   productSize: IProductSize
+  recommendedNetSalePrice: number
+  shippingWeight: number
+  weight: number
+  barcode: Nullable<string>
+  upc: Nullable<string>
+  taric: Nullable<string>
+  originCountry: Nullable<string>
+  bestBeforeDate: Boolean
+  serialNumberTracking: Boolean
+  width: number
+  height: number
+  length: number
+  massUnit: IMassUnit
+  salesUnit: ISalesUnit
+  taxRate: ITaxRate
+  metadata: IProductDetail
 }
 
 export interface ICampaignOrderLimit {

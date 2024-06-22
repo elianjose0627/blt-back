@@ -24,7 +24,7 @@ const productCategoryTagRoutes = (): Router => {
     .put(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateProductCategoryTag
     }), asyncHandler(ProductCategoryTagController.update))
-    .delete(asyncHandler(checkAdmin), asyncHandler(ProductCategoryTagController.delete))
+    .delete(asyncHandler(checkAdmin), asyncHandler(ProductCategoryTagController.purge))
   return productCategoryTagRouter
 }
 

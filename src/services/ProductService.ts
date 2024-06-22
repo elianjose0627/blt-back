@@ -1,12 +1,13 @@
 import { v1 as uuidv1 } from 'uuid'
 import { Op, Sequelize } from 'sequelize'
 import { Joi } from 'celebrate'
-import BaseService, { generateFilterQuery, generateInclude } from './BaseService'
+import BaseService, { generateFilterQuery, generateInclude, includeCompanyAndOwner } from './BaseService'
 import db from '../models'
 import axios from 'axios'
 import { IProduct, IUser } from '../types'
 import { Literal } from 'sequelize/types/utils'
 import * as userRoles from '../utils/userRoles'
+import { productDefaultColumns, productSelectedColumns } from '../utils/selectOptions'
 
 const baseURL = process.env.JTL_API_URL as string
 
@@ -56,16 +57,19 @@ const generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties = (f
       {
         model: db.ProductCategory,
         attributes: {
-          exclude: ['deletedAt']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt']
         },
-        as: 'productCategory',
+        as: 'productCategories',
+        through: {
+          attributes: []
+        },
         where: filterCategory,
         required: Object.keys(filterCategory).length > 0 // Added so as to use a LEFT OUTER JOIN when filter is empty otherwise INNER JOIN
       },
       {
         model: db.Product,
         attributes: {
-          exclude: ['deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'parentId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId']
         },
         as: 'children',
         include: [
@@ -95,7 +99,7 @@ const generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties = (f
       {
         model: db.ProductGraduatedPrice,
         attributes: {
-          exclude: ['deletedAt', 'productId']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId']
         },
         as: 'graduatedPrices'
       },
@@ -138,7 +142,6 @@ class ProductService extends BaseService {
     const companyId = company?.id ?? product?.companyId ?? null
 
     response = await db[this.model].findOne({
-      include: generateInclude(this.model),
       where: {
         jfsku: product.jfsku,
         companyId
@@ -160,7 +163,8 @@ class ProductService extends BaseService {
   async getAllForCompany (
     limit: number, offset: number, companyId: string, search: string = '',
     filter = { isParent: false, category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tags: '', showChildren: 'true', price: '' },
-    orderBy = { name: '', createdAt: '', price: '' }
+    orderBy = { name: '', createdAt: '', price: '' },
+    select = productSelectedColumns
   ): Promise<any> {
     const { category, minPrice = 0, maxPrice = 0, color, material, size, tags, showChildren, price = '' } = filter
 
@@ -178,7 +182,7 @@ class ProductService extends BaseService {
     }
     const whereFilterShowChildren = showChildren === 'false' ? { parentId: { [Op.eq]: null } } : {}
 
-    const attributes: any = { exclude: [] }
+    const attributes = select.replace(/\s+/g, '').split(',').concat(productDefaultColumns)
     const include: any[] = [
       ...generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties(whereFilterCategory, whereFilterColor, whereFilterMaterial, whereFilterSize),
       {
@@ -247,7 +251,8 @@ class ProductService extends BaseService {
   async getAll (
     limit: number, offset: number, search: string = '',
     filter = { isParent: 'true, false', category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tags: '', showChildren: 'true', price: '' },
-    orderBy = { name: '', createdAt: '', price: '' }
+    orderBy = { name: '', createdAt: '', price: '' },
+    select = productSelectedColumns
   ): Promise<any> {
     const {
       isParent = 'true, false', category, minPrice = 0, maxPrice = 0,
@@ -265,7 +270,7 @@ class ProductService extends BaseService {
     let whereFilterPrice: any = {}
     const whereFilterShowChildren = showChildren === 'false' ? { parentId: { [Op.eq]: null } } : {}
 
-    const attributes: any = { exclude: [] }
+    const attributes = select.replace(/\s+/g, '').split(',').concat(productDefaultColumns)
     const include: any[] = [
       {
         model: db.Company,
@@ -279,7 +284,7 @@ class ProductService extends BaseService {
           {
             model: db.ProductCategoryTag,
             attributes: {
-              exclude: ['deletedAt', 'productCategoryId']
+              exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productCategoryId']
             },
             as: 'productCategoryTag'
           }
@@ -287,7 +292,7 @@ class ProductService extends BaseService {
         whereFilterTags,
         required: Object.keys(whereFilterTags).length > 0,
         attributes: {
-          exclude: ['deletedAt', 'productId', 'productCategoryTagId']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId', 'productCategoryTagId']
         },
         as: 'productTags'
       }
@@ -340,7 +345,8 @@ class ProductService extends BaseService {
     user: IUser,
     limit: number, offset: number, search: string = '',
     filter = { isParent: 'true, false', category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tags: '', showChildren: 'true', price: '' },
-    orderBy = { name: '', createdAt: '', price: '' }
+    orderBy = { name: '', createdAt: '', price: '' },
+    select = productSelectedColumns
   ): Promise<any> {
     const {
       isParent = 'true, false', category, minPrice = 0, maxPrice = 0,
@@ -360,7 +366,7 @@ class ProductService extends BaseService {
     let whereFilterPrice: any = {}
     const whereFilterShowChildren = showChildren === 'false' ? { parentId: { [Op.eq]: null } } : {}
 
-    const attributes: any = { exclude: [] }
+    const attributes = select.replace(/\s+/g, '').split(',').concat(productDefaultColumns)
     const extrafilterTag = {
       [Op.and]: [
         whereFilterTags,
@@ -385,7 +391,7 @@ class ProductService extends BaseService {
           {
             model: db.ProductCategoryTag,
             attributes: {
-              exclude: ['deletedAt', 'productCategoryId']
+              exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productCategoryId']
             },
             as: 'productCategoryTag'
           }
@@ -393,7 +399,7 @@ class ProductService extends BaseService {
         where: role === userRoles.ADMIN ? whereFilterTags : extrafilterTag,
         required: role === userRoles.ADMIN ? (Object.keys(whereFilterTags).length > 0) : true,
         attributes: {
-          exclude: ['deletedAt', 'productId', 'productCategoryTagId']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId', 'productCategoryTagId']
         },
         as: 'productTags'
       }
@@ -439,6 +445,115 @@ class ProductService extends BaseService {
       count: records.count,
       rows: records.rows.map((record: any) => record.toJSONFor())
     }
+  }
+
+  async getCatalogueSingle (id: string): Promise<any> {
+    const product = await db.Product.findOne({
+      include: [
+        includeCompanyAndOwner,
+        {
+          model: db.ProductCategory,
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt']
+          },
+          as: 'productCategories',
+          through: {
+            attributes: []
+          }
+        },
+        {
+          model: db.ProductTag,
+          include: [
+            {
+              model: db.ProductCategoryTag,
+              attributes: ['id', 'name'],
+              as: 'productCategoryTag',
+              required: true,
+              include: [
+                {
+                  model: db.ProductTag,
+                  attributes: ['productId'],
+                  as: 'relatedProducts',
+                  limit: 6,
+                  include: [
+                    {
+                      model: db.Product,
+                      attributes: ['name', 'pictures'],
+                      as: 'product'
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          attributes: ['id'],
+          as: 'productTags'
+        },
+        {
+          model: db.Product,
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId']
+          },
+          as: 'children',
+          include: [
+            {
+              model: db.ProductColor,
+              attributes: {
+                exclude: ['createdAt', 'updatedAt', 'deletedAt']
+              },
+              as: 'productColor'
+            },
+            {
+              model: db.ProductMaterial,
+              attributes: {
+                exclude: ['createdAt', 'updatedAt', 'deletedAt']
+              },
+              as: 'productMaterial'
+            },
+            {
+              model: db.ProductSize,
+              attributes: {
+                exclude: ['createdAt', 'updatedAt', 'deletedAt']
+              },
+              as: 'productSize'
+            }
+          ]
+        },
+        {
+          model: db.ProductGraduatedPrice,
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId']
+          },
+          as: 'graduatedPrices'
+        },
+        {
+          model: db.ProductColor,
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt']
+          },
+          as: 'productColor'
+        },
+        {
+          model: db.ProductMaterial,
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt']
+          },
+          as: 'productMaterial'
+        },
+        {
+          model: db.ProductSize,
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt']
+          },
+          as: 'productSize'
+        }
+      ],
+      where: {
+        id
+      }
+    })
+
+    return product
   }
 
   async getProductStock (product: IProduct): Promise<any> {

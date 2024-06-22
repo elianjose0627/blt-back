@@ -2679,10 +2679,17 @@ describe('Company actions', () => {
         .request(app)
         .get(`/api/companies/${companyId}/products`)
         .set('Authorization', `Bearer ${token}`)
+        .query({
+          select: 'type, description'
+        })
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'products')
       expect(res.body.products).to.be.an('array')
+      expect(res.body.products[0]).to.not.include.keys('jfsku', 'merchantSku', 'productGroup', 'pictures', 'isVisible', 'isParent',
+        'recommendedNetSalePrice', 'shippingWeight', 'weight', 'barcode',
+        'upc', 'taric', 'originCountry', 'bestBeforeDate',
+        'serialNumberTracking', 'width', 'height', 'length')
     })
 
     it('Should return 200 Success when an owner successfully retrieves all products excluding children.', async () => {
@@ -2976,7 +2983,7 @@ describe('Company actions', () => {
       const companyId = String(resCompany.body.company.id)
       await verifyCompanyDomain(String(companyId))
 
-      await chai
+      const resProduct = await chai
         .request(app)
         .post(`/api/companies/${String(companyId)}/products`)
         .set('Authorization', `Bearer ${token}`)
@@ -2986,8 +2993,19 @@ describe('Company actions', () => {
             jfsku: '123sw1',
             merchantSku: '123sw1',
             type: 'generic',
-            productGroup: 'clothing',
-            productCategoryId
+            productGroup: 'clothing'
+          }
+        })
+
+      const productId = resProduct.body.product.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
           }
         })
 
@@ -3009,7 +3027,7 @@ describe('Company actions', () => {
       expect(res.body.meta.total).to.equal(1)
     })
 
-    it('Should return 200 Success when an owner successfully retrieves all products without products where isVisible is set to false.', async () => {
+    it('Should return 200 Success when an owner successfully retrieves all products excluding products where isVisible is set to false.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')

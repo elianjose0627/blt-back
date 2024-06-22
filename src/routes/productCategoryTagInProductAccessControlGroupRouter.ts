@@ -15,7 +15,7 @@ const productCategoryTagInProductAccessControlGroupRoutes = (): Router => {
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(ProductCategoryTagInProductAccessControlGroupController.checkRecord))
   productCategoryTagInProductAccessControlGroupRouter.route('/product-category-tag-product-access-control-groups/:id')
-    .delete(asyncHandler(checkAdmin), asyncHandler(ProductCategoryTagInProductAccessControlGroupController.delete))
+    .delete(asyncHandler(checkAdmin), asyncHandler(ProductCategoryTagInProductAccessControlGroupController.purge))
   return productCategoryTagInProductAccessControlGroupRouter
 }
 

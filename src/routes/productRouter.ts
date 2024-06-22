@@ -18,7 +18,7 @@ const ProductRoutes = (): Router => {
   productRouter.route('/products')
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateProductAdmin
-    }), asyncHandler(ProductController.checkProductCategory), asyncHandler(ProductController.insert))
+    }), asyncHandler(ProductController.insert))
     .get(asyncHandler(checkAdmin), celebrate({
       [Segments.QUERY]: validator.validateProductQueryParams
     }), asyncHandler(paginate), asyncHandler(ProductController.getAll))
@@ -36,8 +36,8 @@ const ProductRoutes = (): Router => {
       asyncHandler(checkPermissions), asyncHandler(ProductController.get))
     .put(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkAdmin), celebrate({
-        [Segments.BODY]: validator.validateProduct
-      }), asyncHandler(ProductController.checkProductCategory), asyncHandler(ProductController.update))
+        [Segments.BODY]: validator.validateProductUpdate
+      }), asyncHandler(ProductController.update))
     .delete(asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkAdmin), asyncHandler(ProductController.delete))
   productRouter.route('/products/:id/stocks')

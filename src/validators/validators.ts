@@ -6,6 +6,7 @@ import * as countryList from '../utils/countries'
 import * as userRoles from '../utils/userRoles'
 import * as currencies from '../utils/currencies'
 import * as appModules from '../utils/appModules'
+import { productSelectedColumns } from '../utils/selectOptions'
 
 dayjs.extend(utc)
 
@@ -225,7 +226,17 @@ const validateProductQueryParams = Joi.object({
     name: Joi.string().valid(...['asc', 'desc']),
     price: Joi.string().valid(...['asc', 'desc']),
     createdAt: Joi.string().valid(...['asc', 'desc'])
-  }).optional()
+  }).optional(),
+  select: Joi.string().custom((value, helpers) => {
+    const isValid = value.replace(/\s+/g, '').split(',')
+      .every((option: string) => productSelectedColumns.replace(/\s+/g, '').split(',').includes(option))
+
+    if (isValid === false) {
+      return helpers.error('any.invalid')
+    }
+
+    return value
+  }, 'Comma separated list validation').message(`select must be one of [${productSelectedColumns}]`)
 })
 
 const validateNotifications = Joi.object({
@@ -467,7 +478,7 @@ const validatePicture = Joi.object({
 
 const validateProduct = Joi.object({
   product: Joi.object({
-    name: Joi.string().required().max(64),
+    name: Joi.string().required().max(128),
     jfsku: Joi.string().required().max(64),
     merchantSku: Joi.string().required().max(64),
     productGroup: Joi.string().required().max(64),
@@ -477,12 +488,31 @@ const validateProduct = Joi.object({
       currency: Joi.string().required().valid(...currencies.currencies),
       discount: Joi.number()
     }),
-    productCategoryId: Joi.string().uuid().allow(null).default(null),
     isParent: Joi.boolean(),
     productColorId: Joi.string().uuid().allow(null),
     productMaterialId: Joi.string().uuid().allow(null),
     productSizeId: Joi.string().uuid().allow(null),
-    description: Joi.string().allow(null).allow('').optional()
+    description: Joi.string().max(256).allow(null).allow('').optional()
+  }).required()
+}).required()
+
+const validateProductUpdate = Joi.object({
+  product: Joi.object({
+    name: Joi.string().max(128),
+    jfsku: Joi.string().max(64),
+    merchantSku: Joi.string().max(64),
+    productGroup: Joi.string().max(64),
+    type: Joi.string().valid(...['generic', 'custom']),
+    netRetailPrice: Joi.object({
+      amount: Joi.number(),
+      currency: Joi.string().required().valid(...currencies.currencies),
+      discount: Joi.number()
+    }),
+    isParent: Joi.boolean(),
+    productColorId: Joi.string().uuid().allow(null),
+    productMaterialId: Joi.string().uuid().allow(null),
+    productSizeId: Joi.string().uuid().allow(null),
+    description: Joi.string().max(256).allow(null).allow('').optional()
   }).required()
 }).required()
 
@@ -500,7 +530,6 @@ const validateProductAdmin = Joi.object({
       currency: Joi.string().required().valid(...currencies.currencies),
       discount: Joi.number()
     }),
-    productCategoryId: Joi.string().uuid().allow(null).default(null),
     isParent: Joi.boolean(),
     productColorId: Joi.string().uuid().allow(null),
     productMaterialId: Joi.string().uuid().allow(null),
@@ -881,7 +910,7 @@ const validateCompanySubscription = Joi.object({
 const validateProductCategory = Joi.object({
   productCategory: Joi.object({
     name: Joi.string().lowercase().required().max(64),
-    description: Joi.string().max(256),
+    description: Joi.string().max(256).allow(null).allow(''),
     picture: Joi.object({
       url: Joi.string().uri().required(),
       filename: Joi.string().required()
@@ -998,6 +1027,68 @@ const validateCompanyUserGroupProductAccessControlGroup = Joi.object({
   }).required()
 })
 
+const validateTaxRate = Joi.object({
+  taxRate: Joi.object({
+    publicId: Joi.number().required(),
+    name: Joi.string().required().max(64),
+    zone: Joi.string().required().max(64),
+    countryCode: Joi.string().length(2).allow(null),
+    rate: Joi.number().positive()
+  }).required()
+}).required()
+
+const validateTaxRateUpdate = Joi.object({
+  taxRate: Joi.object({
+    name: Joi.string().max(64),
+    zone: Joi.string().max(64),
+    countryCode: Joi.string().length(2).allow(null),
+    rate: Joi.number().positive()
+  }).required()
+}).required()
+
+const validateMassUnit = Joi.object({
+  massUnit: Joi.object({
+    publicId: Joi.number().required(),
+    name: Joi.string().required().max(64).allow(null),
+    code: Joi.string().required().max(64),
+    displayCode: Joi.string().max(64).allow(null),
+    referenceMassUnit: Joi.number(),
+    referenceMassUnitFactor: Joi.number()
+  }).required()
+}).required()
+
+const validateMassUnitUpdate = Joi.object({
+  massUnit: Joi.object({
+    name: Joi.string().max(64).allow(null),
+    code: Joi.string().max(64),
+    displayCode: Joi.string().max(64).allow(null),
+    referenceMassUnit: Joi.number(),
+    referenceMassUnitFactor: Joi.number()
+  }).required()
+}).required()
+
+const validateSalesUnit = Joi.object({
+  salesUnit: Joi.object({
+    publicId: Joi.number().required(),
+    name: Joi.string().required().max(64).allow(null),
+    unit: Joi.number().required().positive()
+  }).required()
+}).required()
+
+const validateSalesUnitUpdate = Joi.object({
+  salesUnit: Joi.object({
+    publicId: Joi.number(),
+    name: Joi.string().max(64).allow(null),
+    unit: Joi.number().positive()
+  }).required()
+}).required()
+
+const validateProductCategoryProducts = Joi.object({
+  productCategory: Joi.object({
+    productIds: Joi.array().items(Joi.string().uuid().required()).min(1)
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1033,6 +1124,7 @@ export default {
   validateTrackingId,
   validateProduct,
   validateProductAdmin,
+  validateProductUpdate,
   validateProductCompany,
   validateOrder,
   validateSecondaryDomain,
@@ -1075,5 +1167,12 @@ export default {
   validateCompanyUserGroup,
   validateUpdatedCompanyUserGroup,
   validateUserCompanyUserGroup,
-  validateCompanyUserGroupProductAccessControlGroup
+  validateCompanyUserGroupProductAccessControlGroup,
+  validateTaxRate,
+  validateTaxRateUpdate,
+  validateMassUnit,
+  validateMassUnitUpdate,
+  validateSalesUnit,
+  validateSalesUnitUpdate,
+  validateProductCategoryProducts
 }

@@ -15,7 +15,7 @@ const companyUserGroupInProductAccessControlGroupRoutes = (): Router => {
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(CompanyUserGroupInProductAccessControlGroupController.checkRecord))
   companyUserGroupInProductAccessControlGroupRouter.route('/company-user-groups-product-access-control-groups/:id')
-    .delete(asyncHandler(checkAdmin), asyncHandler(CompanyUserGroupInProductAccessControlGroupController.delete))
+    .delete(asyncHandler(checkAdmin), asyncHandler(CompanyUserGroupInProductAccessControlGroupController.purge))
   return companyUserGroupInProductAccessControlGroupRouter
 }
 

@@ -1,16 +1,19 @@
 import BaseController from './BaseController'
-import ProductCategoryTagService from '../services/ProductCategoryTagService'
+import ProductInProductCategoryService from '../services/ProductInProductCategoryService'
 import { CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 
-const productCategoryTagService = new ProductCategoryTagService('ProductCategoryTag')
+const productInProductCategoryService = new ProductInProductCategoryService('ProductProductCategory')
 
-class ProductCategoryTagController extends BaseController {
+class ProductInProductCategoryController extends BaseController {
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { body: { productCategoryTag }, record: productCategory } = req
+    const { body: { productCategory: { productIds } }, params: { id } } = req
 
-    const { response, status } = await productCategoryTagService.insert({ productCategoryTag, productCategory })
+    const { response, status } = await productInProductCategoryService.insert({
+      productIds,
+      productCategoryId: id
+    })
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 
     const statusCode: StatusCode = {
@@ -25,9 +28,9 @@ class ProductCategoryTagController extends BaseController {
     })
   }
 
-  async getAllTagsOfProductCategory (req: CustomRequest, res: CustomResponse): Promise<any> {
+  async getAllProductsInProductCategory (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { query: { limit, page, offset, search }, params: { id } } = req
-    const records = await productCategoryTagService.getTagsOfProductCategory(limit, offset, id, search)
+    const records = await productInProductCategoryService.getAllProductsInProductCategory(limit, offset, id, search)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),
@@ -39,9 +42,9 @@ class ProductCategoryTagController extends BaseController {
       statusCode: statusCodes.OK,
       success: true,
       meta,
-      [productCategoryTagService.manyRecords()]: records.rows
+      [productInProductCategoryService.manyRecords()]: records.rows
     })
   }
 }
 
-export default new ProductCategoryTagController(productCategoryTagService)
+export default new ProductInProductCategoryController(productInProductCategoryService)

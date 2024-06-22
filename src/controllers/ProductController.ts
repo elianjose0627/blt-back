@@ -1,7 +1,6 @@
 import BaseController from './BaseController'
 import ProductService from '../services/ProductService'
 import CompanyService from '../services/CompanyService'
-import ProductCategoryService from '../services/ProductCategoryService'
 import ProductGraduatedPriceService from '../services/ProductGraduatedPriceService'
 import type { CustomNext, CustomRequest, CustomResponse, IProduct, IProductTag, StatusCode } from '../types'
 import { io } from '../utils/socket'
@@ -10,7 +9,6 @@ import * as userRoles from '../utils/userRoles'
 
 const productService = new ProductService('Product')
 const companyService = new CompanyService('Company')
-const productCategoryService = new ProductCategoryService('ProductCategory')
 const productGraduatedPriceService = new ProductGraduatedPriceService('ProductGraduatedPrice')
 
 class ProductController extends BaseController {
@@ -51,28 +49,6 @@ class ProductController extends BaseController {
     }
   }
 
-  async checkProductCategory (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
-    const { body: { product: { productCategoryId } } } = req
-
-    if (productCategoryId === null) {
-      return next()
-    }
-
-    const productCategory = await productCategoryService.findById(productCategoryId)
-
-    if (productCategory !== null) {
-      return next()
-    } else {
-      return res.status(statusCodes.NOT_FOUND).send({
-        statusCode: statusCodes.NOT_FOUND,
-        success: false,
-        errors: {
-          message: 'Product category not found'
-        }
-      })
-    }
-  }
-
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { record: company, body: { product } } = req
 
@@ -108,9 +84,10 @@ class ProductController extends BaseController {
 
   async get (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { params: { id }, accessProductCategoryTags, user } = req
+    let record
 
-    const record = await productService.get(id)
     if (accessProductCategoryTags !== undefined) {
+      record = await productService.getCatalogueSingle(id)
       const { productTags }: { productTags: IProductTag[] } = record
       const productCategoryTags = productTags.map(tag => tag.productCategoryTag.id)
 
@@ -124,6 +101,8 @@ class ProductController extends BaseController {
           }
         })
       }
+    } else {
+      record = await productService.get(id)
     }
 
     return res.status(statusCodes.OK).send({
@@ -134,13 +113,13 @@ class ProductController extends BaseController {
   }
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { query: { limit, page, offset, search, filter, orderBy }, accessProductCategoryTags, user } = req
+    const { query: { limit, page, offset, search, filter, orderBy, select }, accessProductCategoryTags, user } = req
     let records
 
     if (accessProductCategoryTags === undefined) {
-      records = await productService.getAll(limit, offset, search, filter, orderBy)
+      records = await productService.getAll(limit, offset, search, filter, orderBy, select)
     } else {
-      records = await productService.getCatalogue(accessProductCategoryTags, user, limit, offset, search, filter, orderBy)
+      records = await productService.getCatalogue(accessProductCategoryTags, user, limit, offset, search, filter, orderBy, select)
     }
 
     const meta = {
@@ -159,9 +138,9 @@ class ProductController extends BaseController {
   }
 
   async getAllForCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { limit, page, offset, search, filter, orderBy } = req.query
+    const { query: { limit, page, offset, search, filter, orderBy, select } } = req
     const { id } = req.params
-    const records = await productService.getAllForCompany(limit, offset, id, search, filter, orderBy)
+    const records = await productService.getAllForCompany(limit, offset, id, search, filter, orderBy, select)
 
     const meta = {
       total: records.count,
