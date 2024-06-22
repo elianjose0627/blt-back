@@ -77,7 +77,7 @@ class ProductInProductCategoryService extends BaseService {
         {
           model: db.Product,
           as: 'product',
-          attributes: ['id', 'jfsku', 'name', 'pictures'],
+          attributes: ['id', 'jfsku', 'merchantSku', 'name', 'pictures'],
           where: {
             ...where
           },
