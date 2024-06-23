@@ -62,7 +62,7 @@ describe('Product Category actions', () => {
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'productCategories')
-      expect(res.body.productCategories).to.be.an('array')
+      expect(res.body.productCategories).to.be.an('array').lengthOf.above(0)
     })
 
     it('Should return 200 when a non-admin retrieves all product categories.', async () => {
@@ -74,6 +74,29 @@ describe('Product Category actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'productCategories')
       expect(res.body.productCategories).to.be.an('array')
+    })
+
+    it('Should return 200 when a admin retrieves all product categories with search params.', async () => {
+      await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'electricals'
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get('/api/product-categories')
+        .set('Authorization', `Bearer ${token}`)
+        .query({
+          search: 'electricals'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCategories')
+      expect(res.body.productCategories).to.be.an('array').lengthOf.above(0)
     })
   })
 
