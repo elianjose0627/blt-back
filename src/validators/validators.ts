@@ -6,6 +6,7 @@ import * as countryList from '../utils/countries'
 import * as userRoles from '../utils/userRoles'
 import * as currencies from '../utils/currencies'
 import * as appModules from '../utils/appModules'
+import { productSelectedColumns } from '../utils/selectOptions'
 
 dayjs.extend(utc)
 
@@ -87,7 +88,7 @@ const validateUpdatedUser = Joi.object({
         .messages({
           'string.pattern.base': '{#label} must be numeric'
         }),
-      addressAddition: Joi.string().allow('').allow(null).max(256),
+      addressAddition: Joi.string().allow('').allow(null).max(255),
       vat: Joi.string().allow('').allow(null).max(24),
       type: Joi.string().valid(...['billing', 'delivery', 'billingAndDelivery']).allow(null).default(null),
       affiliation: Joi.string().optional().valid(...['personal', 'company', 'other']).allow(null).default('personal')
@@ -225,7 +226,17 @@ const validateProductQueryParams = Joi.object({
     name: Joi.string().valid(...['asc', 'desc']),
     price: Joi.string().valid(...['asc', 'desc']),
     createdAt: Joi.string().valid(...['asc', 'desc'])
-  }).optional()
+  }).optional(),
+  select: Joi.string().custom((value, helpers) => {
+    const isValid = value.replace(/\s+/g, '').split(',')
+      .every((option: string) => productSelectedColumns.replace(/\s+/g, '').split(',').includes(option))
+
+    if (isValid === false) {
+      return helpers.error('any.invalid')
+    }
+
+    return value
+  }, 'Comma separated list validation').message(`select must be one of [${productSelectedColumns}]`)
 })
 
 const validateNotifications = Joi.object({
@@ -291,7 +302,7 @@ const validateCreatedAddress = Joi.object({
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
-    addressAddition: Joi.string().allow('').allow(null).max(256),
+    addressAddition: Joi.string().allow('').allow(null).max(255),
     vat: Joi.string().allow('').allow(null).max(24),
     type: Joi.string().valid(...['billing', 'delivery', 'billingAndDelivery']).allow(null).default('delivery'),
     affiliation: Joi.string().optional().valid(...['personal', 'company', 'other']).allow(null)
@@ -314,7 +325,7 @@ const validateUpdatedAddress = Joi.object({
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
-    addressAddition: Joi.string().allow('').allow(null).max(256),
+    addressAddition: Joi.string().allow('').allow(null).max(255),
     vat: Joi.string().allow('').allow(null).max(24),
     type: Joi.string().valid(...['billing', 'delivery', 'billingAndDelivery']).allow(null).default('delivery'),
     affiliation: Joi.string().optional().valid(...['personal', 'company', 'other']).allow(null)
@@ -336,7 +347,7 @@ const validateCreatedRecipient = Joi.object({
     city: Joi.string().required().max(64),
     street: Joi.string().optional().allow('').allow(null).max(64),
     zip: Joi.string().optional().max(24),
-    addressAddition: Joi.string().optional().allow('').allow(null).max(256),
+    addressAddition: Joi.string().optional().allow('').allow(null).max(255),
     costCenter: Joi.string().optional().allow('').allow(null)
   }).required()
 }).required()
@@ -356,7 +367,7 @@ const validateUpdatedRecipient = Joi.object({
     city: Joi.string().optional().max(64),
     street: Joi.string().optional().allow('').allow(null).max(64),
     zip: Joi.string().optional().max(24),
-    addressAddition: Joi.string().optional().allow('').allow(null).max(256),
+    addressAddition: Joi.string().optional().allow('').allow(null).max(255),
     costCenter: Joi.string().optional().allow('').allow(null)
   }).required()
 }).required()
@@ -467,7 +478,7 @@ const validatePicture = Joi.object({
 
 const validateProduct = Joi.object({
   product: Joi.object({
-    name: Joi.string().required().max(64),
+    name: Joi.string().required().max(128),
     jfsku: Joi.string().required().max(64),
     merchantSku: Joi.string().required().max(64),
     productGroup: Joi.string().required().max(64),
@@ -477,12 +488,31 @@ const validateProduct = Joi.object({
       currency: Joi.string().required().valid(...currencies.currencies),
       discount: Joi.number()
     }),
-    productCategoryId: Joi.string().uuid().allow(null).default(null),
     isParent: Joi.boolean(),
     productColorId: Joi.string().uuid().allow(null),
     productMaterialId: Joi.string().uuid().allow(null),
     productSizeId: Joi.string().uuid().allow(null),
-    description: Joi.string().allow(null).allow('').optional()
+    description: Joi.string().max(255).allow(null).allow('').optional()
+  }).required()
+}).required()
+
+const validateProductUpdate = Joi.object({
+  product: Joi.object({
+    name: Joi.string().max(128),
+    jfsku: Joi.string().max(64),
+    merchantSku: Joi.string().max(64),
+    productGroup: Joi.string().max(64),
+    type: Joi.string().valid(...['generic', 'custom']),
+    netRetailPrice: Joi.object({
+      amount: Joi.number(),
+      currency: Joi.string().required().valid(...currencies.currencies),
+      discount: Joi.number()
+    }),
+    isParent: Joi.boolean(),
+    productColorId: Joi.string().uuid().allow(null),
+    productMaterialId: Joi.string().uuid().allow(null),
+    productSizeId: Joi.string().uuid().allow(null),
+    description: Joi.string().max(255).allow(null).allow('').optional()
   }).required()
 }).required()
 
@@ -500,12 +530,11 @@ const validateProductAdmin = Joi.object({
       currency: Joi.string().required().valid(...currencies.currencies),
       discount: Joi.number()
     }),
-    productCategoryId: Joi.string().uuid().allow(null).default(null),
     isParent: Joi.boolean(),
     productColorId: Joi.string().uuid().allow(null),
     productMaterialId: Joi.string().uuid().allow(null),
     productSizeId: Joi.string().uuid().allow(null),
-    description: Joi.string().allow(null).allow('').optional()
+    description: Joi.string().allow(null).allow('').optional().max(255)
   }).required()
 }).required()
 
@@ -769,7 +798,7 @@ const validatePasswordResetAdmin = Joi.object({
 
 const validateEmailTemplate = Joi.object({
   emailTemplate: Joi.object({
-    subject: Joi.string().max(256).required(),
+    subject: Joi.string().max(255).required(),
     template: Joi.string().required(),
     emailTemplateTypeId: Joi.string().uuid().required()
   }).required()
@@ -779,7 +808,7 @@ const validateEmailTemplateType = Joi.object({
   emailTemplateType: Joi.object({
     name: Joi.string().max(64).required(),
     type: Joi.string().max(32).required(),
-    description: Joi.string().max(256).required(),
+    description: Joi.string().max(255).required(),
     placeholders: Joi.array().items(Joi.string().max(16).lowercase()).min(1).required()
   }).required()
 }).required()
@@ -804,7 +833,7 @@ const validateCampaignAddress = Joi.object({
         .messages({
           'string.pattern.base': '{#label} must be numeric'
         }),
-      addressAddition: Joi.string().allow('').allow(null).max(256),
+      addressAddition: Joi.string().allow('').allow(null).max(255),
       vat: Joi.string().allow('').allow(null).max(24),
       type: Joi.string().valid(...['billing', 'return']).required()
     })).min(1).required()
@@ -881,7 +910,7 @@ const validateCompanySubscription = Joi.object({
 const validateProductCategory = Joi.object({
   productCategory: Joi.object({
     name: Joi.string().lowercase().required().max(64),
-    description: Joi.string().max(256),
+    description: Joi.string().max(255).allow(null).allow(''),
     picture: Joi.object({
       url: Joi.string().uri().required(),
       filename: Joi.string().required()
@@ -949,8 +978,8 @@ const validateGraduatedPrice = Joi.object({
 
 const validateProductAccessControlGroup = Joi.object({
   productAccessControlGroup: Joi.object({
-    name: Joi.string().required().max(256),
-    description: Joi.string().optional().max(256).allow(null).allow(''),
+    name: Joi.string().required().max(255),
+    description: Joi.string().optional().max(255).allow(null).allow(''),
     companyId: Joi.string().uuid().allow(null).default(null)
   }).required()
 })
@@ -975,15 +1004,15 @@ const validateCompanyProductAccessControlGroup = Joi.object({
 
 const validateCompanyUserGroup = Joi.object({
   companyUserGroup: Joi.object({
-    name: Joi.string().required().max(256),
-    description: Joi.string().optional().max(256).allow(null).allow(''),
+    name: Joi.string().required().max(255),
+    description: Joi.string().optional().max(255).allow(null).allow(''),
     companyId: Joi.string().uuid().required()
   }).required()
 })
 const validateUpdatedCompanyUserGroup = Joi.object({
   companyUserGroup: Joi.object({
-    name: Joi.string().required().max(256),
-    description: Joi.string().optional().max(256).allow(null).allow('')
+    name: Joi.string().required().max(255),
+    description: Joi.string().optional().max(255).allow(null).allow('')
   }).required()
 })
 
@@ -995,6 +1024,68 @@ const validateUserCompanyUserGroup = Joi.object({
 const validateCompanyUserGroupProductAccessControlGroup = Joi.object({
   companyUserGroupProductAccessControlGroup: Joi.object({
     companyUserGroupIds: Joi.array().items(Joi.string().uuid().required()).min(1)
+  }).required()
+})
+
+const validateTaxRate = Joi.object({
+  taxRate: Joi.object({
+    publicId: Joi.number().required(),
+    name: Joi.string().required().max(64),
+    zone: Joi.string().required().max(64),
+    countryCode: Joi.string().length(2).allow(null),
+    rate: Joi.number().positive()
+  }).required()
+}).required()
+
+const validateTaxRateUpdate = Joi.object({
+  taxRate: Joi.object({
+    name: Joi.string().max(64),
+    zone: Joi.string().max(64),
+    countryCode: Joi.string().length(2).allow(null),
+    rate: Joi.number().positive()
+  }).required()
+}).required()
+
+const validateMassUnit = Joi.object({
+  massUnit: Joi.object({
+    publicId: Joi.number().required(),
+    name: Joi.string().required().max(64).allow(null),
+    code: Joi.string().required().max(64),
+    displayCode: Joi.string().max(64).allow(null),
+    referenceMassUnit: Joi.number(),
+    referenceMassUnitFactor: Joi.number()
+  }).required()
+}).required()
+
+const validateMassUnitUpdate = Joi.object({
+  massUnit: Joi.object({
+    name: Joi.string().max(64).allow(null),
+    code: Joi.string().max(64),
+    displayCode: Joi.string().max(64).allow(null),
+    referenceMassUnit: Joi.number(),
+    referenceMassUnitFactor: Joi.number()
+  }).required()
+}).required()
+
+const validateSalesUnit = Joi.object({
+  salesUnit: Joi.object({
+    publicId: Joi.number().required(),
+    name: Joi.string().required().max(64).allow(null),
+    unit: Joi.number().required().positive()
+  }).required()
+}).required()
+
+const validateSalesUnitUpdate = Joi.object({
+  salesUnit: Joi.object({
+    publicId: Joi.number(),
+    name: Joi.string().max(64).allow(null),
+    unit: Joi.number().positive()
+  }).required()
+}).required()
+
+const validateProductCategoryProducts = Joi.object({
+  productCategory: Joi.object({
+    productIds: Joi.array().items(Joi.string().uuid().required()).min(1)
   }).required()
 })
 
@@ -1033,6 +1124,7 @@ export default {
   validateTrackingId,
   validateProduct,
   validateProductAdmin,
+  validateProductUpdate,
   validateProductCompany,
   validateOrder,
   validateSecondaryDomain,
@@ -1075,5 +1167,12 @@ export default {
   validateCompanyUserGroup,
   validateUpdatedCompanyUserGroup,
   validateUserCompanyUserGroup,
-  validateCompanyUserGroupProductAccessControlGroup
+  validateCompanyUserGroupProductAccessControlGroup,
+  validateTaxRate,
+  validateTaxRateUpdate,
+  validateMassUnit,
+  validateMassUnitUpdate,
+  validateSalesUnit,
+  validateSalesUnitUpdate,
+  validateProductCategoryProducts
 }

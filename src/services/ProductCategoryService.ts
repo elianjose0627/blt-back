@@ -1,6 +1,7 @@
 import { v1 as uuidv1 } from 'uuid'
 import BaseService from './BaseService'
 import db from '../models'
+import { Op } from 'sequelize'
 
 class ProductCategoryService extends BaseService {
   manyRecords (): string {
@@ -33,16 +34,24 @@ class ProductCategoryService extends BaseService {
     return { response: response.toJSONFor(), status: 201 }
   }
 
-  async getAll (limit: number, offset: number): Promise<any> {
+  async getAll (limit: number, offset: number, search?: string): Promise<any> {
+    let where
+
+    if (search !== undefined) {
+      where = {
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${search}%` } }
+        ]
+      }
+    }
     const records = await db[this.model].findAndCountAll({
       limit,
       offset,
+      where,
       include: [
         {
           model: db.ProductCategoryTag,
-          attributes: {
-            exclude: ['deletedAt', 'productCategoryId']
-          },
+          attributes: ['id', 'name', 'type'],
           as: 'productCategoryTags',
           where: {
             type: 'category'

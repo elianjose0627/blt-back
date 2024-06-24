@@ -21,10 +21,11 @@ const withoutUser = [
   'ProductColor', 'ProductMaterial', 'ProductSize',
   'ProductAccessControlGroup', 'ProductCategoryTagProductAccessControlGroup', 'UserProductAccessControlGroup',
   'CompanyProductAccessControlGroup', 'CompanyUserGroup', 'UserCompanyUserGroup',
-  'CompanyUserGroupProductAccessControlGroup'
+  'CompanyUserGroupProductAccessControlGroup', 'TaxRate', 'MassUnit',
+  'SalesUnit', 'ProductDetail', 'ProductProductCategory'
 ]
 
-const includeCompanyAndOwner = {
+export const includeCompanyAndOwner = {
   model: db.Company,
   attributes: ['id', 'customerId', 'name', 'suffix', 'email', 'phone', 'vat', 'domain', 'isDomainVerified'],
   as: 'company',
@@ -158,9 +159,12 @@ export const generateInclude = (model: string): any => {
       {
         model: db.ProductCategory,
         attributes: {
-          exclude: ['deletedAt']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt']
         },
-        as: 'productCategory'
+        as: 'productCategories',
+        through: {
+          attributes: []
+        }
       },
       {
         model: db.ProductTag,
@@ -192,7 +196,7 @@ export const generateInclude = (model: string): any => {
       {
         model: db.Product,
         attributes: {
-          exclude: ['deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId']
         },
         as: 'children',
         include: [
@@ -222,7 +226,7 @@ export const generateInclude = (model: string): any => {
       {
         model: db.ProductGraduatedPrice,
         attributes: {
-          exclude: ['deletedAt', 'productId']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId']
         },
         as: 'graduatedPrices'
       },
@@ -442,6 +446,7 @@ class BaseService {
 
   async update (record: any, data: any): Promise<any> {
     const updatedRecord = await record.update(data)
+    await updatedRecord.reload()
 
     return updatedRecord.toJSONFor()
   }

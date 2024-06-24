@@ -112,7 +112,7 @@ describe('Product actions', () => {
       expect(res.body.products).to.be.an('array')
     })
 
-    it('Should return 200 Success when an admin successfully retrieves all products excluding chilren.', async () => {
+    it('Should return 200 Success when an admin successfully retrieves all products excluding children.', async () => {
       const resProductParent = await chai
         .request(app)
         .post('/api/products')
@@ -160,13 +160,18 @@ describe('Product actions', () => {
           search: 'Phone',
           filter: {
             showChildren: 'false'
-          }
+          },
+          select: 'type, description'
         })
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'products')
       expect(res.body.products).to.be.an('array').lengthOf(1)
+      expect(res.body.products[0]).to.not.include.keys('jfsku', 'merchantSku', 'productGroup', 'pictures', 'isVisible', 'isParent',
+        'recommendedNetSalePrice', 'shippingWeight', 'weight', 'barcode',
+        'upc', 'taric', 'originCountry', 'bestBeforeDate',
+        'serialNumberTracking', 'width', 'height', 'length')
     })
 
     it('Should return 200 Success when an admin successfully retrieves all products with category params.', async () => {
@@ -182,7 +187,7 @@ describe('Product actions', () => {
 
       const productCategoryId = resProductCategory.body.productCategory.id
 
-      await chai
+      const resProduct = await chai
         .request(app)
         .post('/api/products')
         .set('Authorization', `Bearer ${tokenAdmin}`)
@@ -192,8 +197,18 @@ describe('Product actions', () => {
             jfsku: '1231pc',
             merchantSku: '1231pc',
             type: 'generic',
-            productGroup: 'technology',
-            productCategoryId
+            productGroup: 'technology'
+          }
+        })
+      const productId = resProduct.body.product.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
           }
         })
       const res = await chai
@@ -226,7 +241,7 @@ describe('Product actions', () => {
 
       const productCategoryId = resProductCategory.body.productCategory.id
 
-      await chai
+      const resProduct = await chai
         .request(app)
         .post('/api/products')
         .set('Authorization', `Bearer ${tokenAdmin}`)
@@ -237,12 +252,23 @@ describe('Product actions', () => {
             merchantSku: '1231sw',
             type: 'generic',
             productGroup: 'clothing',
-            productCategoryId,
             netRetailPrice: {
               amount: 200,
               currency: 'EUR',
               discount: 0
             }
+          }
+        })
+
+      const productId = resProduct.body.product.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
           }
         })
       const res = await chai
@@ -277,7 +303,7 @@ describe('Product actions', () => {
 
       const productCategoryId = resProductCategory.body.productCategory.id
 
-      await chai
+      const resProduct = await chai
         .request(app)
         .post('/api/products')
         .set('Authorization', `Bearer ${tokenAdmin}`)
@@ -288,12 +314,22 @@ describe('Product actions', () => {
             merchantSku: '1231sw',
             type: 'generic',
             productGroup: 'clothing',
-            productCategoryId,
             netRetailPrice: {
               amount: 710,
               currency: 'EUR',
               discount: 0
             }
+          }
+        })
+      const productId = resProduct.body.product.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
           }
         })
       const res = await chai
@@ -364,7 +400,7 @@ describe('Product actions', () => {
 
       const productSizeId = resProductSize.body.productSize.id
 
-      await chai
+      const resProduct = await chai
         .request(app)
         .post('/api/products')
         .set('Authorization', `Bearer ${tokenAdmin}`)
@@ -375,10 +411,21 @@ describe('Product actions', () => {
             merchantSku: '1231bt',
             type: 'generic',
             productGroup: 'shoes',
-            productCategoryId,
             productColorId,
             productMaterialId,
             productSizeId
+          }
+        })
+
+      const productId = resProduct.body.product.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
           }
         })
       const res = await chai
@@ -446,12 +493,22 @@ describe('Product actions', () => {
             jfsku: '1231ph',
             merchantSku: '1231ph',
             type: 'generic',
-            productGroup: 'phones',
-            productCategoryId
+            productGroup: 'phones'
           }
         })
 
       const productId = String(resProduct.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
+          }
+        })
+
       await chai
         .request(app)
         .post(`/api/products/${productId}/tags`)
@@ -477,6 +534,21 @@ describe('Product actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'products')
       expect(res.body.products).to.be.an('array').lengthOf.above(0)
       expect(res.body.meta.total).to.equal(1)
+    })
+
+    it('Should return 422 Unprocessable Entity when an admin tries to retrieve all products with disallowed select options.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .query({
+          select: 'type1'
+        })
+
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.be.equal(false)
+      expect(res.body.errors.message).to.equal('A validation error has occured')
     })
 
     it('Should return 403 when a non-admin retrieves all products.', async () => {
@@ -914,6 +986,16 @@ describe('Product actions', () => {
 
       const productCategoryId = resProductCategory.body.productCategory.id
 
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
+          }
+        })
+
       const res = await chai
         .request(app)
         .put(`/api/products/${String(productId)}`)
@@ -921,29 +1003,6 @@ describe('Product actions', () => {
         .send({
           product: {
             name: 'Soda Water Fresh',
-            jfsku: '1231',
-            merchantSku: '1231',
-            type: 'generic',
-            productGroup: 'beverage',
-            productCategoryId
-          }
-        })
-
-      expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'product')
-      expect(res.body.product).to.be.an('object')
-      expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt', 'company', 'productCategory')
-      expect(res.body.product.name).to.equal('Soda Water Fresh')
-    })
-
-    it('Should return 404 Not Found when an administrator updates a product by id with a category that does not exist.', async () => {
-      const resProduct = await chai
-        .request(app)
-        .post('/api/products')
-        .set('Authorization', `Bearer ${tokenAdmin}`)
-        .send({
-          product: {
-            name: 'Soda Water',
             jfsku: '1231',
             merchantSku: '1231',
             type: 'generic',
@@ -951,26 +1010,11 @@ describe('Product actions', () => {
           }
         })
 
-      const productId = resProduct.body.product.id
-
-      const res = await chai
-        .request(app)
-        .put(`/api/products/${String(productId)}`)
-        .set('Authorization', `Bearer ${tokenAdmin}`)
-        .send({
-          product: {
-            name: 'Soda Water Fresh',
-            jfsku: '1231',
-            merchantSku: '1231',
-            type: 'generic',
-            productGroup: 'beverage',
-            productCategoryId: uuidv1()
-          }
-        })
-
-      expect(res).to.have.status(404)
-      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Product category not found')
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'product')
+      expect(res.body.product).to.be.an('object')
+      expect(res.body.product).to.include.keys('id', 'name', 'jfsku', 'merchantSku', 'productGroup', 'type', 'netRetailPrice', 'createdAt', 'updatedAt', 'company', 'productCategories')
+      expect(res.body.product.name).to.equal('Soda Water Fresh')
     })
 
     it('Should return 403 Forbidden when an non-employee, non-admin, non-owner tries to update a product by id.', async () => {
@@ -1205,38 +1249,6 @@ describe('Product actions', () => {
   })
 
   describe('Product Tags', () => {
-    it('Should return 400 Bad Request when an admin tries to add a tag to a product without a category', async () => {
-      const resProduct = await chai
-        .request(app)
-        .post('/api/products')
-        .set('Authorization', `Bearer ${tokenAdmin}`)
-        .send({
-          product: {
-            name: 'Sparkling Water',
-            jfsku: 'J13371',
-            merchantSku: '10371',
-            type: 'generic',
-            productGroup: 'beverage'
-          }
-        })
-
-      const productId = resProduct.body.product.id
-
-      const res = await chai
-        .request(app)
-        .post(`/api/products/${String(productId)}/tags`)
-        .set('Authorization', `Bearer ${tokenAdmin}`)
-        .send({
-          productTag: {
-            productCategoryTagIds: [uuidv1()]
-          }
-        })
-
-      expect(res).to.have.status(400)
-      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Assign a category to this product in order to add tags')
-    })
-
     it('Should return 201 Created when an admin adds a tag to a product', async () => {
       const resProductCategory = await chai
         .request(app)
@@ -1272,12 +1284,21 @@ describe('Product actions', () => {
             jfsku: 'J12371',
             merchantSku: '12371',
             type: 'generic',
-            productGroup: 'beverage',
-            productCategoryId
+            productGroup: 'beverage'
           }
         })
 
       const productId = resProduct.body.product.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
+          }
+        })
 
       const res = await chai
         .request(app)
@@ -1329,12 +1350,21 @@ describe('Product actions', () => {
             jfsku: 'J34971',
             merchantSku: '42721',
             type: 'generic',
-            productGroup: 'laptop',
-            productCategoryId
+            productGroup: 'laptop'
           }
         })
 
       const productId = resProduct.body.product.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
+          }
+        })
 
       await chai
         .request(app)
@@ -1384,12 +1414,21 @@ describe('Product actions', () => {
             jfsku: 'J12371',
             merchantSku: '12371',
             type: 'generic',
-            productGroup: 'beverage',
-            productCategoryId
+            productGroup: 'beverage'
           }
         })
 
       const productId = resProduct.body.product.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
+          }
+        })
 
       const res = await chai
         .request(app)
@@ -1429,12 +1468,21 @@ describe('Product actions', () => {
             jfsku: 'J12371',
             merchantSku: '12371',
             type: 'generic',
-            productGroup: 'beverage',
-            productCategoryId
+            productGroup: 'beverage'
           }
         })
 
       const productId = resProduct.body.product.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
+          }
+        })
 
       const res = await chai
         .request(app)
@@ -1451,7 +1499,7 @@ describe('Product actions', () => {
       expect(res.body.errors.message).to.be.equal('Product Tags not found')
     })
 
-    it('Should return 404 Not Found when an admin tries to add a tag that belongs to another category from the product', async () => {
+    it('Should return 201 Created when an admim adds a tag that belongs to another category to the product', async () => {
       const resProductCategory = await chai
         .request(app)
         .post('/api/product-categories')
@@ -1508,12 +1556,21 @@ describe('Product actions', () => {
             jfsku: 'J12371',
             merchantSku: '12371',
             type: 'generic',
-            productGroup: 'beverage',
-            productCategoryId
+            productGroup: 'beverage'
           }
         })
 
       const productId = resProduct.body.product.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
+          }
+        })
 
       const res = await chai
         .request(app)
@@ -1525,9 +1582,9 @@ describe('Product actions', () => {
           }
         })
 
-      expect(res).to.have.status(404)
-      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.be.equal('Product Tag not found')
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productTags')
+      expect(res.body.productTags).to.be.an('array').lengthOf.above(0)
     })
 
     it('Should return 204 No Content when an admin removes tags from a product', async () => {
@@ -1565,12 +1622,21 @@ describe('Product actions', () => {
             jfsku: 'J12372',
             merchantSku: '12372',
             type: 'generic',
-            productGroup: 'beverage',
-            productCategoryId
+            productGroup: 'beverage'
           }
         })
 
       const productId = resProduct.body.product.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
+          }
+        })
 
       await chai
         .request(app)
@@ -1654,12 +1720,21 @@ describe('Product actions', () => {
             jfsku: 'J12312',
             merchantSku: '12312',
             type: 'generic',
-            productGroup: 'machinery',
-            productCategoryId
+            productGroup: 'machinery'
           }
         })
 
       const productId = resProduct.body.product.id
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
+          }
+        })
 
       await chai
         .request(app)
@@ -2077,13 +2152,18 @@ describe('Product actions', () => {
         .get('/api/products/catalogue')
         .query({
           limit: 10,
-          page: 1
+          page: 1,
+          select: 'type, description'
         })
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'products')
       expect(res.body.products).to.be.an('array').lengthOf.above(1)
+      expect(res.body.products[0]).to.not.include.keys('jfsku', 'merchantSku', 'productGroup', 'pictures', 'isVisible', 'isParent',
+        'recommendedNetSalePrice', 'shippingWeight', 'weight', 'barcode',
+        'upc', 'taric', 'originCountry', 'bestBeforeDate',
+        'serialNumberTracking', 'width', 'height', 'length')
     })
 
     it('Should return 200 OK when a user gets the product catalogue', async () => {
@@ -2192,12 +2272,21 @@ describe('Product actions', () => {
             jfsku: '1231tr10',
             merchantSku: '1231tr10',
             type: 'generic',
-            productGroup: 'technology',
-            productCategoryId
+            productGroup: 'technology'
           }
         })
 
       const productId = String(resProduct.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
+          }
+        })
 
       await chai
         .request(app)
@@ -2304,12 +2393,21 @@ describe('Product actions', () => {
             jfsku: '1231nk3310',
             merchantSku: '1231nk3310',
             type: 'generic',
-            productGroup: 'technology',
-            productCategoryId
+            productGroup: 'technology'
           }
         })
 
       const productId = String(resProduct.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
+          }
+        })
 
       await chai
         .request(app)
@@ -2418,7 +2516,6 @@ describe('Product actions', () => {
             merchantSku: '1231opnce',
             type: 'generic',
             productGroup: 'technology',
-            productCategoryId,
             netRetailPrice: {
               amount: 200,
               currency: 'EUR',
@@ -2428,6 +2525,16 @@ describe('Product actions', () => {
         })
 
       const productId = String(resProduct.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
+          }
+        })
 
       await chai
         .request(app)
@@ -2539,7 +2646,6 @@ describe('Product actions', () => {
             merchantSku: '1231lg',
             type: 'generic',
             productGroup: 'technology',
-            productCategoryId,
             netRetailPrice: {
               amount: 500,
               currency: 'EUR',
@@ -2549,6 +2655,16 @@ describe('Product actions', () => {
         })
 
       const productId = String(resProduct.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
+          }
+        })
 
       await chai
         .request(app)
@@ -2659,7 +2775,6 @@ describe('Product actions', () => {
             merchantSku: '1231snxp',
             type: 'generic',
             productGroup: 'technology',
-            productCategoryId,
             isParent: true,
             netRetailPrice: {
               amount: 500,
@@ -2670,6 +2785,16 @@ describe('Product actions', () => {
         })
 
       const productId = String(resProduct.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
+          }
+        })
 
       const resProductChild = await chai
         .request(app)
@@ -2682,7 +2807,6 @@ describe('Product actions', () => {
             merchantSku: '1231snxp2',
             type: 'generic',
             productGroup: 'technology',
-            productCategoryId,
             netRetailPrice: {
               amount: 500,
               currency: 'EUR',
@@ -2692,6 +2816,16 @@ describe('Product actions', () => {
         })
 
       const productChildId = String(resProductChild.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productChildId]
+          }
+        })
 
       await chai
         .request(app)
@@ -2847,12 +2981,21 @@ describe('Product actions', () => {
             jfsku: '1231gxn1',
             merchantSku: '1231gxn1',
             type: 'generic',
-            productGroup: 'technology',
-            productCategoryId
+            productGroup: 'technology'
           }
         })
 
       const productId = String(resProduct.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
+          }
+        })
 
       await chai
         .request(app)
@@ -2987,12 +3130,21 @@ describe('Product actions', () => {
             jfsku: '1231smcb1',
             merchantSku: '1231smcb1',
             type: 'generic',
-            productGroup: 'technology',
-            productCategoryId
+            productGroup: 'technology'
           }
         })
 
       const productId = String(resProduct.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
+          }
+        })
 
       await chai
         .request(app)
@@ -3127,12 +3279,21 @@ describe('Product actions', () => {
             jfsku: '1231iph10',
             merchantSku: '1231iph10',
             type: 'generic',
-            productGroup: 'technology',
-            productCategoryId
+            productGroup: 'technology'
           }
         })
 
       const productId = String(resProduct.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId]
+          }
+        })
 
       await chai
         .request(app)
