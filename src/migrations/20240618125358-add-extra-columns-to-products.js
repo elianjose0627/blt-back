@@ -92,7 +92,7 @@ module.exports = {
           key: 'id'
         }
       }),
-      queryInterface.addColumn('Products', 'metadataSynced', {
+      queryInterface.addColumn('Products', 'isMetadataSynced', {
         defaultValue: false,
         type: Sequelize.BOOLEAN
       })
@@ -116,7 +116,7 @@ module.exports = {
       queryInterface.removeColumn('Products', 'salesUnitId'),
       queryInterface.removeColumn('Products', 'massUnitId'),
       queryInterface.removeColumn('Products', 'productDetailId'),
-      queryInterface.removeColumn('Products', 'metadataSynced')
+      queryInterface.removeColumn('Products', 'isMetadataSynced')
     ])
   }
 }
