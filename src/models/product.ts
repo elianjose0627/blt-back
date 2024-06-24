@@ -28,11 +28,12 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     upc: Nullable<string>
     taric: Nullable<string>
     originCountry: Nullable<string>
-    bestBeforeDate: Boolean
-    serialNumberTracking: Boolean
+    bestBeforeDate: boolean
+    serialNumberTracking: boolean
     width: number
     height: number
     length: number
+    isMetadataSynced: boolean
   }
 
   class Product extends Model<ProductAttributes> {
@@ -63,8 +64,8 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     private readonly upc: Nullable<string>
     private readonly taric: Nullable<string>
     private readonly originCountry: Nullable<string>
-    private readonly bestBeforeDate: Boolean
-    private readonly serialNumberTracking: Boolean
+    private readonly bestBeforeDate: boolean
+    private readonly serialNumberTracking: boolean
     private readonly width: number
     private readonly height: number
     private readonly productLength: number
@@ -72,6 +73,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     private readonly salesUnit: ISalesUnit
     private readonly taxRate: ITaxRate
     private readonly metadata: IProductDetail
+    private readonly isMetadataSynced: boolean
 
     static associate (models: any): any {
       Product.belongsTo(models.Company, {
@@ -172,6 +174,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         salesUnit: this.salesUnit,
         taxRate: this.taxRate,
         metadata: this.metadata,
+        isMetadataSynced: this.isMetadataSynced,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       }
@@ -282,6 +285,10 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false,
       defaultValue: 0.00,
       type: DataTypes.DOUBLE
+    },
+    isMetadataSynced: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   }, {
     sequelize,
