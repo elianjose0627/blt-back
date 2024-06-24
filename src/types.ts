@@ -545,8 +545,8 @@ export interface IProduct {
   upc: Nullable<string>
   taric: Nullable<string>
   originCountry: Nullable<string>
-  bestBeforeDate: Boolean
-  serialNumberTracking: Boolean
+  bestBeforeDate: boolean
+  serialNumberTracking: boolean
   width: number
   height: number
   length: number
@@ -554,6 +554,7 @@ export interface IProduct {
   salesUnit: ISalesUnit
   taxRate: ITaxRate
   metadata: IProductDetail
+  isMetadataSynced: boolean
 }
 
 export interface ICampaignOrderLimit {
