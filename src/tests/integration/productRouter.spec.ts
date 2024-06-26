@@ -3575,7 +3575,7 @@ describe('Product actions', () => {
         .get('/api/products/004492b8-1ef3-4449-81f1-35fcdedba799/catalogue')
         .set('Authorization', `Bearer ${token}`)
 
-      expect(res).to.have.status(200)
+      expect(res).to.have.status(404)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('Product not found')
     })
