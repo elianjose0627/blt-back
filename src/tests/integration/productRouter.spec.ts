@@ -3357,6 +3357,149 @@ describe('Product actions', () => {
       expect(res.body.product.name).to.equal('iPhone')
     })
 
+    it('Should return 200 OK when a user in a product access control group gets a similar product tags in the catalogue', async () => {
+      await createVerifiedUser('ivers917@kreeprotectedproducts.kr', '1234567890')
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'ivers917@kreeprotectedproducts.kr', password: '1234567890' } })
+
+      const tokenUser = String(resUser.body.token)
+      const userId = String(resUser.body.user.id)
+
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'technology'
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      const resProductCategoryTag = await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTag: {
+            name: 'watch'
+          }
+        })
+      const productCategoryTagId = resProductCategoryTag.body.productCategoryTag.id
+
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Apple Smart Watch',
+            jfsku: '1231isw10',
+            merchantSku: '1231isw10',
+            type: 'generic',
+            productGroup: 'technology'
+          }
+        })
+      const productId = String(resProduct.body.product.id)
+      const resProduct2 = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Apple Smart Watch 2',
+            jfsku: '1231isw102',
+            merchantSku: '1231isw102',
+            type: 'generic',
+            productGroup: 'technology'
+          }
+        })
+
+      const productId2 = String(resProduct2.body.product.id)
+
+      await chai
+        .request(app)
+        .post(`/api/product-categories/${String(productCategoryId)}/products`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            productIds: [productId, productId2]
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/products/${String(productId)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productTag: {
+            productCategoryTagIds: [productCategoryTagId]
+          }
+        })
+      await chai
+        .request(app)
+        .post(`/api/products/${String(productId2)}/tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productTag: {
+            productCategoryTagIds: [productCategoryTagId]
+          }
+        })
+
+      // Create a product access control group
+      const resProductAccessControlGroup = await chai
+        .request(app)
+        .post('/api/product-access-control-groups')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productAccessControlGroup: {
+            name: 'Test Access Control Group Apple Watch'
+          }
+        })
+
+      const productAccessControlGroupId = resProductAccessControlGroup.body.productAccessControlGroup.id
+
+      // Add tag and user to the product access control group
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          userProductAccessControlGroup: {
+            userIds: [
+              userId
+            ]
+          }
+        })
+      await chai
+        .request(app)
+        .post(`/api/product-access-control-groups/${String(productAccessControlGroupId)}/product-category-tags`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategoryTagProductAccessControlGroup: {
+            productCategoryTagIds: [
+              productCategoryTagId
+            ]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${productId}/catalogue/similar`)
+        .query({
+          limit: 10,
+          page: 1
+        })
+        .set('Authorization', `Bearer ${tokenUser}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'meta', 'productTags')
+      expect(res.body.productTags).to.be.an('array').lengthOf.above(0)
+    })
+
     it('Should return 403 Forbidden when a user not in a product access control group tries to get a product in the catalogue', async () => {
       await createVerifiedUser('ivers974@kreeprotectedproducts.kr', '1234567890')
       const resUser = await chai
