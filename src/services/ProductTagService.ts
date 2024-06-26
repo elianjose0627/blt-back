@@ -67,32 +67,57 @@ class ProductTagService extends BaseService {
   }
 
   async getSimilarProducts (limit: number, offset: number, productCategoryTagIds: string[], productId: string): Promise<any> {
-    const response = await sequelizeInstance.query(
-      `
-      SELECT DISTINCT ON ("ProductTag"."productId")
-        "ProductTag"."createdAt",
-        "ProductTag"."updatedAt",
-        "product"."id" AS "product.id",
-        "product"."name" AS "product.name",
-        "product"."pictures" AS "product.pictures"
-      FROM "ProductTags" AS "ProductTag"
-      LEFT OUTER JOIN "Products" AS "product"
-        ON "ProductTag"."productId" = "product"."id" AND ("product"."deletedAt" IS NULL)
-      WHERE "ProductTag"."deletedAt" IS NULL
-        AND "ProductTag"."productId" != :productId
-        AND "ProductTag"."productCategoryTagId" IN (:productCategoryTagIds)
-      ORDER BY "ProductTag"."productId", "ProductTag"."createdAt" DESC
-      LIMIT :limit OFFSET :offset;
-      `,
-      {
-        replacements: { productCategoryTagIds, productId, limit, offset },
-        type: QueryTypes.SELECT,
-        nest: true
+    if (productCategoryTagIds.length > 0) {
+      const response = await sequelizeInstance.query(
+        `
+        SELECT DISTINCT ON ("ProductTag"."productId")
+          "ProductTag"."createdAt",
+          "ProductTag"."updatedAt",
+          "product"."id" AS "product.id",
+          "product"."name" AS "product.name",
+          "product"."pictures" AS "product.pictures"
+        FROM "ProductTags" AS "ProductTag"
+        LEFT OUTER JOIN "Products" AS "product"
+          ON "ProductTag"."productId" = "product"."id" AND ("product"."deletedAt" IS NULL)
+        WHERE "ProductTag"."deletedAt" IS NULL
+          AND "ProductTag"."productId" != :productId
+          AND "ProductTag"."productCategoryTagId" IN (:productCategoryTagIds)
+        ORDER BY "ProductTag"."productId", "ProductTag"."createdAt" DESC
+        LIMIT :limit OFFSET :offset;
+        `,
+        {
+          replacements: { productCategoryTagIds, productId, limit, offset },
+          type: QueryTypes.SELECT,
+          nest: true
+        }
+      )
+      return {
+        rows: response,
+        count: response.length
       }
-    )
-    return {
-      rows: response,
-      count: response.length
+    } else {
+      const response = await db[this.model].findAndCountAll({
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: {
+          exclude: ['deletedAt', 'productCategoryTagId', 'productId']
+        },
+        where: {
+          productCategoryTagId: productCategoryTagIds,
+          [Op.not]: {
+            productId
+          }
+        },
+        include: [
+          {
+            model: db.Product,
+            as: 'product',
+            attributes: ['id', 'name', 'pictures']
+          }
+        ]
+      })
+      return response
     }
   }
 }
