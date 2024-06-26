@@ -3357,7 +3357,7 @@ describe('Product actions', () => {
       expect(res.body.product.name).to.equal('iPhone')
     })
 
-    it('Should return 200 OK when a user in a product access control group gets a similar product tags in the catalogue', async () => {
+    it('Should return 200 OK when a user in a product access control group gets similar product tags in the catalogue', async () => {
       await createVerifiedUser('ivers917@kreeprotectedproducts.kr', '1234567890')
       const resUser = await chai
         .request(app)
@@ -3498,6 +3498,36 @@ describe('Product actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'meta', 'productTags')
       expect(res.body.productTags).to.be.an('array').lengthOf.above(0)
+    })
+
+    it('Should return 200 OK when admin gets similar product tags in the catalogue for an untagged product', async () => {
+      const resProduct = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Apple Smart Watch 4',
+            jfsku: '1231isw104',
+            merchantSku: '1231isw104',
+            type: 'generic',
+            productGroup: 'technology'
+          }
+        })
+      const productId = String(resProduct.body.product.id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${productId}/catalogue/similar`)
+        .query({
+          limit: 10,
+          page: 1
+        })
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'meta', 'productTags')
+      expect(res.body.productTags).to.be.an('array').lengthOf(0)
     })
 
     it('Should return 403 Forbidden when a user not in a product access control group tries to get a product in the catalogue', async () => {

@@ -20,18 +20,20 @@ class ProductController extends BaseController {
 
     if (accessProductCategoryTags !== undefined) {
       record = await productService.getCatalogueSingle(id)
-      const { productTags }: { productTags: IProductTag[] } = record
-      const productCategoryTags = productTags.map(tag => tag.productCategoryTag.id)
+      if (record !== null) {
+        const { productTags }: { productTags: IProductTag[] } = record
+        const productCategoryTags = productTags.map(tag => tag.productCategoryTag.id)
 
-      const hasAccess = productCategoryTags.some(tag => accessProductCategoryTags.includes(tag))
-      if (user.role !== userRoles.ADMIN && !hasAccess) {
-        return res.status(statusCodes.FORBIDDEN).send({
-          statusCode: statusCodes.FORBIDDEN,
-          success: false,
-          errors: {
-            message: 'You do not have access to this product in the catalogue'
-          }
-        })
+        const hasAccess = productCategoryTags.some(tag => accessProductCategoryTags.includes(tag))
+        if (user.role !== userRoles.ADMIN && !hasAccess) {
+          return res.status(statusCodes.FORBIDDEN).send({
+            statusCode: statusCodes.FORBIDDEN,
+            success: false,
+            errors: {
+              message: 'You do not have access to this product in the catalogue'
+            }
+          })
+        }
       }
     } else {
       record = await productService.get(id)
