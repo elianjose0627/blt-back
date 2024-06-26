@@ -65,6 +65,31 @@ class ProductTagService extends BaseService {
 
     return { response: response.map((response: any) => response.toJSONFor()), status: 201 }
   }
+
+  async getSimilarProducts (limit: number, offset: number, productCategoryTagId: string[], productId: string): Promise<any> {
+    const response = await db[this.model].findAndCountAll({
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+      attributes: {
+        exclude: ['deletedAt', 'productCategoryTagId', 'productId']
+      },
+      where: {
+        productCategoryTagId,
+        [Op.not]: {
+          productId
+        }
+      },
+      include: [
+        {
+          model: db.Product,
+          as: 'product',
+          attributes: ['id', 'name', 'pictures']
+        }
+      ]
+    })
+    return response
+  }
 }
 
 export default ProductTagService
