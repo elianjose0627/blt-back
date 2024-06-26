@@ -3568,5 +3568,16 @@ describe('Product actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('You do not have access to this product in the catalogue')
     })
+
+    it('Should return 404 Not Found when a user tries to get a product that does not exists in the catalogue', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/products/004492b8-1ef3-4449-81f1-35fcdedba799/catalogue')
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Product not found')
+    })
   })
 })
