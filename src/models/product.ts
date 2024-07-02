@@ -34,6 +34,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     height: number
     length: number
     isMetadataSynced: boolean
+    isExceedStockEnabled: boolean
   }
 
   class Product extends Model<ProductAttributes> {
@@ -74,6 +75,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     private readonly taxRate: ITaxRate
     private readonly metadata: IProductDetail
     private readonly isMetadataSynced: boolean
+    private readonly isExceedStockEnabled: boolean
 
     static associate (models: any): any {
       Product.belongsTo(models.Company, {
@@ -175,6 +177,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         taxRate: this.taxRate,
         metadata: this.metadata,
         isMetadataSynced: this.isMetadataSynced,
+        isExceedStockEnabled: this.isExceedStockEnabled,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       }
@@ -287,6 +290,11 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
       type: DataTypes.DOUBLE
     },
     isMetadataSynced: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    isExceedStockEnabled: {
+      allowNull: false,
       type: DataTypes.BOOLEAN,
       defaultValue: false
     }

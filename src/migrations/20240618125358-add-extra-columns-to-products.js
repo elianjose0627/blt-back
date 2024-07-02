@@ -93,6 +93,12 @@ module.exports = {
         }
       }),
       queryInterface.addColumn('Products', 'isMetadataSynced', {
+        allowNull: false,
+        defaultValue: false,
+        type: Sequelize.BOOLEAN
+      }),
+      queryInterface.addColumn('Products', 'isExceedStockEnabled', {
+        allowNull: false,
         defaultValue: false,
         type: Sequelize.BOOLEAN
       })
@@ -116,7 +122,8 @@ module.exports = {
       queryInterface.removeColumn('Products', 'salesUnitId'),
       queryInterface.removeColumn('Products', 'massUnitId'),
       queryInterface.removeColumn('Products', 'productDetailId'),
-      queryInterface.removeColumn('Products', 'isMetadataSynced')
+      queryInterface.removeColumn('Products', 'isMetadataSynced'),
+      queryInterface.removeColumn('Products', 'isExceedStockEnabled')
     ])
   }
 }
