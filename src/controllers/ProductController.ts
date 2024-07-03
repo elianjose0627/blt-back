@@ -354,6 +354,31 @@ class ProductController extends BaseController {
       [productTagService.manyRecords()]: response.rows
     })
   }
+
+  async getProductVariations (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const {
+      query: { limit, page, offset },
+      params: { id },
+      record: product
+    } = req
+
+    const parentId = product.isParent === true ? id : product.parentId
+
+    const response = await productService.getProductVariations(limit, offset, parentId)
+    const meta = {
+      total: response.count,
+      pageCount: Math.ceil(response.count / limit),
+      perPage: limit,
+      page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      [productService.manyRecords()]: response.rows
+    })
+  }
 }
 
 export default new ProductController(productService)
