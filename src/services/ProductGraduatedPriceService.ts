@@ -14,7 +14,8 @@ class ProductGraduatedPriceService extends BaseService {
     response = await db[this.model].findOne({
       where: {
         firstUnit: productGraduatedPrice.firstUnit,
-        lastUnit: productGraduatedPrice.lastUnit
+        lastUnit: productGraduatedPrice.lastUnit,
+        productId: product.id
       },
       paranoid: false // To get soft deleted record
     })
