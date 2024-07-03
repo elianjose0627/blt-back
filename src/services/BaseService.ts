@@ -196,7 +196,7 @@ export const generateInclude = (model: string): any => {
       {
         model: db.Product,
         attributes: {
-          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId', 'massUnitId', 'salesUnitId', 'taxRateId', 'productDetailId']
         },
         as: 'children',
         include: [

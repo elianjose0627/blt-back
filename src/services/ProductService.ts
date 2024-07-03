@@ -69,7 +69,7 @@ const generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties = (f
       {
         model: db.Product,
         attributes: {
-          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'parentId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId']
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'parentId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId', 'massUnitId', 'salesUnitId', 'taxRateId', 'productDetailId']
         },
         as: 'children',
         include: [
@@ -492,7 +492,7 @@ class ProductService extends BaseService {
         {
           model: db.Product,
           attributes: {
-            exclude: ['createdAt', 'updatedAt', 'deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId']
+            exclude: ['createdAt', 'updatedAt', 'deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId', 'massUnitId', 'salesUnitId', 'taxRateId', 'productDetailId']
           },
           as: 'children',
           include: [
@@ -636,6 +636,47 @@ class ProductService extends BaseService {
         }
       },
       returning: true
+    })
+    return response
+  }
+
+  async getProductVariations (limit: number, offset: number, parentId: string): Promise<any> {
+    const response = await db[this.model].findAndCountAll({
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+      attributes: {
+        exclude: ['createdAt', 'updatedAt', 'deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId', 'massUnitId', 'salesUnitId', 'taxRateId', 'productDetailId']
+      },
+      where: {
+        parentId,
+        [Op.not]: {
+          parentId: null
+        }
+      },
+      include: [
+        {
+          model: db.ProductColor,
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt']
+          },
+          as: 'productColor'
+        },
+        {
+          model: db.ProductMaterial,
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt']
+          },
+          as: 'productMaterial'
+        },
+        {
+          model: db.ProductSize,
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt']
+          },
+          as: 'productSize'
+        }
+      ]
     })
     return response
   }

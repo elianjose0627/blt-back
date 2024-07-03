@@ -37,6 +37,10 @@ const ProductRoutes = (): Router => {
     .get(celebrate({
       [Segments.QUERY]: validator.validateProductQueryParams
     }), asyncHandler(paginate), asyncHandler(ProductController.getSimilarProducts))
+  productRouter.route('/products/:id/catalogue/variations')
+    .get(celebrate({
+      [Segments.QUERY]: validator.validateProductQueryParams
+    }), asyncHandler(paginate), asyncHandler(ProductController.getProductVariations))
   productRouter.use('/products/:id', celebrate({
     [Segments.PARAMS]: validator.validateProductId
   }, { abortEarly: false }), asyncHandler(ProductController.checkRecord))

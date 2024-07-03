@@ -3530,6 +3530,112 @@ describe('Product actions', () => {
       expect(res.body.productTags).to.be.an('array').lengthOf(0)
     })
 
+    it('Should return 200 Success when an admin successfully retrieves all product variations for a parent.', async () => {
+      const resProductParent = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Smart Watch 26',
+            jfsku: '1231sw26',
+            merchantSku: '1231sw26',
+            type: 'generic',
+            productGroup: 'technology',
+            isParent: true
+          }
+        })
+      const parentProductId = String(resProductParent.body.product.id)
+      const resProductChild = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Smart Watch 26 2',
+            jfsku: '1231sw262',
+            merchantSku: '1231sw262',
+            type: 'generic',
+            productGroup: 'technology'
+          }
+        })
+      const childProductId = String(resProductChild.body.product.id)
+      await chai
+        .request(app)
+        .patch(`/api/products/${childProductId}/child`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            parentId: parentProductId
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${parentProductId}/catalogue/variations`)
+        .query({
+          limit: 10,
+          page: 1
+        })
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
+    })
+
+    it('Should return 200 Success when an admin successfully retrieves all product variations for a child.', async () => {
+      const resProductParent = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Smart Watch 26 3',
+            jfsku: '1231sw263',
+            merchantSku: '1231sw263',
+            type: 'generic',
+            productGroup: 'technology',
+            isParent: true
+          }
+        })
+      const parentProductId = String(resProductParent.body.product.id)
+      const resProductChild = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Smart Watch 26 4',
+            jfsku: '1231sw264',
+            merchantSku: '1231sw264',
+            type: 'generic',
+            productGroup: 'technology'
+          }
+        })
+      const childProductId = String(resProductChild.body.product.id)
+      await chai
+        .request(app)
+        .patch(`/api/products/${childProductId}/child`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            parentId: parentProductId
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${childProductId}/catalogue/variations`)
+        .query({
+          limit: 10,
+          page: 1
+        })
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
+    })
+
     it('Should return 403 Forbidden when a user not in a product access control group tries to get a product in the catalogue', async () => {
       await createVerifiedUser('ivers974@kreeprotectedproducts.kr', '1234567890')
       const resUser = await chai
