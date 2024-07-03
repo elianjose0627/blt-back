@@ -364,7 +364,7 @@ class ProductController extends BaseController {
 
     const parentId = product.isParent === true ? id : product.parentId
 
-    const response = await productService.getProductVariations(limit, offset, parentId)
+    const response = await productService.getProductVariations(limit, offset, parentId, product.isParent)
     const meta = {
       total: response.count,
       pageCount: Math.ceil(response.count / limit),

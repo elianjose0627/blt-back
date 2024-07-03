@@ -640,7 +640,7 @@ class ProductService extends BaseService {
     return response
   }
 
-  async getProductVariations (limit: number, offset: number, parentId: string): Promise<any> {
+  async getProductVariations (limit: number, offset: number, parentId: string, isParent: boolean): Promise<any> {
     const response = await db[this.model].findAndCountAll({
       limit,
       offset,
@@ -649,10 +649,20 @@ class ProductService extends BaseService {
         exclude: ['createdAt', 'updatedAt', 'deletedAt', 'parentId', 'productCategoryId', 'companyId', 'productColorId', 'productMaterialId', 'productSizeId', 'massUnitId', 'salesUnitId', 'taxRateId', 'productDetailId']
       },
       where: {
-        parentId,
-        [Op.not]: {
-          parentId: null
-        }
+        [Op.or]: [
+          {
+            [Op.and]: [
+              { parentId },
+              { [Op.not]: { parentId: null } }
+            ]
+          },
+          {
+            [Op.and]: [
+              { id: parentId },
+              { isParent }
+            ]
+          }
+        ]
       },
       include: [
         {
