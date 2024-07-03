@@ -1,12 +1,13 @@
 import { v1 as uuidv1 } from 'uuid'
+import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
-import dayjs from 'dayjs'
 import triggerPubSub from '../utils/triggerPubSub'
 import * as userRoles from '../utils/userRoles'
 import * as statusCodes from '../constants/statusCodes'
 import { IDuplicatePostedOrder, IPendingOrder, IUserExtended } from '../types'
+import { Platform } from '../enums/platform'
 
 dayjs.extend(utc)
 
@@ -76,6 +77,7 @@ class PendingOrderService extends BaseService {
     const bulkInsertData = pendingOrders.map((pendingOrder: any) => ({
       ...pendingOrder,
       id: uuidv1(),
+      platform: Platform.Onlineshop,
       userId: currentUser.id,
       campaignId: null,
       customerId: company?.customerId ?? 0,

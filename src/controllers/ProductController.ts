@@ -2,6 +2,7 @@ import BaseController from './BaseController'
 import ProductService from '../services/ProductService'
 import CompanyService from '../services/CompanyService'
 import ProductGraduatedPriceService from '../services/ProductGraduatedPriceService'
+import ProductTagService from '../services/ProductTagService'
 import type { CustomNext, CustomRequest, CustomResponse, IProduct, IProductTag, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
@@ -10,11 +11,33 @@ import * as userRoles from '../utils/userRoles'
 const productService = new ProductService('Product')
 const companyService = new CompanyService('Company')
 const productGraduatedPriceService = new ProductGraduatedPriceService('ProductGraduatedPrice')
+const productTagService = new ProductTagService('ProductTag')
 
 class ProductController extends BaseController {
   async checkRecord (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
-    const { params: { id } } = req
-    const record = await productService.get(id)
+    const { params: { id }, accessProductCategoryTags, user } = req
+    let record
+
+    if (accessProductCategoryTags !== undefined) {
+      record = await productService.getCatalogueSingle(id)
+      if (record !== null) {
+        const { productTags }: { productTags: IProductTag[] } = record
+        const productCategoryTags = productTags.map(tag => tag.productCategoryTag.id)
+
+        const hasAccess = productCategoryTags.some(tag => accessProductCategoryTags.includes(tag))
+        if (user.role !== userRoles.ADMIN && !hasAccess) {
+          return res.status(statusCodes.FORBIDDEN).send({
+            statusCode: statusCodes.FORBIDDEN,
+            success: false,
+            errors: {
+              message: 'You do not have access to this product in the catalogue'
+            }
+          })
+        }
+      }
+    } else {
+      record = await productService.get(id)
+    }
 
     if (record === null) {
       return res.status(statusCodes.NOT_FOUND).send({
@@ -83,27 +106,7 @@ class ProductController extends BaseController {
   }
 
   async get (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { params: { id }, accessProductCategoryTags, user } = req
-    let record
-
-    if (accessProductCategoryTags !== undefined) {
-      record = await productService.getCatalogueSingle(id)
-      const { productTags }: { productTags: IProductTag[] } = record
-      const productCategoryTags = productTags.map(tag => tag.productCategoryTag.id)
-
-      const hasAccess = productCategoryTags.some(tag => accessProductCategoryTags.includes(tag))
-      if (user.role !== userRoles.ADMIN && !hasAccess) {
-        return res.status(statusCodes.FORBIDDEN).send({
-          statusCode: statusCodes.FORBIDDEN,
-          success: false,
-          errors: {
-            message: 'You do not have access to this product in the catalogue'
-          }
-        })
-      }
-    } else {
-      record = await productService.get(id)
-    }
+    const { record } = req
 
     return res.status(statusCodes.OK).send({
       statusCode: statusCodes.OK,
@@ -323,6 +326,57 @@ class ProductController extends BaseController {
       statusCode: statusCode[status],
       success: true,
       [productGraduatedPriceService.singleRecord()]: response
+    })
+  }
+
+  async getSimilarProducts (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const {
+      query: { limit, page, offset },
+      params: { id },
+      record: product
+    } = req
+
+    const { productTags }: { productTags: IProductTag[] } = product
+    const productCategoryTags = productTags.map(tag => tag.productCategoryTag.id)
+
+    const response = await productTagService.getSimilarProducts(limit, offset, productCategoryTags, id)
+    const meta = {
+      total: response.count,
+      pageCount: Math.ceil(response.count / limit),
+      perPage: limit,
+      page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      [productTagService.manyRecords()]: response.rows
+    })
+  }
+
+  async getProductVariations (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const {
+      query: { limit, page, offset },
+      params: { id },
+      record: product
+    } = req
+
+    const parentId = product.isParent === true ? id : product.parentId
+
+    const response = await productService.getProductVariations(limit, offset, parentId, product.isParent)
+    const meta = {
+      total: response.count,
+      pageCount: Math.ceil(response.count / limit),
+      perPage: limit,
+      page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      [productService.manyRecords()]: response.rows
     })
   }
 }

@@ -28,6 +28,19 @@ const ProductRoutes = (): Router => {
     }), asyncHandler(paginate),
     asyncHandler(setCatalogueAccess),
     asyncHandler(ProductController.getAll))
+  productRouter.use('/products/:id/catalogue', celebrate({
+    [Segments.PARAMS]: validator.validateProductId
+  }, { abortEarly: false }), asyncHandler(setCatalogueAccess), asyncHandler(ProductController.checkRecord))
+  productRouter.route('/products/:id/catalogue')
+    .get(asyncHandler(ProductController.get))
+  productRouter.route('/products/:id/catalogue/similar')
+    .get(celebrate({
+      [Segments.QUERY]: validator.validateProductQueryParams
+    }), asyncHandler(paginate), asyncHandler(ProductController.getSimilarProducts))
+  productRouter.route('/products/:id/catalogue/variations')
+    .get(celebrate({
+      [Segments.QUERY]: validator.validateProductQueryParams
+    }), asyncHandler(paginate), asyncHandler(ProductController.getProductVariations))
   productRouter.use('/products/:id', celebrate({
     [Segments.PARAMS]: validator.validateProductId
   }, { abortEarly: false }), asyncHandler(ProductController.checkRecord))
@@ -73,8 +86,6 @@ const ProductRoutes = (): Router => {
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateGraduatedPrice
     }, { abortEarly: false }), asyncHandler(ProductController.addGraduatedPrice))
-  productRouter.route('/products/:id/catalogue')
-    .get(asyncHandler(setCatalogueAccess), asyncHandler(ProductController.get))
   return productRouter
 }
 

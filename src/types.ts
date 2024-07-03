@@ -555,6 +555,7 @@ export interface IProduct {
   taxRate: ITaxRate
   metadata: IProductDetail
   isMetadataSynced: boolean
+  isExceedStockEnabled: boolean
 }
 
 export interface ICampaignOrderLimit {
