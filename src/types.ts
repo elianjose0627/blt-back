@@ -517,7 +517,7 @@ export interface IProductDetail {
 }
 export interface IProduct {
   id: string
-  jfsku: string
+  jfsku: Nullable<string>
   name: string
   description: string
   merchantSku: string
