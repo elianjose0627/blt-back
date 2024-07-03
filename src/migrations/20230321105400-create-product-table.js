@@ -8,7 +8,7 @@ module.exports = {
         type: Sequelize.UUID
       },
       jfsku: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.STRING
       },
       name: {

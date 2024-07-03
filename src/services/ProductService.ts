@@ -326,7 +326,10 @@ class ProductService extends BaseService {
           [Op.in]: isParent.split(',')
         },
         ...whereFilterPrice,
-        ...whereFilterShowChildren
+        ...whereFilterShowChildren,
+        jfsku: {
+          [Op.ne]: null
+        }
       },
       limit,
       offset,
@@ -433,7 +436,10 @@ class ProductService extends BaseService {
           [Op.in]: isParent.split(',')
         },
         ...whereFilterPrice,
-        ...whereFilterShowChildren
+        ...whereFilterShowChildren,
+        jfsku: {
+          [Op.ne]: null
+        }
       },
       limit,
       offset,

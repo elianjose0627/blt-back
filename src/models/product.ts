@@ -11,7 +11,7 @@ import type {
 const ProductModel = (sequelize: any, DataTypes: any): any => {
   interface ProductAttributes {
     id: string
-    jfsku: string
+    jfsku: Nullable<string>
     name: string
     description: string
     merchantSku: string
@@ -192,7 +192,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     },
     jfsku: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     name: {
       type: DataTypes.STRING,
