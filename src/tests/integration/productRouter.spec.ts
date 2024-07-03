@@ -3580,7 +3580,7 @@ describe('Product actions', () => {
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'products')
-      expect(res.body.products).to.be.an('array').lengthOf(1)
+      expect(res.body.products).to.be.an('array').lengthOf(2)
     })
 
     it('Should return 200 Success when an admin successfully retrieves all product variations for a child.', async () => {
