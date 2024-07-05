@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { IStock, Nullable } from '../types'
+import type { Nullable } from '../types'
 
 const StockModel = (sequelize: any, DataTypes: any): any => {
   interface StockAttributes {
@@ -14,34 +14,8 @@ const StockModel = (sequelize: any, DataTypes: any): any => {
   }
 
   class Stock extends Model<StockAttributes> {
-    private readonly id: string
-    private readonly jfsku: string
-    private readonly merchantSku: Nullable<string>
-    private readonly stockLevel: number
-    private readonly stockLevelAnnounced: number
-    private readonly stockLevelReserved: number
-    private readonly stockLevelBlocked: number
-    private readonly fulfillerTimestamp: Date
-    private readonly createdAt: Date
-    private readonly updatedAt: Date
-
     static associate (models: any): any {
 
-    }
-
-    toJSONFor (): IStock {
-      return {
-        id: this.id,
-        jfsku: this.jfsku,
-        merchantSku: this.merchantSku,
-        stockLevel: this.stockLevel,
-        stockLevelAnnounced: this.stockLevelAnnounced,
-        stockLevelReserved: this.stockLevelReserved,
-        stockLevelBlocked: this.stockLevelBlocked,
-        fulfillerTimestamp: this.fulfillerTimestamp,
-        createdAt: this.createdAt,
-        updatedAt: this.updatedAt
-      }
     }
   };
 
