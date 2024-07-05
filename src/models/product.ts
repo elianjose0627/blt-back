@@ -5,7 +5,8 @@ import type {
   IProductMaterial, IProductPicture, IProductSize,
   NetRetailPrice, ProductType, Nullable,
   IMassUnit, ISalesUnit, ITaxRate,
-  IProductDetail
+  IProductDetail,
+  IStock
 } from '../types'
 
 const ProductModel = (sequelize: any, DataTypes: any): any => {
@@ -76,6 +77,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     private readonly metadata: IProductDetail
     private readonly isMetadataSynced: boolean
     private readonly isExceedStockEnabled: boolean
+    private readonly stock: IStock
 
     static associate (models: any): any {
       Product.belongsTo(models.Company, {
@@ -138,6 +140,11 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         as: 'metadata',
         onDelete: 'SET NULL'
       })
+      Product.hasOne(models.Stock, {
+        foreignKey: 'productId',
+        onDelete: 'CASCADE',
+        as: 'stock'
+      })
     }
 
     toJSONFor (): IProduct {
@@ -178,6 +185,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         metadata: this.metadata,
         isMetadataSynced: this.isMetadataSynced,
         isExceedStockEnabled: this.isExceedStockEnabled,
+        stock: this.stock,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       }
