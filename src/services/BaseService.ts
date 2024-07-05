@@ -250,6 +250,13 @@ export const generateInclude = (model: string): any => {
           exclude: ['createdAt', 'updatedAt', 'deletedAt']
         },
         as: 'productSize'
+      },
+      {
+        model: db.Stock,
+        as: 'stock',
+        attributes: {
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId']
+        }
       }
     ])
   }

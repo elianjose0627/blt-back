@@ -129,6 +129,13 @@ const generateIncludeCategoryAndTagAndProductAndGraduatedPriceAndProperties = (f
         as: 'productSize',
         where: filterSize,
         required: Object.keys(filterSize).length > 0
+      },
+      {
+        model: db.Stock,
+        as: 'stock',
+        attributes: {
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId']
+        }
       }
     ]
   )
@@ -552,6 +559,13 @@ class ProductService extends BaseService {
             exclude: ['createdAt', 'updatedAt', 'deletedAt']
           },
           as: 'productSize'
+        },
+        {
+          model: db.Stock,
+          as: 'stock',
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId']
+          }
         }
       ],
       where: {
@@ -691,6 +705,13 @@ class ProductService extends BaseService {
             exclude: ['createdAt', 'updatedAt', 'deletedAt']
           },
           as: 'productSize'
+        },
+        {
+          model: db.Stock,
+          as: 'stock',
+          attributes: {
+            exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId']
+          }
         }
       ]
     })
