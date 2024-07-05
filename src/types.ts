@@ -344,6 +344,7 @@ export interface IProductPicture {
 export interface IStock {
   id: string
   jfsku: string
+  merchantSku: Nullable<string>
   stockLevel: number
   stockLevelAnnounced: number
   stockLevelReserved: number
