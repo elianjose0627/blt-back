@@ -32,8 +32,7 @@ const StockModel = (sequelize: any, DataTypes: any): any => {
     },
     merchantSku: {
       type: DataTypes.STRING,
-      allowNull: true,
-      unique: true
+      allowNull: true
     },
     stockLevel: {
       type: DataTypes.DOUBLE,
