@@ -14,7 +14,6 @@ module.exports = {
       },
       merchantSku: {
         allowNull: true,
-        unique: true,
         type: Sequelize.STRING
       },
       stockLevel: {
