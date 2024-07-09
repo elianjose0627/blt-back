@@ -1290,3 +1290,26 @@ export const deleteUserCompanyUserGroup = async (userCompanyUserGroupId: string)
     await userCompanyUserGroup.destroy({ force: true })
   }
 }
+
+export const createProduct = async (): Promise<any> => {
+  await db.Product.create({
+    id: uuidv4(),
+    name: 'Welcome Box - Techstarter',
+    jfsku: '1498',
+    merchantSku: '1498',
+    type: 'generic',
+    productGroup: 'beverage'
+  })
+}
+
+export const createProductWithMinimumOrderQuantity = async (): Promise<any> => {
+  await db.Product.create({
+    id: uuidv4(),
+    name: 'Gußkarte - Duisburger Werkstätten',
+    jfsku: 'VZ9N017HHPM',
+    merchantSku: '110000000000',
+    type: 'generic',
+    minimumOrderQuantity: 10,
+    productGroup: 'beverage'
+  })
+}

@@ -1048,3 +1048,7 @@ export interface ICompanySubscription {
   createdAt: Date
   updatedAt: Date
 }
+
+export interface RequestBodyPendingOrders {
+  pendingOrders: IPendingOrder[]
+}
