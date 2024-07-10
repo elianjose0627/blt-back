@@ -7,6 +7,7 @@ const ProductCategoryModel = (sequelize: any, DataTypes: any): any => {
     name: string
     description: Nullable<string>
     picture: Nullable<MediaData>
+    sortIndex: number
   }
 
   class ProductCategory extends Model<ProductCategoryAttributes> {
@@ -14,6 +15,7 @@ const ProductCategoryModel = (sequelize: any, DataTypes: any): any => {
     private readonly name: string
     private readonly description: Nullable<string>
     private readonly picture: Nullable<MediaData>
+    private readonly sortIndex: number
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly productCategoryTags: IProductCategoryTag[]
@@ -37,6 +39,7 @@ const ProductCategoryModel = (sequelize: any, DataTypes: any): any => {
         name: this.name,
         description: this.description,
         picture: this.picture,
+        sortIndex: this.sortIndex,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         productCategoryTags: this.productCategoryTags
@@ -61,6 +64,11 @@ const ProductCategoryModel = (sequelize: any, DataTypes: any): any => {
     picture: {
       type: DataTypes.JSON,
       allowNull: true
+    },
+    sortIndex: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
     }
   }, {
     sequelize,

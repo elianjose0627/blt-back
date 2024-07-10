@@ -19,6 +19,11 @@ module.exports = {
         type: Sequelize.JSON,
         allowNull: true
       },
+      sortIndex: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

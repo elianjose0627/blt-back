@@ -3465,6 +3465,54 @@ describe('Company actions', () => {
     })
   })
 
+  describe('Add a user to a company', () => {
+    it('Should return 200 OK when a company owner successfully adds a user with a secondary domain to a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company 1805',
+            email: 'test@company1805secondarydomain.com',
+            domain: 'company1805secondarydomain.com'
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(companyId)
+
+      await createTestUser('nickfury@company1805secondarydomain2.com', 'avengersinitiative')
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${companyId}/secondary-domains`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          secondaryDomain: {
+            name: 'company1805secondarydomain2.com'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@company1805secondarydomain2.com',
+            actionType: 'add'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.user.email).to.equal('nickfury@company1805secondarydomain2.com')
+    })
+  })
+
   describe('Get all users of a company', () => {
     it('Should return 200 Success when an owner successfully retrieves all users of a company.', async () => {
       const resCompany = await chai
@@ -3654,7 +3702,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('The email domain and the company domain do not match')
+      expect(res.body.errors.message).to.equal('The email domain and the company domains do not match')
     })
 
     it('Should return 403 Forbidden when an owner tries to add a user to a company with an unverified domain.', async () => {

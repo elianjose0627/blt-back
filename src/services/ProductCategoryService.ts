@@ -59,7 +59,7 @@ class ProductCategoryService extends BaseService {
           required: false
         }
       ],
-      order: [['createdAt', 'DESC']],
+      order: [['sortIndex', 'ASC'], ['createdAt', 'DESC']],
       attributes: { exclude: [] },
       distinct: true
     })
