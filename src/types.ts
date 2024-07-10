@@ -378,6 +378,7 @@ export interface IProductCategory {
   name: string
   description: Nullable<string>
   picture: Nullable<MediaData>
+  sortIndex: number
   createdAt: Date
   updatedAt: Date
   productCategoryTags?: IProductCategoryTag[]

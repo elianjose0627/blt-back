@@ -916,7 +916,8 @@ const validateProductCategory = Joi.object({
     picture: Joi.object({
       url: Joi.string().uri().required(),
       filename: Joi.string().required()
-    }).allow(null)
+    }).allow(null),
+    sortIndex: Joi.number().positive().allow(0)
   }).required()
 })
 
