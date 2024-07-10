@@ -1313,3 +1313,25 @@ export const createProductWithMinimumOrderQuantity = async (): Promise<any> => {
     productGroup: 'beverage'
   })
 }
+
+export const createProductWithGraduatedPricesAndIsExceedStockEnabledIsTrue = async (): Promise<any> => {
+  const product = await db.Product.create({
+    id: uuidv4(),
+    name: 'Marmelade Himbeere Pur',
+    jfsku: 'VZ9N01W5D8F',
+    merchantSku: '305',
+    type: 'generic',
+    isExceedStockEnabled: true,
+    productGroup: 'beverage'
+  })
+
+  if (product !== null) {
+    await db.ProductGraduatedPrice.create({
+      id: uuidv4(),
+      firstUnit: 1,
+      lastUnit: 10,
+      price: 1,
+      productId: product.id
+    })
+  }
+}

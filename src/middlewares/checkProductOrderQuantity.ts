@@ -1,8 +1,10 @@
 import * as statusCodes from '../constants/statusCodes'
 import db from '../models'
 import type { CustomNext, CustomRequest, CustomResponse, IProduct, RequestBodyPendingOrders } from '../types'
+import { getMaximumProductOrderQuantity } from '../utils/getMaximumProductOrderQuantity'
+import { getMinimumProductOrderQuantity } from '../utils/getMinimumProductOrderQuantity'
 
-const checkMinimumProductOrderQuantity = async (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> => {
+const checkProductOrderQuantity = async (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> => {
   const { pendingOrders } = req.body as RequestBodyPendingOrders
 
   const pendingOrderLineRequests = pendingOrders.flatMap(pendingOrder => pendingOrder.orderLineRequests)
@@ -18,6 +20,13 @@ const checkMinimumProductOrderQuantity = async (req: CustomRequest, res: CustomR
         attributes: {
           exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId']
         }
+      },
+      {
+        model: db.ProductGraduatedPrice,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId']
+        },
+        as: 'graduatedPrices'
       }
     ]
   })
@@ -35,13 +44,27 @@ const checkMinimumProductOrderQuantity = async (req: CustomRequest, res: CustomR
         }
       })
     }
+    const maximumQuantity = 1000
+    const minimumOrderQuantity = getMinimumProductOrderQuantity(foundProduct.minimumOrderQuantity, foundProduct.graduatedPrices)
 
-    if (quantity < foundProduct.minimumOrderQuantity) {
+    const maximumOrderQuantity = getMaximumProductOrderQuantity(maximumQuantity, foundProduct.graduatedPrices)
+
+    if (quantity < minimumOrderQuantity) {
       return res.status(statusCodes.BAD_REQUEST).send({
         statusCode: statusCodes.BAD_REQUEST,
         success: false,
         errors: {
-          message: `Article ${pendingOrderLineRequest.itemName} with Article Number ${pendingOrderLineRequest.articleNumber} should have a minimum order quantity of ${foundProduct.minimumOrderQuantity}`
+          message: `Article ${pendingOrderLineRequest.itemName} with Article Number ${pendingOrderLineRequest.articleNumber} should have a minimum order quantity of ${minimumOrderQuantity}`
+        }
+      })
+    }
+
+    if (foundProduct.isExceedStockEnabled && quantity > maximumOrderQuantity) {
+      return res.status(statusCodes.BAD_REQUEST).send({
+        statusCode: statusCodes.BAD_REQUEST,
+        success: false,
+        errors: {
+          message: `Article ${pendingOrderLineRequest.itemName} with Article Number ${pendingOrderLineRequest.articleNumber} should have a maximum order quantity of ${maximumOrderQuantity}`
         }
       })
     }
@@ -50,4 +73,4 @@ const checkMinimumProductOrderQuantity = async (req: CustomRequest, res: CustomR
   return next()
 }
 
-export default checkMinimumProductOrderQuantity
+export default checkProductOrderQuantity

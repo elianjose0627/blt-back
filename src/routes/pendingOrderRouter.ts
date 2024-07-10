@@ -7,7 +7,7 @@ import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import paginate from '../middlewares/pagination'
 import checkAdmin from '../middlewares/checkAdmin'
-import checkMinimumProductOrderQuantity from '../middlewares/checkMinimumProductOrderQuantity'
+import checkProductOrderQuantity from '../middlewares/checkProductOrderQuantity'
 
 const pendingOrderRoutes = (): any => {
   const pendingOrderRouter = express.Router()
@@ -20,7 +20,7 @@ const pendingOrderRoutes = (): any => {
     .post(PendingOrderController.setModule,
       celebrate({
         [Segments.BODY]: validator.validatePendingOrders
-      }), asyncHandler(checkMinimumProductOrderQuantity), asyncHandler(PendingOrderController.insertCataloguePendingOrders))
+      }), asyncHandler(checkProductOrderQuantity), asyncHandler(PendingOrderController.insertCataloguePendingOrders))
   pendingOrderRouter.route('/pending-orders/duplicate')
     .post(celebrate({
       [Segments.BODY]: validator.validatePostedOrders
