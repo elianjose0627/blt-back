@@ -67,6 +67,7 @@ export interface Database {
   ProductDetail?: any
   ProductProductCategory?: any
   Stock?: any
+  BundleStock?: any
   [key: string]: any
 }
 

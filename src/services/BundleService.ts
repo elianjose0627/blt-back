@@ -68,6 +68,13 @@ class BundleService extends BaseService {
         model: db.Picture,
         attributes: ['id', 'filename', 'url', 'size', 'mimeType', 'updatedAt', 'createdAt'],
         as: 'pictures'
+      },
+      {
+        model: db.BundleStock,
+        as: 'stock',
+        attributes: {
+          exclude: ['createdAt', 'updatedAt', 'deletedAt', 'bundleId']
+        }
       }
     ]
     if (search !== undefined) {
