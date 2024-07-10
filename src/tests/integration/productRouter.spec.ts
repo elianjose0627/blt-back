@@ -138,7 +138,8 @@ describe('Product actions', () => {
             jfsku: '1231ph2',
             merchantSku: '1231ph2',
             type: 'generic',
-            productGroup: 'technology'
+            productGroup: 'technology',
+            minimumOrderQuantity: 2
           }
         })
       const childProductId = String(resProductChild.body.product.id)
@@ -575,7 +576,8 @@ describe('Product actions', () => {
             jfsku: '1237',
             merchantSku: '1237',
             type: 'generic',
-            productGroup: 'beverage'
+            productGroup: 'beverage',
+            minimumOrderQuantity: 10
           }
         })
 

@@ -36,6 +36,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     length: number
     isMetadataSynced: boolean
     isExceedStockEnabled: boolean
+    minimumOrderQuantity: number
   }
 
   class Product extends Model<ProductAttributes> {
@@ -77,6 +78,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     private readonly metadata: IProductDetail
     private readonly isMetadataSynced: boolean
     private readonly isExceedStockEnabled: boolean
+    private readonly minimumOrderQuantity: number
     private readonly stock: IStock
 
     static associate (models: any): any {
@@ -185,6 +187,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         metadata: this.metadata,
         isMetadataSynced: this.isMetadataSynced,
         isExceedStockEnabled: this.isExceedStockEnabled,
+        minimumOrderQuantity: this.minimumOrderQuantity,
         stock: this.stock,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
@@ -305,6 +308,11 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false,
       type: DataTypes.BOOLEAN,
       defaultValue: false
+    },
+    minimumOrderQuantity: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
+      defaultValue: 1
     }
   }, {
     sequelize,

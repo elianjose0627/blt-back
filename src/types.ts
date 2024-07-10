@@ -557,6 +557,7 @@ export interface IProduct {
   metadata: IProductDetail
   isMetadataSynced: boolean
   isExceedStockEnabled: boolean
+  minimumOrderQuantity: number
 }
 
 export interface ICampaignOrderLimit {
@@ -1046,4 +1047,8 @@ export interface ICompanySubscription {
   autoRenew: boolean
   createdAt: Date
   updatedAt: Date
+}
+
+export interface RequestBodyPendingOrders {
+  pendingOrders: IPendingOrder[]
 }

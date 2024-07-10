@@ -11,7 +11,10 @@ import {
   updatePendingOrderWithPostedOrderId,
   createCompanyAdministrator,
   createVerifiedUser,
-  createCompanyAdministratorWithCompany
+  createCompanyAdministratorWithCompany,
+  createProduct,
+  createProductWithMinimumOrderQuantity,
+  createProductWithGraduatedPricesAndIsExceedStockEnabledIsTrue
 } from '../utils'
 
 const { expect } = chai
@@ -24,6 +27,9 @@ let token: string
 describe('Pending Orders actions', () => {
   before(async () => {
     await createAdminTestUser()
+    await createProduct()
+    await createProductWithMinimumOrderQuantity()
+    await createProductWithGraduatedPricesAndIsExceedStockEnabledIsTrue()
 
     await chai
       .request(app)
@@ -96,10 +102,6 @@ describe('Pending Orders actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
       expect(res.body.pendingOrders).to.be.an('array')
       expect(res.body.pendingOrders).to.have.lengthOf.above(0)
-
-      expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
-      expect(res.body.pendingOrders).to.be.an('array')
     })
 
     it('Should return 201 Created when a company admin with company that has a customerId creates an order', async () => {
@@ -146,6 +148,228 @@ describe('Pending Orders actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
       expect(res.body.pendingOrders).to.be.an('array')
       expect(res.body.pendingOrders).to.have.lengthOf.above(0)
+    })
+
+    it('Should return 404 Not Found when a user creates an order with an article that does not exist', async () => {
+      await createVerifiedUser('mantis104@gotg.com', 'woooooow')
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'mantis104@gotg.com', password: 'woooooow' } })
+
+      const tokenUser = resUser.body.token
+
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(tokenUser)}`)
+        .send({
+          pendingOrders: [
+            {
+              costCenter: '',
+              platform: 0,
+              language: 0,
+              currency: 'EUR',
+              orderNo: '0',
+              inetorderno: 0,
+              shippingId: 21,
+              shipped: dayjs.utc().add(1, 'day'),
+              deliverydate: dayjs.utc().add(1, 'day'),
+              note: '',
+              description: ' +',
+              paymentType: 0,
+              paymentTarget: 0,
+              discount: 0.00,
+              orderStatus: 0,
+              orderLineRequests: [
+                {
+                  itemName: 'Welcome Box - Techstarter',
+                  articleNumber: '1499',
+                  itemNetSale: 0.00,
+                  itemVAT: 0.00,
+                  quantity: 1,
+                  type: 0,
+                  discount: 0.00,
+                  netPurchasePrice: 0.00
+                }
+              ],
+              shippingAddressRequests: [
+                {
+                  salutation: 'Mr',
+                  firstName: 'Felix',
+                  lastName: 'Ixkes',
+                  title: '',
+                  company: '',
+                  companyAddition: '',
+                  street: 'Flügelstraße 6',
+                  addressAddition: '',
+                  zipCode: '40227',
+                  place: 'Düsseldorf',
+                  phone: '',
+                  state: '',
+                  country: 'Germany',
+                  iso: '',
+                  telephone: '',
+                  mobile: '',
+                  fax: '',
+                  email: 'christoph@biglittlethings.de'
+                }
+              ]
+            }
+          ]
+        })
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.be.equal('Article Welcome Box - Techstarter with Article Number 1499 not found')
+    })
+
+    it('Should return 400 Bad Request when a user creates an order with an article that has a high minimum quantity set', async () => {
+      await createVerifiedUser('mantis105@gotg.com', 'woooooow')
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'mantis105@gotg.com', password: 'woooooow' } })
+
+      const tokenUser = resUser.body.token
+
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(tokenUser)}`)
+        .send({
+          pendingOrders: [
+            {
+              costCenter: '',
+              platform: 0,
+              language: 0,
+              currency: 'EUR',
+              orderNo: '0',
+              inetorderno: 0,
+              shippingId: 21,
+              shipped: dayjs.utc().add(1, 'day'),
+              deliverydate: dayjs.utc().add(1, 'day'),
+              note: '',
+              description: ' +',
+              paymentType: 0,
+              paymentTarget: 0,
+              discount: 0.00,
+              orderStatus: 0,
+              orderLineRequests: [
+                {
+                  itemName: 'Gußkarte - Duisburger Werkstätten',
+                  articleNumber: '110000000000',
+                  itemNetSale: 0.00,
+                  itemVAT: 0.00,
+                  quantity: 1,
+                  type: 0,
+                  discount: 0.00,
+                  netPurchasePrice: 0.00
+                }
+              ],
+              shippingAddressRequests: [
+                {
+                  salutation: 'Mr',
+                  firstName: 'Felix',
+                  lastName: 'Ixkes',
+                  title: '',
+                  company: '',
+                  companyAddition: '',
+                  street: 'Flügelstraße 6',
+                  addressAddition: '',
+                  zipCode: '40227',
+                  place: 'Düsseldorf',
+                  phone: '',
+                  state: '',
+                  country: 'Germany',
+                  iso: '',
+                  telephone: '',
+                  mobile: '',
+                  fax: '',
+                  email: 'christoph@biglittlethings.de'
+                }
+              ]
+            }
+          ]
+        })
+
+      expect(res).to.have.status(400)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.be.equal('Article Gußkarte - Duisburger Werkstätten with Article Number 110000000000 should have a minimum order quantity of 10')
+    })
+
+    it('Should return 400 Bad Request when a user creates an order that exceeds maximum limit of graduated prices with an article that has graduated prices and exceed stock is true', async () => {
+      await createVerifiedUser('mantis106@gotg.com', 'woooooow')
+      const resUser = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'mantis106@gotg.com', password: 'woooooow' } })
+
+      const tokenUser = resUser.body.token
+
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(tokenUser)}`)
+        .send({
+          pendingOrders: [
+            {
+              costCenter: '',
+              platform: 0,
+              language: 0,
+              currency: 'EUR',
+              orderNo: '0',
+              inetorderno: 0,
+              shippingId: 21,
+              shipped: dayjs.utc().add(1, 'day'),
+              deliverydate: dayjs.utc().add(1, 'day'),
+              note: '',
+              description: ' +',
+              paymentType: 0,
+              paymentTarget: 0,
+              discount: 0.00,
+              orderStatus: 0,
+              orderLineRequests: [
+                {
+                  itemName: 'Marmelade Himbeere Pur',
+                  articleNumber: '305',
+                  itemNetSale: 0.00,
+                  itemVAT: 0.00,
+                  quantity: 11,
+                  type: 0,
+                  discount: 0.00,
+                  netPurchasePrice: 0.00
+                }
+              ],
+              shippingAddressRequests: [
+                {
+                  salutation: 'Mr',
+                  firstName: 'Felix',
+                  lastName: 'Ixkes',
+                  title: '',
+                  company: '',
+                  companyAddition: '',
+                  street: 'Flügelstraße 6',
+                  addressAddition: '',
+                  zipCode: '40227',
+                  place: 'Düsseldorf',
+                  phone: '',
+                  state: '',
+                  country: 'Germany',
+                  iso: '',
+                  telephone: '',
+                  mobile: '',
+                  fax: '',
+                  email: 'christoph@biglittlethings.de'
+                }
+              ]
+            }
+          ]
+        })
+
+      expect(res).to.have.status(400)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.be.equal('Article Marmelade Himbeere Pur with Article Number 305 should have a maximum order quantity of 10')
     })
   })
 
