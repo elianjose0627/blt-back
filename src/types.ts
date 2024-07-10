@@ -189,6 +189,7 @@ export interface IBundle {
   campaign: ICampaign
   specifications: ISpecifications
   pictures: IPicture[]
+  stock: IStock
 }
 
 export interface Theme {
