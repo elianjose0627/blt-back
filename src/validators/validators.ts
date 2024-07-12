@@ -211,6 +211,7 @@ const commonQueryParams = {
       })
       .optional(),
     showChildren: Joi.string().trim().lowercase().valid(...['true', 'false']),
+    showParent: Joi.string().trim().lowercase().valid(...['true', 'false']),
     price: Joi.string().pattern(/^\d+-\d+(?:,\d+-\d+)*$/)
       .messages({
         'string.pattern.base': '{#label} must contain valid ranges separated by commas'

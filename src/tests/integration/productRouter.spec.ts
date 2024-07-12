@@ -3582,6 +3582,62 @@ describe('Product actions', () => {
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
+    })
+
+    it('Should return 200 Success when an admin successfully retrieves all product variations for a parent with filter set to true.', async () => {
+      const resProductParent = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Smart Watch 27',
+            jfsku: '1231sw27',
+            merchantSku: '1231sw27',
+            type: 'generic',
+            productGroup: 'technology',
+            isParent: true
+          }
+        })
+      const parentProductId = String(resProductParent.body.product.id)
+      const resProductChild = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Smart Watch 27 2',
+            jfsku: '1231sw272',
+            merchantSku: '1231sw272',
+            type: 'generic',
+            productGroup: 'technology'
+          }
+        })
+      const childProductId = String(resProductChild.body.product.id)
+      await chai
+        .request(app)
+        .patch(`/api/products/${childProductId}/child`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            parentId: parentProductId
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${parentProductId}/catalogue/variations`)
+        .query({
+          limit: 10,
+          page: 1,
+          filter: {
+            showParent: 'true'
+          }
+        })
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
       expect(res.body.products).to.be.an('array').lengthOf(2)
     })
 
