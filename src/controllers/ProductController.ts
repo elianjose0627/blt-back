@@ -357,14 +357,14 @@ class ProductController extends BaseController {
 
   async getProductVariations (req: CustomRequest, res: CustomResponse): Promise<any> {
     const {
-      query: { limit, page, offset },
+      query: { limit, page, offset, filter },
       params: { id },
       record: product
     } = req
 
     const parentId = product.isParent === true ? id : product.parentId
 
-    const response = await productService.getProductVariations(limit, offset, parentId, product.isParent)
+    const response = await productService.getProductVariations(limit, offset, parentId, filter)
     const meta = {
       total: response.count,
       pageCount: Math.ceil(response.count / limit),
