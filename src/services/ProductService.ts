@@ -654,7 +654,8 @@ class ProductService extends BaseService {
     return response
   }
 
-  async getProductVariations (limit: number, offset: number, parentId: string, isParent: boolean): Promise<any> {
+  async getProductVariations (limit: number, offset: number, parentId: string, filter = { showParent: false }): Promise<any> {
+    const { showParent } = filter
     const response = await db[this.model].findAndCountAll({
       limit,
       offset,
@@ -673,7 +674,7 @@ class ProductService extends BaseService {
           {
             [Op.and]: [
               { id: parentId },
-              { isParent }
+              { isParent: showParent }
             ]
           }
         ]
