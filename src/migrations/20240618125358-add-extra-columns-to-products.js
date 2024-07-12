@@ -101,6 +101,11 @@ module.exports = {
         allowNull: false,
         defaultValue: false,
         type: Sequelize.BOOLEAN
+      }),
+      queryInterface.addColumn('Products', 'minimumOrderQuantity', {
+        allowNull: false,
+        defaultValue: 1,
+        type: Sequelize.INTEGER
       })
     ])
   },
@@ -123,7 +128,8 @@ module.exports = {
       queryInterface.removeColumn('Products', 'massUnitId'),
       queryInterface.removeColumn('Products', 'productDetailId'),
       queryInterface.removeColumn('Products', 'isMetadataSynced'),
-      queryInterface.removeColumn('Products', 'isExceedStockEnabled')
+      queryInterface.removeColumn('Products', 'isExceedStockEnabled'),
+      queryInterface.removeColumn('Products', 'minimumOrderQuantity')
     ])
   }
 }

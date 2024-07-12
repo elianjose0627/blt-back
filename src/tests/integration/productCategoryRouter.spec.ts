@@ -51,7 +51,8 @@ describe('Product Category actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productCategory: {
-            name: 'kitchenware'
+            name: 'kitchenware',
+            sortIndex: 1
           }
         })
 
@@ -83,7 +84,8 @@ describe('Product Category actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productCategory: {
-            name: 'electricals'
+            name: 'electricals',
+            sortIndex: 0
           }
         })
       const res = await chai

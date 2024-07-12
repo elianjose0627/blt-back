@@ -7,7 +7,9 @@ import UserService from '../services/UserService'
 import CompanyService from '../services/CompanyService'
 import AddressService from '../services/AddressService'
 import * as statusCodes from '../constants/statusCodes'
-import type { CustomNext, CustomRequest, CustomResponse, IEmailTemplate, Nullable, StatusCode } from '../types'
+import type {
+  CustomNext, CustomRequest, CustomResponse, IEmailTemplate, ISecondaryDomain, Nullable, StatusCode
+} from '../types'
 import * as userRoles from '../utils//userRoles'
 import { sendNotifierEmail } from '../utils/sendMail'
 import { io } from '../utils/socket'
@@ -351,8 +353,10 @@ class UserController extends BaseController {
     const {
       user,
       body: { user: { email, actionType, role } },
-      record: { id: companyId, name: companyName, domain, isDomainVerified }
+      record: { id: companyId, name: companyName, domain, isDomainVerified, secondaryDomains }
     } = req
+
+    const primaryAndSecondaryDomains = [domain].concat(secondaryDomains.map((secondaryDomain: ISecondaryDomain) => secondaryDomain.name))
 
     const replacements = {
       app: appName,
@@ -390,12 +394,12 @@ class UserController extends BaseController {
       })
     }
 
-    if (domain !== emailDomain && actionType === 'add') {
+    if (!primaryAndSecondaryDomains.includes(emailDomain) && actionType === 'add') {
       return res.status(statusCodes.FORBIDDEN).send({
         statusCode: statusCodes.FORBIDDEN,
         success: false,
         errors: {
-          message: 'The email domain and the company domain do not match'
+          message: 'The email domain and the company domains do not match'
         }
       })
     }

@@ -189,6 +189,7 @@ export interface IBundle {
   campaign: ICampaign
   specifications: ISpecifications
   pictures: IPicture[]
+  stock: IStock
 }
 
 export interface Theme {
@@ -378,6 +379,7 @@ export interface IProductCategory {
   name: string
   description: Nullable<string>
   picture: Nullable<MediaData>
+  sortIndex: number
   createdAt: Date
   updatedAt: Date
   productCategoryTags?: IProductCategoryTag[]
@@ -557,6 +559,7 @@ export interface IProduct {
   metadata: IProductDetail
   isMetadataSynced: boolean
   isExceedStockEnabled: boolean
+  minimumOrderQuantity: number
 }
 
 export interface ICampaignOrderLimit {
@@ -1046,4 +1049,8 @@ export interface ICompanySubscription {
   autoRenew: boolean
   createdAt: Date
   updatedAt: Date
+}
+
+export interface RequestBodyPendingOrders {
+  pendingOrders: IPendingOrder[]
 }

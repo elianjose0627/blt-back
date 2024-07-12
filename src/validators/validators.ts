@@ -512,7 +512,8 @@ const validateProductUpdate = Joi.object({
     productColorId: Joi.string().uuid().allow(null),
     productMaterialId: Joi.string().uuid().allow(null),
     productSizeId: Joi.string().uuid().allow(null),
-    description: Joi.string().max(255).allow(null).allow('').optional()
+    description: Joi.string().max(255).allow(null).allow('').optional(),
+    minimumOrderQuantity: Joi.number().min(1)
   }).required()
 }).required()
 
@@ -534,7 +535,8 @@ const validateProductAdmin = Joi.object({
     productColorId: Joi.string().uuid().allow(null),
     productMaterialId: Joi.string().uuid().allow(null),
     productSizeId: Joi.string().uuid().allow(null),
-    description: Joi.string().allow(null).allow('').optional().max(255)
+    description: Joi.string().allow(null).allow('').optional().max(255),
+    minimumOrderQuantity: Joi.number().min(1)
   }).required()
 }).required()
 
@@ -914,7 +916,8 @@ const validateProductCategory = Joi.object({
     picture: Joi.object({
       url: Joi.string().uri().required(),
       filename: Joi.string().required()
-    }).allow(null)
+    }).allow(null),
+    sortIndex: Joi.number().positive().allow(0)
   }).required()
 })
 
