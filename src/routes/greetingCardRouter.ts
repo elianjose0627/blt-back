@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import GreetingCardController from '../controllers/GreetingCardController'
@@ -8,7 +8,7 @@ import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 
-const greetingCardRoutes = (): any => {
+const greetingCardRoutes = (): Router => {
   const greetingCardRouter = express.Router()
 
   greetingCardRouter.use('/greeting-cards', checkAuth, checkUserIsVerifiedStatus, GreetingCardController.setModule)

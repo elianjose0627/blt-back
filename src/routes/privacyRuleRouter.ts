@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import PrivacyRuleController from '../controllers/PrivacyRuleController'
@@ -8,7 +8,7 @@ import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 
-const privacyRuleRoutes = (): any => {
+const privacyRuleRoutes = (): Router => {
   const privacyRuleRouter = express.Router()
 
   privacyRuleRouter.use('/privacy-rules', checkAuth, checkUserIsVerifiedStatus, PrivacyRuleController.setModule)

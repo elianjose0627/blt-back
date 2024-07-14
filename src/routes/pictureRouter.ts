@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import PictureController from '../controllers/PictureController'
@@ -8,7 +8,7 @@ import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import paginate from '../middlewares/pagination'
 
-const pictureRoutes = (): any => {
+const pictureRoutes = (): Router => {
   const pictureRouter = express.Router()
 
   pictureRouter.use('/pictures', checkAuth, checkUserIsVerifiedStatus, PictureController.setModule)

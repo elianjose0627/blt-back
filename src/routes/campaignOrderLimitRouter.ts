@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import CampaignOrderLimitController from '../controllers/CampaignOrderLimitController'
@@ -8,7 +8,7 @@ import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import CampaignController from '../controllers/CampaignController'
 
-const campaignOrderLimitRoutes = (): any => {
+const campaignOrderLimitRoutes = (): Router => {
   const campaignOrderLimitRouter = express.Router()
 
   campaignOrderLimitRouter.use('/campaign-order-limits', checkAuth, checkUserIsVerifiedStatus, CampaignController.setModule)

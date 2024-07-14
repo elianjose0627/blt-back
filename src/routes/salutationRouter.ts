@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import SalutationController from '../controllers/SalutationController'
@@ -8,7 +8,7 @@ import checkAuth from '../middlewares/checkAuth'
 import paginate from '../middlewares/pagination'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 
-const salutationRoutes = (): any => {
+const salutationRoutes = (): Router => {
   const salutationRouter = express.Router()
 
   salutationRouter.use('/salutations', checkAuth, SalutationController.setModule)

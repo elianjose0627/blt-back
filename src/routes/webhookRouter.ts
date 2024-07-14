@@ -1,8 +1,8 @@
-import express from 'express'
+import express, { Router } from 'express'
 import WebhookController from '../controllers/WebhookController'
 import asyncHandler from '../middlewares/asyncHandler'
 
-const webhookRoutes = (): any => {
+const webhookRoutes = (): Router => {
   const webhookRouter = express.Router()
 
   webhookRouter.route('/webhooks/slack')
