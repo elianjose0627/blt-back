@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import PendingOrderController from '../controllers/PendingOrderController'
@@ -9,7 +9,7 @@ import paginate from '../middlewares/pagination'
 import checkAdmin from '../middlewares/checkAdmin'
 import checkProductOrderQuantity from '../middlewares/checkProductOrderQuantity'
 
-const pendingOrderRoutes = (): any => {
+const pendingOrderRoutes = (): Router => {
   const pendingOrderRouter = express.Router()
 
   pendingOrderRouter.use('/pending-orders', checkAuth, checkUserIsVerifiedStatus)

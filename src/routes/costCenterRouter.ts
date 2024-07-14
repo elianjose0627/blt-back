@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import CostCenterController from '../controllers/CostCenterController'
@@ -7,7 +7,7 @@ import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import checkPermissions from '../middlewares/checkPermissions'
 
-const costCenterRoutes = (): any => {
+const costCenterRoutes = (): Router => {
   const costCenterRouter = express.Router()
 
   costCenterRouter.use('/cost-centers', checkAuth, checkUserIsVerifiedStatus, CostCenterController.setModule)

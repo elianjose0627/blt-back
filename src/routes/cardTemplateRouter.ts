@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import CardTemplateController from '../controllers/CardTemplateController'
@@ -8,7 +8,7 @@ import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import checkPermissions from '../middlewares/checkPermissions'
 import CampaignController from '../controllers/CampaignController'
 
-const cardTemplateRoutes = (): any => {
+const cardTemplateRoutes = (): Router => {
   const cardTemplateRouter = express.Router()
 
   cardTemplateRouter.use('/card-templates', checkAuth, checkUserIsVerifiedStatus, CampaignController.setModule)

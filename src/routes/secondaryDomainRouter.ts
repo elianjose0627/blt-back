@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import SecondaryDomainController from '../controllers/SecondaryDomainController'
@@ -7,7 +7,7 @@ import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 
-const secondaryDomainRoutes = (): any => {
+const secondaryDomainRoutes = (): Router => {
   const secondaryDomainRouter = express.Router()
 
   secondaryDomainRouter.use('/secondary-domains', checkAuth, checkUserIsVerifiedStatus, SecondaryDomainController.setModule)

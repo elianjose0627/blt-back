@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import CampaignAddressController from '../controllers/CampaignAddressController'
@@ -8,7 +8,7 @@ import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import CampaignController from '../controllers/CampaignController'
 import checkPermissions from '../middlewares/checkPermissions'
 
-const campaignAddressRoutes = (): any => {
+const campaignAddressRoutes = (): Router => {
   const campaignAddressRouter = express.Router()
 
   campaignAddressRouter.use('/campaign-addresses', checkAuth, checkUserIsVerifiedStatus, CampaignController.setModule)
