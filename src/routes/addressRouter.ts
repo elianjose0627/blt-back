@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import AddressController from '../controllers/AddressController'
@@ -7,7 +7,7 @@ import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import checkPermissions from '../middlewares/checkPermissions'
 
-const AddressRoutes = (): any => {
+const AddressRoutes = (): Router => {
   const addressRouter = express.Router()
 
   addressRouter.use('/addresses', checkAuth, checkUserIsVerifiedStatus, AddressController.setModule)

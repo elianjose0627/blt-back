@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import BundleItemController from '../controllers/BundleItemController'
@@ -7,7 +7,7 @@ import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 
-const bundleItemRoutes = (): any => {
+const bundleItemRoutes = (): Router => {
   const bundleItemRouter = express.Router()
 
   bundleItemRouter.use('/bundle-items', checkAuth, checkUserIsVerifiedStatus)

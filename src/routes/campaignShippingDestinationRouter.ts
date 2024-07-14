@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import CampaignShippingDestinationController from '../controllers/CampaignShippingDestinationController'
@@ -8,7 +8,7 @@ import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import CampaignController from '../controllers/CampaignController'
 
-const campaignShippingDestinationRoutes = (): any => {
+const campaignShippingDestinationRoutes = (): Router => {
   const campaignShippingDestinationRouter = express.Router()
 
   campaignShippingDestinationRouter.use('/campaign-shipping-destinations', checkAuth, checkUserIsVerifiedStatus, CampaignController.setModule)

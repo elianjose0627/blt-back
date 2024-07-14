@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import LegalTextController from '../controllers/LegalTextController'
@@ -8,7 +8,7 @@ import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import checkAdmin from '../middlewares/checkAdmin'
 import paginate from '../middlewares/pagination'
 
-const legalTextRoutes = (): any => {
+const legalTextRoutes = (): Router => {
   const legalTextRouter = express.Router()
 
   legalTextRouter.route('/legal-texts')

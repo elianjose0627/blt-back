@@ -1,11 +1,11 @@
 import { celebrate, Segments } from 'celebrate'
-import express from 'express'
+import express, { Router } from 'express'
 import ShipmentController from '../controllers/ShipmentController'
 import asyncHandler from '../middlewares/asyncHandler'
 import checkAuth from '../middlewares/checkAuth'
 import validator from '../validators/validators'
 
-const shipmentRoutes = (): any => {
+const shipmentRoutes = (): Router => {
   const shipmentRouter = express.Router()
 
   shipmentRouter.use('/shipments', checkAuth, ShipmentController.setModule)
