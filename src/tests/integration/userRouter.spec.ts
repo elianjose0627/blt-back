@@ -12,7 +12,10 @@ import {
   createBlockedDomain,
   createVerifiedCompany,
   verifyCompanyDomain,
-  deleteAllNonDefaultEmailTemplates
+  deleteAllNonDefaultEmailTemplates,
+  iversAtKreeDotKrPassword,
+  thenaEternalPassword,
+  sersiEternalPassword
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 import { encodeString, encryptUUID } from '../../utils/encryption'
@@ -26,6 +29,8 @@ let userId: string
 let tokenAdmin: string
 let userIdAdmin: string
 let emailTemplateTypes: any[]
+const ironManPassword = faker.internet.password()
+const raywireTestPassword = faker.internet.password()
 
 describe('A user', () => {
   before(async () => {
@@ -36,17 +41,17 @@ describe('A user', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Tony', lastName: 'Stark', email: 'ironman@starkindustriesmarvel.com', phone: '254720123456', password: 'mackone' } })
+      .send({ user: { firstName: 'Tony', lastName: 'Stark', email: 'ironman@starkindustriesmarvel.com', phone: '254720123456', password: ironManPassword } })
 
     const res1 = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ironman@starkindustriesmarvel.com', password: 'mackone' } })
+      .send({ user: { email: 'ironman@starkindustriesmarvel.com', password: ironManPassword } })
 
     const res2 = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
+      .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
 
     token = res1.body.token
     userId = res1.body.user.id
@@ -75,7 +80,7 @@ describe('A user', () => {
             lastName: 'Three',
             email: 'warthree@asgard.com',
             phone: '254720123456',
-            password: 'thorisgreat',
+            password: faker.internet.password(),
             role: userRoles.ADMIN
           }
         })
@@ -96,7 +101,7 @@ describe('A user', () => {
             lastName: 'Conqueror',
             email: 'kq@mkangdynastyarvel.com',
             phone: '254720123456',
-            password: 'timeandspace',
+            password: faker.internet.password(),
             role: userRoles.COMPANYADMINISTRATOR,
             isGhost: true
           }
@@ -131,7 +136,7 @@ describe('A user', () => {
             lastName: 'Conqueror',
             email: 'kqvariant1@mkangdynastyarvel.com',
             phone: '254720123456',
-            password: 'timeandspace',
+            password: faker.internet.password(),
             role: userRoles.COMPANYADMINISTRATOR,
             companyId,
             isGhost: true
@@ -155,7 +160,7 @@ describe('A user', () => {
             lastName: 'Three',
             email: 'warthree@asgard.com',
             phone: '254720123456',
-            password: 'thorisgreat',
+            password: faker.internet.password(),
             role: userRoles.ADMIN,
             companyId: uuidv1()
           }
@@ -178,7 +183,7 @@ describe('A user', () => {
             lastName: 'Three',
             email: 'warthree@t-online.de',
             phone: '254720123456',
-            password: 'thorisgreat',
+            password: faker.internet.password(),
             role: userRoles.ADMIN
           }
         })
@@ -248,7 +253,7 @@ describe('A user', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Lady', lastName: 'Siff', email: 'siff@asgard.com', phone: '254720123456', password: 'thorisgreat' } })
+        .send({ user: { firstName: 'Lady', lastName: 'Siff', email: 'siff@asgard.com', phone: '254720123456', password: faker.internet.password() } })
 
       const username = faker.internet.userName()
       const userId: string = resUser.body.user.id
@@ -267,7 +272,7 @@ describe('A user', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Hela', lastName: 'Odindittur', email: 'hela@asgard.com', phone: '254720123456', password: 'fenrir' } })
+        .send({ user: { firstName: 'Hela', lastName: 'Odindittur', email: 'hela@asgard.com', phone: '254720123456', password: faker.internet.password() } })
 
       const username = faker.internet.userName()
       const userId: string = resUser.body.user.id
@@ -307,7 +312,7 @@ describe('A user', () => {
             username,
             email: faker.internet.email(),
             phone: null,
-            password: 'mackone'
+            password: ironManPassword
           }
         })
 
@@ -367,7 +372,7 @@ describe('A user', () => {
         .request(app)
         .patch(`/api/users/${userId}/password`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ user: { currentPassword: 'mackonewrong', password: '1234567890' } })
+        .send({ user: { currentPassword: faker.internet.password(), password: faker.internet.password(13) } })
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'user')
@@ -379,7 +384,7 @@ describe('A user', () => {
         .request(app)
         .patch(`/api/users/${userId}/password`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ user: { currentPassword: 'mackone', password: '1234567890' } })
+        .send({ user: { currentPassword: ironManPassword, password: faker.internet.password() } })
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'user')
@@ -499,15 +504,16 @@ describe('A user', () => {
 
   describe('Update a role as a user', () => {
     it('Should return 403 Forbidden when a user tries to update their own role.', async () => {
+      const randomPassword = faker.internet.password()
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Pepper', lastName: 'Potts', email: 'rescure@starkindustriesmarvel.com', phone: '254720123456', password: 'tonyhasaheart' } })
+        .send({ user: { firstName: 'Pepper', lastName: 'Potts', email: 'rescure@starkindustriesmarvel.com', phone: '254720123456', password: randomPassword } })
 
       const resUpdate = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'rescure@starkindustriesmarvel.com', password: 'tonyhasaheart' } })
+        .send({ user: { email: 'rescure@starkindustriesmarvel.com', password: randomPassword } })
       const tokenUpdate = String(resUpdate.body.token)
 
       const res = await chai
@@ -524,15 +530,16 @@ describe('A user', () => {
 
   describe('Verify the email of a user', () => {
     it('Should return 200 OK when an admin verifies the email of a user.', async () => {
+      const randomPassword = faker.internet.password()
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Iron', lastName: 'Heart', email: 'iheart@starkindustriesmarvel.com', phone: '254720123456', password: 'tonyhasaheart' } })
+        .send({ user: { firstName: 'Iron', lastName: 'Heart', email: 'iheart@starkindustriesmarvel.com', phone: '254720123456', password: randomPassword } })
 
       const resUpdate = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'iheart@starkindustriesmarvel.com', password: 'tonyhasaheart' } })
+        .send({ user: { email: 'iheart@starkindustriesmarvel.com', password: randomPassword } })
       const userId = String(resUpdate.body.user.id)
 
       const res = await chai
@@ -549,15 +556,16 @@ describe('A user', () => {
 
   describe('Set active state of a user', () => {
     it('Should return 200 OK when an admin activates a user.', async () => {
+      const randomPassword = faker.internet.password()
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Shuri', lastName: 'Shuri', email: 'shuri@starkindustriesmarvel.com', phone: '254720123456', password: 'whatarethose' } })
+        .send({ user: { firstName: 'Shuri', lastName: 'Shuri', email: 'shuri@starkindustriesmarvel.com', phone: '254720123456', password: randomPassword } })
 
       const resUpdate = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shuri@starkindustriesmarvel.com', password: 'whatarethose' } })
+        .send({ user: { email: 'shuri@starkindustriesmarvel.com', password: randomPassword } })
       const userId = String(resUpdate.body.user.id)
 
       const res = await chai
@@ -572,15 +580,16 @@ describe('A user', () => {
     })
 
     it('Should return 200 OK when an admin deactivates a user.', async () => {
+      const randomPassword = faker.internet.password()
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Nakia', lastName: 'Nakia', email: 'nakia@starkindustriesmarvel.com', phone: '254720123456', password: 'wakandaforever' } })
+        .send({ user: { firstName: 'Nakia', lastName: 'Nakia', email: 'nakia@starkindustriesmarvel.com', phone: '254720123456', password: randomPassword } })
 
       const resUpdate = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nakia@starkindustriesmarvel.com', password: 'wakandaforever' } })
+        .send({ user: { email: 'nakia@starkindustriesmarvel.com', password: randomPassword } })
       const userId = String(resUpdate.body.user.id)
 
       const res = await chai
@@ -638,15 +647,16 @@ describe('A user', () => {
 
   describe('Update notification settings of another user', () => {
     it('Should return 403 when a user tries to update the notification settings of another user.', async () => {
+      const randomPassword = faker.internet.password()
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Sookie', lastName: 'Stackhouse', email: 'sook@bontemps.com', phone: '254720123456', password: 'vampirebill' } })
+        .send({ user: { firstName: 'Sookie', lastName: 'Stackhouse', email: 'sook@bontemps.com', phone: '254720123456', password: randomPassword } })
 
       const res1 = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'sook@bontemps.com', password: 'vampirebill' } })
+        .send({ user: { email: 'sook@bontemps.com', password: randomPassword } })
       const res = await chai
         .request(app)
         .patch(`/api/users/${userIdAdmin}/notifications`)
@@ -664,12 +674,12 @@ describe('A user', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: 'julien' } })
+      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: raywireTestPassword } })
 
     const resLogin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'raywiretest@gmail.com', password: 'julien' } })
+      .send({ user: { email: 'raywiretest@gmail.com', password: raywireTestPassword } })
 
     const token = String(resLogin.body.token)
     const userId = String(resLogin.body.user.id)
@@ -690,12 +700,12 @@ describe('A user', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: 'julien' } })
+      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: raywireTestPassword } })
 
     const resLogin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'raywiretest@gmail.com', password: 'julien' } })
+      .send({ user: { email: 'raywiretest@gmail.com', password: raywireTestPassword } })
 
     const token = String(resLogin.body.token)
     const userId = String(resLogin.body.user.id)
@@ -714,15 +724,16 @@ describe('A user', () => {
   })
 
   it('should return 401 when the otp is invalid', async () => {
+    const randomPassword = faker.internet.password()
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Diana', lastName: 'Prince', email: 'ww@themyscira.com', phone: '254720123456', password: 'ariessux' } })
+      .send({ user: { firstName: 'Diana', lastName: 'Prince', email: 'ww@themyscira.com', phone: '254720123456', password: randomPassword } })
 
     const resLogin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ww@themyscira.com', password: 'ariessux' } })
+      .send({ user: { email: 'ww@themyscira.com', password: randomPassword } })
 
     const token = String(resLogin.body.token)
     const userId = String(resLogin.body.user.id)
@@ -742,7 +753,7 @@ describe('A user', () => {
     const resLogin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'thenaeternal@celestialmarvel.com', password: 'kingo123' } })
+      .send({ user: { email: 'thenaeternal@celestialmarvel.com', password: thenaEternalPassword } })
 
     const token = String(resLogin.body.token)
     const userId = String(resLogin.body.user.id)
@@ -761,7 +772,7 @@ describe('A user', () => {
     const resLogin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'thenaeternal@celestialmarvel.com', password: 'kingo123' } })
+      .send({ user: { email: 'thenaeternal@celestialmarvel.com', password: thenaEternalPassword } })
 
     const token = String(resLogin.body.token)
     const userId = String(resLogin.body.user.id)
@@ -780,7 +791,7 @@ describe('A user', () => {
     const resLogin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'sersieternal@celestialmarvel.com', password: 'icarussux' } })
+      .send({ user: { email: 'sersieternal@celestialmarvel.com', password: sersiEternalPassword } })
 
     const token = String(resLogin.body.token)
     const userId = String(resLogin.body.user.id)
@@ -801,7 +812,7 @@ describe('A user', () => {
     const resLogin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'sersieternal@celestialmarvel.com', password: 'icarussux' } })
+      .send({ user: { email: 'sersieternal@celestialmarvel.com', password: sersiEternalPassword } })
 
     const token = String(resLogin.body.token)
     const userId = String(resLogin.body.user.id)
@@ -818,15 +829,16 @@ describe('A user', () => {
   })
 
   it('should return 204 when a user purges their account', async () => {
+    const randomPassword = faker.internet.password()
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Test', lastName: 'User', email: 'tobedeleted@urbntiger.com', phone: '0123456789', password: 'deleteme' } })
+      .send({ user: { firstName: 'Test', lastName: 'User', email: 'tobedeleted@urbntiger.com', phone: '0123456789', password: randomPassword } })
 
     const resLogin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'tobedeleted@urbntiger.com', password: 'deleteme' } })
+      .send({ user: { email: 'tobedeleted@urbntiger.com', password: randomPassword } })
 
     const token = String(resLogin.body.token)
     const userId = String(resLogin.body.user.id)
@@ -848,15 +860,16 @@ describe('A user', () => {
   })
 
   it('should return 403 when a user purges an account that does not belong to them', async () => {
+    const randomPassword = faker.internet.password()
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Test', lastName: 'User', email: 'tobedeleted1@urbntiger.com', phone: '0123456789', password: 'deleteme' } })
+      .send({ user: { firstName: 'Test', lastName: 'User', email: 'tobedeleted1@urbntiger.com', phone: '0123456789', password: randomPassword } })
 
     const resLogin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'tobedeleted1@urbntiger.com', password: 'deleteme' } })
+      .send({ user: { email: 'tobedeleted1@urbntiger.com', password: randomPassword } })
 
     const userId = String(resLogin.body.user.id)
 
@@ -871,21 +884,22 @@ describe('A user', () => {
   })
 
   describe('Create an address', () => {
+    const randomPassword = faker.internet.password()
     before(async () => {
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Auth', lastName: 'May', email: 'auymay@starkindustriesmarvel.com', phone: '254720123456', password: 'petertingle' } })
+        .send({ user: { firstName: 'Auth', lastName: 'May', email: 'auymay@starkindustriesmarvel.com', phone: '254720123456', password: randomPassword } })
 
       const res1 = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'auymay@starkindustriesmarvel.com', password: 'petertingle' } })
+        .send({ user: { email: 'auymay@starkindustriesmarvel.com', password: randomPassword } })
 
       const res2 = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
+        .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
 
       token = res1.body.token
       userId = res1.body.user.id
@@ -1063,7 +1077,7 @@ describe('A user', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser@biglittlethings.de', phone: '254720123456', password: 'testuser' } })
+        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser@biglittlethings.de', phone: '254720123456', password: faker.internet.password() } })
 
       const resCompany = await chai
         .request(app)
@@ -1107,16 +1121,17 @@ describe('A user', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       const companyInviteCode = resCompanyInvite.body.company.inviteCode
+      const randomPassword = faker.internet.password()
 
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser2024feb@biglittlethings.de', phone: '254720123456', password: 'testuser' } })
+        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser2024feb@biglittlethings.de', phone: '254720123456', password: randomPassword } })
 
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'testuser2024feb@biglittlethings.de', password: 'testuser' } })
+        .send({ user: { email: 'testuser2024feb@biglittlethings.de', password: randomPassword } })
 
       const res = await chai
         .request(app)
@@ -1158,16 +1173,17 @@ describe('A user', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       const companyInviteCode = resCompanyInvite.body.company.inviteCode
+      const randomPassword = faker.internet.password()
 
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser2024feb@biglittlethings.de', phone: '254720123456', password: 'testuser' } })
+        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser2024feb1@biglittlethings.de', phone: '254720123456', password: randomPassword } })
 
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'testuser2024feb@biglittlethings.de', password: 'testuser' } })
+        .send({ user: { email: 'testuser2024feb1@biglittlethings.de', password: randomPassword } })
 
       const res = await chai
         .request(app)
@@ -1197,16 +1213,17 @@ describe('A user', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       const companyInviteCode = resCompanyInvite.body.company.shortInviteCode
+      const randomPassword = faker.internet.password()
 
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser2024febshort@biglittlethings.de', phone: '254720123456', password: 'testuser' } })
+        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser2024febshort@biglittlethings.de', phone: '254720123456', password: randomPassword } })
 
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'testuser2024febshort@biglittlethings.de', password: 'testuser' } })
+        .send({ user: { email: 'testuser2024febshort@biglittlethings.de', password: randomPassword } })
 
       const res = await chai
         .request(app)
@@ -1229,16 +1246,17 @@ describe('A user', () => {
       const uuid = uuidv1()
       const encryptedUUID = encryptUUID(uuid, 'base64', uuid)
       const encryptedUUIDWithCompanyIdBase64 = encodeString(`${encryptedUUID}.${uuid}`, 'base64')
+      const randomPassword = faker.internet.password()
 
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser20241921@biglittlethings.de', phone: '254720123456', password: 'testuser' } })
+        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser20241921@biglittlethings.de', phone: '254720123456', password: randomPassword } })
 
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'testuser20241921@biglittlethings.de', password: 'testuser' } })
+        .send({ user: { email: 'testuser20241921@biglittlethings.de', password: randomPassword } })
 
       const res = await chai
         .request(app)
@@ -1258,16 +1276,17 @@ describe('A user', () => {
 
     it('should return 422 Unprocessable entity if a user tries to join a company using an invalid invite code', async () => {
       const companyInviteCode = 'SnB6eXVvTHpXdlBCeWNsdUpkR3VndkFlbXptSEp3Zm9HUXY2RGdZMEdDY28wRXcyTDM1R3EvaUJBRkcwZWUrVy5kMmM0NTc0MC1mNGM5LTExZWQtY'
+      const randomPassword = faker.internet.password()
 
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser20241922@biglittlethings.de', phone: '254720123456', password: 'testuser' } })
+        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser20241922@biglittlethings.de', phone: '254720123456', password: randomPassword } })
 
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'testuser20241922@biglittlethings.de', password: 'testuser' } })
+        .send({ user: { email: 'testuser20241922@biglittlethings.de', password: randomPassword } })
 
       const res = await chai
         .request(app)
@@ -1288,16 +1307,17 @@ describe('A user', () => {
     it('should return 422 Unprocessable entity if a user tries to join a company using an invalid invite code that on decryption is not a guid', async () => {
       const encryptedNoneUUID = encryptUUID('123456780123401234012340123456789012', 'base64', uuidv1())
       const encodeDncryptedNoneUUIDWithCompanyIdToBase64 = encodeString(`${encryptedNoneUUID}.${uuidv1()}`, 'base64')
+      const randomPassword = faker.internet.password()
 
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser20241923@biglittlethings.de', phone: '254720123456', password: 'testuser' } })
+        .send({ user: { firstName: 'Test', lastName: 'User', email: 'testuser20241923@biglittlethings.de', phone: '254720123456', password: randomPassword } })
 
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'testuser20241923@biglittlethings.de', password: 'testuser' } })
+        .send({ user: { email: 'testuser20241923@biglittlethings.de', password: randomPassword } })
 
       const res = await chai
         .request(app)
@@ -1361,7 +1381,7 @@ describe('A user', () => {
             lastName: 'Three',
             email: 'warthree@asgardtemplate.com',
             phone: '254720123456',
-            password: 'thorisgreat',
+            password: faker.internet.password(),
             role: userRoles.ADMIN
           }
         })
@@ -1387,18 +1407,18 @@ describe('A user', () => {
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Tony', lastName: 'Stark', email: 'ironman@starkindustriesmarveltemplate.com', phone: '254720123456', password: 'mackone' } })
+        .send({ user: { firstName: 'Tony', lastName: 'Stark', email: 'ironman@starkindustriesmarveltemplate.com', phone: '254720123456', password: ironManPassword } })
 
       const resLogin = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ironman@starkindustriesmarveltemplate.com', password: 'mackone' } })
+        .send({ user: { email: 'ironman@starkindustriesmarveltemplate.com', password: ironManPassword } })
 
       const res = await chai
         .request(app)
         .patch(`/api/users/${String(resLogin.body.user.id)}/password`)
         .set('Authorization', `Bearer ${String(resLogin.body.token)}`)
-        .send({ user: { currentPassword: 'mackone', password: '1234567890' } })
+        .send({ user: { currentPassword: ironManPassword, password: faker.internet.password() } })
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'user')
@@ -1410,12 +1430,12 @@ describe('A user', () => {
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Tony', lastName: 'Stark', email: 'ironman@starkindustriesmarveltemplate2.com', phone: '254720123456', password: 'mackone' } })
+        .send({ user: { firstName: 'Tony', lastName: 'Stark', email: 'ironman@starkindustriesmarveltemplate2.com', phone: '254720123456', password: ironManPassword } })
 
       const resLogin = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ironman@starkindustriesmarveltemplate2.com', password: 'mackone' } })
+        .send({ user: { email: 'ironman@starkindustriesmarveltemplate2.com', password: ironManPassword } })
       const res = await chai
         .request(app)
         .patch(`/api/users/${String(resLogin.body.user.id)}/password-reset-admin`)
@@ -1445,12 +1465,12 @@ describe('A user', () => {
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: 'julien' } })
+        .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: raywireTestPassword } })
 
       const resLogin = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'raywiretest@gmail.com', password: 'julien' } })
+        .send({ user: { email: 'raywiretest@gmail.com', password: raywireTestPassword } })
 
       const token = String(resLogin.body.token)
       const userId = String(resLogin.body.user.id)

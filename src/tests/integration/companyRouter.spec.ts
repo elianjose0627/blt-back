@@ -16,11 +16,16 @@ import {
   createPrivacyRule,
   createTestUser,
   createBlockedDomain,
-  setSubscriptionToPaid
+  setSubscriptionToPaid,
+  iversAtKreeDotKrPassword,
+  nickFuryPassword,
+  sheHulkAtStarkIndustriesPassword,
+  happyHoganPassword
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 import * as appModules from '../../utils/appModules'
 import { IEmailTemplateType } from '../../types'
+import { faker } from '@faker-js/faker'
 
 const { expect } = chai
 
@@ -43,28 +48,28 @@ describe('Company actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: 'mackone' } })
+      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: sheHulkAtStarkIndustriesPassword } })
     await verifyUser('shehulk@starkindustriesmarvel.com')
 
     const resUser = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
     const resAdmin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
+      .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
 
     const resCampaignManager = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+      .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
     const resCompanyAdministrator = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+      .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
     tokenAdmin = resAdmin.body.token
     token = resUser.body.token
@@ -191,15 +196,16 @@ describe('Company actions', () => {
     })
 
     it('Should return 403 Forbidden when an unverified user tries to create a company.', async () => {
+      const randomPassword = faker.internet.password()
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'The', lastName: 'Hulk', email: 'thehulk@starkindustriesmarvel.com', phone: '254720123456', password: 'smashsmash' } })
+        .send({ user: { firstName: 'The', lastName: 'Hulk', email: 'thehulk@starkindustriesmarvel.com', phone: '254720123456', password: randomPassword } })
 
       const resUnverifiedUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'thehulk@starkindustriesmarvel.com', password: 'smashsmash' } })
+        .send({ user: { email: 'thehulk@starkindustriesmarvel.com', password: randomPassword } })
 
       const res = await chai
         .request(app)
@@ -329,7 +335,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -357,13 +363,14 @@ describe('Company actions', () => {
         })
 
       const companyId = resCompany.body.company.id
+      const randomPassword = faker.internet.password()
 
-      const user = await createTestUser('nebula@gotg.com', 'thanossux')
+      const user = await createTestUser('nebula@gotg.com', randomPassword)
 
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: user.email, password: 'thanossux' } })
+        .send({ user: { email: user.email, password: randomPassword } })
 
       const tokenUser = resUser.body.token
 
@@ -425,7 +432,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -458,7 +465,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -498,7 +505,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -524,11 +531,12 @@ describe('Company actions', () => {
       const resCompany = await createVerifiedCompany(userId)
 
       const companyId = resCompany.id
+      const randomPassword = faker.internet.password()
 
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Pepper', lastName: 'Potts', email: 'peppot@starkindustriesmarvel.com', password: 'iamironwoman' } })
+        .send({ user: { firstName: 'Pepper', lastName: 'Potts', email: 'peppot@starkindustriesmarvel.com', password: randomPassword } })
 
       await chai
         .request(app)
@@ -567,11 +575,12 @@ describe('Company actions', () => {
 
       const companyId = resCompany.body.company.id
       await verifyCompanyDomain(String(companyId))
+      const randomPassword = faker.internet.password()
 
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Medusa', lastName: 'Boltagon', email: 'medusa@inhumans.com', password: 'blackbolt' } })
+        .send({ user: { firstName: 'Medusa', lastName: 'Boltagon', email: 'medusa@inhumans.com', password: randomPassword } })
 
       const res = await chai
         .request(app)
@@ -653,11 +662,12 @@ describe('Company actions', () => {
       const companyId = resCompany.body.company.id
 
       await verifyCompanyDomain(String(companyId))
+      const randomPassword = faker.internet.password()
 
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Gorgon', lastName: 'Petragon', email: 'gorgon@inhumans.com', password: 'earthquake' } })
+        .send({ user: { firstName: 'Gorgon', lastName: 'Petragon', email: 'gorgon@inhumans.com', password: randomPassword } })
 
       await chai
         .request(app)
@@ -684,7 +694,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -747,7 +757,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -781,7 +791,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -802,11 +812,12 @@ describe('Company actions', () => {
       const resCompany = await createVerifiedCompany(userId)
 
       const companyId = resCompany.id
+      const randomPassword = faker.internet.password()
 
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Queen', lastName: 'Ramonda', email: 'qr@starkindustriesmarvel.com', password: 'iamironwoman' } })
+        .send({ user: { firstName: 'Queen', lastName: 'Ramonda', email: 'qr@starkindustriesmarvel.com', password: randomPassword } })
 
       await chai
         .request(app)
@@ -846,11 +857,12 @@ describe('Company actions', () => {
       const companyId = resCompany.body.company.id
 
       await verifyCompanyDomain(String(companyId))
+      const randomPassword = faker.internet.password()
 
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Crystal', lastName: 'Amaquelin', email: 'crystal@inhumans.com', password: 'quicksilver' } })
+        .send({ user: { firstName: 'Crystal', lastName: 'Amaquelin', email: 'crystal@inhumans.com', password: randomPassword } })
 
       const res = await chai
         .request(app)
@@ -896,11 +908,12 @@ describe('Company actions', () => {
       const resCompany = await createVerifiedCompany(userId)
 
       const companyId = resCompany.id
+      const randomPassword = faker.internet.password()
 
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Okoye', lastName: 'Dora', email: 'okoyedora@starkindustriesmarvel.com', password: 'iamironwoman' } })
+        .send({ user: { firstName: 'Okoye', lastName: 'Dora', email: 'okoyedora@starkindustriesmarvel.com', password: randomPassword } })
 
       await chai
         .request(app)
@@ -940,11 +953,12 @@ describe('Company actions', () => {
       const companyId = resCompany.body.company.id
 
       await verifyCompanyDomain(String(companyId))
+      const randomPassword = faker.internet.password()
 
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Gorgon', lastName: 'Boltagon', email: 'gorgonboltagon@inhumans.com', password: 'smashsmash' } })
+        .send({ user: { firstName: 'Gorgon', lastName: 'Boltagon', email: 'gorgonboltagon@inhumans.com', password: randomPassword } })
 
       const res = await chai
         .request(app)
@@ -963,11 +977,12 @@ describe('Company actions', () => {
       const resCompany = await createVerifiedCompany(userId)
 
       const companyId = resCompany.id
+      const randomPassword = faker.internet.password()
 
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Natasha', lastName: 'Romanoff', email: 'natrom@starkindustriesmarvel.com', password: 'theredroom' } })
+        .send({ user: { firstName: 'Natasha', lastName: 'Romanoff', email: 'natrom@starkindustriesmarvel.com', password: randomPassword } })
 
       await chai
         .request(app)
@@ -1006,11 +1021,12 @@ describe('Company actions', () => {
 
       const companyId = resCompany.body.company.id
       await verifyCompanyDomain(String(companyId))
+      const randomPassword = faker.internet.password()
 
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Maximus', lastName: 'Boltagon', email: 'maxbolt@inhumans.com', password: 'pureevil' } })
+        .send({ user: { firstName: 'Maximus', lastName: 'Boltagon', email: 'maxbolt@inhumans.com', password: randomPassword } })
 
       const res = await chai
         .request(app)
@@ -1597,7 +1613,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -1645,7 +1661,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -1913,7 +1929,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -1954,7 +1970,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -2043,7 +2059,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -2088,7 +2104,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -2292,7 +2308,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -2333,7 +2349,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -2449,7 +2465,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -2491,7 +2507,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -2540,7 +2556,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -3161,7 +3177,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -3202,7 +3218,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -3291,7 +3307,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -3330,7 +3346,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -3375,7 +3391,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -3559,7 +3575,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -3597,16 +3613,17 @@ describe('Company actions', () => {
       const resCompany = await createVerifiedCompany(userId)
 
       const companyId = resCompany.id
+      const randomPassword = faker.internet.password()
 
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Red', lastName: 'Hulk', email: 'redhulk@starkindustriesmarvel.com', phone: '254720123456', password: 'tonysuxx' } })
+        .send({ user: { firstName: 'Red', lastName: 'Hulk', email: 'redhulk@starkindustriesmarvel.com', phone: '254720123456', password: randomPassword } })
 
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
       token = resUser.body.token
 
@@ -3637,7 +3654,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email, password: 'mackone' } })
+        .send({ user: { email, password: sheHulkAtStarkIndustriesPassword } })
 
       token = resUser.body.token
 
@@ -3686,7 +3703,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
       token = resUser.body.token
 
@@ -3713,7 +3730,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
       token = resUser.body.token
 
@@ -3736,7 +3753,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
       token = resUser.body.token
 
@@ -3775,7 +3792,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
       token = resUser.body.token
 
@@ -3797,7 +3814,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -3820,7 +3837,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
       token = resUser.body.token
 
@@ -3849,7 +3866,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
       token = resUser.body.token
 
@@ -3871,7 +3888,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -3896,7 +3913,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
       token = resUser.body.token
 
@@ -3918,7 +3935,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
       token = resUser.body.token
       const resCompany = await chai
@@ -3951,6 +3968,7 @@ describe('Company actions', () => {
       const companyId = resCompany.id
 
       await createPrivacyRule(companyId, appModules.ADDRESSES, userRoles.COMPANYADMINISTRATOR)
+      const randomPassword = faker.internet.password()
 
       await chai
         .request(app)
@@ -3966,7 +3984,7 @@ describe('Company actions', () => {
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Maria', lastName: 'Hill', email: 'mariahill@starkindustriesmarvel.com', password: 'himymmymih' } })
+        .send({ user: { firstName: 'Maria', lastName: 'Hill', email: 'mariahill@starkindustriesmarvel.com', password: randomPassword } })
 
       await chai
         .request(app)
@@ -3997,7 +4015,7 @@ describe('Company actions', () => {
       const resNewUser2 = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Mara', lastName: 'Hull', email: 'marahull@starkindustriesmarvel.com', password: 'himymmymih2' } })
+        .send({ user: { firstName: 'Mara', lastName: 'Hull', email: 'marahull@starkindustriesmarvel.com', password: randomPassword } })
 
       await chai
         .request(app)
@@ -4024,7 +4042,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -4042,7 +4060,7 @@ describe('Company actions', () => {
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+        .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
       token = resUser.body.token
       const resCompany = await chai
@@ -4071,7 +4089,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -4145,7 +4163,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -4200,7 +4218,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -4391,7 +4409,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -4432,7 +4450,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -4546,7 +4564,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -4579,7 +4597,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -4626,7 +4644,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -4791,7 +4809,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -4915,7 +4933,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -4977,7 +4995,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -5020,7 +5038,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -5068,7 +5086,7 @@ describe('Company actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -5287,7 +5305,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -5328,7 +5346,7 @@ describe('Company actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -5457,6 +5475,7 @@ describe('Company actions', () => {
       const resCompany = await createVerifiedCompany(userId)
 
       const companyId = resCompany.id
+      const randomPassword = faker.internet.password()
 
       const emailTemplateTypesRes = await chai
         .request(app)
@@ -5480,7 +5499,7 @@ describe('Company actions', () => {
       const resNewUser = await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Pepper', lastName: 'Potts', email: 'peppot2@starkindustriesmarvel.com', password: 'iamironwoman' } })
+        .send({ user: { firstName: 'Pepper', lastName: 'Potts', email: 'peppot2@starkindustriesmarvel.com', password: randomPassword } })
 
       await chai
         .request(app)
@@ -5511,7 +5530,7 @@ describe('Company actions', () => {
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk21@starkindustriesmarvel21.com', phone: '254720123456', password: 'mackone' } })
+        .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk21@starkindustriesmarvel21.com', phone: '254720123456', password: sheHulkAtStarkIndustriesPassword } })
       await verifyUser('shehulk21@starkindustriesmarvel21.com')
 
       const emailTemplateTypesRes = await chai

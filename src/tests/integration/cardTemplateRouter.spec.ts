@@ -1,10 +1,15 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
+import { faker } from '@faker-js/faker'
 import app from '../../app'
 import {
   deleteTestUser, createAdminTestUser,
   createCompanyAdministrator, createCampaignManager,
-  createVerifiedCompany, verifyUser, verifyCompanyDomain
+  createVerifiedCompany, verifyUser, verifyCompanyDomain,
+  iversAtKreeDotKrPassword,
+  nickFuryPassword,
+  sheHulkAtStarkIndustriesPassword,
+  happyHoganPassword
 } from '../utils'
 
 const { expect } = chai
@@ -26,29 +31,29 @@ describe('Card Template actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: 'mackone' } })
+      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: sheHulkAtStarkIndustriesPassword } })
 
     await verifyUser('shehulk@starkindustriesmarvel.com')
 
     const resUser = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
     const resAdmin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
+      .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
 
     const resCampaignManager = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+      .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
     const resCompanyAdministrator = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+      .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
     tokenAdmin = resAdmin.body.token
     tokenCompanyAdministrator = resCompanyAdministrator.body.token
@@ -134,7 +139,7 @@ describe('Card Template actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -196,7 +201,7 @@ describe('Card Template actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -268,7 +273,7 @@ describe('Card Template actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -339,7 +344,7 @@ describe('Card Template actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: 'pepperpotts' } })
+        .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -442,11 +447,12 @@ describe('Card Template actions', () => {
 
       const companyId = resCompany.body.company.id
       await verifyCompanyDomain(String(companyId))
+      const randomPassword = faker.internet.password()
 
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Mar', lastName: 'Vell', email: 'marvell@kree.kr', phone: '254720123456', password: 'thecolourblue' } })
+        .send({ user: { firstName: 'Mar', lastName: 'Vell', email: 'marvell@kree.kr', phone: '254720123456', password: randomPassword } })
 
       await verifyUser('marvell@kree.kr')
 
@@ -464,7 +470,7 @@ describe('Card Template actions', () => {
       const resNewUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'marvell@kree.kr', password: 'thecolourblue' } })
+        .send({ user: { email: 'marvell@kree.kr', password: randomPassword } })
 
       const tokenNewUser = resNewUser.body.token
 

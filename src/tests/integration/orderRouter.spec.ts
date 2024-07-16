@@ -12,7 +12,11 @@ import {
   createCompanyOrder,
   createCompanyOrderWithMissingEmail,
   createCompanyOrderWithMissingCityStreetZip,
-  createCompanyOrderWithMinimalShippingAddress
+  createCompanyOrderWithMinimalShippingAddress,
+  iversAtKreeDotKrPassword,
+  nickFuryPassword,
+  sheHulkAtStarkIndustriesPassword,
+  sharonCarterPassword
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 import * as appModules from '../../utils/appModules'
@@ -35,29 +39,29 @@ describe('Order actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: 'mackone' } })
+      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: sheHulkAtStarkIndustriesPassword } })
 
     await verifyUser('shehulk@starkindustriesmarvel.com')
 
     const resUser = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
     const resAdmin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
+      .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
 
     const resCompanyAdmin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+      .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
     const resCompanyAdminTwo = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'sharoncarter@starkindustriesmarvel.com', password: 'thepowerbroker' } })
+      .send({ user: { email: 'sharoncarter@starkindustriesmarvel.com', password: sharonCarterPassword } })
 
     await createPrivacyRule(resCompanyAdminTwo.body.user.company.id, appModules.ORDERS, userRoles.COMPANYADMINISTRATOR)
     await createCompanyOrder(resCompanyAdminTwo.body.user.company.id)

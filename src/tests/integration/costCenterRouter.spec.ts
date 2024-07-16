@@ -1,5 +1,6 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
+import { faker } from '@faker-js/faker'
 import app from '../../app'
 import {
   deleteTestUser,
@@ -7,7 +8,9 @@ import {
   verifyUser,
   verifyCompanyDomain,
   createCompanyAdministratorWithCompany,
-  createCampaignManager
+  createCampaignManager,
+  iversAtKreeDotKrPassword,
+  sheHulkAtStarkIndustriesPassword
 } from '../utils'
 
 const { expect } = chai
@@ -18,39 +21,41 @@ let tokenAdmin: string
 let token: string
 let tokenCompanyAdminTwo: string
 let tokenCampaignManager: string
+const campaignManagerPassword = faker.internet.password()
+const companyAdministratorWithCompanyPassword = faker.internet.password()
 
 describe('Cost Centers actions', () => {
   before(async () => {
     await createAdminTestUser()
-    await createCompanyAdministratorWithCompany('minerva@kreecostcenter1.kr', 'thedoctor')
-    await createCampaignManager('ronan@kree.kr', 'theaccuser')
+    await createCompanyAdministratorWithCompany('minerva@kreecostcenter1.kr', companyAdministratorWithCompanyPassword)
+    await createCampaignManager('ronan1@kree.kr', campaignManagerPassword)
 
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: 'mackone' } })
+      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: sheHulkAtStarkIndustriesPassword } })
 
     await verifyUser('shehulk@starkindustriesmarvel.com')
 
     const resUser = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
     const resAdmin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
+      .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
 
     const resCompanyAdminTwo = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'minerva@kreecostcenter1.kr', password: 'thedoctor' } })
+      .send({ user: { email: 'minerva@kreecostcenter1.kr', password: companyAdministratorWithCompanyPassword } })
 
     const resCampaignManager = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ronan@kree.kr', password: 'theaccuser' } })
+      .send({ user: { email: 'ronan1@kree.kr', password: campaignManagerPassword } })
 
     tokenAdmin = resAdmin.body.token
     token = resUser.body.token
@@ -173,7 +178,7 @@ describe('Cost Centers actions', () => {
       const resCompanyAdmin = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'minerva@kreecostcenter1.kr', password: 'thedoctor' } })
+        .send({ user: { email: 'minerva@kreecostcenter1.kr', password: companyAdministratorWithCompanyPassword } })
 
       tokenCompanyAdminTwo = resCompanyAdmin.body.token
 
@@ -228,7 +233,7 @@ describe('Cost Centers actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           user: {
-            email: 'ronan@kree.kr',
+            email: 'ronan1@kree.kr',
             actionType: 'add'
           }
         })
@@ -236,7 +241,7 @@ describe('Cost Centers actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ronan@kree.kr', password: 'theaccuser' } })
+        .send({ user: { email: 'ronan1@kree.kr', password: campaignManagerPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
