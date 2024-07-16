@@ -4,7 +4,8 @@ import app from '../../app'
 import {
   createAdminTestUser,
   createVerifiedUser,
-  createVerifiedCompany
+  createVerifiedCompany,
+  iversAtKreeDotKrPassword
 } from '../utils'
 
 const { expect } = chai
@@ -20,7 +21,7 @@ describe('User in User Company Group actions', () => {
     const resAdmin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
+      .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
 
     tokenAdmin = resAdmin.body.token
   })

@@ -2,6 +2,7 @@ import sgMail from '@sendgrid/mail'
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import { v1 as uuidv1 } from 'uuid'
+import { faker } from '@faker-js/faker'
 
 import app from '../../app'
 import generateToken from '../../utils/generateToken'
@@ -11,7 +12,8 @@ import {
   createLockedOutUser1min,
   createAdminTestUser,
   verifyCompanyDomain,
-  createBlockedDomain
+  createBlockedDomain,
+  iversAtKreeDotKrPassword
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 import { encodeString, encryptUUID } from '../../utils/encryption'
@@ -22,10 +24,11 @@ chai.use(chaiHttp)
 
 let tokenAdmin: string
 let emailTemplateTypes: any[]
+const blockedUserPassword = faker.internet.password(15)
 
 describe('Auth Actions', () => {
   before(async () => {
-    await createBlockedUser()
+    await createBlockedUser(blockedUserPassword)
     await createLockedOutUser30mins()
     await createLockedOutUser1min()
     await createUserWithOtp()
@@ -34,7 +37,7 @@ describe('Auth Actions', () => {
     const resAdmin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
+      .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
 
     tokenAdmin = resAdmin.body.token
   })
@@ -47,15 +50,16 @@ describe('Auth Actions', () => {
   })
 
   it('should return a token on successful log in with email and password', async () => {
+    const randomPassword = faker.internet.password()
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Peter', lastName: 'Quill', email: 'starlord1@guardiansofthegalaxy.com', phone: '254720123456', password: 'footloose' } })
+      .send({ user: { firstName: 'Peter', lastName: 'Quill', email: 'starlord1@guardiansofthegalaxy.com', phone: '254720123456', password: randomPassword } })
 
     const res = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'starlord1@guardiansofthegalaxy.com', password: 'footloose' } })
+      .send({ user: { email: 'starlord1@guardiansofthegalaxy.com', password: randomPassword } })
 
     expect(res).to.have.status(200)
     expect(res.body).to.include.keys('statusCode', 'success', 'token', 'user')
@@ -88,7 +92,7 @@ describe('Auth Actions', () => {
       .query({
         companyId: resInviteLink.body.company.inviteLink.split('=')[1]
       })
-      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoon@guardiansofthegalaxy.com', phone: '254720123456', password: 'friend' } })
+      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoon@guardiansofthegalaxy.com', phone: '254720123456', password: faker.internet.password() } })
 
     expect(res).to.have.status(201)
     expect(res.body).to.include.keys('statusCode', 'success', 'user')
@@ -124,7 +128,7 @@ describe('Auth Actions', () => {
       .query({
         companyId: resInviteLink.body.company.inviteLink.split('=')[1]
       })
-      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoontwo@guardiansofthegalaxy.com', phone: '254720123456', password: 'friend' } })
+      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoontwo@guardiansofthegalaxy.com', phone: '254720123456', password: faker.internet.password() } })
 
     expect(res).to.have.status(201)
     expect(res.body).to.include.keys('statusCode', 'success', 'user')
@@ -159,7 +163,7 @@ describe('Auth Actions', () => {
       .query({
         companyId: resInviteLink.body.company.shortInviteLink.split('=')[1]
       })
-      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoontwotwo@guardiansofthegalaxy.com', phone: '254720123456', password: 'friend' } })
+      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoontwotwo@guardiansofthegalaxy.com', phone: '254720123456', password: faker.internet.password() } })
 
     expect(res).to.have.status(201)
     expect(res.body).to.include.keys('statusCode', 'success', 'user')
@@ -178,7 +182,7 @@ describe('Auth Actions', () => {
       .query({
         companyId: encryptedUUIDWithCompanyIdHex
       })
-      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoon1@guardiansofthegalaxy.com', phone: '254720123456', password: 'friend' } })
+      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoon1@guardiansofthegalaxy.com', phone: '254720123456', password: faker.internet.password() } })
 
     expect(res).to.have.status(404)
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')
@@ -195,7 +199,7 @@ describe('Auth Actions', () => {
       .query({
         companyId
       })
-      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoon1@guardiansofthegalaxy.com', phone: '254720123456', password: 'friend' } })
+      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoon1@guardiansofthegalaxy.com', phone: '254720123456', password: faker.internet.password() } })
 
     expect(res).to.have.status(422)
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')
@@ -213,7 +217,7 @@ describe('Auth Actions', () => {
       .query({
         companyId: encodeCompanyIdToHex
       })
-      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoon1@guardiansofthegalaxy.com', phone: '254720123456', password: 'friend' } })
+      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoon1@guardiansofthegalaxy.com', phone: '254720123456', password: faker.internet.password() } })
 
     expect(res).to.have.status(422)
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')
@@ -232,7 +236,7 @@ describe('Auth Actions', () => {
           username: '',
           email: 'starlord1@guardiansofthegalaxy.com',
           phone: '254720123456',
-          password: 'footloose'
+          password: faker.internet.password()
         }
       })
 
@@ -254,7 +258,7 @@ describe('Auth Actions', () => {
           username: 'pquill',
           email: 'starlord@t-online.de',
           phone: '254720123456',
-          password: 'footloose'
+          password: faker.internet.password()
         }
       })
 
@@ -265,15 +269,16 @@ describe('Auth Actions', () => {
   })
 
   it('should return 200 on successful logout', async () => {
+    const randomPassword = faker.internet.password()
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Mary', lastName: 'Jane', email: 'mj@spiderteam.com', phone: '254720123456', password: 'petertingle' } })
+      .send({ user: { firstName: 'Mary', lastName: 'Jane', email: 'mj@spiderteam.com', phone: '254720123456', password: randomPassword } })
 
     const resLogin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'mj@spiderteam.com', password: 'petertingle' } })
+      .send({ user: { email: 'mj@spiderteam.com', password: randomPassword } })
 
     const token = resLogin.body.token
 
@@ -288,15 +293,16 @@ describe('Auth Actions', () => {
   })
 
   it('should return 401 on attempting to logout with an expired token', async () => {
+    const randomPassword = faker.internet.password()
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Mary', lastName: 'Jane', email: 'mj2@spiderteam.com', phone: '254720123456', password: 'petertingle' } })
+      .send({ user: { firstName: 'Mary', lastName: 'Jane', email: 'mj2@spiderteam.com', phone: '254720123456', password: randomPassword } })
 
     const resLogin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'mj2@spiderteam.com', password: 'petertingle' } })
+      .send({ user: { email: 'mj2@spiderteam.com', password: randomPassword } })
 
     const token = resLogin.body.token
 
@@ -319,7 +325,7 @@ describe('Auth Actions', () => {
     const res = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'wandamaximoff@avengers.com', password: 'thescarletwitch' } })
+      .send({ user: { email: 'wandamaximoff@avengers.com', password: blockedUserPassword } })
 
     expect(res).to.have.status(401)
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')
@@ -330,7 +336,7 @@ describe('Auth Actions', () => {
     const res = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'monicarambeau@swordmarvel.com', password: 'photonrox' } })
+      .send({ user: { email: 'monicarambeau@swordmarvel.com', password: faker.internet.password(6) } })
 
     expect(res).to.have.status(401)
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')
@@ -341,7 +347,7 @@ describe('Auth Actions', () => {
     const res = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'mariarambeau@swordmarvel.com', password: 'photonrox' } })
+      .send({ user: { email: 'mariarambeau@swordmarvel.com', password: faker.internet.password(6) } })
 
     expect(res).to.have.status(401)
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')
@@ -352,12 +358,12 @@ describe('Auth Actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Luke', lastName: 'Cage', email: 'lukecage@alias.com', phone: '254720123456', password: 'stormer' } })
+      .send({ user: { firstName: 'Luke', lastName: 'Cage', email: 'lukecage@alias.com', phone: '254720123456', password: faker.internet.password(6) } })
 
     const res = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'lukecage@alias.com', password: 'breaker' } })
+      .send({ user: { email: 'lukecage@alias.com', password: faker.internet.password(8) } })
 
     expect(res).to.have.status(401)
   })
@@ -366,7 +372,7 @@ describe('Auth Actions', () => {
     const res = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'lukecaga@alias.com', password: 'breaker' } })
+      .send({ user: { email: 'lukecaga@alias.com', password: faker.internet.password() } })
 
     expect(res).to.have.status(404)
     expect(res.body.errors.message).to.equal('User not found')
@@ -376,7 +382,7 @@ describe('Auth Actions', () => {
     const res = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { password: 'breaker' } })
+      .send({ user: { password: faker.internet.password() } })
 
     expect(res).to.have.status(422)
   })
@@ -394,7 +400,7 @@ describe('Auth Actions', () => {
     const res = await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Luke', lastName: 'Cage', email: 'lukecage@alias.com', password: 'hellowhellow', username: '  lukecage' } })
+      .send({ user: { firstName: 'Luke', lastName: 'Cage', email: 'lukecage@alias.com', password: faker.internet.password(), username: '  lukecage' } })
 
     expect(res).to.have.status(422)
     expect(res.body.errors.details[0].username).to.equal('user.username cannot contain spaces')
@@ -404,7 +410,7 @@ describe('Auth Actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: 'julien' } })
+      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: faker.internet.password() } })
 
     const res = await chai
       .request(app)
@@ -421,7 +427,7 @@ describe('Auth Actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: 'julien' } })
+      .send({ user: { firstName: 'Test', lastName: 'User', email: 'raywiretest@gmail.com', phone: '254720123456', password: faker.internet.password() } })
 
     sgMail.setApiKey('')
 
@@ -450,7 +456,7 @@ describe('Auth Actions', () => {
     const res = await chai
       .request(app)
       .patch('/auth/reset-password')
-      .send({ user: { password: '123456' } })
+      .send({ user: { password: faker.internet.password() } })
 
     expect(res).to.have.status(401)
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')
@@ -468,10 +474,11 @@ describe('Auth Actions', () => {
   })
 
   it('should return 200 when the password of a user is successfully reset', async () => {
+    const randomPassword = faker.internet.password()
     const resUser = await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Queen', lastName: 'Hippolyta', email: 'qh@themyscira.com', phone: '254720123456', password: 'iamthegreatest' } })
+      .send({ user: { firstName: 'Queen', lastName: 'Hippolyta', email: 'qh@themyscira.com', phone: '254720123456', password: randomPassword } })
 
     const token = generateToken(resUser.body.user, 'reset', '1 minute')
 
@@ -479,7 +486,7 @@ describe('Auth Actions', () => {
       .request(app)
       .patch('/auth/reset-password')
       .set('Authorization', `Bearer ${String(token)}`)
-      .send({ user: { password: '123456' } })
+      .send({ user: { password: randomPassword } })
 
     expect(res).to.have.status(200)
     expect(res.body).to.include.keys('statusCode', 'success', 'user')
@@ -488,15 +495,16 @@ describe('Auth Actions', () => {
   })
 
   it('should return 401 when a user uses an invalid token to reset password', async () => {
+    const randomPassword = faker.internet.password()
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'Gwen', lastName: 'Stacy', email: 'gs@spiderteam.com', phone: '254720123456', password: 'petertingle' } })
+      .send({ user: { firstName: 'Gwen', lastName: 'Stacy', email: 'gs@spiderteam.com', phone: '254720123456', password: randomPassword } })
 
     const resLogin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'gs@spiderteam.com', password: 'petertingle' } })
+      .send({ user: { email: 'gs@spiderteam.com', password: randomPassword } })
 
     const token = resLogin.body.token
 
@@ -504,7 +512,7 @@ describe('Auth Actions', () => {
       .request(app)
       .patch('/auth/reset-password')
       .set('Authorization', `Bearer ${String(token)}`)
-      .send({ user: { password: '123456' } })
+      .send({ user: { password: faker.internet.password() } })
 
     expect(res).to.have.status(401)
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')
@@ -583,7 +591,7 @@ describe('Auth Actions', () => {
             lastName: 'Three',
             email: 'warthree@asgardtemplateauth.com',
             phone: '254720123456',
-            password: 'thorisgreat'
+            password: faker.internet.password()
           }
         })
 

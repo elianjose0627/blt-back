@@ -5,7 +5,10 @@ import {
   deleteTestUser,
   createAdminTestUser,
   verifyUser,
-  createCompanyAdministrator
+  createCompanyAdministrator,
+  iversAtKreeDotKrPassword,
+  nickFuryPassword,
+  sheHulkAtStarkIndustriesPassword
 } from '../utils'
 
 const { expect } = chai
@@ -24,24 +27,24 @@ describe('Legal Text actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: 'mackone' } })
+      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: sheHulkAtStarkIndustriesPassword } })
 
     await verifyUser('shehulk@starkindustriesmarvel.com')
 
     const resUser = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
     const resAdmin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
+      .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
 
     const resCompanyAdmin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+      .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
     tokenAdmin = resAdmin.body.token
     token = resUser.body.token

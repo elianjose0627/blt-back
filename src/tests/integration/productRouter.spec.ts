@@ -1,6 +1,7 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import { v1 as uuidv1 } from 'uuid'
+import { faker } from '@faker-js/faker'
 import app from '../../app'
 import {
   deleteTestUser,
@@ -13,7 +14,9 @@ import {
   deleteCompanyFromProductAccessControlGroup,
   deleteCompanyUserGroupFromProductAccessControlGroup,
   deleteCompanyUserGroup,
-  deleteUserCompanyUserGroup
+  deleteUserCompanyUserGroup,
+  iversAtKreeDotKrPassword,
+  sheHulkAtStarkIndustriesPassword
 } from '../utils'
 
 const { expect } = chai
@@ -28,39 +31,41 @@ let companyProductAccessControlGroupId: string
 let companyUserGroupProductAccessControlGroupId: string
 let companyUserGroupId2: string
 let userCompanyUserGroupId: string
+const campaignManagerPassword = faker.internet.password()
+const companyAdministratorWithCompanyPassword = faker.internet.password()
 
 describe('Product actions', () => {
   before(async () => {
     await createAdminTestUser()
-    await createCompanyAdministratorWithCompany('minerva@kreeproducts.kr', 'thedoctor')
-    await createCampaignManager('ronan@kreeproducts.kr', 'theaccuser')
+    await createCompanyAdministratorWithCompany('minerva@kreeproducts.kr', companyAdministratorWithCompanyPassword)
+    await createCampaignManager('ronan@kreeproducts.kr', campaignManagerPassword)
 
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: 'mackone' } })
+      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: sheHulkAtStarkIndustriesPassword } })
 
     await verifyUser('shehulk@starkindustriesmarvel.com')
 
     const resUser = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
     const resAdmin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
+      .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
 
     const resCompanyAdminTwo = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'minerva@kreeproducts.kr', password: 'thedoctor' } })
+      .send({ user: { email: 'minerva@kreeproducts.kr', password: companyAdministratorWithCompanyPassword } })
 
     const resCampaignManager = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ronan@kreeproducts.kr', password: 'theaccuser' } })
+      .send({ user: { email: 'ronan@kreeproducts.kr', password: campaignManagerPassword } })
 
     tokenAdmin = resAdmin.body.token
     token = resUser.body.token
@@ -776,7 +781,7 @@ describe('Product actions', () => {
       const resCompanyAdmin = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'minerva@kreeproducts.kr', password: 'thedoctor' } })
+        .send({ user: { email: 'minerva@kreeproducts.kr', password: companyAdministratorWithCompanyPassword } })
 
       tokenCompanyAdminTwo = resCompanyAdmin.body.token
 
@@ -838,7 +843,7 @@ describe('Product actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ronan@kreeproducts.kr', password: 'theaccuser' } })
+        .send({ user: { email: 'ronan@kreeproducts.kr', password: campaignManagerPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -2184,7 +2189,8 @@ describe('Product actions', () => {
     })
 
     it('Should return 200 OK when an employee gets the product catalogue', async () => {
-      await createVerifiedUser('ivers2@kreeprotectedproducts.kr', '1234567890')
+      const randomPassword = faker.internet.password()
+      await createVerifiedUser('ivers2@kreeprotectedproducts.kr', randomPassword)
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -2214,7 +2220,7 @@ describe('Product actions', () => {
       const resEmployee = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ivers2@kreeprotectedproducts.kr', password: '1234567890' } })
+        .send({ user: { email: 'ivers2@kreeprotectedproducts.kr', password: randomPassword } })
 
       const tokenEmployee = String(resEmployee.body.token)
       const res = await chai
@@ -2232,11 +2238,12 @@ describe('Product actions', () => {
     })
 
     it('Should return 200 OK when a user in a product access control group gets the product catalogue', async () => {
-      await createVerifiedUser('ivers99@kreeprotectedproducts.kr', '1234567890')
+      const randomPassword = faker.internet.password()
+      await createVerifiedUser('ivers99@kreeprotectedproducts.kr', randomPassword)
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ivers99@kreeprotectedproducts.kr', password: '1234567890' } })
+        .send({ user: { email: 'ivers99@kreeprotectedproducts.kr', password: randomPassword } })
 
       const tokenUser = String(resUser.body.token)
       const userId = String(resUser.body.user.id)
@@ -2353,11 +2360,12 @@ describe('Product actions', () => {
     })
 
     it('Should return 200 OK when a user in a product access control group searches for an item in the product catalogue', async () => {
-      await createVerifiedUser('ivers919@kreeprotectedproducts.kr', '1234567890')
+      const randomPassword = faker.internet.password()
+      await createVerifiedUser('ivers919@kreeprotectedproducts.kr', randomPassword)
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ivers919@kreeprotectedproducts.kr', password: '1234567890' } })
+        .send({ user: { email: 'ivers919@kreeprotectedproducts.kr', password: randomPassword } })
 
       const tokenUser = String(resUser.body.token)
       const userId = String(resUser.body.user.id)
@@ -2475,11 +2483,12 @@ describe('Product actions', () => {
     })
 
     it('Should return 200 OK when a user in a product access control group filters by price in the product catalogue', async () => {
-      await createVerifiedUser('ivers9190@kreeprotectedproducts.kr', '1234567890')
+      const randomPassword = faker.internet.password()
+      await createVerifiedUser('ivers9190@kreeprotectedproducts.kr', randomPassword)
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ivers9190@kreeprotectedproducts.kr', password: '1234567890' } })
+        .send({ user: { email: 'ivers9190@kreeprotectedproducts.kr', password: randomPassword } })
 
       const tokenUser = String(resUser.body.token)
       const userId = String(resUser.body.user.id)
@@ -2605,11 +2614,12 @@ describe('Product actions', () => {
     })
 
     it('Should return 200 OK when a user in a product access control group filters by price range in the product catalogue', async () => {
-      await createVerifiedUser('ivers9191@kreeprotectedproducts.kr', '1234567890')
+      const randomPassword = faker.internet.password()
+      await createVerifiedUser('ivers9191@kreeprotectedproducts.kr', randomPassword)
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ivers9191@kreeprotectedproducts.kr', password: '1234567890' } })
+        .send({ user: { email: 'ivers9191@kreeprotectedproducts.kr', password: randomPassword } })
 
       const tokenUser = String(resUser.body.token)
       const userId = String(resUser.body.user.id)
@@ -2734,11 +2744,12 @@ describe('Product actions', () => {
     })
 
     it('Should return 200 OK when a user in a product access control group filters by show children in the product catalogue', async () => {
-      await createVerifiedUser('ivers1990@kreeprotectedproducts.kr', '1234567890')
+      const randomPassword = faker.internet.password()
+      await createVerifiedUser('ivers1990@kreeprotectedproducts.kr', randomPassword)
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ivers1990@kreeprotectedproducts.kr', password: '1234567890' } })
+        .send({ user: { email: 'ivers1990@kreeprotectedproducts.kr', password: randomPassword } })
 
       const tokenUser = String(resUser.body.token)
       const userId = String(resUser.body.user.id)
@@ -2916,7 +2927,8 @@ describe('Product actions', () => {
     })
 
     it('Should return 200 OK when an employee whose company is in a product access control group gets the product catalogue', async () => {
-      await createVerifiedUser('ivers88@kreeprotectedproducts.kr', '1234567890')
+      const randomPassword = faker.internet.password()
+      await createVerifiedUser('ivers88@kreeprotectedproducts.kr', randomPassword)
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -2946,7 +2958,7 @@ describe('Product actions', () => {
       const resEmployee = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ivers88@kreeprotectedproducts.kr', password: '1234567890' } })
+        .send({ user: { email: 'ivers88@kreeprotectedproducts.kr', password: randomPassword } })
 
       const tokenEmployee = String(resEmployee.body.token)
 
@@ -3064,7 +3076,8 @@ describe('Product actions', () => {
     })
 
     it('Should return 200 OK when an employee in a company user group gets the product catalogue', async () => {
-      await createVerifiedUser('ivers8@kreeprotectedproducts.kr', '1234567890')
+      const randomPassword = faker.internet.password()
+      await createVerifiedUser('ivers8@kreeprotectedproducts.kr', randomPassword)
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -3094,7 +3107,7 @@ describe('Product actions', () => {
       const resEmployee = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ivers8@kreeprotectedproducts.kr', password: '1234567890' } })
+        .send({ user: { email: 'ivers8@kreeprotectedproducts.kr', password: randomPassword } })
 
       const tokenEmployee = String(resEmployee.body.token)
       const userId = String(resEmployee.body.user.id)
@@ -3239,11 +3252,12 @@ describe('Product actions', () => {
     })
 
     it('Should return 200 OK when a user in a product access control group gets a product in the catalogue', async () => {
-      await createVerifiedUser('ivers97@kreeprotectedproducts.kr', '1234567890')
+      const randomPassword = faker.internet.password()
+      await createVerifiedUser('ivers97@kreeprotectedproducts.kr', randomPassword)
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ivers97@kreeprotectedproducts.kr', password: '1234567890' } })
+        .send({ user: { email: 'ivers97@kreeprotectedproducts.kr', password: randomPassword } })
 
       const tokenUser = String(resUser.body.token)
       const userId = String(resUser.body.user.id)
@@ -3360,11 +3374,12 @@ describe('Product actions', () => {
     })
 
     it('Should return 200 OK when a user in a product access control group gets similar product tags in the catalogue', async () => {
-      await createVerifiedUser('ivers917@kreeprotectedproducts.kr', '1234567890')
+      const randomPassword = faker.internet.password()
+      await createVerifiedUser('ivers917@kreeprotectedproducts.kr', randomPassword)
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ivers917@kreeprotectedproducts.kr', password: '1234567890' } })
+        .send({ user: { email: 'ivers917@kreeprotectedproducts.kr', password: randomPassword } })
 
       const tokenUser = String(resUser.body.token)
       const userId = String(resUser.body.user.id)
@@ -3695,11 +3710,12 @@ describe('Product actions', () => {
     })
 
     it('Should return 403 Forbidden when a user not in a product access control group tries to get a product in the catalogue', async () => {
-      await createVerifiedUser('ivers974@kreeprotectedproducts.kr', '1234567890')
+      const randomPassword = faker.internet.password()
+      await createVerifiedUser('ivers974@kreeprotectedproducts.kr', randomPassword)
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ivers974@kreeprotectedproducts.kr', password: '1234567890' } })
+        .send({ user: { email: 'ivers974@kreeprotectedproducts.kr', password: randomPassword } })
 
       const tokenUser = String(resUser.body.token)
 

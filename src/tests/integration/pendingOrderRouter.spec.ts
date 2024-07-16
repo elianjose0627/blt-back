@@ -2,6 +2,7 @@ import chai from 'chai'
 import chaiHttp from 'chai-http'
 import dayjs from 'dayjs'
 import app from '../../app'
+import { faker } from '@faker-js/faker'
 import {
   deleteTestUser,
   createAdminTestUser,
@@ -14,7 +15,9 @@ import {
   createCompanyAdministratorWithCompany,
   createProduct,
   createProductWithMinimumOrderQuantity,
-  createProductWithGraduatedPricesAndIsExceedStockEnabledIsTrue
+  createProductWithGraduatedPricesAndIsExceedStockEnabledIsTrue,
+  iversAtKreeDotKrPassword,
+  sheHulkAtStarkIndustriesPassword
 } from '../utils'
 
 const { expect } = chai
@@ -34,19 +37,19 @@ describe('Pending Orders actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: 'mackone' } })
+      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: sheHulkAtStarkIndustriesPassword } })
 
     await verifyUser('shehulk@starkindustriesmarvel.com')
 
     const resUser = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
     const resAdmin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
+      .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
 
     tokenAdmin = resAdmin.body.token
     token = resUser.body.token
@@ -82,11 +85,12 @@ describe('Pending Orders actions', () => {
 
   describe('Create a pending order', () => {
     it('Should return 201 Created when a user creates an order', async () => {
-      await createVerifiedUser('mantis101@gotg.com', 'woooooow')
+      const randomPassword = faker.internet.password()
+      await createVerifiedUser('mantis101@gotg.com', randomPassword)
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'mantis101@gotg.com', password: 'woooooow' } })
+        .send({ user: { email: 'mantis101@gotg.com', password: randomPassword } })
 
       const tokenUser = resUser.body.token
 
@@ -105,11 +109,12 @@ describe('Pending Orders actions', () => {
     })
 
     it('Should return 201 Created when a company admin with company that has a customerId creates an order', async () => {
-      await createCompanyAdministratorWithCompany('mantis102@gotg.com', 'woooooow', '040')
+      const randomPassword = faker.internet.password()
+      await createCompanyAdministratorWithCompany('mantis102@gotg.com', randomPassword, '040')
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'mantis102@gotg.com', password: 'woooooow' } })
+        .send({ user: { email: 'mantis102@gotg.com', password: randomPassword } })
 
       const tokenUser = resUser.body.token
 
@@ -128,11 +133,12 @@ describe('Pending Orders actions', () => {
     })
 
     it('Should return 201 Created when a company admin with company that has no customerId creates an order', async () => {
-      await createCompanyAdministratorWithCompany('mantis103@gotg.com', 'woooooow')
+      const randomPassword = faker.internet.password()
+      await createCompanyAdministratorWithCompany('mantis103@gotg.com', randomPassword)
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'mantis103@gotg.com', password: 'woooooow' } })
+        .send({ user: { email: 'mantis103@gotg.com', password: randomPassword } })
 
       const tokenUser = resUser.body.token
 
@@ -151,11 +157,12 @@ describe('Pending Orders actions', () => {
     })
 
     it('Should return 404 Not Found when a user creates an order with an article that does not exist', async () => {
-      await createVerifiedUser('mantis104@gotg.com', 'woooooow')
+      const randomPassword = faker.internet.password()
+      await createVerifiedUser('mantis104@gotg.com', randomPassword)
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'mantis104@gotg.com', password: 'woooooow' } })
+        .send({ user: { email: 'mantis104@gotg.com', password: randomPassword } })
 
       const tokenUser = resUser.body.token
 
@@ -225,11 +232,12 @@ describe('Pending Orders actions', () => {
     })
 
     it('Should return 400 Bad Request when a user creates an order with an article that has a high minimum quantity set', async () => {
-      await createVerifiedUser('mantis105@gotg.com', 'woooooow')
+      const randomPassword = faker.internet.password()
+      await createVerifiedUser('mantis105@gotg.com', randomPassword)
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'mantis105@gotg.com', password: 'woooooow' } })
+        .send({ user: { email: 'mantis105@gotg.com', password: randomPassword } })
 
       const tokenUser = resUser.body.token
 
@@ -299,11 +307,12 @@ describe('Pending Orders actions', () => {
     })
 
     it('Should return 400 Bad Request when a user creates an order that exceeds maximum limit of graduated prices with an article that has graduated prices and exceed stock is true', async () => {
-      await createVerifiedUser('mantis106@gotg.com', 'woooooow')
+      const randomPassword = faker.internet.password()
+      await createVerifiedUser('mantis106@gotg.com', randomPassword)
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'mantis106@gotg.com', password: 'woooooow' } })
+        .send({ user: { email: 'mantis106@gotg.com', password: randomPassword } })
 
       const tokenUser = resUser.body.token
 
@@ -523,12 +532,13 @@ describe('Pending Orders actions', () => {
 
       await updatePendingOrderWithPostedOrderId(resPendingOrders.body.pendingOrders[0].id, '20064477727948800')
       await updatePendingOrderWithPostedOrderId(resPendingOrders.body.pendingOrders[1].id, '20064460270206976')
+      const randomPassword = faker.internet.password()
 
-      await createCompanyAdministrator('test@companymarvelpendingorders23.com', '12345678')
+      await createCompanyAdministrator('test@companymarvelpendingorders23.com', randomPassword)
       const resCompanyAdminUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'test@companymarvelpendingorders23.com', password: '12345678' } })
+        .send({ user: { email: 'test@companymarvelpendingorders23.com', password: randomPassword } })
 
       const tokenCompanyAdmin = resCompanyAdminUser.body.token
 

@@ -2,7 +2,8 @@ import chai from 'chai'
 import chaiHttp from 'chai-http'
 import app from '../../app'
 import {
-  createAdminTestUser
+  createAdminTestUser,
+  iversAtKreeDotKrPassword
 } from '../utils'
 
 const { expect } = chai
@@ -18,7 +19,7 @@ describe('Product Category Tag in User Product Access Control Group actions', ()
     const resAdmin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
+      .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
 
     tokenAdmin = resAdmin.body.token
   })

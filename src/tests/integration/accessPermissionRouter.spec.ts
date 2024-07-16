@@ -9,11 +9,15 @@ import {
   createVerifiedCompany,
   verifyCompanyDomain,
   createCampaignManager,
-  createCompanyAdministrator
+  createCompanyAdministrator,
+  iversAtKreeDotKrPassword,
+  nickFuryPassword,
+  sheHulkAtStarkIndustriesPassword
 } from '../utils'
 import * as appModules from '../../utils/appModules'
 import * as userRoles from '../../utils/userRoles'
 import { READ, READWRITE } from '../../utils/permissions'
+import { faker } from '@faker-js/faker'
 
 const { expect } = chai
 
@@ -25,40 +29,42 @@ let tokenCampaignManager: string
 let tokenCampaignManager2: string
 let tokenCompanyAdministrator: string
 let userId: string
+const campaignManagerPassword = faker.internet.password()
+const roguePassword = faker.internet.password()
 
 describe('Access Permissions actions', () => {
   before(async () => {
     await createAdminTestUser()
-    await createCampaignManager('ronanac@kree.kr', 'theaccuser')
-    await createCampaignManager('ronanac2@kreeaccesspermissioncampaignmanager.kr', 'theaccuser')
+    await createCampaignManager('ronanac@kree.kr', campaignManagerPassword)
+    await createCampaignManager('ronanac2@kreeaccesspermissioncampaignmanager.kr', campaignManagerPassword)
     await createCompanyAdministrator()
 
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: 'mackone' } })
+      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: sheHulkAtStarkIndustriesPassword } })
 
     await verifyUser('shehulk@starkindustriesmarvel.com')
 
     const resAdmin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
+      .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
 
     const resUser = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
     const resCampaignManager2 = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ronanac2@kreeaccesspermissioncampaignmanager.kr', password: 'theaccuser' } })
+      .send({ user: { email: 'ronanac2@kreeaccesspermissioncampaignmanager.kr', password: campaignManagerPassword } })
 
     const resCompanyAdministrator = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+      .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
     tokenAdmin = resAdmin.body.token
     token = resUser.body.token
@@ -115,7 +121,7 @@ describe('Access Permissions actions', () => {
       const resCompanyAdministrator = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: 'captainmarvel' } })
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
       tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
@@ -266,14 +272,14 @@ describe('Access Permissions actions', () => {
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Rouge', lastName: 'Rouge', email: 'rouge@starkindustriesmarvel.com', phone: '254720123456', password: 'wolverine' } })
+        .send({ user: { firstName: 'Rouge', lastName: 'Rouge', email: 'rouge@starkindustriesmarvel.com', phone: '254720123456', password: roguePassword } })
 
       await verifyUser('rouge@starkindustriesmarvel.com')
 
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'rouge@starkindustriesmarvel.com', password: 'wolverine' } })
+        .send({ user: { email: 'rouge@starkindustriesmarvel.com', password: roguePassword } })
 
       const tokenUser = resUser.body.token
       const res = await chai
@@ -400,7 +406,7 @@ describe('Access Permissions actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ronanac2@kreeaccesspermissioncampaignmanager.kr', password: 'theaccuser' } })
+        .send({ user: { email: 'ronanac2@kreeaccesspermissioncampaignmanager.kr', password: campaignManagerPassword } })
 
       tokenCampaignManager2 = resCampaignManager.body.token
 
@@ -502,14 +508,14 @@ describe('Access Permissions actions', () => {
       await chai
         .request(app)
         .post('/auth/signup')
-        .send({ user: { firstName: 'Rouge', lastName: 'One', email: 'rougeone@starkindustriesmarvel.com', phone: '254720123456', password: 'wolverine' } })
+        .send({ user: { firstName: 'Rouge', lastName: 'One', email: 'rougeone@starkindustriesmarvel.com', phone: '254720123456', password: roguePassword } })
 
       await verifyUser('rougeone@starkindustriesmarvel.com')
 
       const resUser = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'rougeone@starkindustriesmarvel.com', password: 'wolverine' } })
+        .send({ user: { email: 'rougeone@starkindustriesmarvel.com', password: roguePassword } })
 
       const tokenUser = resUser.body.token
 
@@ -554,7 +560,7 @@ describe('Access Permissions actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ronanac@kree.kr', password: 'theaccuser' } })
+        .send({ user: { email: 'ronanac@kree.kr', password: campaignManagerPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
@@ -622,7 +628,7 @@ describe('Access Permissions actions', () => {
       const resCampaignManager = await chai
         .request(app)
         .post('/auth/login')
-        .send({ user: { email: 'ronanac@kree.kr', password: 'theaccuser' } })
+        .send({ user: { email: 'ronanac@kree.kr', password: campaignManagerPassword } })
 
       tokenCampaignManager = resCampaignManager.body.token
 
