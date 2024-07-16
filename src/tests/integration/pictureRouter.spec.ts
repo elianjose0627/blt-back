@@ -4,7 +4,8 @@ import app from '../../app'
 import {
   deleteTestUser,
   createAdminTestUser,
-  createVerifiedCompany
+  createVerifiedCompany,
+  iversAtKreeDotKrPassword
 } from '../utils'
 
 const { expect } = chai
@@ -21,7 +22,7 @@ describe('Picture actions', () => {
     const resAdmin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
+      .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
 
     tokenAdmin = resAdmin.body.token
     userIdAdmin = resAdmin.body.user.id

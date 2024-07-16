@@ -8,7 +8,9 @@ import {
   createAdminTestUser,
   verifyUser,
   createMaintenanceMode,
-  deleteAllMaintenanceModes
+  deleteAllMaintenanceModes,
+  iversAtKreeDotKrPassword,
+  sheHulkAtStarkIndustriesPassword
 } from '../utils'
 
 dayjs.extend(localizedFormat)
@@ -28,19 +30,19 @@ describe('Maintenance mode actions', () => {
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: 'mackone' } })
+      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: sheHulkAtStarkIndustriesPassword } })
 
     await verifyUser('shehulk@starkindustriesmarvel.com')
 
     const resUser = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: 'mackone' } })
+      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
 
     const resAdmin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ivers@kree.kr', password: 'thebiggun' } })
+      .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
 
     tokenAdmin = resAdmin.body.token
     token = resUser.body.token

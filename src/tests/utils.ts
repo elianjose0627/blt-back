@@ -1,11 +1,21 @@
 import { v1 as uuidv1, v4 as uuidv4 } from 'uuid'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import { faker } from '@faker-js/faker'
 import db from '../models'
 import * as userRoles from '../utils/userRoles'
-
-import utc from 'dayjs/plugin/utc'
 import type { Module, Role } from '../types'
+
 dayjs.extend(utc)
+
+export const iversAtKreeDotKrPassword = faker.internet.password()
+export const nickFuryPassword = faker.internet.password()
+export const sheHulkAtStarkIndustriesPassword = faker.internet.password()
+export const drStrangePassword = faker.internet.password()
+export const happyHoganPassword = faker.internet.password()
+export const sharonCarterPassword = faker.internet.password()
+export const thenaEternalPassword = faker.internet.password()
+export const sersiEternalPassword = faker.internet.password()
 
 export const deleteTestUser = async (email: string): Promise<any> => {
   const user = await db.User.findOne({
@@ -21,7 +31,7 @@ export const deleteTestUser = async (email: string): Promise<any> => {
   }
 }
 
-export const createAdminTestUser = async (email = 'ivers@kree.kr', password = 'thebiggun'): Promise<any> => {
+export const createAdminTestUser = async (email = 'ivers@kree.kr', password = iversAtKreeDotKrPassword): Promise<any> => {
   const user = await db.User.findOne({
     attributes: ['id', 'email'],
     where: {
@@ -47,7 +57,7 @@ export const createAdminTestUser = async (email = 'ivers@kree.kr', password = 't
   }
 }
 
-export const createTestUser = async (email = 'drstrange@starkindustriesmarvel.com', password = 'thesanctum'): Promise<any> => {
+export const createTestUser = async (email = 'drstrange@starkindustriesmarvel.com', password = drStrangePassword): Promise<any> => {
   const user = await db.User.create({
     id: uuidv1(),
     firstName: 'Steven',
@@ -70,7 +80,7 @@ export const createUnverifiedUser = async (): Promise<any> => {
     lastName: 'Houdini',
     email: 'hh@starkindustriesmarvel.com',
     phone: '2222222222',
-    password: 'thegrandwizard',
+    password: faker.internet.password(),
     isVerified: false
   })
 
@@ -79,14 +89,14 @@ export const createUnverifiedUser = async (): Promise<any> => {
   }
 }
 
-export const createBlockedUser = async (): Promise<any> => {
+export const createBlockedUser = async (password: string): Promise<any> => {
   const user = await db.User.create({
     id: uuidv1(),
     firstName: 'Wanda',
     lastName: 'Maximoff',
     email: 'wandamaximoff@avengers.com',
     phone: '2222222222',
-    password: 'thescarletwitch',
+    password,
     isVerified: true,
     isActive: false
   })
@@ -96,7 +106,7 @@ export const createBlockedUser = async (): Promise<any> => {
   }
 }
 
-export const createCampaignManager = async (email = 'happyhogan@starkindustriesmarvel.com', password = 'pepperpotts'): Promise<any> => {
+export const createCampaignManager = async (email = 'happyhogan@starkindustriesmarvel.com', password = happyHoganPassword): Promise<any> => {
   const user = await db.User.findOne({
     attributes: ['id', 'email'],
     where: {
@@ -122,7 +132,7 @@ export const createCampaignManager = async (email = 'happyhogan@starkindustriesm
   }
 }
 
-export const createCompanyAdministrator = async (email = 'nickfury@starkindustriesmarvel.com', password = 'captainmarvel'): Promise<any> => {
+export const createCompanyAdministrator = async (email = 'nickfury@starkindustriesmarvel.com', password = nickFuryPassword): Promise<any> => {
   const user = await db.User.findOne({
     attributes: ['id', 'email'],
     where: {
@@ -156,7 +166,7 @@ export const createCompanyAdministrator = async (email = 'nickfury@starkindustri
   }
 }
 
-export const createCompanyAdministratorWithCompany = async (email = 'sharoncarter@starkindustriesmarvel.com', password = 'thepowerbroker', customerId: string | null = null): Promise<any> => {
+export const createCompanyAdministratorWithCompany = async (email = 'sharoncarter@starkindustriesmarvel.com', password = sharonCarterPassword, customerId: string | null = null): Promise<any> => {
   const user = await db.User.findOne({
     attributes: ['id', 'email'],
     where: {
@@ -198,7 +208,7 @@ export const createUnverifiedAdmin = async (): Promise<any> => {
     lastName: 'Walker',
     email: 'trishwalker@aliasinvestigationsmarvel.com',
     phone: '2222222222',
-    password: 'jessicajones',
+    password: faker.internet.password(),
     isVerified: false,
     isActive: true,
     role: userRoles.ADMIN
@@ -216,7 +226,7 @@ export const createLockedOutUser30mins = async (): Promise<any> => {
     lastName: 'Rambeau',
     email: 'monicarambeau@swordmarvel.com',
     phone: '2222222222',
-    password: 'photonroxx',
+    password: faker.internet.password(10),
     isVerified: true,
     loginTime: {
       lastSuccessful: null,
@@ -237,7 +247,7 @@ export const createLockedOutUser1min = async (): Promise<any> => {
     lastName: 'Rambeau',
     email: 'mariarambeau@swordmarvel.com',
     phone: '2222222222',
-    password: 'photonroxx',
+    password: faker.internet.password(10),
     isVerified: true,
     loginTime: {
       lastSuccessful: null,
@@ -258,7 +268,7 @@ export const createUserWithOtp = async (): Promise<any> => {
     lastName: 'Eternal',
     email: 'thenaeternal@celestialmarvel.com',
     phone: '2222222222',
-    password: 'kingo123',
+    password: thenaEternalPassword,
     isVerified: true,
     otp: {
       createdAt: dayjs.utc(),
@@ -278,7 +288,7 @@ export const createUserWithExpiredOtp = async (): Promise<any> => {
     lastName: 'Eternal',
     email: 'sersieternal@celestialmarvel.com',
     phone: '2222222222',
-    password: 'icarussux',
+    password: sersiEternalPassword,
     isVerified: true,
     otp: {
       createdAt: dayjs.utc().subtract(3, 'minute'),
@@ -316,7 +326,7 @@ export const createVerifiedAdminUser = async (): Promise<any> => {
     lastName: 'Drax',
     email: 'drax@aguardiansofthegalaxy.com',
     phone: '2222222222',
-    password: 'peterquill',
+    password: faker.internet.password(),
     isVerified: true,
     isActive: true,
     role: userRoles.ADMIN
