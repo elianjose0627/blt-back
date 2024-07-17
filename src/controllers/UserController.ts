@@ -426,7 +426,7 @@ class UserController extends BaseController {
         statusCode: statusCodes.NOT_FOUND,
         success: false,
         errors: {
-          message: `The user was not found, an invitation email has been sent to ${String(email)}`
+          message: `An invitation to register an account has been sent to ${String(email)}`
         }
       })
     }
