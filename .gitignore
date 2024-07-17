@@ -106,3 +106,5 @@ build
 .tern-port
 
 .DS_Store
+
+.cache_ggshield
