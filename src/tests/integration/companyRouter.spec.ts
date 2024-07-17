@@ -3670,7 +3670,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(404)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal(`The user was not found, an invitation email has been sent to ${String(nonExistentEmail)}`)
+      expect(res.body.errors.message).to.equal(`An invitation to register an account has been sent to ${String(nonExistentEmail)}`)
     })
 
     it('Should return 422 Unprocessable entity when an owner tries to add a user with a blocked email domain to a company.', async () => {
@@ -5428,7 +5428,7 @@ describe('Company actions', () => {
       expect(res).to.have.status(404)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.success).to.equal(false)
-      expect(res.body.errors.message).to.equal('The user was not found, an invitation email has been sent to peppot4@starkindustriesmarvel.com')
+      expect(res.body.errors.message).to.equal('An invitation to register an account has been sent to peppot4@starkindustriesmarvel.com')
     })
     it('Should return 404 Not Found when a company owner tries to add a user who is not in the platform and a non default account invitation email template exists.', async () => {
       const resCompany = await createVerifiedCompany(userId)
@@ -5468,7 +5468,7 @@ describe('Company actions', () => {
       expect(res).to.have.status(404)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.success).to.equal(false)
-      expect(res.body.errors.message).to.equal('The user was not found, an invitation email has been sent to peppot3@starkindustriesmarvel.com')
+      expect(res.body.errors.message).to.equal('An invitation to register an account has been sent to peppot3@starkindustriesmarvel.com')
     })
 
     it('Should return 200 OK when a company owner updates the role of an employee when a non default update role email template exists.', async () => {
