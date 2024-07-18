@@ -1,6 +1,7 @@
 import { v1 as uuidv1 } from 'uuid'
 import BaseService from './BaseService'
 import db from '../models'
+import { Op } from 'sequelize'
 
 class ProductSizeService extends BaseService {
   manyRecords (): string {
@@ -31,6 +32,28 @@ class ProductSizeService extends BaseService {
     response = await db[this.model].create({ ...productSize, id: uuidv1() })
 
     return { response: response.toJSONFor(), status: 201 }
+  }
+
+  async getAll (limit: number, offset: number, search?: string): Promise<any> {
+    let where
+
+    if (search !== undefined) {
+      where = {
+        type: { [Op.eq]: search }
+      }
+    }
+    const records = await db[this.model].findAndCountAll({
+      limit,
+      offset,
+      order: [['sortIndex', 'ASC'], ['createdAt', 'DESC']],
+      attributes: { exclude: [] },
+      where
+    })
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
   }
 }
 

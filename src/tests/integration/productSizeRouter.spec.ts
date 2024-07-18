@@ -67,6 +67,31 @@ describe('Product Size actions', () => {
       expect(res.body.productSizes).to.be.an('array')
     })
 
+    it('Should return 200 Success when an admin successfully retrieves all product sizes with a filter.', async () => {
+      await chai
+        .request(app)
+        .post('/api/product-sizes')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productSize: {
+            name: '4xl',
+            type: 'fabric'
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/product-sizes')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .query({
+          search: 'fabric'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productSizes')
+      expect(res.body.productSizes).to.be.an('array').lengthOf(1)
+    })
+
     it('Should return 200 when a non-admin retrieves all product sizes.', async () => {
       const res = await chai
         .request(app)

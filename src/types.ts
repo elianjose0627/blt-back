@@ -410,6 +410,8 @@ export interface IProductMaterial {
 export interface IProductSize {
   id: string
   name: string
+  type: string
+  sortIndex: number
   createdAt: Date
   updatedAt: Date
 }
