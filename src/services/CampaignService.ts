@@ -189,7 +189,8 @@ class CampaignService extends BaseService {
             where
           ]
         },
-        include
+        include,
+        distinct: true
       })
     } else if (allowedCompanyRoles.includes(user.role)) {
       records = await db.Order.findAndCountAll({
@@ -204,7 +205,8 @@ class CampaignService extends BaseService {
           ],
           companyId: user.company.id
         },
-        include
+        include,
+        distinct: true
       })
     } else {
       records = await db.Order.findAndCountAll({
@@ -219,7 +221,8 @@ class CampaignService extends BaseService {
           ],
           'shippingAddress.email': user.email
         },
-        include
+        include,
+        distinct: true
       })
     }
 
