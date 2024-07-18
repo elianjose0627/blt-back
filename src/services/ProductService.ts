@@ -654,8 +654,12 @@ class ProductService extends BaseService {
     return response
   }
 
-  async getProductVariations (limit: number, offset: number, parentId: string, filter = { showParent: false }): Promise<any> {
-    const { showParent } = filter
+  async getProductVariations (limit: number, offset: number, parentId: string, filter = { showParent: false, color: '', material: '', size: '' }): Promise<any> {
+    const { showParent = false, color, material, size } = filter
+    const whereFilterColor = generateFilterQuery({ name: color })
+    const whereFilterMaterial = generateFilterQuery({ name: material })
+    const whereFilterSize = generateFilterQuery({ name: size })
+
     const response = await db[this.model].findAndCountAll({
       limit,
       offset,
@@ -685,21 +689,27 @@ class ProductService extends BaseService {
           attributes: {
             exclude: ['createdAt', 'updatedAt', 'deletedAt']
           },
-          as: 'productColor'
+          as: 'productColor',
+          where: whereFilterColor,
+          required: Object.keys(whereFilterColor).length > 0
         },
         {
           model: db.ProductMaterial,
           attributes: {
             exclude: ['createdAt', 'updatedAt', 'deletedAt']
           },
-          as: 'productMaterial'
+          as: 'productMaterial',
+          where: whereFilterMaterial,
+          required: Object.keys(whereFilterMaterial).length > 0
         },
         {
           model: db.ProductSize,
           attributes: {
             exclude: ['createdAt', 'updatedAt', 'deletedAt']
           },
-          as: 'productSize'
+          as: 'productSize',
+          where: whereFilterSize,
+          required: Object.keys(whereFilterSize).length > 0
         },
         {
           model: db.Stock,
@@ -708,7 +718,8 @@ class ProductService extends BaseService {
             exclude: ['createdAt', 'updatedAt', 'deletedAt', 'productId']
           }
         }
-      ]
+      ],
+      distinct: true
     })
     return response
   }
