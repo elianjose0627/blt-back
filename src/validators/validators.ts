@@ -943,7 +943,9 @@ const validateProductMaterial = Joi.object({
 
 const validateProductSize = Joi.object({
   productSize: Joi.object({
-    name: Joi.string().lowercase().required()
+    name: Joi.string().max(32).lowercase().required(),
+    type: Joi.string().max(32).allow(null).default(null),
+    sortIndex: Joi.number().positive().allow(0)
   }).required()
 })
 

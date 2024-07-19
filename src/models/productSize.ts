@@ -2,14 +2,18 @@ import { Model } from 'sequelize'
 import type { IProductSize } from '../types'
 
 const ProductSizeModel = (sequelize: any, DataTypes: any): any => {
-  interface ProductMaterialAttributes {
+  interface ProductSizeAttributes {
     id: string
     name: string
+    type: string
+    sortIndex: number
   }
 
-  class ProductSize extends Model<ProductMaterialAttributes> {
+  class ProductSize extends Model<ProductSizeAttributes> {
     private readonly id: string
     private readonly name: string
+    private readonly type: string
+    private readonly sortIndex: number
     private readonly createdAt: Date
     private readonly updatedAt: Date
 
@@ -21,6 +25,8 @@ const ProductSizeModel = (sequelize: any, DataTypes: any): any => {
       return {
         id: this.id,
         name: this.name,
+        type: this.type,
+        sortIndex: this.sortIndex,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       }
@@ -36,6 +42,14 @@ const ProductSizeModel = (sequelize: any, DataTypes: any): any => {
     name: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    type: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    sortIndex: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     sequelize,
