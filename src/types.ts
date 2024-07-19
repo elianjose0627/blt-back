@@ -562,6 +562,7 @@ export interface IProduct {
   isMetadataSynced: boolean
   isExceedStockEnabled: boolean
   minimumOrderQuantity: number
+  articleId: number
 }
 
 export interface ICampaignOrderLimit {
