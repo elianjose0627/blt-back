@@ -388,7 +388,7 @@ describe('Product actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productMaterial: {
-            name: 'suede'
+            name: 'suede-blue'
           }
         })
 
@@ -442,7 +442,7 @@ describe('Product actions', () => {
           page: 1,
           filter: {
             color: 'black',
-            material: 'suede',
+            material: 'suede-blue',
             size: '46'
           }
         })
@@ -3701,6 +3701,315 @@ describe('Product actions', () => {
         .query({
           limit: 10,
           page: 1
+        })
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
+    })
+
+    it('Should return 200 Success when an admin successfully retrieves all product variations for a child with size filter.', async () => {
+      const resProductSize = await chai
+        .request(app)
+        .post('/api/product-sizes')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productSize: {
+            name: '4xl'
+          }
+        })
+      const resProductSize2 = await chai
+        .request(app)
+        .post('/api/product-sizes')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productSize: {
+            name: '5xl'
+          }
+        })
+
+      const resProductParent = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Smart Watch 18 3',
+            jfsku: '1231sw183',
+            merchantSku: '1231sw183',
+            type: 'generic',
+            productGroup: 'technology',
+            isParent: true
+          }
+        })
+      const parentProductId = String(resProductParent.body.product.id)
+      const resProductChild = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Smart Watch 18 4',
+            jfsku: '1231sw184',
+            merchantSku: '1231sw184',
+            type: 'generic',
+            productGroup: 'technology',
+            productSizeId: resProductSize.body.productSize.id
+          }
+        })
+      const resProductChild2 = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Smart Watch 18 5',
+            jfsku: '1231sw185',
+            merchantSku: '1231sw185',
+            type: 'generic',
+            productGroup: 'technology',
+            productSizeId: resProductSize2.body.productSize.id
+          }
+        })
+      const childProductId = String(resProductChild.body.product.id)
+      const childProductId2 = String(resProductChild2.body.product.id)
+      await chai
+        .request(app)
+        .patch(`/api/products/${childProductId}/child`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            parentId: parentProductId
+          }
+        })
+      await chai
+        .request(app)
+        .patch(`/api/products/${childProductId2}/child`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            parentId: parentProductId
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${childProductId}/catalogue/variations`)
+        .query({
+          limit: 10,
+          page: 1,
+          filter: {
+            size: '4xl'
+          }
+        })
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
+    })
+
+    it('Should return 200 Success when an admin successfully retrieves all product variations for a child with color filter.', async () => {
+      const color = faker.color.human()
+      const colorTwo = faker.color.human()
+      const resProductColor = await chai
+        .request(app)
+        .post('/api/product-colors')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productColor: {
+            name: color,
+            hexCode: faker.color.rgb({ prefix: '#' }),
+            rgb: faker.color.rgb({ format: 'css' })
+          }
+        })
+
+      const resProductColorTwo = await chai
+        .request(app)
+        .post('/api/product-colors')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productColor: {
+            name: colorTwo,
+            hexCode: faker.color.rgb({ prefix: '#' }),
+            rgb: faker.color.rgb({ format: 'css' })
+          }
+        })
+
+      const resProductParent = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Smart Watch 19 3',
+            jfsku: '1231sw193',
+            merchantSku: '1231sw193',
+            type: 'generic',
+            productGroup: 'technology',
+            isParent: true
+          }
+        })
+      const parentProductId = String(resProductParent.body.product.id)
+      const resProductChild = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Smart Watch 19 4',
+            jfsku: '1231sw194',
+            merchantSku: '1231sw194',
+            type: 'generic',
+            productGroup: 'technology',
+            productColorId: resProductColor.body.productColor.id
+          }
+        })
+      const resProductChild2 = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Smart Watch 19 5',
+            jfsku: '1231sw195',
+            merchantSku: '1231sw195',
+            type: 'generic',
+            productGroup: 'technology',
+            productColorId: resProductColorTwo.body.productColor.id
+          }
+        })
+      const childProductId = String(resProductChild.body.product.id)
+      const childProductId2 = String(resProductChild2.body.product.id)
+      await chai
+        .request(app)
+        .patch(`/api/products/${childProductId}/child`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            parentId: parentProductId
+          }
+        })
+      await chai
+        .request(app)
+        .patch(`/api/products/${childProductId2}/child`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            parentId: parentProductId
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${childProductId}/catalogue/variations`)
+        .query({
+          limit: 10,
+          page: 1,
+          filter: {
+            color
+          }
+        })
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(1)
+    })
+
+    it('Should return 200 Success when an admin successfully retrieves all product variations for a child with material filter.', async () => {
+      const material = faker.commerce.productMaterial()
+      const materialTwo = faker.commerce.productMaterial()
+      const resProductMaterial = await chai
+        .request(app)
+        .post('/api/product-materials')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productMaterial: {
+            name: material
+          }
+        })
+      const resProductMaterialTwo = await chai
+        .request(app)
+        .post('/api/product-materials')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productMaterial: {
+            name: materialTwo
+          }
+        })
+
+      const resProductParent = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Smart Watch 29 3',
+            jfsku: '1231sw293',
+            merchantSku: '1231sw293',
+            type: 'generic',
+            productGroup: 'technology',
+            isParent: true
+          }
+        })
+      const parentProductId = String(resProductParent.body.product.id)
+      const resProductChild = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Smart Watch 29 4',
+            jfsku: '1231sw294',
+            merchantSku: '1231sw294',
+            type: 'generic',
+            productGroup: 'technology',
+            productMaterialId: resProductMaterial.body.productMaterial.id
+          }
+        })
+      const resProductChild2 = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Smart Watch 29 5',
+            jfsku: '1231sw295',
+            merchantSku: '1231sw295',
+            type: 'generic',
+            productGroup: 'technology',
+            productMaterialId: resProductMaterialTwo.body.productMaterial.id
+          }
+        })
+      const childProductId = String(resProductChild.body.product.id)
+      const childProductId2 = String(resProductChild2.body.product.id)
+      await chai
+        .request(app)
+        .patch(`/api/products/${childProductId}/child`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            parentId: parentProductId
+          }
+        })
+      await chai
+        .request(app)
+        .patch(`/api/products/${childProductId2}/child`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            parentId: parentProductId
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${childProductId}/catalogue/variations`)
+        .query({
+          limit: 10,
+          page: 1,
+          filter: {
+            material
+          }
         })
         .set('Authorization', `Bearer ${tokenAdmin}`)
 

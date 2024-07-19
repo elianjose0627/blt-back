@@ -410,6 +410,8 @@ export interface IProductMaterial {
 export interface IProductSize {
   id: string
   name: string
+  type: string
+  sortIndex: number
   createdAt: Date
   updatedAt: Date
 }
@@ -560,6 +562,7 @@ export interface IProduct {
   isMetadataSynced: boolean
   isExceedStockEnabled: boolean
   minimumOrderQuantity: number
+  articleId: number
 }
 
 export interface ICampaignOrderLimit {
