@@ -7,6 +7,7 @@ import * as userRoles from '../utils/userRoles'
 import * as currencies from '../utils/currencies'
 import * as appModules from '../utils/appModules'
 import { productSelectedColumns } from '../utils/selectOptions'
+import { phoneValidationPattern } from '../constants/regexPatterns'
 
 dayjs.extend(utc)
 
@@ -21,7 +22,7 @@ const validateCreatedUser = Joi.object({
         'string.pattern.base': '{#label} cannot contain spaces'
       }),
     email: Joi.string().email().lowercase().required().max(128),
-    phone: Joi.string().optional().allow('').allow(null).min(4).max(24).regex(/^(\+?)[0-9()\s-]{4,24}$/)
+    phone: Joi.string().optional().allow('').allow(null).regex(phoneValidationPattern)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
@@ -38,7 +39,7 @@ const validateCreatedUserByAdmin = Joi.object({
         'string.pattern.base': '{#label} cannot contain spaces'
       }),
     email: Joi.string().email().lowercase().required().max(128),
-    phone: Joi.string().optional().allow('').allow(null).min(4).max(24).regex(/^(\+?)[0-9()\s-]{4,24}$/)
+    phone: Joi.string().optional().allow('').allow(null).regex(phoneValidationPattern)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
@@ -68,7 +69,7 @@ const validateUpdatedUser = Joi.object({
       .messages({
         'string.pattern.base': '{#label} cannot contain spaces'
       }),
-    phone: Joi.string().optional().allow('').allow(null).min(4).max(24).regex(/^(\+?)[0-9()\s-]{4,24}$/)
+    phone: Joi.string().optional().allow('').allow(null).regex(phoneValidationPattern)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
@@ -84,7 +85,7 @@ const validateUpdatedUser = Joi.object({
       city: Joi.string().required().max(64),
       street: Joi.string().optional().allow('').allow(null).max(64),
       zip: Joi.string().optional().max(24),
-      phone: Joi.string().optional().allow('').allow(null).min(4).max(24).regex(/^(\+?)[0-9()\s-]{4,24}$/)
+      phone: Joi.string().optional().allow('').allow(null).regex(phoneValidationPattern)
         .messages({
           'string.pattern.base': '{#label} must be numeric'
         }),
@@ -253,7 +254,7 @@ const validateCreatedCompany = Joi.object({
     name: Joi.string().required().max(64),
     suffix: Joi.string().max(32).allow('').allow(null),
     email: Joi.string().email().lowercase().required().max(128),
-    phone: Joi.string().optional().allow('').allow(null).min(4).max(24).regex(/^(\+?)[0-9()\s-]{4,24}$/)
+    phone: Joi.string().optional().allow('').allow(null).regex(phoneValidationPattern)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
@@ -269,7 +270,7 @@ const validateUpdatedCompany = Joi.object({
     name: Joi.string().optional().max(64),
     suffix: Joi.string().max(32).allow('').allow(null),
     email: Joi.string().email().lowercase().optional().max(128),
-    phone: Joi.string().optional().allow('').allow(null).min(4).max(24).regex(/^(\+?)[0-9()\s-]{4,24}$/)
+    phone: Joi.string().optional().allow('').allow(null).regex(phoneValidationPattern)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
@@ -299,7 +300,7 @@ const validateCreatedAddress = Joi.object({
     city: Joi.string().required().max(64),
     street: Joi.string().optional().allow('').allow(null).max(64),
     zip: Joi.string().optional().max(24),
-    phone: Joi.string().optional().allow('').allow(null).min(4).max(24).regex(/^(\+?)[0-9()\s-]{4,24}$/)
+    phone: Joi.string().optional().allow('').allow(null).regex(phoneValidationPattern)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
@@ -322,7 +323,7 @@ const validateUpdatedAddress = Joi.object({
     city: Joi.string().optional().max(64),
     street: Joi.string().optional().allow('').allow(null).max(64),
     zip: Joi.string().optional().max(24),
-    phone: Joi.string().optional().allow('').allow(null).min(4).max(24).regex(/^(\+?)[0-9()\s-]{4,24}$/)
+    phone: Joi.string().optional().allow('').allow(null).regex(phoneValidationPattern)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
@@ -340,7 +341,7 @@ const validateCreatedRecipient = Joi.object({
     firstName: Joi.string().optional().allow('').allow(null).max(64),
     lastName: Joi.string().optional().allow('').allow(null).max(64),
     email: Joi.string().email().lowercase().optional().allow('').allow(null).max(128),
-    phone: Joi.string().optional().allow('').allow(null).min(4).max(24).regex(/^(\+?)[0-9()\s-]{4,24}$/)
+    phone: Joi.string().optional().allow('').allow(null).regex(phoneValidationPattern)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
@@ -360,7 +361,7 @@ const validateUpdatedRecipient = Joi.object({
     firstName: Joi.string().optional().allow('').allow(null).max(64),
     lastName: Joi.string().optional().allow('').allow(null).max(64),
     email: Joi.string().email().lowercase().optional().allow('').allow(null).max(128),
-    phone: Joi.string().optional().allow('').allow(null).min(4).max(24).regex(/^(\+?)[0-9()\s-]{4,24}$/)
+    phone: Joi.string().optional().allow('').allow(null).regex(phoneValidationPattern)
       .messages({
         'string.pattern.base': '{#label} must be numeric'
       }),
@@ -589,7 +590,7 @@ const validateOrder = Joi.object({
       street: Joi.string().required(),
       zip: Joi.string().required(),
       country: Joi.string().required(),
-      phone: Joi.string().required()
+      phone: Joi.string().required().allow(null).allow('')
     }),
     attributes: Joi.array().items(
       Joi.object(
@@ -835,7 +836,7 @@ const validateCampaignAddress = Joi.object({
       city: Joi.string().required().max(64),
       street: Joi.string().optional().allow('').allow(null).max(64),
       zip: Joi.string().optional().max(24),
-      phone: Joi.string().optional().allow('').allow(null).min(4).max(24).regex(/^(\+?)[0-9()\s-]{4,24}$/)
+      phone: Joi.string().optional().allow('').allow(null).regex(phoneValidationPattern)
         .messages({
           'string.pattern.base': '{#label} must be numeric'
         }),
