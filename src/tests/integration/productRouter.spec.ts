@@ -18,6 +18,7 @@ import {
   iversAtKreeDotKrPassword,
   sheHulkAtStarkIndustriesPassword
 } from '../utils'
+import { IProduct } from '../../types'
 
 const { expect } = chai
 
@@ -4015,7 +4016,10 @@ describe('Product actions', () => {
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'products')
-      expect(res.body.products).to.be.an('array').lengthOf(1)
+      expect(res.body.products).to.be.an('array').lengthOf.above(0)
+      res.body.products.forEach((product: IProduct) => {
+        expect(product.productMaterial.name).to.equal(material.toLowerCase())
+      })
     })
 
     it('Should return 403 Forbidden when a user not in a product access control group tries to get a product in the catalogue', async () => {
