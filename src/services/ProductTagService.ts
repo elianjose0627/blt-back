@@ -70,19 +70,19 @@ class ProductTagService extends BaseService {
     if (productCategoryTagIds.length > 0) {
       const response = await sequelizeInstance.query(
         `
-        SELECT DISTINCT ON ("ProductTag"."productId")
+        SELECT DISTINCT ON ("Product"."productColorId")
           "ProductTag"."createdAt",
           "ProductTag"."updatedAt",
-          "product"."id" AS "product.id",
-          "product"."name" AS "product.name",
-          "product"."pictures" AS "product.pictures"
+          "Product"."id" AS "Product.id",
+          "Product"."name" AS "Product.name",
+          "Product"."pictures" AS "Product.pictures"
         FROM "ProductTags" AS "ProductTag"
-        LEFT OUTER JOIN "Products" AS "product"
-          ON "ProductTag"."productId" = "product"."id" AND ("product"."deletedAt" IS NULL)
+        LEFT OUTER JOIN "Products" AS "Product"
+          ON "ProductTag"."productId" = "Product"."id" AND ("Product"."deletedAt" IS NULL)
         WHERE "ProductTag"."deletedAt" IS NULL
           AND "ProductTag"."productId" != :productId
           AND "ProductTag"."productCategoryTagId" IN (:productCategoryTagIds)
-        ORDER BY "ProductTag"."productId", "ProductTag"."createdAt" DESC
+        ORDER BY "Product"."productColorId", "ProductTag"."createdAt" DESC
         LIMIT :limit OFFSET :offset;
         `,
         {
