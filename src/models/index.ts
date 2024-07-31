@@ -68,6 +68,7 @@ export interface Database {
   ProductProductCategory?: any
   Stock?: any
   BundleStock?: any
+  CompanyInviteToken?: any
   [key: string]: any
 }
 
