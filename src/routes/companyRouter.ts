@@ -143,7 +143,9 @@ const companyRoutes = (): Router => {
       asyncHandler(CompanyController.checkCompanyDomainVerification), asyncHandler(CompanyController.getInviteLinkAndCode))
     .patch(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions),
-      asyncHandler(CompanyController.checkCompanyDomainVerification), asyncHandler(CompanyController.updateInviteLinkAndCode))
+      asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
+        [Segments.BODY]: validator.validateCompanyInviteToken
+      }, { abortEarly: false }), asyncHandler(CompanyController.updateInviteLinkAndCode))
   companyRouter.route('/companies/:id/access-permissions')
     .post(AccessPermissionController.setModule, asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions),

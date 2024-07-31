@@ -5,7 +5,7 @@ import dns from 'dns'
 import BaseController from './BaseController'
 import CompanyService from '../services/CompanyService'
 import UserService from '../services/UserService'
-import type { CustomNext, CustomRequest, CustomResponse, IEmailTemplate, StatusCode } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse, ICompanyInviteToken, IEmailTemplate, Role, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
@@ -14,6 +14,7 @@ import { sendNotifierEmail } from '../utils/sendMail'
 import { encryptUUID, encodeString, shortenUUID } from '../utils/encryption'
 import EmailTemplateService from '../services/EmailTemplateService'
 import { replacePlaceholders } from '../utils/replacePlaceholders'
+import CompanyInviteTokenService from '../services/CompanyInviteTokenService'
 
 dayjs.extend(utc)
 
@@ -21,6 +22,7 @@ const companyService = new CompanyService('Company')
 const userService = new UserService('User')
 const addressService = new AddressService('Address')
 const emailTemplateService = new EmailTemplateService('EmailTemplate')
+const companyInviteTokenService = new CompanyInviteTokenService('CompanyInviteToken')
 
 const appName = String(process.env.APP_NAME)
 const appUrl = String(process.env.APP_URL)
@@ -529,17 +531,56 @@ class CompanyController extends BaseController {
     }
   }
 
+  static getRoleInviteToken (companyInviteTokens: ICompanyInviteToken[], role: Role, companyId: string): string {
+    const foundCompanyInviteToken = companyInviteTokens.find(companyInviteToken => companyInviteToken.role === role)
+    if (foundCompanyInviteToken !== undefined) {
+      return foundCompanyInviteToken.inviteToken
+    }
+    return companyId
+  }
+
+  static async generateRoleInviteToken (companyInviteTokens: ICompanyInviteToken[], role: Role, companyId: string, roles: Role[]): Promise<string> {
+    if (roles.includes(role)) {
+      const inviteToken = uuidv4()
+      await companyInviteTokenService.insert({ inviteToken, role, companyId })
+      return inviteToken
+    }
+    return this.getRoleInviteToken(companyInviteTokens, role, companyId)
+  }
+
+  static generateShortEncryptedUUIDsWithCompanyIdForRoles (id: string, inviteToken: string, role: Role): { shortEncryptedUUIDWithCompanyIdHexRole: string, shortEncryptedUUIDWithCompanyIdBase64Role: string } {
+    const shortUUID = shortenUUID(id)
+    const shortEncryptedUUID = encryptUUID(shortUUID, 'base64', inviteToken)
+
+    const shortEncryptedUUIDWithCompanyIdHexRole = encodeString(`${shortEncryptedUUID}.${shortUUID}.${role}`, 'hex')
+    const shortEncryptedUUIDWithCompanyIdBase64Role = encodeString(`${shortEncryptedUUID}...${shortUUID}...${role}`, 'base64')
+
+    return {
+      shortEncryptedUUIDWithCompanyIdHexRole,
+      shortEncryptedUUIDWithCompanyIdBase64Role
+    }
+  }
+
   async getInviteLinkAndCode (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { params: { id }, record: { inviteToken } } = req
-    const encryptedUUID = encryptUUID(id, 'base64', inviteToken ?? id)
+    const { params: { id }, record: { companyInviteTokens } } = req
+
+    const employeeInviteToken = CompanyController.getRoleInviteToken(companyInviteTokens, userRoles.EMPLOYEE, id)
+    const campaignManagerInviteToken = CompanyController.getRoleInviteToken(companyInviteTokens, userRoles.CAMPAIGNMANAGER, id)
+    const companyAdministratorInviteToken = CompanyController.getRoleInviteToken(companyInviteTokens, userRoles.COMPANYADMINISTRATOR, id)
+
+    const encryptedUUID = encryptUUID(id, 'base64', employeeInviteToken)
     const encryptedUUIDWithCompanyIdHex = encodeString(`${encryptedUUID}.${id}`, 'hex')
     const encryptedUUIDWithCompanyIdBase64 = encodeString(`${encryptedUUID}.${id}`, 'base64')
 
     // Short versions
     const shortUUID = shortenUUID(id)
-    const shortEncryptedUUID = encryptUUID(shortUUID, 'base64', inviteToken ?? id)
+    const shortEncryptedUUID = encryptUUID(shortUUID, 'base64', employeeInviteToken)
     const shortEncryptedUUIDWithCompanyIdHex = encodeString(`${shortEncryptedUUID}.${shortUUID}`, 'hex')
     const shortEncryptedUUIDWithCompanyIdBase64 = encodeString(`${shortEncryptedUUID}...${shortUUID}`, 'base64')
+
+    const employeeShortEncryptedUUIDs = CompanyController.generateShortEncryptedUUIDsWithCompanyIdForRoles(id, employeeInviteToken, userRoles.EMPLOYEE)
+    const campaignManagerShortEncryptedUUIDs = CompanyController.generateShortEncryptedUUIDsWithCompanyIdForRoles(id, campaignManagerInviteToken, userRoles.CAMPAIGNMANAGER)
+    const companyAdministratorShortEncryptedUUIDs = CompanyController.generateShortEncryptedUUIDsWithCompanyIdForRoles(id, companyAdministratorInviteToken, userRoles.COMPANYADMINISTRATOR)
 
     return res.status(statusCodes.OK).send({
       statusCode: statusCodes.OK,
@@ -548,27 +589,68 @@ class CompanyController extends BaseController {
         inviteLink: `${String(process.env.APP_URL)}/register?companyId=${encryptedUUIDWithCompanyIdHex}`,
         inviteCode: encryptedUUIDWithCompanyIdBase64,
         shortInviteLink: `${String(process.env.APP_URL)}/register?companyId=${shortEncryptedUUIDWithCompanyIdHex}`,
-        shortInviteCode: shortEncryptedUUIDWithCompanyIdBase64
+        shortInviteCode: shortEncryptedUUIDWithCompanyIdBase64,
+        roles: {
+          companyAdministrator: {
+            shortInviteLink: `${String(process.env.APP_URL)}/register?companyId=${companyAdministratorShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdHexRole}`,
+            shortInviteCode: companyAdministratorShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role
+          },
+          campaignManager: {
+            shortInviteLink: `${String(process.env.APP_URL)}/register?companyId=${campaignManagerShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdHexRole}`,
+            shortInviteCode: campaignManagerShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role
+          },
+          employee: {
+            shortInviteLink: `${String(process.env.APP_URL)}/register?companyId=${employeeShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdHexRole}`,
+            shortInviteCode: employeeShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role
+          }
+        }
       }
     })
   }
 
   async updateInviteLinkAndCode (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { params: { id }, record } = req
-    const inviteToken = uuidv4()
+    const { params: { id }, record, body: { companyInviteToken: { roles } } } = req
 
-    await companyService.update(record, { inviteToken })
+    const employeeInviteToken = await CompanyController.generateRoleInviteToken(record.companyInviteTokens, userRoles.EMPLOYEE, id, roles)
+    const campaignManagerInviteToken = await CompanyController.generateRoleInviteToken(record.companyInviteTokens, userRoles.CAMPAIGNMANAGER, id, roles)
+    const companyAdministratorInviteToken = await CompanyController.generateRoleInviteToken(record.companyInviteTokens, userRoles.COMPANYADMINISTRATOR, id, roles)
 
-    const encryptedUUID = encryptUUID(id, 'base64', inviteToken)
+    const encryptedUUID = encryptUUID(id, 'base64', employeeInviteToken)
     const encryptedUUIDWithCompanyIdHex = encodeString(`${encryptedUUID}.${id}`, 'hex')
     const encryptedUUIDWithCompanyIdBase64 = encodeString(`${encryptedUUID}.${id}`, 'base64')
+
+    // Short versions
+    const shortUUID = shortenUUID(id)
+    const shortEncryptedUUID = encryptUUID(shortUUID, 'base64', employeeInviteToken)
+    const shortEncryptedUUIDWithCompanyIdHex = encodeString(`${shortEncryptedUUID}.${shortUUID}`, 'hex')
+    const shortEncryptedUUIDWithCompanyIdBase64 = encodeString(`${shortEncryptedUUID}...${shortUUID}`, 'base64')
+
+    const employeeShortEncryptedUUIDs = CompanyController.generateShortEncryptedUUIDsWithCompanyIdForRoles(id, employeeInviteToken, userRoles.EMPLOYEE)
+    const campaignManagerShortEncryptedUUIDs = CompanyController.generateShortEncryptedUUIDsWithCompanyIdForRoles(id, campaignManagerInviteToken, userRoles.CAMPAIGNMANAGER)
+    const companyAdministratorShortEncryptedUUIDs = CompanyController.generateShortEncryptedUUIDsWithCompanyIdForRoles(id, companyAdministratorInviteToken, userRoles.COMPANYADMINISTRATOR)
 
     return res.status(statusCodes.OK).send({
       statusCode: statusCodes.OK,
       success: true,
       company: {
         inviteLink: `${String(process.env.APP_URL)}/register?companyId=${encryptedUUIDWithCompanyIdHex}`,
-        inviteCode: encryptedUUIDWithCompanyIdBase64
+        inviteCode: encryptedUUIDWithCompanyIdBase64,
+        shortInviteLink: `${String(process.env.APP_URL)}/register?companyId=${shortEncryptedUUIDWithCompanyIdHex}`,
+        shortInviteCode: shortEncryptedUUIDWithCompanyIdBase64,
+        roles: {
+          companyAdministrator: {
+            shortInviteLink: `${String(process.env.APP_URL)}/register?companyId=${companyAdministratorShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdHexRole}`,
+            shortInviteCode: companyAdministratorShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role
+          },
+          campaignManager: {
+            shortInviteLink: `${String(process.env.APP_URL)}/register?companyId=${campaignManagerShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdHexRole}`,
+            shortInviteCode: campaignManagerShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role
+          },
+          employee: {
+            shortInviteLink: `${String(process.env.APP_URL)}/register?companyId=${employeeShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdHexRole}`,
+            shortInviteCode: employeeShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role
+          }
+        }
       }
     })
   }

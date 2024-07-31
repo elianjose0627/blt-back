@@ -69,11 +69,13 @@ class UserService extends BaseService {
   }
 
   async insert (data: any): Promise<any> {
-    const { user, currentUser, isTemporary, companyId } = data
+    const { user, currentUser, isTemporary, companyId, userRole } = data
     let record
 
     if (companyId !== undefined) {
-      record = await db[this.model].create({ ...user, id: uuidv1(), role: userRoles.EMPLOYEE, companyId })
+      const role = userRole
+
+      record = await db[this.model].create({ ...user, id: uuidv1(), role, companyId })
     } else {
       record = await db[this.model].create({ ...user, id: uuidv1() })
     }
