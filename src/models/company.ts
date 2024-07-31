@@ -16,7 +16,6 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     domain: string
     isDomainVerified: boolean
     domainVerificationCode: { value: string, createdAt: Date }
-    inviteToken: Nullable<string>
     theme: Nullable<Theme>
     logo: Nullable<MediaData>
   }
@@ -115,6 +114,11 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         as: 'companyProductAccessControlGroups',
         onDelete: 'CASCADE'
       })
+      Company.hasMany(models.CompanyInviteToken, {
+        foreignKey: 'companyId',
+        as: 'companyInviteTokens',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): ICompany {
@@ -189,10 +193,6 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         createdAt: null,
         value: null
       }
-    },
-    inviteToken: {
-      type: DataTypes.UUID,
-      defaultValue: null
     },
     theme: {
       type: DataTypes.JSON,
