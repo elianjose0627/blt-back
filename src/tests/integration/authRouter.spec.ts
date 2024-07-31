@@ -201,6 +201,84 @@ describe('Auth Actions', () => {
     expect(res.body.user.role).to.equal(userRoles.EMPLOYEE)
   })
 
+  it('should return 200 OK on successful sign up using company invite link for company with domain checks set', async () => {
+    const password = faker.internet.password()
+    const companyAdmin = await createCompanyAdministrator('test@companydomaincheck1.com', password)
+
+    const companyId = companyAdmin.companyId
+
+    await chai
+      .request(app)
+      .patch(`/api/companies/${String(companyId)}/invite-domain-check`)
+      .set('Authorization', `Bearer ${tokenAdmin}`)
+      .send({
+        companyInviteToken: {
+          roles: {
+            Employee: true,
+            CampaignManager: false,
+            CompanyAdministrator: false
+          }
+        }
+      })
+
+    const resInviteLink = await chai
+      .request(app)
+      .get(`/api/companies/${String(companyId)}/invite-link`)
+      .set('Authorization', `Bearer ${tokenAdmin}`)
+
+    const res = await chai
+      .request(app)
+      .post('/auth/signup')
+      .query({
+        companyId: resInviteLink.body.company.inviteLink.split('=')[1]
+      })
+      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoontwo@companydomaincheck1.com', phone: '254720123456', password: faker.internet.password() } })
+
+    expect(res).to.have.status(201)
+    expect(res.body).to.include.keys('statusCode', 'success', 'user')
+    expect(res.body.success).to.equal(true)
+    expect(res.body.user.role).to.equal(userRoles.EMPLOYEE)
+  })
+
+  it('should return 403 Forbidden on sign up using company invite link for company with domain checks set', async () => {
+    const password = faker.internet.password()
+    const companyAdmin = await createCompanyAdministrator('test@companydomaincheck.com', password)
+
+    const companyId = companyAdmin.companyId
+
+    await chai
+      .request(app)
+      .patch(`/api/companies/${String(companyId)}/invite-domain-check`)
+      .set('Authorization', `Bearer ${tokenAdmin}`)
+      .send({
+        companyInviteToken: {
+          roles: {
+            Employee: true,
+            CampaignManager: false,
+            CompanyAdministrator: false
+          }
+        }
+      })
+
+    const resInviteLink = await chai
+      .request(app)
+      .get(`/api/companies/${String(companyId)}/invite-link`)
+      .set('Authorization', `Bearer ${tokenAdmin}`)
+
+    const res = await chai
+      .request(app)
+      .post('/auth/signup')
+      .query({
+        companyId: resInviteLink.body.company.inviteLink.split('=')[1]
+      })
+      .send({ user: { firstName: 'Rocket', lastName: 'Raccoon', email: 'rocketraccoontwo@guardiansofthegalaxy2323.com', phone: '254720123456', password: faker.internet.password() } })
+
+    expect(res).to.have.status(403)
+    expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+    expect(res.body.success).to.equal(false)
+    expect(res.body.errors.message).to.equal('The email domain and the company domains do not match')
+  })
+
   it('should return 404 Not Found if a user tries to sign up using company id link with a company that does not exists', async () => {
     const companyId = uuidv1()
     const encryptedUUID = encryptUUID(companyId, 'base64', companyId)

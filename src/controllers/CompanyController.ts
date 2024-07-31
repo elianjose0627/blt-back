@@ -531,19 +531,29 @@ class CompanyController extends BaseController {
     }
   }
 
-  static getRoleInviteToken (companyInviteTokens: ICompanyInviteToken[], role: Role, companyId: string): string {
+  static getRoleInviteToken (companyInviteTokens: ICompanyInviteToken[], role: Role, companyId: string): { inviteToken: string, isDomainCheckEnabled: boolean } {
     const foundCompanyInviteToken = companyInviteTokens.find(companyInviteToken => companyInviteToken.role === role)
     if (foundCompanyInviteToken !== undefined) {
-      return foundCompanyInviteToken.inviteToken
+      return {
+        inviteToken: foundCompanyInviteToken.inviteToken,
+        isDomainCheckEnabled: foundCompanyInviteToken.isDomainCheckEnabled
+      }
     }
-    return companyId
+    return {
+      inviteToken: companyId,
+      isDomainCheckEnabled: false
+    }
   }
 
-  static async generateRoleInviteToken (companyInviteTokens: ICompanyInviteToken[], role: Role, companyId: string, roles: Role[]): Promise<string> {
+  static async generateRoleInviteToken (companyInviteTokens: ICompanyInviteToken[], role: Role, companyId: string, roles: Role[]): Promise<{ inviteToken: string, isDomainCheckEnabled: boolean }> {
     if (roles.includes(role)) {
       const inviteToken = uuidv4()
-      await companyInviteTokenService.insert({ inviteToken, role, companyId })
-      return inviteToken
+      const { response } = await companyInviteTokenService.insert({ inviteToken, role, companyId })
+
+      return {
+        inviteToken: response.inviteToken,
+        isDomainCheckEnabled: response.isDomainCheckEnabled
+      }
     }
     return this.getRoleInviteToken(companyInviteTokens, role, companyId)
   }
@@ -564,9 +574,18 @@ class CompanyController extends BaseController {
   async getInviteLinkAndCode (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { params: { id }, record: { companyInviteTokens } } = req
 
-    const employeeInviteToken = CompanyController.getRoleInviteToken(companyInviteTokens, userRoles.EMPLOYEE, id)
-    const campaignManagerInviteToken = CompanyController.getRoleInviteToken(companyInviteTokens, userRoles.CAMPAIGNMANAGER, id)
-    const companyAdministratorInviteToken = CompanyController.getRoleInviteToken(companyInviteTokens, userRoles.COMPANYADMINISTRATOR, id)
+    const {
+      inviteToken: employeeInviteToken,
+      isDomainCheckEnabled: employeeIsDomainCheckEnabled
+    } = CompanyController.getRoleInviteToken(companyInviteTokens, userRoles.EMPLOYEE, id)
+    const {
+      inviteToken: campaignManagerInviteToken,
+      isDomainCheckEnabled: campaignManagerIsDomainCheckEnabled
+    } = CompanyController.getRoleInviteToken(companyInviteTokens, userRoles.CAMPAIGNMANAGER, id)
+    const {
+      inviteToken: companyAdministratorInviteToken,
+      isDomainCheckEnabled: companyAdministratorIsDomainCheckEnabled
+    } = CompanyController.getRoleInviteToken(companyInviteTokens, userRoles.COMPANYADMINISTRATOR, id)
 
     const encryptedUUID = encryptUUID(id, 'base64', employeeInviteToken)
     const encryptedUUIDWithCompanyIdHex = encodeString(`${encryptedUUID}.${id}`, 'hex')
@@ -593,15 +612,18 @@ class CompanyController extends BaseController {
         roles: {
           companyAdministrator: {
             shortInviteLink: `${String(process.env.APP_URL)}/register?companyId=${companyAdministratorShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdHexRole}`,
-            shortInviteCode: companyAdministratorShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role
+            shortInviteCode: companyAdministratorShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role,
+            isDomainCheckEnabled: companyAdministratorIsDomainCheckEnabled
           },
           campaignManager: {
             shortInviteLink: `${String(process.env.APP_URL)}/register?companyId=${campaignManagerShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdHexRole}`,
-            shortInviteCode: campaignManagerShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role
+            shortInviteCode: campaignManagerShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role,
+            isDomainCheckEnabled: campaignManagerIsDomainCheckEnabled
           },
           employee: {
             shortInviteLink: `${String(process.env.APP_URL)}/register?companyId=${employeeShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdHexRole}`,
-            shortInviteCode: employeeShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role
+            shortInviteCode: employeeShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role,
+            isDomainCheckEnabled: employeeIsDomainCheckEnabled
           }
         }
       }
@@ -611,9 +633,18 @@ class CompanyController extends BaseController {
   async updateInviteLinkAndCode (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { params: { id }, record, body: { companyInviteToken: { roles } } } = req
 
-    const employeeInviteToken = await CompanyController.generateRoleInviteToken(record.companyInviteTokens, userRoles.EMPLOYEE, id, roles)
-    const campaignManagerInviteToken = await CompanyController.generateRoleInviteToken(record.companyInviteTokens, userRoles.CAMPAIGNMANAGER, id, roles)
-    const companyAdministratorInviteToken = await CompanyController.generateRoleInviteToken(record.companyInviteTokens, userRoles.COMPANYADMINISTRATOR, id, roles)
+    const {
+      inviteToken: employeeInviteToken,
+      isDomainCheckEnabled: employeeIsDomainCheckEnabled
+    } = await CompanyController.generateRoleInviteToken(record.companyInviteTokens, userRoles.EMPLOYEE, id, roles)
+    const {
+      inviteToken: campaignManagerInviteToken,
+      isDomainCheckEnabled: campaignManagerIsDomainCheckEnabled
+    } = await CompanyController.generateRoleInviteToken(record.companyInviteTokens, userRoles.CAMPAIGNMANAGER, id, roles)
+    const {
+      inviteToken: companyAdministratorInviteToken,
+      isDomainCheckEnabled: companyAdministratorIsDomainCheckEnabled
+    } = await CompanyController.generateRoleInviteToken(record.companyInviteTokens, userRoles.COMPANYADMINISTRATOR, id, roles)
 
     const encryptedUUID = encryptUUID(id, 'base64', employeeInviteToken)
     const encryptedUUIDWithCompanyIdHex = encodeString(`${encryptedUUID}.${id}`, 'hex')
@@ -640,18 +671,33 @@ class CompanyController extends BaseController {
         roles: {
           companyAdministrator: {
             shortInviteLink: `${String(process.env.APP_URL)}/register?companyId=${companyAdministratorShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdHexRole}`,
-            shortInviteCode: companyAdministratorShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role
+            shortInviteCode: companyAdministratorShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role,
+            isDomainCheckEnabled: companyAdministratorIsDomainCheckEnabled
           },
           campaignManager: {
             shortInviteLink: `${String(process.env.APP_URL)}/register?companyId=${campaignManagerShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdHexRole}`,
-            shortInviteCode: campaignManagerShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role
+            shortInviteCode: campaignManagerShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role,
+            isDomainCheckEnabled: campaignManagerIsDomainCheckEnabled
           },
           employee: {
             shortInviteLink: `${String(process.env.APP_URL)}/register?companyId=${employeeShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdHexRole}`,
-            shortInviteCode: employeeShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role
+            shortInviteCode: employeeShortEncryptedUUIDs.shortEncryptedUUIDWithCompanyIdBase64Role,
+            isDomainCheckEnabled: employeeIsDomainCheckEnabled
           }
         }
       }
+    })
+  }
+
+  async updateInviteDomainCheck (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record: { id: companyId, companyInviteTokens }, body: { companyInviteToken: { roles } } } = req
+
+    const response = await companyInviteTokenService.updateInviteDomainCheck({ companyId, companyInviteTokens, roles })
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      company: response
     })
   }
 }
