@@ -79,7 +79,7 @@ class UserController extends BaseController {
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { body: { user }, user: currentUser, query: { companyId: encodedEncryptedCompanyId } } = req
     let decryptedCompanyId
-    let userRole
+    let userRole = userRoles.EMPLOYEE
 
     try {
       if (encodedEncryptedCompanyId !== undefined) {
@@ -94,6 +94,25 @@ class UserController extends BaseController {
         decryptedCompanyId = decryptUUID(encryptedCompanyId, 'base64', inviteToken)
         decryptedCompanyId = decryptedCompanyId.length === 36 ? decryptedCompanyId : expandShortUUID(decryptedCompanyId)
         userRole = decodedRole
+
+        const foundCompanyInviteToken: ICompanyInviteToken = companyInviteTokens.find((companyInviteToken: ICompanyInviteToken) => companyInviteToken.role === userRole)
+
+        if (foundCompanyInviteToken?.isDomainCheckEnabled) {
+          const { domain, secondaryDomains } = company
+
+          const primaryAndSecondaryDomains = [domain].concat(secondaryDomains.map((secondaryDomain: ISecondaryDomain) => secondaryDomain.name))
+          const emailDomain = user.email.split('@').pop()
+
+          if (!primaryAndSecondaryDomains.includes(emailDomain)) {
+            return res.status(statusCodes.FORBIDDEN).send({
+              statusCode: statusCodes.FORBIDDEN,
+              success: false,
+              errors: {
+                message: 'The email domain and the company domains do not match'
+              }
+            })
+          }
+        }
       }
     } catch (error) {
       return res.status(statusCodes.UNPROCESSABLE_ENTITY).send({
@@ -591,7 +610,7 @@ class UserController extends BaseController {
     const { body: { user }, record: userRecord } = req
     const encodedEncryptedCompanyId = user.companyInviteCode
     let decryptedCompanyId
-    let userRole
+    let userRole = userRoles.EMPLOYEE
 
     try {
       let [encryptedCompanyId, companyId, decodedRole = userRoles.EMPLOYEE] = decodeString(encodedEncryptedCompanyId, 'base64').split(/\.{1,3}/)
@@ -605,6 +624,25 @@ class UserController extends BaseController {
       decryptedCompanyId = decryptUUID(encryptedCompanyId, 'base64', inviteToken)
       decryptedCompanyId = decryptedCompanyId.length === 36 ? decryptedCompanyId : expandShortUUID(decryptedCompanyId)
       userRole = decodedRole
+
+      const foundCompanyInviteToken: ICompanyInviteToken = companyInviteTokens.find((companyInviteToken: ICompanyInviteToken) => companyInviteToken.role === userRole)
+
+      if (foundCompanyInviteToken?.isDomainCheckEnabled) {
+        const { domain, secondaryDomains } = company
+
+        const primaryAndSecondaryDomains = [domain].concat(secondaryDomains.map((secondaryDomain: ISecondaryDomain) => secondaryDomain.name))
+        const emailDomain = userRecord.email.split('@').pop()
+
+        if (!primaryAndSecondaryDomains.includes(emailDomain)) {
+          return res.status(statusCodes.FORBIDDEN).send({
+            statusCode: statusCodes.FORBIDDEN,
+            success: false,
+            errors: {
+              message: 'The email domain and the company domains do not match'
+            }
+          })
+        }
+      }
     } catch (error: any) {
       return res.status(statusCodes.UNPROCESSABLE_ENTITY).send({
         statusCode: statusCodes.UNPROCESSABLE_ENTITY,

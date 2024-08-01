@@ -5,6 +5,7 @@ const CompanyInviteTokenModel = (sequelize: any, DataTypes: any): any => {
   interface CompanyInviteTokenAttributes {
     id: string
     inviteToken: string
+    isDomainCheckEnabled: boolean
     role: Role
   }
 
@@ -31,6 +32,11 @@ const CompanyInviteTokenModel = (sequelize: any, DataTypes: any): any => {
     role: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    isDomainCheckEnabled: {
+      allowNull: false,
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   }, {
     sequelize,
