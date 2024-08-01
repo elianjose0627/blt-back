@@ -230,6 +230,7 @@ export interface ICompanyInviteToken {
   id: string
   inviteToken: string
   role: Role
+  isDomainCheckEnabled: boolean
   createdAt?: Date
   updatedAt?: Date
 }

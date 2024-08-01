@@ -77,7 +77,7 @@ export const generateInclude = (model: string): any => {
         },
         {
           model: db.CompanyInviteToken,
-          attributes: ['id', 'role', 'inviteToken'],
+          attributes: ['id', 'role', 'inviteToken', 'isDomainCheckEnabled'],
           as: 'companyInviteTokens'
         }
       ]
