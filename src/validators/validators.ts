@@ -12,6 +12,7 @@ import { phoneValidationPattern } from '../constants/regexPatterns'
 dayjs.extend(utc)
 
 const imageMimeTypes = ['image/bmp', 'image/jpeg', 'image/x-png', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+const defaultTextLength = 10000
 
 const validateCreatedUser = Joi.object({
   user: Joi.object({
@@ -260,8 +261,7 @@ const validateCreatedCompany = Joi.object({
       }),
     vat: Joi.string().optional().max(24).allow('').allow(null),
     domain: Joi.string().domain().allow('').allow(null),
-    customerId: Joi.number().optional().allow('').allow(null),
-    inviteToken: Joi.string().uuid().optional()
+    customerId: Joi.number().optional().allow('').allow(null)
   }).required()
 }).required()
 
@@ -276,8 +276,7 @@ const validateUpdatedCompany = Joi.object({
       }),
     vat: Joi.string().optional().max(24).allow('').allow(null),
     domain: Joi.string().domain().allow('').allow(null),
-    customerId: Joi.number().optional().allow('').allow(null),
-    inviteToken: Joi.string().uuid().optional()
+    customerId: Joi.number().optional().allow('').allow(null)
   }).required()
 }).required()
 
@@ -719,8 +718,8 @@ const validateCardTemplate = Joi.object({
   cardTemplate: Joi.object({
     name: Joi.string().max(128).allow('').allow(null).required(),
     description: Joi.string().max(128).allow('').allow(null).required(),
-    front: Joi.string().allow('').max(5000).allow(null).required(),
-    back: Joi.string().allow('').max(5000).allow(null).required(),
+    front: Joi.string().allow('').max(defaultTextLength).allow(null).required(),
+    back: Joi.string().allow('').max(defaultTextLength).allow(null).required(),
     frontOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape']),
     backOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape']),
     isDraft: Joi.boolean().optional().default(true),
@@ -742,8 +741,8 @@ const validateCardSetting = Joi.object({
     isRotationEnabled: Joi.boolean().allow(null),
     isBackEditable: Joi.boolean().allow(null),
     isAutoProcessingEnabled: Joi.boolean().allow(null),
-    defaultBack: Joi.string().allow('').max(5000).allow(null),
-    defaultFront: Joi.string().allow('').max(5000).allow(null),
+    defaultBack: Joi.string().allow('').max(defaultTextLength).allow(null),
+    defaultFront: Joi.string().allow('').max(defaultTextLength).allow(null),
     exportOrientation: Joi.string().allow('').allow(null).valid(...['portrait', 'landscape']),
     exportSides: Joi.string().allow('').allow(null).valid('both', 'front', 'back'),
     supplierEmail: Joi.string().email().allow(null),
@@ -1099,6 +1098,23 @@ const validateProductCategoryProducts = Joi.object({
   }).required()
 })
 
+const validateCompanyInviteToken = Joi.object({
+  companyInviteToken: Joi.object({
+    roles: Joi.array()
+      .items(Joi.string().valid(...[userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])).min(1)
+  }).required()
+})
+
+const validateCompanyInviteDomainCheck = Joi.object({
+  companyInviteToken: Joi.object({
+    roles: Joi.object({
+      [userRoles.EMPLOYEE]: Joi.boolean(),
+      [userRoles.CAMPAIGNMANAGER]: Joi.boolean(),
+      [userRoles.COMPANYADMINISTRATOR]: Joi.boolean()
+    }).required()
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1184,5 +1200,7 @@ export default {
   validateMassUnitUpdate,
   validateSalesUnit,
   validateSalesUnitUpdate,
-  validateProductCategoryProducts
+  validateProductCategoryProducts,
+  validateCompanyInviteToken,
+  validateCompanyInviteDomainCheck
 }
