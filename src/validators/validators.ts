@@ -261,8 +261,7 @@ const validateCreatedCompany = Joi.object({
       }),
     vat: Joi.string().optional().max(24).allow('').allow(null),
     domain: Joi.string().domain().allow('').allow(null),
-    customerId: Joi.number().optional().allow('').allow(null),
-    inviteToken: Joi.string().uuid().optional()
+    customerId: Joi.number().optional().allow('').allow(null)
   }).required()
 }).required()
 
@@ -277,8 +276,7 @@ const validateUpdatedCompany = Joi.object({
       }),
     vat: Joi.string().optional().max(24).allow('').allow(null),
     domain: Joi.string().domain().allow('').allow(null),
-    customerId: Joi.number().optional().allow('').allow(null),
-    inviteToken: Joi.string().uuid().optional()
+    customerId: Joi.number().optional().allow('').allow(null)
   }).required()
 }).required()
 
@@ -1100,6 +1098,23 @@ const validateProductCategoryProducts = Joi.object({
   }).required()
 })
 
+const validateCompanyInviteToken = Joi.object({
+  companyInviteToken: Joi.object({
+    roles: Joi.array()
+      .items(Joi.string().valid(...[userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])).min(1)
+  }).required()
+})
+
+const validateCompanyInviteDomainCheck = Joi.object({
+  companyInviteToken: Joi.object({
+    roles: Joi.object({
+      [userRoles.EMPLOYEE]: Joi.boolean(),
+      [userRoles.CAMPAIGNMANAGER]: Joi.boolean(),
+      [userRoles.COMPANYADMINISTRATOR]: Joi.boolean()
+    }).required()
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1185,5 +1200,7 @@ export default {
   validateMassUnitUpdate,
   validateSalesUnit,
   validateSalesUnitUpdate,
-  validateProductCategoryProducts
+  validateProductCategoryProducts,
+  validateCompanyInviteToken,
+  validateCompanyInviteDomainCheck
 }

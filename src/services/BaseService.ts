@@ -22,7 +22,7 @@ const withoutUser = [
   'ProductAccessControlGroup', 'ProductCategoryTagProductAccessControlGroup', 'UserProductAccessControlGroup',
   'CompanyProductAccessControlGroup', 'CompanyUserGroup', 'UserCompanyUserGroup',
   'CompanyUserGroupProductAccessControlGroup', 'TaxRate', 'MassUnit',
-  'SalesUnit', 'ProductDetail', 'ProductProductCategory'
+  'SalesUnit', 'ProductDetail', 'ProductProductCategory', 'CompanyInviteToken'
 ]
 
 export const includeCompanyAndOwner = {
@@ -74,6 +74,11 @@ export const generateInclude = (model: string): any => {
             }
           },
           required: false
+        },
+        {
+          model: db.CompanyInviteToken,
+          attributes: ['id', 'role', 'inviteToken', 'isDomainCheckEnabled'],
+          as: 'companyInviteTokens'
         }
       ]
     )

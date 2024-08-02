@@ -772,6 +772,41 @@ describe('Company actions', () => {
       expect(res.body.company).to.include.keys('inviteLink', 'inviteCode')
     })
 
+    it('Should return 200 OK when a company administrator gets a company invitation link and code with company invite tokens set.', async () => {
+      const password = faker.internet.password()
+      const companyAdmin = await createCompanyAdministrator('test@companyinvitedtokenstwo.de', password)
+
+      const companyId = companyAdmin.companyId
+      await verifyCompanyDomain(companyId)
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'test@companyinvitedtokenstwo.de', password } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .send({
+          companyInviteToken: {
+            roles: [userRoles.CAMPAIGNMANAGER, userRoles.COMPANYADMINISTRATOR, userRoles.EMPLOYEE]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('inviteLink', 'inviteCode')
+    })
+
     it('Should return 200 OK when a company administrator updates a company invitation link and code.', async () => {
       const resCompany = await createVerifiedCompany(userId)
 
@@ -799,11 +834,191 @@ describe('Company actions', () => {
         .request(app)
         .patch(`/api/companies/${String(companyId)}/invite-link`)
         .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .send({
+          companyInviteToken: {
+            roles: ['Employee', 'CompanyAdministrator', 'CampaignManager']
+          }
+        })
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'company')
       expect(res.body.company).to.be.an('object')
-      expect(res.body.company).to.include.keys('inviteLink', 'inviteCode')
+      expect(res.body.company).to.include.keys('inviteLink', 'inviteCode', 'shortInviteLink', 'shortInviteCode', 'roles')
+      expect(res.body.company.roles).to.include.keys('companyAdministrator', 'campaignManager', 'employee')
+      expect(res.body.company.roles.companyAdministrator).to.include.keys('shortInviteLink', 'shortInviteCode', 'isDomainCheckEnabled')
+      expect(res.body.company.roles.campaignManager).to.include.keys('shortInviteLink', 'shortInviteCode', 'isDomainCheckEnabled')
+      expect(res.body.company.roles.employee).to.include.keys('shortInviteLink', 'shortInviteCode', 'isDomainCheckEnabled')
+    })
+
+    it('Should return 200 OK when a company administrator updates a company invitation link and code for a single role.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .send({
+          companyInviteToken: {
+            roles: ['Employee']
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('inviteLink', 'inviteCode', 'shortInviteLink', 'shortInviteCode', 'roles')
+      expect(res.body.company.roles).to.include.keys('companyAdministrator', 'campaignManager', 'employee')
+      expect(res.body.company.roles.companyAdministrator).to.include.keys('shortInviteLink', 'shortInviteCode', 'isDomainCheckEnabled')
+      expect(res.body.company.roles.campaignManager).to.include.keys('shortInviteLink', 'shortInviteCode', 'isDomainCheckEnabled')
+      expect(res.body.company.roles.employee).to.include.keys('shortInviteLink', 'shortInviteCode', 'isDomainCheckEnabled')
+    })
+
+    it('Should return 200 OK when a company administrator updates a company invitation link and code for a single role twice.', async () => {
+      const resCompany = await createVerifiedCompany(userId)
+
+      const companyId = resCompany.id
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          user: {
+            email: 'nickfury@starkindustriesmarvel.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .send({
+          companyInviteToken: {
+            roles: ['Employee']
+          }
+        })
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .send({
+          companyInviteToken: {
+            roles: ['Employee']
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('inviteLink', 'inviteCode', 'shortInviteLink', 'shortInviteCode', 'roles')
+      expect(res.body.company.roles).to.include.keys('companyAdministrator', 'campaignManager', 'employee')
+      expect(res.body.company.roles.companyAdministrator).to.include.keys('shortInviteLink', 'shortInviteCode')
+      expect(res.body.company.roles.campaignManager).to.include.keys('shortInviteLink', 'shortInviteCode')
+      expect(res.body.company.roles.employee).to.include.keys('shortInviteLink', 'shortInviteCode')
+    })
+
+    it('Should return 200 OK when a company administrator sets domain check for invitation links.', async () => {
+      const password = faker.internet.password()
+      const companyAdmin = await createCompanyAdministrator('test@companyinvitedtokenstwentytwo.de', password)
+
+      const companyId = companyAdmin.companyId
+      await verifyCompanyDomain(companyId)
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'test@companyinvitedtokenstwentytwo.de', password } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .send({
+          companyInviteToken: {
+            roles: [userRoles.CAMPAIGNMANAGER, userRoles.COMPANYADMINISTRATOR, userRoles.EMPLOYEE]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/invite-domain-check`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .send({
+          companyInviteToken: {
+            roles: {
+              Employee: true,
+              CampaignManager: true,
+              CompanyAdministrator: true
+            }
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('array')
+    })
+
+    it('Should return 200 OK when a company administrator sets domain check for invitation links.', async () => {
+      const password = faker.internet.password()
+      const companyAdmin = await createCompanyAdministrator('test@companyinvitedtokenstwentytwofour.de', password)
+
+      const companyId = companyAdmin.companyId
+      await verifyCompanyDomain(companyId)
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'test@companyinvitedtokenstwentytwofour.de', password } })
+
+      tokenCompanyAdministrator = resCompanyAdministrator.body.token
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/invite-domain-check`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .send({
+          companyInviteToken: {
+            roles: {
+              Employee: true,
+              CampaignManager: true,
+              CompanyAdministrator: true
+            }
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('array')
     })
   })
 

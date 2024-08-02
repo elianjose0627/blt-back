@@ -216,7 +216,6 @@ export interface ICompany {
   addresses?: IAddress[]
   secondaryDomains?: ISecondaryDomain[]
   accessPermissions?: IAccessPermission[]
-  inviteToken?: Nullable<string>
   theme: Nullable<Theme>
   logo: Nullable<MediaData>
   subscriptions: ICompanySubscription[]
@@ -226,6 +225,15 @@ export interface ICompany {
 
 export type AddressType = 'billing' | 'delivery' | 'billingAndDelivery' | 'return'
 export type AddressAffiliation = 'personal' | 'company' | 'other' | null
+
+export interface ICompanyInviteToken {
+  id: string
+  inviteToken: string
+  role: Role
+  isDomainCheckEnabled: boolean
+  createdAt?: Date
+  updatedAt?: Date
+}
 
 export interface IAddress {
   id: string

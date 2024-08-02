@@ -157,7 +157,8 @@ export const createCompanyAdministrator = async (email = 'nickfury@starkindustri
         id: uuidv1(),
         name: 'Test Company',
         userId: user.id,
-        email
+        email,
+        domain: email.split('@').pop()
       })
 
       await user.update({ companyId: company.id })

@@ -18,7 +18,7 @@ const triggerPubSub = async (topicId: string, functionName = 'Cloud Function', a
           ...attributes
         }
       })
-    logger.info('Message %s published.', messageId)
+    logger.info(`Message ${messageId} published.`)
     return true
   } catch (error: any) {
     logger.error(error.message)
