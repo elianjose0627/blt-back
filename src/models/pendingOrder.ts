@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { IPendingOrder, OrderLineRequest, ShippingAddressRequest, PaymentInformationRequest, ICompany, Nullable } from '../types'
+import type { IPendingOrder, OrderLineRequest, ShippingAddressRequest, PaymentInformationRequest, ICompany, Nullable, BillingAddressRequest } from '../types'
 
 const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
   interface PendingOrderAttributes {
@@ -29,6 +29,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     createdByFullName: string
     orderLineRequests: OrderLineRequest[]
     shippingAddressRequests: ShippingAddressRequest[]
+    billingAddressRequests: BillingAddressRequest[]
     paymentInformationRequests: PaymentInformationRequest[]
     isPosted: boolean
     postedOrderId: Nullable<string>
@@ -63,6 +64,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly createdByFullName: string
     private readonly orderLineRequests: OrderLineRequest[]
     private readonly shippingAddressRequests: ShippingAddressRequest[]
+    private readonly billingAddressRequests: BillingAddressRequest[]
     private readonly paymentInformationRequests: PaymentInformationRequest[]
     private readonly isPosted: boolean
     private readonly postedOrderId: Nullable<string>
@@ -118,6 +120,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
         createdByFullName: this.createdByFullName,
         orderLineRequests: this.orderLineRequests,
         shippingAddressRequests: this.shippingAddressRequests,
+        billingAddressRequests: this.billingAddressRequests,
         paymentInformationRequests: this.paymentInformationRequests,
         isPosted: this.isPosted,
         postedOrderId: this.postedOrderId,
@@ -234,6 +237,10 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false
     },
     shippingAddressRequests: {
+      type: DataTypes.JSON,
+      allowNull: true
+    },
+    billingAddressRequests: {
       type: DataTypes.JSON,
       allowNull: true
     },

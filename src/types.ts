@@ -938,6 +938,8 @@ export interface ShippingAddressRequest {
   updatedBy: string
 }
 
+export interface BillingAddressRequest extends ShippingAddressRequest {}
+
 export interface OrderLineRequest {
   orderId: number
   itemName: string
@@ -979,6 +981,7 @@ export interface IPendingOrder {
   createdByFullName: string
   orderLineRequests: OrderLineRequest[]
   shippingAddressRequests: ShippingAddressRequest[]
+  billingAddressRequests: BillingAddressRequest[]
   paymentInformationRequests: PaymentInformationRequest[]
   isPosted: boolean
   postedOrderId: Nullable<string>
