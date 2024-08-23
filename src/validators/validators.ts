@@ -454,6 +454,7 @@ const validateBundle = Joi.object({
       isBatch: Joi.boolean().default(false),
       isDivisible: Joi.boolean().default(false),
       isBestBefore: Joi.boolean().default(false),
+      isPackaging: Joi.boolean().default(false),
       isSerialNumber: Joi.boolean().default(false),
       isBillOfMaterials: Joi.boolean().default(false),
       billOfMaterialsComponents: Joi.array().items(
@@ -693,6 +694,28 @@ const commonPendingOrderSchema = {
       email: Joi.string()
     })
   ).min(1).required(),
+  billingAddressRequests: Joi.array().items(
+    Joi.object({
+      salutation: Joi.string().allow('').allow(null),
+      firstName: Joi.string(),
+      lastName: Joi.string(),
+      title: Joi.string().allow('').allow(null),
+      company: Joi.string().allow('').allow(null),
+      companyAddition: Joi.string().allow('').allow(null),
+      street: Joi.string(),
+      addressAddition: Joi.string().allow('').allow(null),
+      zipCode: Joi.string(),
+      place: Joi.string(),
+      phone: Joi.string().allow('').allow(null),
+      state: Joi.string().allow('').allow(null),
+      country: Joi.string(),
+      iso: Joi.string().allow('').allow(null),
+      telephone: Joi.string().allow('').allow(null),
+      mobile: Joi.string().allow('').allow(null),
+      fax: Joi.string().allow('').allow(null),
+      email: Joi.string()
+    })
+  ).optional(),
   paymentInformationRequests: Joi.array().items(
     Joi.object({
       bankName: Joi.string(),
