@@ -454,6 +454,7 @@ const validateBundle = Joi.object({
       isBatch: Joi.boolean().default(false),
       isDivisible: Joi.boolean().default(false),
       isBestBefore: Joi.boolean().default(false),
+      isPackaging: Joi.boolean().default(false),
       isSerialNumber: Joi.boolean().default(false),
       isBillOfMaterials: Joi.boolean().default(false),
       billOfMaterialsComponents: Joi.array().items(
