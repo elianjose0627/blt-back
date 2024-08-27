@@ -494,7 +494,7 @@ const validateProduct = Joi.object({
     productColorId: Joi.string().uuid().allow(null),
     productMaterialId: Joi.string().uuid().allow(null),
     productSizeId: Joi.string().uuid().allow(null),
-    description: Joi.string().max(255).allow(null).allow('').optional(),
+    description: Joi.string().max(defaultTextLength).allow(null).allow('').optional(),
     isExceedStockEnabled: Joi.boolean()
   }).required()
 }).required()
@@ -515,7 +515,7 @@ const validateProductUpdate = Joi.object({
     productColorId: Joi.string().uuid().allow(null),
     productMaterialId: Joi.string().uuid().allow(null),
     productSizeId: Joi.string().uuid().allow(null),
-    description: Joi.string().max(255).allow(null).allow('').optional(),
+    description: Joi.string().max(defaultTextLength).allow(null).allow('').optional(),
     minimumOrderQuantity: Joi.number().min(1),
     isExceedStockEnabled: Joi.boolean().default(false)
   }).required()
