@@ -24,6 +24,15 @@ class ProductCategoryController extends BaseController {
       [this.recordName()]: response
     })
   }
+
+  async updateSortOrder (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { body: { productCategories } } = req
+
+    const response = await productCategoryService.updateSortOrder({ productCategories })
+    io.emit(`${String(productCategoryService.recordName())}`, { message: `${String(productCategoryService.recordName())} updated` })
+
+    return res.status(statusCodes.NO_CONTENT).send(response)
+  }
 }
 
 export default new ProductCategoryController(productCategoryService)

@@ -332,6 +332,45 @@ describe('Product Category actions', () => {
     })
   })
 
+  describe('Update sort order of product categories', () => {
+    it('Should return 204 when an admin updates the sort order of product categories.', async () => {
+      const resProductCategory1 = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'Electronics'
+          }
+        })
+      const productCategory1Id = resProductCategory1.body.productCategory.id
+
+      const resProductCategory2 = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'Food'
+          }
+        })
+      const productCategory2Id = resProductCategory2.body.productCategory.id
+
+      const res = await chai
+        .request(app)
+        .put('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategories: [
+            { productCategoryId: productCategory1Id, sortIndex: 1 },
+            { productCategoryId: productCategory2Id, sortIndex: 0 }
+          ]
+        })
+
+      expect(res).to.have.status(204)
+    })
+  })
+
   describe('Product Category Tag actions', () => {
     it('Should return 201 when an admin adds a tag to a product category.', async () => {
       const resProductCategory = await chai

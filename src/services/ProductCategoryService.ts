@@ -69,6 +69,20 @@ class ProductCategoryService extends BaseService {
       rows: records.rows.map((record: any) => record.toJSONFor())
     }
   }
+
+  async updateSortOrder (data: { productCategories: Array<{ productCategoryId: string, sortIndex: number }> }): Promise<any> {
+    const { productCategories } = data
+
+    const updatePromises = productCategories.map(productCategory =>
+      db[this.model].update(
+        { sortIndex: productCategory.sortIndex },
+        { where: { id: productCategory.productCategoryId } }
+      )
+    )
+
+    const response = await Promise.all(updatePromises)
+    return response
+  }
 }
 
 export default ProductCategoryService
