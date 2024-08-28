@@ -1138,6 +1138,15 @@ const validateCompanyInviteDomainCheck = Joi.object({
   }).required()
 })
 
+const validateProductCategorySortOrder = Joi.object({
+  productCategories: Joi.array().items(
+    Joi.object({
+      productCategoryId: Joi.string().uuid().required(),
+      sortIndex: Joi.number().positive().required().allow(0)
+    })
+  ).min(1).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1225,5 +1234,6 @@ export default {
   validateSalesUnitUpdate,
   validateProductCategoryProducts,
   validateCompanyInviteToken,
-  validateCompanyInviteDomainCheck
+  validateCompanyInviteDomainCheck,
+  validateProductCategorySortOrder
 }

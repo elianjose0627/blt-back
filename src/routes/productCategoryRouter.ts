@@ -21,6 +21,9 @@ const productCategoryRoutes = (): Router => {
     .get(celebrate({
       [Segments.QUERY]: validator.validateQueryParams
     }), asyncHandler(paginate), asyncHandler(ProductCategoryController.getAll))
+    .put(asyncHandler(checkAdmin), celebrate({
+      [Segments.BODY]: validator.validateProductCategorySortOrder
+    }), asyncHandler(ProductCategoryController.updateSortOrder))
   productCategoryRouter.use('/product-categories/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(ProductCategoryController.checkRecord))
