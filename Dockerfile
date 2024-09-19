@@ -1,17 +1,16 @@
-# Pull in the official version of Node 14.
-FROM node:14-alpine
+# Pull in the official version of Node.
+FROM node:18-alpine
 
 # Create and change to the app directory.
 WORKDIR /usr/src/app
 
-COPY package.json ./
-COPY yarn.lock ./
+COPY package.json yarn.lock ./
 
 # Install production dependencies.
-RUN yarn install --production
+RUN yarn install --production --frozen-lockfile && yarn cache clean
 
 # Copy local codebase into the container image
-COPY . ./
+COPY . .
 
 # Start the api server
-CMD [ "npm", "start" ]
+CMD [ "yarn", "start" ]
