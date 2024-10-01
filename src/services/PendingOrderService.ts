@@ -77,7 +77,7 @@ class PendingOrderService extends BaseService {
     const bulkInsertData = pendingOrders.map((pendingOrder: any) => ({
       ...pendingOrder,
       id: uuidv1(),
-      platform: Platform.Onlineshop,
+      platform: Platform.None,
       userId: currentUser.id,
       campaignId: null,
       customerId: company?.customerId ?? 0,
