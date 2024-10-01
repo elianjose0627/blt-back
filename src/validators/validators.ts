@@ -697,8 +697,8 @@ const commonPendingOrderSchema = {
   billingAddressRequests: Joi.array().items(
     Joi.object({
       salutation: Joi.string().allow('').allow(null),
-      firstName: Joi.string(),
-      lastName: Joi.string(),
+      firstName: Joi.string().allow('').allow(null),
+      lastName: Joi.string().allow('').allow(null),
       title: Joi.string().allow('').allow(null),
       company: Joi.string().allow('').allow(null),
       companyAddition: Joi.string().allow('').allow(null),
