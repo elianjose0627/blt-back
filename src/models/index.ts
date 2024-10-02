@@ -69,6 +69,7 @@ export interface Database {
   Stock?: any
   BundleStock?: any
   CompanyInviteToken?: any
+  Invoice?: any
   [key: string]: any
 }
 
