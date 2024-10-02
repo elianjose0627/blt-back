@@ -86,7 +86,7 @@ app.use(apiPrefix, routers.taxRateRouter())
 app.use(apiPrefix, routers.massUnitRouter())
 app.use(apiPrefix, routers.salesUnitRouter())
 app.use(apiPrefix, routers.productInProductCategoryRouter())
-
+app.use(apiPrefix, routers.invoiceRouter())
 // Add validation middleware
 app.use(joiErrors)
 
