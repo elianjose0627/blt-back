@@ -323,6 +323,25 @@ export const generateInclude = (model: string): any => {
       }
     ]
   }
+  if (model === 'Invoice') {
+    return [
+      {
+        model: db.Company,
+        as: 'company',
+        attributes: ['id', 'name', 'email', 'domain']
+      },
+      {
+        model: db.Campaign,
+        attributes: ['id', 'name', 'status', 'type'],
+        as: 'campaign'
+      },
+      {
+        model: db.User,
+        attributes: ['id', 'firstName', 'lastName', 'username', 'email'],
+        as: 'owner'
+      }
+    ]
+  }
   if (withoutUser.includes(model)) {
     return ([])
   }

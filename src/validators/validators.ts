@@ -242,6 +242,19 @@ const validateProductQueryParams = Joi.object({
   }, 'Comma separated list validation').message(`select must be one of [${productSelectedColumns}]`)
 })
 
+const validateInvoiceQueryParams = Joi.object({
+  ...commonQueryParams,
+  sortBy: Joi.object({
+    dueDate: Joi.string().valid(...['asc', 'desc']),
+    createdAt: Joi.string().valid(...['asc', 'desc']),
+    deliveryDate: Joi.string().valid(...['asc', 'desc']),
+    documentDate: Joi.string().valid(...['asc', 'desc'])
+  }),
+  filter: Joi.object({
+    status: Joi.string().valid(...['open', 'paid', 'overdue', 'draft', 'sent', 'cancelled'])
+  }).optional()
+}).required()
+
 const validateNotifications = Joi.object({
   user: Joi.object({
     notifications: Joi.object({
@@ -691,7 +704,8 @@ const commonPendingOrderSchema = {
       telephone: Joi.string().allow('').allow(null),
       mobile: Joi.string().allow('').allow(null),
       fax: Joi.string().allow('').allow(null),
-      email: Joi.string()
+      email: Joi.string(),
+      costCenter: Joi.string().allow('').allow(null)
     })
   ).min(1).required(),
   billingAddressRequests: Joi.array().items(
@@ -713,7 +727,8 @@ const commonPendingOrderSchema = {
       telephone: Joi.string().allow('').allow(null),
       mobile: Joi.string().allow('').allow(null),
       fax: Joi.string().allow('').allow(null),
-      email: Joi.string()
+      email: Joi.string(),
+      costCenter: Joi.string().allow('').allow(null)
     })
   ).optional(),
   paymentInformationRequests: Joi.array().items(
@@ -1235,5 +1250,6 @@ export default {
   validateProductCategoryProducts,
   validateCompanyInviteToken,
   validateCompanyInviteDomainCheck,
-  validateProductCategorySortOrder
+  validateProductCategorySortOrder,
+  validateInvoiceQueryParams
 }

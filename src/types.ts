@@ -641,6 +641,35 @@ export interface IJtlShippingMethod {
   updatedAt: Date
 }
 
+export interface IInvoice {
+  id: string
+  postedOrderId: string
+  invoiceNumber: string
+  taxRate: number
+  discountRate: number
+  totalVat: number
+  totalNet: number
+  totalGross: number
+  totalDiscount: number
+  totalShipping: number
+  amountPaid: number
+  currency: string
+  status: string
+  isEmailSent: boolean
+  orderLineRequests: OrderLineRequest[]
+  shippingAddressRequests: ShippingAddressRequest[]
+  billingAddressRequests: BillingAddressRequest[]
+  company: ICompany
+  campaign: ICampaign
+  owner: IUser
+  dueDate: Date
+  deliveryDate: Date
+  documentDate: Date
+  costCenter: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface ShippingAddress {
   lastname: string
   city: string
