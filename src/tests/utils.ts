@@ -1346,3 +1346,85 @@ export const createProductWithGraduatedPricesAndIsExceedStockEnabledIsTrue = asy
     })
   }
 }
+
+export const createInvoice = async (companyId: string, userId: string): Promise<any> => {
+  const invoice = await db.Invoice.create({
+    id: uuidv4(),
+    postedOrderId: uuidv4(),
+    invoiceNumber: uuidv1(),
+    taxRate: 19,
+    discountRate: 0,
+    totalVat: 0,
+    totalNet: 0,
+    totalGross: 0,
+    totalDiscount: 0,
+    totalShipping: 0,
+    amountPaid: 0,
+    currency: 'EUR',
+    dueDate: dayjs.utc().add(1, 'day'),
+    deliveryDate: dayjs.utc().add(1, 'day'),
+    documentDate: dayjs.utc(),
+    costCenter: '123456',
+    companyId,
+    userId,
+    status: 'open',
+    orderLineRequests: [
+      {
+        type: 0,
+        itemVAT: 0,
+        discount: 0,
+        itemName: 'Tasse - Kitty Mug - 1c - navy - Kurita - Muster',
+        quantity: 2,
+        itemNetSale: 0,
+        articleNumber: '1005',
+        netPurchasePrice: 0
+      }
+    ],
+    shippingAddressRequests: [
+      {
+        fax: '',
+        iso: '',
+        email: faker.internet.email(),
+        phone: '',
+        place: faker.address.city(),
+        state: '',
+        title: '',
+        mobile: '',
+        street: faker.address.streetAddress(),
+        company: '',
+        country: faker.address.country(),
+        zipCode: faker.address.zipCode(),
+        lastName: faker.name.lastName(),
+        firstName: faker.name.firstName(),
+        telephone: '',
+        salutation: 'Mr',
+        addressAddition: '',
+        companyAddition: ''
+      }
+    ],
+    billingAddressRequests: [
+      {
+        fax: '',
+        iso: '',
+        email: faker.internet.email(),
+        phone: '',
+        place: faker.address.city(),
+        state: '',
+        title: '',
+        mobile: '',
+        street: faker.address.streetAddress(),
+        company: '',
+        country: faker.address.country(),
+        zipCode: faker.address.zipCode(),
+        lastName: faker.name.lastName(),
+        firstName: faker.name.firstName(),
+        telephone: '',
+        salutation: 'Mr',
+        addressAddition: '',
+        companyAddition: ''
+      }
+    ]
+  })
+
+  return invoice
+}
