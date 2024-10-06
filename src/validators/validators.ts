@@ -704,7 +704,8 @@ const commonPendingOrderSchema = {
       telephone: Joi.string().allow('').allow(null),
       mobile: Joi.string().allow('').allow(null),
       fax: Joi.string().allow('').allow(null),
-      email: Joi.string()
+      email: Joi.string(),
+      costCenter: Joi.string().allow('').allow(null)
     })
   ).min(1).required(),
   billingAddressRequests: Joi.array().items(
@@ -726,7 +727,8 @@ const commonPendingOrderSchema = {
       telephone: Joi.string().allow('').allow(null),
       mobile: Joi.string().allow('').allow(null),
       fax: Joi.string().allow('').allow(null),
-      email: Joi.string()
+      email: Joi.string(),
+      costCenter: Joi.string().allow('').allow(null)
     })
   ).optional(),
   paymentInformationRequests: Joi.array().items(
