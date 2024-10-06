@@ -1364,6 +1364,7 @@ export const createInvoice = async (companyId: string, userId: string): Promise<
     dueDate: dayjs.utc().add(1, 'day'),
     deliveryDate: dayjs.utc().add(1, 'day'),
     documentDate: dayjs.utc(),
+    costCenter: '123456',
     companyId,
     userId,
     status: 'open',

@@ -87,6 +87,10 @@ module.exports = {
         allowNull: false,
         defaultValue: Sequelize.NOW
       },
+      costCenter: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       orderLineRequests: {
         type: Sequelize.JSONB,
         allowNull: false

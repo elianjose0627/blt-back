@@ -665,6 +665,7 @@ export interface IInvoice {
   dueDate: Date
   deliveryDate: Date
   documentDate: Date
+  costCenter: string | null
   createdAt: Date
   updatedAt: Date
 }

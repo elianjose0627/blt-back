@@ -28,6 +28,7 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
     dueDate: Date
     deliveryDate: Date
     documentDate: Date
+    costCenter: string | null
     orderLineRequests: OrderLineRequest[]
     shippingAddressRequests: ShippingAddressRequest[]
     billingAddressRequests: BillingAddressRequest[]
@@ -51,6 +52,7 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
     private readonly dueDate: Date
     private readonly deliveryDate: Date
     private readonly documentDate: Date
+    private readonly costCenter: string | null
     private readonly company: ICompany
     private readonly campaign: ICampaign
     private readonly owner: IUser
@@ -97,6 +99,7 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
         deliveryDate: this.deliveryDate,
         documentDate: this.documentDate,
         amountPaid: this.amountPaid,
+        costCenter: this.costCenter,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         company: this.company,
@@ -193,6 +196,10 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: new Date()
+    },
+    costCenter: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     orderLineRequests: {
       type: DataTypes.JSONB,
