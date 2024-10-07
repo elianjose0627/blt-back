@@ -6,7 +6,8 @@ import type {
   NetRetailPrice, ProductType, Nullable,
   IMassUnit, ISalesUnit, ITaxRate,
   IProductDetail,
-  IStock
+  IStock,
+  ISpecifications
 } from '../types'
 
 const ProductModel = (sequelize: any, DataTypes: any): any => {
@@ -38,6 +39,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     isExceedStockEnabled: boolean
     minimumOrderQuantity: number
     articleId: number
+    specifications: Nullable<ISpecifications>
   }
 
   class Product extends Model<ProductAttributes> {
@@ -82,6 +84,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     private readonly minimumOrderQuantity: number
     private readonly articleId: number
     private readonly stock: IStock
+    private readonly specifications: Nullable<ISpecifications>
 
     static associate (models: any): any {
       Product.belongsTo(models.Company, {
@@ -192,6 +195,7 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
         minimumOrderQuantity: this.minimumOrderQuantity,
         articleId: this.articleId,
         stock: this.stock,
+        specifications: this.specifications,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       }
@@ -320,6 +324,10 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     articleId: {
       allowNull: true,
       type: DataTypes.INTEGER
+    },
+    specifications: {
+      allowNull: true,
+      type: DataTypes.JSONB
     }
   }, {
     sequelize,
