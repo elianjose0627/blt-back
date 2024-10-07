@@ -165,6 +165,7 @@ export interface ISpecifications {
   isSerialNumber: boolean
   isBillOfMaterials: boolean
   billOfMaterialsComponents: BillOfMaterialsComponent[]
+  isPackaging: boolean
 }
 
 export interface BillOfMaterialsComponent {
@@ -571,6 +572,7 @@ export interface IProduct {
   isExceedStockEnabled: boolean
   minimumOrderQuantity: number
   articleId: number
+  specifications: Nullable<ISpecifications>
 }
 
 export interface ICampaignOrderLimit {
