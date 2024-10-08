@@ -4,7 +4,16 @@ module.exports = {
     return Promise.all([
       queryInterface.addColumn('Products', 'specifications', {
         allowNull: true,
-        type: Sequelize.JSONB
+        type: Sequelize.JSONB,
+        defaultValue: {
+          isBatch: false,
+          isDivisible: false,
+          isPackaging: false,
+          isBestBefore: false,
+          isSerialNumber: false,
+          isBillOfMaterials: false,
+          billOfMaterialsComponents: []
+        }
       })
     ])
   },

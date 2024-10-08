@@ -218,7 +218,8 @@ const commonQueryParams = {
       .messages({
         'string.pattern.base': '{#label} must contain valid ranges separated by commas'
       }).optional(),
-    affiliation: Joi.string().optional()
+    affiliation: Joi.string().optional(),
+    isBillOfMaterials: Joi.string().trim().lowercase().valid(...['true', 'false'])
   }).optional()
 }
 const validateQueryParams = Joi.object({ ...commonQueryParams }).required()
