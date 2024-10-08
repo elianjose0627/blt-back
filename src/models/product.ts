@@ -327,7 +327,16 @@ const ProductModel = (sequelize: any, DataTypes: any): any => {
     },
     specifications: {
       allowNull: true,
-      type: DataTypes.JSONB
+      type: DataTypes.JSONB,
+      defaultValue: {
+        isBatch: false,
+        isDivisible: false,
+        isPackaging: false,
+        isBestBefore: false,
+        isSerialNumber: false,
+        isBillOfMaterials: false,
+        billOfMaterialsComponents: []
+      }
     }
   }, {
     sequelize,
