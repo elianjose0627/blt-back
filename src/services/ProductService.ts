@@ -257,13 +257,13 @@ class ProductService extends BaseService {
 
   async getAll (
     limit: number, offset: number, search: string = '',
-    filter = { isParent: 'true, false', category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tags: '', showChildren: 'true', price: '' },
+    filter = { isParent: 'true, false', category: '', minPrice: 0, maxPrice: 0, color: '', material: '', size: '', tags: '', showChildren: 'true', price: '', isBillOfMaterials: null },
     orderBy = { name: '', createdAt: '', price: '' },
     select = productSelectedColumns
   ): Promise<any> {
     const {
       isParent = 'true, false', category, minPrice = 0, maxPrice = 0,
-      color, material, size, tags, showChildren, price = ''
+      color, material, size, tags, showChildren, price = '', isBillOfMaterials
     } = filter
 
     const order = generateOrderBy(orderBy)
@@ -276,6 +276,7 @@ class ProductService extends BaseService {
     const whereFilterSize = generateFilterQuery({ name: size })
     let whereFilterPrice: any = {}
     const whereFilterShowChildren = showChildren === 'false' ? { parentId: { [Op.eq]: null } } : {}
+    const whereFilterIsBillOfMaterials = isBillOfMaterials == null ? {} : { 'specifications.isBillOfMaterials': { [Op.eq]: isBillOfMaterials } }
 
     const attributes = select.replace(/\s+/g, '').split(',').concat(productDefaultColumns)
     const include: any[] = [
@@ -330,10 +331,11 @@ class ProductService extends BaseService {
       where: {
         ...whereSearch,
         isParent: {
-          [Op.in]: isParent.split(',')
+          [Op.in]: isParent.split(',').map((item: string) => item.trim())
         },
         ...whereFilterPrice,
-        ...whereFilterShowChildren
+        ...whereFilterShowChildren,
+        ...whereFilterIsBillOfMaterials
       },
       limit,
       offset,

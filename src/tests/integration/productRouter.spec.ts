@@ -118,6 +118,30 @@ describe('Product actions', () => {
       expect(res.body.products).to.be.an('array')
     })
 
+    it('Should return 200 Success when an admin successfully retrieves all products with params.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/products')
+        .query({
+          limit: 10,
+          page: 1,
+          search: '123',
+          filter: {
+            isBillOfMaterials: 'true'
+          },
+          orderBy: {
+            createdAt: 'asc',
+            name: 'asc',
+            price: 'asc'
+          }
+        })
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'products')
+      expect(res.body.products).to.be.an('array')
+    })
+
     it('Should return 200 Success when an admin successfully retrieves all products excluding children.', async () => {
       const resProductParent = await chai
         .request(app)
@@ -3812,7 +3836,10 @@ describe('Product actions', () => {
 
     it('Should return 200 Success when an admin successfully retrieves all product variations for a child with color filter.', async () => {
       const color = faker.color.human()
-      const colorTwo = faker.color.human()
+      let colorTwo
+      do {
+        colorTwo = faker.color.human()
+      } while (colorTwo === color)
       const resProductColor = await chai
         .request(app)
         .post('/api/product-colors')
