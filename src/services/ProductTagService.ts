@@ -67,57 +67,45 @@ class ProductTagService extends BaseService {
   }
 
   async getSimilarProducts (limit: number, offset: number, productCategoryTagIds: string[], productId: string): Promise<any> {
-    if (productCategoryTagIds.length > 0) {
-      const response = await sequelizeInstance.query(
-        `
-        SELECT DISTINCT ON ("product"."productColorId")
-          "ProductTag"."createdAt",
-          "ProductTag"."updatedAt",
-          "product"."id" AS "product.id",
-          "product"."name" AS "product.name",
-          "product"."pictures" AS "product.pictures"
-        FROM "ProductTags" AS "ProductTag"
-        LEFT OUTER JOIN "Products" AS "product"
-          ON "ProductTag"."productId" = "product"."id" AND ("product"."deletedAt" IS NULL)
-        WHERE "ProductTag"."deletedAt" IS NULL
-          AND "ProductTag"."productId" != :productId
-          AND "ProductTag"."productCategoryTagId" IN (:productCategoryTagIds)
-        ORDER BY "product"."productColorId", "ProductTag"."createdAt" DESC
-        LIMIT :limit OFFSET :offset;
-        `,
-        {
-          replacements: { productCategoryTagIds, productId, limit, offset },
-          type: QueryTypes.SELECT,
-          nest: true
-        }
-      )
-      return {
-        rows: response,
-        count: response.length
+    const response = await sequelizeInstance.query(
+      `
+      SELECT DISTINCT ON ("Products".id, "Products"."productColorId")
+      "Products".id,
+      "Products".name,
+      "Products"."merchantSku",
+      "Products".pictures,
+      "Products"."createdAt",
+      "Products"."updatedAt"
+      FROM "ProductTags"
+      JOIN "Products" ON "ProductTags"."productId" = "Products".id
+      WHERE "ProductTags"."productId" != :productId
+        AND "ProductTags"."productCategoryTagId" IN (:productCategoryTagIds)
+        AND "Products".id IN (
+          SELECT "productId"
+          FROM "ProductTags"
+          WHERE "productCategoryTagId" IN (:productCategoryTagIds)
+          GROUP BY "productId"
+          HAVING COUNT(DISTINCT "productCategoryTagId") = :tagCount
+        )
+      ORDER BY "Products".id, "Products"."productColorId", "ProductTags"."createdAt" DESC
+      LIMIT :limit OFFSET :offset;
+      `,
+      {
+        replacements: {
+          productId,
+          productCategoryTagIds,
+          tagCount: productCategoryTagIds.length,
+          limit,
+          offset
+        },
+        type: QueryTypes.SELECT,
+        nest: true
       }
-    } else {
-      const response = await db[this.model].findAndCountAll({
-        limit,
-        offset,
-        order: [['createdAt', 'DESC']],
-        attributes: {
-          exclude: ['deletedAt', 'productCategoryTagId', 'productId']
-        },
-        where: {
-          productCategoryTagId: productCategoryTagIds,
-          [Op.not]: {
-            productId
-          }
-        },
-        include: [
-          {
-            model: db.Product,
-            as: 'product',
-            attributes: ['id', 'name', 'pictures']
-          }
-        ]
-      })
-      return response
+    )
+
+    return {
+      rows: response,
+      count: response.length
     }
   }
 }
