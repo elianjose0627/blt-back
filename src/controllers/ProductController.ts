@@ -3,7 +3,15 @@ import ProductService from '../services/ProductService'
 import CompanyService from '../services/CompanyService'
 import ProductGraduatedPriceService from '../services/ProductGraduatedPriceService'
 import ProductTagService from '../services/ProductTagService'
-import type { CustomNext, CustomRequest, CustomResponse, IProduct, IProductTag, StatusCode } from '../types'
+import type {
+  CustomNext,
+  CustomRequest,
+  CustomResponse,
+  IProduct,
+  IProductCategory,
+  IProductTag,
+  StatusCode
+} from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
@@ -336,10 +344,13 @@ class ProductController extends BaseController {
       record: product
     } = req
 
-    const { productTags }: { productTags: IProductTag[] } = product
+    const { productTags, productCategories }: { productTags: IProductTag[], productCategories: IProductCategory[] } = product
     const productCategoryTags = productTags.map(tag => tag.productCategoryTag.id)
+    const productCategoryIds = productCategories.map(category => category.id)
+    const response = productCategoryTags.length > 0
+      ? await productTagService.getSimilarProducts(limit, offset, productCategoryTags, id)
+      : await productService.getSimilarProducts(limit, offset, productCategoryIds, id)
 
-    const response = await productTagService.getSimilarProducts(limit, offset, productCategoryTags, id)
     const meta = {
       total: response.count,
       pageCount: Math.ceil(response.count / limit),
@@ -351,7 +362,7 @@ class ProductController extends BaseController {
       statusCode: statusCodes.OK,
       success: true,
       meta,
-      [productTagService.manyRecords()]: response.rows
+      [productService.manyRecords()]: response.rows
     })
   }
 

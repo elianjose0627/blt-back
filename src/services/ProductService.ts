@@ -725,6 +725,34 @@ class ProductService extends BaseService {
     })
     return response
   }
+
+  async getSimilarProducts (limit: number, offset: number, productCategoryIds: string[], productId: string): Promise<any> {
+    const response = await db.Product.findAndCountAll({
+      limit,
+      offset,
+      attributes: ['id', 'name', 'merchantSku', 'pictures', 'createdAt', 'updatedAt'],
+      where: {
+        id: {
+          [Op.not]: productId
+        }
+      },
+      distinct: true,
+      include: [
+        {
+          model: db.ProductCategory,
+          as: 'productCategories',
+          attributes: [],
+          through: { attributes: [] },
+          where: {
+            id: {
+              [Op.in]: productCategoryIds
+            }
+          }
+        }
+      ]
+    })
+    return response
+  }
 }
 
 export default ProductService

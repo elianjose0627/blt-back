@@ -3538,8 +3538,8 @@ describe('Product actions', () => {
         .set('Authorization', `Bearer ${tokenUser}`)
 
       expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'meta', 'productTags')
-      expect(res.body.productTags).to.be.an('array').lengthOf.above(0)
+      expect(res.body).to.include.keys('statusCode', 'success', 'meta', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf.above(0)
     })
 
     it('Should return 200 OK when admin gets similar product tags in the catalogue for an untagged product', async () => {
@@ -3568,8 +3568,8 @@ describe('Product actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'meta', 'productTags')
-      expect(res.body.productTags).to.be.an('array').lengthOf(0)
+      expect(res.body).to.include.keys('statusCode', 'success', 'meta', 'products')
+      expect(res.body.products).to.be.an('array').lengthOf(0)
     })
 
     it('Should return 200 Success when an admin successfully retrieves all product variations for a parent.', async () => {
