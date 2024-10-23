@@ -308,6 +308,7 @@ export interface ICampaign {
   isNoteEnabled: boolean
   isActive: boolean
   isHidden: boolean
+  isBulkCreateEnabled: boolean
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
