@@ -1941,7 +1941,7 @@ describe('Company actions', () => {
       expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'type', 'createdAt', 'updatedAt')
     })
 
-    it('Should return 201 Created when an admin creates a campaign with quota, correctionQuota, isQuotaEnable and isNoteEnabled set.', async () => {
+    it('Should return 201 Created when an admin creates a campaign with quota, correctionQuota, isQuotaEnable, isBulkCreateEnabled and isNoteEnabled set.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -1969,7 +1969,8 @@ describe('Company actions', () => {
             isQuotaEnabled: true,
             isNoteEnabled: true,
             shippingMethodType: 12,
-            shippingMethodIsDropShipping: true
+            shippingMethodIsDropShipping: true,
+            isBulkCreateEnabled: false
           }
         })
 
