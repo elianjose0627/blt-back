@@ -18,6 +18,7 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     isNoteEnabled: boolean
     isActive: boolean
     isHidden: boolean
+    isBulkCreateEnabled: boolean
     shippingMethodType: Nullable<number>
     shippingMethodIsDropShipping: boolean
   }
@@ -38,6 +39,7 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     private readonly isNoteEnabled: boolean
     private readonly isActive: boolean
     private readonly isHidden: boolean
+    private readonly isBulkCreateEnabled: boolean
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly company: ICompany
@@ -109,6 +111,7 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
         isNoteEnabled: this.isNoteEnabled,
         isActive: this.isActive,
         isHidden: this.isHidden,
+        isBulkCreateEnabled: this.isBulkCreateEnabled,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         company: this.company,
@@ -184,6 +187,10 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     isHidden: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
+    },
+    isBulkCreateEnabled: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
     },
     shippingMethodType: {
       type: DataTypes.INTEGER,

@@ -46,8 +46,18 @@ class PendingOrderController extends BaseController {
 
     const {
       isQuotaEnabled, isExceedQuotaEnabled, usedQuota, quota, correctionQuota,
-      campaignOrderLimits
+      campaignOrderLimits, isBulkCreateEnabled
     } = campaign as ICampaign
+
+    if (!isBulkCreateEnabled && pendingOrders.length > 1) {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'Bulk create is not enabled for this campaign'
+        }
+      })
+    }
 
     const pendingOrdersQuantity: number = pendingOrders.reduce((accumulator: number, pendingOrder: IPendingOrder) => accumulator + pendingOrder.quantity, 0)
     const totalUsedQuota = usedQuota + correctionQuota
