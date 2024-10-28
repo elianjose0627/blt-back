@@ -647,7 +647,7 @@ export interface IJtlShippingMethod {
 export interface IInvoice {
   id: string
   postedOrderId: string
-  invoiceNumber: string
+  invoiceNumber: number
   taxRate: number
   discountRate: number
   totalVat: number

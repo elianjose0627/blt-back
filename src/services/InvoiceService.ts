@@ -23,7 +23,7 @@ class InvoiceService extends BaseService {
         [Op.and]: [
           {
             [Op.or]: [
-              { invoiceNumber: { [Op.iLike]: `%${search}%` } },
+              { postedOrderId: { [Op.iLike]: `%${search}%` } },
               { status: { [Op.iLike]: `%${search}%` } }
             ]
           }

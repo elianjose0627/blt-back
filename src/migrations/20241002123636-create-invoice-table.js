@@ -14,9 +14,10 @@ module.exports = {
         allowNull: false
       },
       invoiceNumber: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         unique: true,
-        allowNull: false
+        allowNull: false,
+        autoIncrement: true
       },
       taxRate: {
         type: Sequelize.FLOAT,
