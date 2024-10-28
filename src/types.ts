@@ -308,6 +308,7 @@ export interface ICampaign {
   isNoteEnabled: boolean
   isActive: boolean
   isHidden: boolean
+  isBulkCreateEnabled: boolean
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
@@ -646,7 +647,7 @@ export interface IJtlShippingMethod {
 export interface IInvoice {
   id: string
   postedOrderId: string
-  invoiceNumber: string
+  invoiceNumber: number
   taxRate: number
   discountRate: number
   totalVat: number
@@ -781,6 +782,7 @@ export interface IOrder {
   company?: ICompany
   shipments?: IShipment[]
   trackingId: Nullable<string>
+  isVisible: boolean
 }
 
 export interface CustomRequest extends Request {

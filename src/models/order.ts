@@ -29,6 +29,7 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
     createdAtByUser: Nullable<Date>
     modificationInfo: Nullable<ModificationInfo>
     trackingId: Nullable<string>
+    isVisible: boolean
   }
 
   class Order extends Model<OrderAttributes> {
@@ -62,7 +63,7 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly company: ICompany
     private readonly shipments: IShipment[]
     private readonly trackingId: Nullable<string>
-
+    private readonly isVisible: boolean
     static associate (models: any): any {
       Order.belongsTo(models.Company, {
         foreignKey: 'companyId',
@@ -106,7 +107,8 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
         modificationInfo: this.modificationInfo,
         company: this.company,
         shipments: this.shipments,
-        trackingId: this.trackingId
+        trackingId: this.trackingId,
+        isVisible: this.isVisible
       }
     }
   };
@@ -218,6 +220,11 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
     trackingId: {
       type: DataTypes.TEXT,
       allowNull: true
+    },
+    isVisible: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true
     }
   }, {
     sequelize,

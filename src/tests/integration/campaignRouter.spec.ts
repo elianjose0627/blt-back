@@ -2025,6 +2025,51 @@ describe('Campaign actions', () => {
       expect(res.body.pendingOrders).to.have.lengthOf.above(0)
     })
 
+    it('Should return 403 Forbidden when an owner tries to create bulk orders for a campaign with bulk create disabled.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Bulk Create Disabled',
+            email: 'test@companymarvelbulkcreatedisabled.com',
+            customerId: 223
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Bulk Create Disabled',
+            type: 'onboarding',
+            status: 'draft',
+            isBulkCreateEnabled: false
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.success).to.equal(false)
+      expect(res.body.errors.message).to.equal('Bulk create is not enabled for this campaign')
+    })
+
     it('Should return 429 Too Many Requests when a Company Admin tries to create bulk orders for a campaign with a limit on the role.', async () => {
       const resCompany = await chai
         .request(app)

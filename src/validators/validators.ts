@@ -412,6 +412,7 @@ const validateCampaignAdmin = Joi.object({
     isNoteEnabled: Joi.boolean(),
     isActive: Joi.boolean(),
     isHidden: Joi.boolean(),
+    isBulkCreateEnabled: Joi.boolean(),
     shippingMethodType: Joi.number().allow(null).default(null),
     shippingMethodIsDropShipping: Joi.boolean()
   }).required()
@@ -626,6 +627,12 @@ const validateOrder = Joi.object({
     orderValue: Joi.number(),
     attachments: Joi.any(),
     modificationInfo: Joi.any()
+  })
+}).required()
+
+const validateOrderUpdate = Joi.object({
+  order: Joi.object({
+    isVisible: Joi.boolean()
   })
 }).required()
 
@@ -1252,5 +1259,6 @@ export default {
   validateCompanyInviteToken,
   validateCompanyInviteDomainCheck,
   validateProductCategorySortOrder,
-  validateInvoiceQueryParams
+  validateInvoiceQueryParams,
+  validateOrderUpdate
 }

@@ -19,6 +19,13 @@ const orderRoutes = (): Router => {
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateOrder
     }), asyncHandler(OrderController.insert))
+  orderRouter.use('/orders/:id', celebrate({
+    [Segments.PARAMS]: validator.validateUUID
+  }, { abortEarly: false }), asyncHandler(OrderController.checkRecord))
+  orderRouter.route('/orders/:id')
+    .put(asyncHandler(checkAdmin), celebrate({
+      [Segments.BODY]: validator.validateOrderUpdate
+    }), asyncHandler(OrderController.update))
 
   return orderRouter
 }

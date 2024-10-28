@@ -1351,7 +1351,6 @@ export const createInvoice = async (companyId: string, userId: string): Promise<
   const invoice = await db.Invoice.create({
     id: uuidv4(),
     postedOrderId: uuidv4(),
-    invoiceNumber: uuidv1(),
     taxRate: 19,
     discountRate: 0,
     totalVat: 0,
