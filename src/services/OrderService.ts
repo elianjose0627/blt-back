@@ -48,7 +48,8 @@ class OrderService extends BaseService {
         attributes: { exclude: [] },
         where: {
           ...where,
-          companyId: user.company.id
+          companyId: user.company.id,
+          isVisible: true
         },
         distinct: true
       })
@@ -61,7 +62,8 @@ class OrderService extends BaseService {
         attributes: { exclude: [] },
         where: {
           ...where,
-          'shippingAddress.email': user.email
+          'shippingAddress.email': user.email,
+          isVisible: true
         },
         distinct: true
       })

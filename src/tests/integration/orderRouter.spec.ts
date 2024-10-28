@@ -1,5 +1,6 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
+import { faker } from '@faker-js/faker'
 import app from '../../app'
 import {
   deleteTestUser,
@@ -262,6 +263,83 @@ describe('Order actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'orders', 'meta')
       expect(res.body.orders).to.be.an('array')
       expect(res.body.meta.pageCount).to.be.a('number')
+    })
+  })
+
+  describe('Update an order', () => {
+    it('Should return 200 OK when an admin updates an order.', async () => {
+      const resOrder = await chai
+        .request(app)
+        .post('/api/orders')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          order: {
+            outboundId: 'VZ9N02ZZY4',
+            fulfillerId: 'NDZ2',
+            merchantOutboundNumber: 'AU-2024-21635-001',
+            warehouseId: 'NDZ204DE-12589-0002',
+            status: 'Acknowledged',
+            shippingAddress: {
+              lastname: faker.name.lastName(),
+              city: faker.address.city(),
+              email: faker.internet.email(),
+              firstname: faker.name.firstName(),
+              street: faker.address.streetAddress(),
+              zip: faker.address.zipCode(),
+              country: faker.address.country()
+            },
+            items: [
+              {
+                jfsku: 'VZ9N01SJN9E',
+                outboundItemId: '222495',
+                name: 'Zeppelin Box - Apriil 2023',
+                merchantSku: '1552',
+                quantity: 1,
+                itemType: 'BillOfMaterials',
+                quantityOpen: 1,
+                externalNumber: '',
+                price: 0,
+                vat: 19
+              }
+            ],
+            senderAddress: {
+              company: faker.company.name(),
+              city: faker.address.city(),
+              email: faker.internet.email(),
+              street: faker.address.streetAddress(),
+              zip: faker.address.zipCode(),
+              country: faker.address.country(),
+              phone: faker.phone.number()
+            },
+            attributes: [],
+            priority: 0,
+            currency: 'EUR',
+            externalNote: 'Mit DHL versenden. Versanddatum: 20.04.2023',
+            salesChannel: 'XML-Import',
+            desiredDeliveryDate: '2024-04-19T22:00:00.000+00:00',
+            shippingMethodId: 'NDZ20AAFC64A2SER',
+            shippingType: 'Standard',
+            shippingFee: 0,
+            orderValue: 0,
+            attachments: []
+          }
+        })
+      const order = resOrder.body.order
+      const res = await chai
+        .request(app)
+        .put(`/api/orders/${String(order.id)}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          order: {
+            isVisible: false
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'order')
+      expect(res.body.order).to.be.an('object')
+      expect(res.body.order).to.include.keys('id', 'isVisible')
+      expect(res.body.order.isVisible).to.equal(false)
     })
   })
 })

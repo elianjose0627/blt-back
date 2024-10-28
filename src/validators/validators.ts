@@ -630,6 +630,12 @@ const validateOrder = Joi.object({
   })
 }).required()
 
+const validateOrderUpdate = Joi.object({
+  order: Joi.object({
+    isVisible: Joi.boolean()
+  })
+}).required()
+
 const validateLegalText = Joi.object({
   legalText: Joi.object({
     type: Joi.string().required().valid(...['privacy', 'terms', 'defaultPrivacy', 'defaultTerms']),
@@ -1253,5 +1259,6 @@ export default {
   validateCompanyInviteToken,
   validateCompanyInviteDomainCheck,
   validateProductCategorySortOrder,
-  validateInvoiceQueryParams
+  validateInvoiceQueryParams,
+  validateOrderUpdate
 }
