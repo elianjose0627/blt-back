@@ -782,6 +782,7 @@ export interface IOrder {
   company?: ICompany
   shipments?: IShipment[]
   trackingId: Nullable<string>
+  isVisible: boolean
 }
 
 export interface CustomRequest extends Request {
