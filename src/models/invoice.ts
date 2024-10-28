@@ -13,7 +13,7 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
   interface InvoiceAttributes {
     id: string
     postedOrderId: string
-    invoiceNumber: string
+    invoiceNumber: number
     taxRate: number
     discountRate: number
     totalVat: number
@@ -37,7 +37,7 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
   class Invoice extends Model<InvoiceAttributes> {
     private readonly id: string
     private readonly postedOrderId: string
-    private readonly invoiceNumber: string
+    private readonly invoiceNumber: number
     private readonly taxRate: number
     private readonly discountRate: number
     private readonly totalVat: number
@@ -124,9 +124,10 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false
     },
     invoiceNumber: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       unique: true,
-      allowNull: false
+      allowNull: false,
+      autoIncrement: true
     },
     taxRate: {
       type: DataTypes.FLOAT,
