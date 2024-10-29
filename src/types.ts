@@ -785,6 +785,19 @@ export interface IOrder {
   isVisible: boolean
 }
 
+export interface ICountry {
+  id: string
+  name: string
+  nameGerman: string
+  alpha2Code: string
+  alpha3Code: string
+  numeric: number
+  shippingBaseFee: number
+  shippingPerBundle: number
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface CustomRequest extends Request {
   user?: any
   employee?: any
