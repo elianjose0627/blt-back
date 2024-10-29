@@ -70,6 +70,7 @@ export interface Database {
   BundleStock?: any
   CompanyInviteToken?: any
   Invoice?: any
+  Country?: any
   [key: string]: any
 }
 
