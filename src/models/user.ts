@@ -24,6 +24,10 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
     loginTime: Nullable<LoginTime>
     password: string
     otp: any
+    hireDate: Nullable<Date>
+    startDate: Nullable<Date>
+    birthDate: Nullable<Date>
+    releaseDate: Nullable<Date>
   }
   class User extends Model<UserAttributes> {
     private readonly id: string
@@ -45,6 +49,10 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
     private readonly password: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
+    private readonly hireDate: Nullable<Date>
+    private readonly startDate: Nullable<Date>
+    private readonly birthDate: Nullable<Date>
+    private readonly releaseDate: Nullable<Date>
     private readonly company: ICompany
     private readonly addresses: IAddress[]
     private readonly productAccessControlGroups: IProductAccessControlGroup[]
@@ -97,6 +105,10 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
         logoutTime: this.logoutTime,
         notifications: this.notifications,
         loginTime: this.loginTime,
+        hireDate: this.hireDate,
+        startDate: this.startDate,
+        birthDate: this.birthDate,
+        releaseDate: this.releaseDate,
         company: this.company,
         addresses: this.addresses,
         productAccessControlGroups: this.productAccessControlGroups,
@@ -197,6 +209,22 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
         lastFailed: null,
         failed: 0
       }
+    },
+    hireDate: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    startDate: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    birthDate: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    releaseDate: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   }, {
     sequelize,

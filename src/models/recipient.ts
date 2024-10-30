@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { ICompany, IRecipient } from '../types'
+import type { ICompany, IRecipient, Nullable } from '../types'
 
 const RecipientModel = (sequelize: any, DataTypes: any): any => {
   interface RecipientAttributes {
@@ -16,6 +16,10 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
     zip: string
     addressAddition: string
     costCenter: string
+    hireDate: Nullable<Date>
+    startDate: Nullable<Date>
+    birthDate: Nullable<Date>
+    releaseDate: Nullable<Date>
   }
 
   class Recipient extends Model<RecipientAttributes> {
@@ -34,6 +38,10 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
     private readonly costCenter: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
+    private readonly hireDate: Nullable<Date>
+    private readonly startDate: Nullable<Date>
+    private readonly birthDate: Nullable<Date>
+    private readonly releaseDate: Nullable<Date>
     private readonly company: ICompany
 
     static associate (models: any): any {
@@ -61,6 +69,10 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
         costCenter: this.costCenter,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
+        hireDate: this.hireDate,
+        startDate: this.startDate,
+        birthDate: this.birthDate,
+        releaseDate: this.releaseDate,
         company: this.company
       }
     }
@@ -118,6 +130,22 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
     },
     costCenter: {
       type: DataTypes.STRING,
+      allowNull: true
+    },
+    hireDate: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    startDate: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    birthDate: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    releaseDate: {
+      type: DataTypes.DATE,
       allowNull: true
     }
   }, {
