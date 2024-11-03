@@ -21,6 +21,7 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     isBulkCreateEnabled: boolean
     shippingMethodType: Nullable<number>
     shippingMethodIsDropShipping: boolean
+    includeStartDate: boolean
   }
 
   class Campaign extends Model<CampaignAttributes> {
@@ -50,6 +51,7 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     private readonly campaignAddresses: IAddress[]
     private readonly shippingMethodType: Nullable<number>
     private readonly shippingMethodIsDropShipping: boolean
+    private readonly includeStartDate: boolean
 
     static associate (models: any): any {
       Campaign.belongsTo(models.Company, {
@@ -121,7 +123,8 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
         campaignOrderLimits: this.campaignOrderLimits,
         campaignAddresses: this.campaignAddresses,
         shippingMethodType: this.shippingMethodType,
-        shippingMethodIsDropShipping: this.shippingMethodIsDropShipping
+        shippingMethodIsDropShipping: this.shippingMethodIsDropShipping,
+        includeStartDate: this.includeStartDate
       }
     }
   };
@@ -197,6 +200,10 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
       allowNull: true
     },
     shippingMethodIsDropShipping: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    includeStartDate: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     }
