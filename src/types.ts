@@ -64,6 +64,10 @@ export interface IUser {
   notifications: INotifications
   loginTime: LoginTime
   logoutTime?: Nullable<Date>
+  hireDate: Nullable<Date>
+  startDate: Nullable<Date>
+  birthDate: Nullable<Date>
+  releaseDate: Nullable<Date>
   company: Partial<ICompany> | null
   addresses: Array<Partial<IAddress>>
   productAccessControlGroups: IProductAccessControlGroup[]
@@ -276,6 +280,10 @@ export interface IRecipient {
   costCenter?: string
   createdAt?: Date
   updatedAt?: Date
+  hireDate: Nullable<Date>
+  startDate: Nullable<Date>
+  birthDate: Nullable<Date>
+  releaseDate: Nullable<Date>
   company?: ICompany
 }
 
@@ -309,6 +317,7 @@ export interface ICampaign {
   isActive: boolean
   isHidden: boolean
   isBulkCreateEnabled: boolean
+  includeStartDate: boolean
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
@@ -980,6 +989,8 @@ export interface ShippingAddressRequest {
   mobile: string
   fax: string
   email: string
+  costCenter?: string
+  startDate?: Nullable<Date>
   createdBy: string
   updatedBy: string
 }

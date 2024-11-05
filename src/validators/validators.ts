@@ -50,7 +50,11 @@ const validateCreatedUserByAdmin = Joi.object({
       .required(),
     isActive: Joi.boolean().default(true),
     isGhost: Joi.boolean().default(false),
-    companyId: Joi.string().uuid().allow(null).default(null)
+    companyId: Joi.string().uuid().allow(null).default(null),
+    startDate: Joi.date().allow(null).default(null),
+    birthDate: Joi.date().allow(null).default(null),
+    hireDate: Joi.date().allow(null).default(null),
+    releaseDate: Joi.date().allow(null).default(null)
   }).required()
 }).required()
 
@@ -77,6 +81,7 @@ const validateUpdatedUser = Joi.object({
     location: Joi.object({
       country: Joi.string().required().valid(...countryList.countries).allow('').allow(null)
     }).optional().allow(null),
+    birthDate: Joi.date().allow(null).default(null),
     address: Joi.object({
       id: Joi.string().guid().optional().allow(null).default(null),
       companyName: Joi.string().allow(null),
@@ -363,7 +368,11 @@ const validateCreatedRecipient = Joi.object({
     street: Joi.string().optional().allow('').allow(null).max(64),
     zip: Joi.string().optional().max(24),
     addressAddition: Joi.string().optional().allow('').allow(null).max(255),
-    costCenter: Joi.string().optional().allow('').allow(null)
+    costCenter: Joi.string().optional().allow('').allow(null),
+    startDate: Joi.date().allow(null).default(null),
+    birthDate: Joi.date().allow(null).default(null),
+    hireDate: Joi.date().allow(null).default(null),
+    releaseDate: Joi.date().allow(null).default(null)
   }).required()
 }).required()
 
@@ -383,7 +392,11 @@ const validateUpdatedRecipient = Joi.object({
     street: Joi.string().optional().allow('').allow(null).max(64),
     zip: Joi.string().optional().max(24),
     addressAddition: Joi.string().optional().allow('').allow(null).max(255),
-    costCenter: Joi.string().optional().allow('').allow(null)
+    costCenter: Joi.string().optional().allow('').allow(null),
+    startDate: Joi.date().allow(null).default(null),
+    birthDate: Joi.date().allow(null).default(null),
+    hireDate: Joi.date().allow(null).default(null),
+    releaseDate: Joi.date().allow(null).default(null)
   }).required()
 }).required()
 
@@ -414,7 +427,8 @@ const validateCampaignAdmin = Joi.object({
     isHidden: Joi.boolean(),
     isBulkCreateEnabled: Joi.boolean(),
     shippingMethodType: Joi.number().allow(null).default(null),
-    shippingMethodIsDropShipping: Joi.boolean()
+    shippingMethodIsDropShipping: Joi.boolean(),
+    includeStartDate: Joi.boolean()
   }).required()
 }).required()
 
@@ -713,7 +727,8 @@ const commonPendingOrderSchema = {
       mobile: Joi.string().allow('').allow(null),
       fax: Joi.string().allow('').allow(null),
       email: Joi.string(),
-      costCenter: Joi.string().allow('').allow(null)
+      costCenter: Joi.string().allow('').allow(null).default(null),
+      startDate: Joi.date().allow(null).default(null)
     })
   ).min(1).required(),
   billingAddressRequests: Joi.array().items(
