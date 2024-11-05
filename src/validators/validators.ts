@@ -133,9 +133,12 @@ const validateUserCompanyRole = Joi.object({
   }).required()
 }).required()
 
-const validateUserCompany = Joi.object({
+const validateUserCompanyAndRole = Joi.object({
   user: Joi.object({
-    companyId: Joi.string().uuid().required()
+    companyId: Joi.string().uuid().required(),
+    role: Joi.string()
+      .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
+      .default(userRoles.USER)
   }).required()
 }).required()
 
@@ -1215,7 +1218,7 @@ export default {
   validateUserActivation,
   validateCreatedUserByAdmin,
   validateBundle,
-  validateUserCompany,
+  validateUserCompanyAndRole,
   validatePicture,
   validateTrackingId,
   validateProduct,
