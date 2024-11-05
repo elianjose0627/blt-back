@@ -80,8 +80,8 @@ const userRoutes = (): Router => {
     }), asyncHandler(paginate), asyncHandler(UserController.getAddresses))
   userRouter.route('/users/:id/company')
     .patch(asyncHandler(checkAdmin), celebrate({
-      [Segments.BODY]: validator.validateUserCompany
-    }, { abortEarly: false }), asyncHandler(UserController.updateUserCompany))
+      [Segments.BODY]: validator.validateUserCompanyAndRole
+    }, { abortEarly: false }), asyncHandler(UserController.updateUserCompanyAndRole))
   userRouter.route('/users/:id/company-invite')
     .patch(asyncHandler(UserController.checkOwner), celebrate({
       [Segments.BODY]: validator.validateUserCompanyInvite
