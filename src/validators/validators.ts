@@ -82,6 +82,9 @@ const validateUpdatedUser = Joi.object({
       country: Joi.string().required().valid(...countryList.countries).allow('').allow(null)
     }).optional().allow(null),
     birthDate: Joi.date().allow(null).default(null),
+    hireDate: Joi.date().allow(null).default(null),
+    releaseDate: Joi.date().allow(null).default(null),
+    startDate: Joi.date().allow(null).default(null),
     address: Joi.object({
       id: Joi.string().guid().optional().allow(null).default(null),
       companyName: Joi.string().allow(null),
