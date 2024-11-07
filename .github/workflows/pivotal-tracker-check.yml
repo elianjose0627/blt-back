@@ -36,7 +36,7 @@ jobs:
         STORY_IDS="${{ steps.extract_story_ids.outputs.story_ids }}"
         INVALID_IDS=()
 
-        for STORY_ID in $STORY_IDS; do
+        for STORY_ID in $(echo "$STORY_IDS" | sort -u); do
           RESPONSE=$(curl -s -H "X-TrackerToken: ${{ secrets.PIVOTAL_TRACKER_API_TOKEN }}" \
                       "https://www.pivotaltracker.com/services/v5/stories/$STORY_ID")
           
