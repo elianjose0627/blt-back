@@ -1107,6 +1107,44 @@ describe('A user', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'user')
       expect(res.body.user).to.be.an('object')
       expect(res.body.success).to.equal(true)
+      expect(res.body.user.role).to.equal(userRoles.USER)
+    })
+
+    it('Should return 200 OK when an admin updates the company of a user and role', async () => {
+      const resUser = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'TestRole', lastName: 'User', email: 'testuserrole@biglittlethings.de', phone: '254720123456', password: faker.internet.password() } })
+
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            name: 'Test Dynasty Company',
+            email: 'test@company17roledynastymarvel.com'
+          }
+        })
+
+      const companyId = resCompany.body.company.id
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${String(resUser.body.user.id)}/company`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            companyId,
+            role: userRoles.EMPLOYEE
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.success).to.equal(true)
+      expect(res.body.user.role).to.equal(userRoles.EMPLOYEE)
     })
   })
 

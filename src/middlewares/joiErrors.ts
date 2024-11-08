@@ -9,8 +9,6 @@ const joiErrors = (err: any, req: CustomRequest, res: CustomResponse, next: Cust
     return next(err)
   }
 
-  logger.error(err.details)
-
   let errorDetails: any = []
   // capture errors in the request body
   const bodyErrors = err.details.get(Segments.BODY)?.details
@@ -31,6 +29,8 @@ const joiErrors = (err: any, req: CustomRequest, res: CustomResponse, next: Cust
   }
 
   const errorArray = errorDetails.map((detail: any) => ({ [detail.context.key]: detail.message.replace(/"/g, '') }))
+
+  logger.error({ message: 'A validation error has occured', details: errorArray })
 
   return res.status(statusCodes.UNPROCESSABLE_ENTITY).json({
     statusCode: statusCodes.UNPROCESSABLE_ENTITY,

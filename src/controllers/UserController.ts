@@ -506,10 +506,10 @@ class UserController extends BaseController {
     })
   }
 
-  async updateUserCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
+  async updateUserCompanyAndRole (req: CustomRequest, res: CustomResponse): Promise<any> {
     const {
       record: user,
-      body: { user: { companyId } }
+      body: { user: { companyId, role } }
     } = req
 
     const company = await companyService.findById(companyId)
@@ -524,7 +524,7 @@ class UserController extends BaseController {
       })
     }
 
-    const response = await userService.update(user, { companyId, logoutTime: dayjs.utc() })
+    const response = await userService.update(user, { companyId, role, logoutTime: dayjs.utc() })
 
     return res.status(statusCodes.OK).send({
       statusCode: statusCodes.OK,

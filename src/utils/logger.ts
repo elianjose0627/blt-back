@@ -12,7 +12,10 @@ const loggingWinston = new LoggingWinston({
 // Logs will be written to: "projects/YOUR_PROJECT_ID/logs/winston_log"
 const logger = winston.createLogger({
   level: 'info',
-  format: winston.format.json(),
+  format: winston.format.combine(
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
   transports: [
     new winston.transports.Console(),
     // Add Stackdriver Logging
