@@ -8,6 +8,8 @@ const outboundRoutes = (): Router => {
   const outboundRouter = express.Router()
 
   outboundRouter.use('/outbounds', checkAuth, checkUserIsVerifiedStatus, OutboundController.setModule)
+  outboundRouter.route('/outbounds/:id')
+    .get(asyncHandler(OutboundController.getOutbound))
   outboundRouter.route('/outbounds/:id/shipping-notifications')
     .get(asyncHandler(OutboundController.getShippingNotifications))
   return outboundRouter

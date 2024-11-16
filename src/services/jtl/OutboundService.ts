@@ -15,6 +15,16 @@ const apiClient: any = axios.create({
 })
 
 class OutboundService extends BaseService {
+  async getOutbound (outboundId: string): Promise<any> {
+    const token = await db.Token.findOne()
+    const { accessToken } = token
+    apiClient.defaults.headers.common.Authorization = `Bearer ${String(accessToken)}`
+
+    const { data } = await apiClient.get(`/outbounds/${outboundId}`)
+
+    return data
+  }
+
   async getShippingNotifications (outboundId: string): Promise<any> {
     const token = await db.Token.findOne()
     const { accessToken } = token
