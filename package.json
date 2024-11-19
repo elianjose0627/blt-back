@@ -42,7 +42,8 @@
       ".eslintrc.js",
       "src/server/*",
       "src/utils/socket.ts",
-      "src/constants"
+      "src/constants",
+      "**/wawiAPI"
     ],
     "reporter": [
       "html",

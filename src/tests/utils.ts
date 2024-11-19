@@ -5,6 +5,7 @@ import { faker } from '@faker-js/faker'
 import db from '../models'
 import * as userRoles from '../utils/userRoles'
 import type { Module, Role } from '../types'
+import generateToken from '../utils/generateToken'
 
 dayjs.extend(utc)
 
@@ -1426,4 +1427,161 @@ export const createInvoice = async (companyId: string, userId: string): Promise<
   })
 
   return invoice
+}
+
+export const outboundShippingNotifications = [
+  {
+    outboundId: faker.random.alphaNumeric(12),
+    fulfillerId: faker.random.alphaNumeric(4),
+    fulfillerShippingNotificationNumber: faker.random.alphaNumeric(12),
+    merchantOutboundNumber: faker.random.alphaNumeric(12),
+    outboundShippingNotificationId: faker.random.alphaNumeric(12),
+    items: [
+      {
+        outboundShippingNotificationItemId: faker.random.alphaNumeric(12),
+        jfsku: faker.random.alphaNumeric(10),
+        quantity: 1,
+        serialnumbers: []
+      },
+      {
+        outboundShippingNotificationItemId: faker.random.alphaNumeric(12),
+        jfsku: faker.random.alphaNumeric(10),
+        quantity: 1,
+        bestBefore: {
+          year: 2026,
+          month: 4,
+          day: 9
+        },
+        batch: '09.04.2026',
+        serialnumbers: []
+      },
+      {
+        outboundShippingNotificationItemId: faker.random.alphaNumeric(12),
+        jfsku: faker.random.alphaNumeric(10),
+        quantity: 1,
+        serialnumbers: []
+      },
+      {
+        outboundShippingNotificationItemId: faker.random.alphaNumeric(12),
+        jfsku: faker.random.alphaNumeric(10),
+        quantity: 1,
+        serialnumbers: []
+      },
+      {
+        outboundShippingNotificationItemId: faker.random.alphaNumeric(12),
+        jfsku: faker.random.alphaNumeric(10),
+        quantity: 1,
+        serialnumbers: []
+      },
+      {
+        outboundShippingNotificationItemId: faker.random.alphaNumeric(12),
+        jfsku: faker.random.alphaNumeric(10),
+        quantity: 1,
+        serialnumbers: []
+      },
+      {
+        outboundShippingNotificationItemId: faker.random.alphaNumeric(12),
+        jfsku: faker.random.alphaNumeric(10),
+        quantity: 1,
+        serialnumbers: []
+      },
+      {
+        outboundShippingNotificationItemId: faker.random.alphaNumeric(12),
+        jfsku: faker.random.alphaNumeric(10),
+        quantity: 1,
+        bestBefore: {
+          year: 2025,
+          month: 7,
+          day: 23
+        },
+        batch: faker.random.alphaNumeric(5),
+        serialnumbers: []
+      },
+      {
+        outboundShippingNotificationItemId: faker.random.alphaNumeric(12),
+        jfsku: faker.random.alphaNumeric(10),
+        quantity: 1,
+        bestBefore: {
+          year: 2025,
+          month: 8,
+          day: 15
+        },
+        batch: '15.08.2025',
+        serialnumbers: []
+      }
+    ],
+    packages: [
+      {
+        freightOption: 'Parcel',
+        note: '',
+        identifier: [
+          {
+            value: faker.random.numeric(20),
+            identifierType: 'TrackingId'
+          }
+        ],
+        shippingDate: '2024-10-28T14:10:32.550+00:00',
+        shippingMethodId: faker.random.alphaNumeric(12),
+        weight: 1.359
+      }
+    ],
+    outboundStatus: 'Shipped',
+    note: '',
+    modificationInfo: {
+      createdAt: '2024-10-28T14:13:28.374+00:00',
+      updatedAt: '2024-10-28T14:13:28.374+00:00',
+      state: 'New'
+    }
+  }
+]
+
+export const inboundShippingNotifications = [
+  {
+    inboundShippingNotificationId: faker.random.alphaNumeric(12),
+    inboundId: faker.random.alphaNumeric(12),
+    merchantInboundNumber: faker.random.numeric(4),
+    fulfillerId: faker.random.alphaNumeric(4),
+    items: [
+      {
+        jfsku: faker.random.alphaNumeric(10),
+        quantity: 10,
+        packageId: 1,
+        serialnumbers: []
+      },
+      {
+        jfsku: faker.random.alphaNumeric(10),
+        quantity: 5,
+        packageId: 1,
+        serialnumbers: []
+      }
+    ],
+    packages: [
+      {
+        estimatedDeliveryDate: '0001-01-01T00:00:00.000+00:00',
+        freightOption: 'Parcel',
+        note: '',
+        trackingUrl: '',
+        carrierName: 'DHL',
+        identifier: [],
+        shippingDate: '0001-01-01T00:00:00.000+00:00'
+      }
+    ],
+    merchantShippingNotificationNumber: '',
+    note: '',
+    modificationInfo: {
+      createdAt: '2024-10-14T09:14:15.412+00:00',
+      updatedAt: '2024-10-14T09:14:15.650+00:00',
+      state: 'Modified'
+    }
+  }
+]
+
+export const createToken = async (): Promise<any> => {
+  const existingToken = await db.Token.findOne()
+  if (existingToken !== null) return
+  await db.Token.create({
+    id: uuidv4(),
+    accessToken: generateToken({ id: uuidv4(), email: faker.internet.email(), role: userRoles.USER, logoutTime: null, isVerified: true }, 'login'),
+    refreshToken: generateToken({ id: uuidv4(), email: faker.internet.email(), role: userRoles.USER, logoutTime: null, isVerified: true }, 'login')
+  })
 }
