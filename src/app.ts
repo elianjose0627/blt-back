@@ -89,6 +89,9 @@ app.use(apiPrefix, routers.productInProductCategoryRouter())
 app.use(apiPrefix, routers.invoiceRouter())
 app.use(apiPrefix, routers.inboundRouter())
 app.use(apiPrefix, routers.outboundRouter())
+app.use(apiPrefix, routers.itemRouter())
+app.use(apiPrefix, routers.categoryRouter())
+
 // Add validation middleware
 app.use(joiErrors)
 
