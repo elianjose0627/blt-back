@@ -1191,6 +1191,98 @@ const validateProductCategorySortOrder = Joi.object({
   ).min(1).required()
 })
 
+const validateArticleItem = Joi.object({
+  item: Joi.object({
+    categories: Joi.array().items(
+      Joi.object({
+        categoryId: Joi.number().positive().required()
+      })
+    ).min(1).required(),
+    name: Joi.string().required(),
+    sku: Joi.string(),
+    manufacturerId: Joi.number().positive(),
+    responsiblePersonId: Joi.number().positive(),
+    description: Joi.string(),
+    shortDescription: Joi.string(),
+    identifiers: Joi.object({
+      gtin: Joi.string(),
+      manufacturerNumber: Joi.string(),
+      isbn: Joi.string(),
+      upc: Joi.string(),
+      amazonFnsku: Joi.string(),
+      asins: Joi.array().items(Joi.string()),
+      ownIdentifier: Joi.string()
+    }),
+    components: Joi.array().items(
+      Joi.object({
+        itemId: Joi.number().positive().required(),
+        quantity: Joi.number().positive().required(),
+        sortNumber: Joi.number()
+      })
+    ),
+    itemPriceData: Joi.object({
+      salesPriceNet: Joi.number().positive(),
+      suggestedRetailPrice: Joi.number().positive(),
+      purchasePriceNet: Joi.number().positive(),
+      ebayPrice: Joi.number().positive(),
+      amazonPrice: Joi.number().positive()
+    }),
+    activeSalesChannels: Joi.string(),
+    sortNumber: Joi.number().positive().allow(0),
+    annotation: Joi.string(),
+    releasedOnDate: Joi.date(),
+    storageOptions: Joi.object({
+      inventoryManagementActive: Joi.boolean(),
+      splitQuantity: Joi.boolean(),
+      globalMinimumStockLevel: Joi.number().positive().allow(0),
+      buffer: Joi.number().positive().allow(0),
+      serialNumberItem: Joi.boolean(),
+      serialNumberTracking: Joi.boolean(),
+      subjectToShelfLifeExpirationDate: Joi.boolean(),
+      subjectToBatchItem: Joi.boolean(),
+      procurementTime: Joi.number().positive().allow(0),
+      determineProcurementTimeAutomatically: Joi.boolean(),
+      additionalHandlingTime: Joi.number().positive().allow(0)
+    }),
+    countryOfOrigin: Joi.string(),
+    conditionId: Joi.number().positive(),
+    shippingClassId: Joi.number().positive(),
+    productGroupId: Joi.number().positive(),
+    taxClassId: Joi.number().positive(),
+    dimensions: Joi.object({
+      length: Joi.number().positive().allow(0),
+      width: Joi.number().positive().allow(0),
+      height: Joi.number().positive().allow(0)
+    }),
+    weights: Joi.object({
+      itemWeigth: Joi.number().positive().allow(0),
+      shippingWeight: Joi.number().positive().allow(0)
+    }),
+    allowNegativeStock: Joi.boolean(),
+    quantities: Joi.object({
+      minimumOrderQuantity: Joi.number().positive().allow(0),
+      minimumPurchaseQuantityForCustomerGroup: Joi.array().items(
+        Joi.object({
+          customerGroupId: Joi.number().positive().required(),
+          permissibleOrderQuantity: Joi.number().positive().allow(0),
+          minimumPurchaseQuantity: Joi.number().positive().allow(0),
+          isActive: Joi.boolean()
+        })
+      ),
+      permissibleOrderQuantity: Joi.number().positive().allow(0)
+    }),
+    dangerousGoods: Joi.object({
+      unNumber: Joi.string(),
+      hazardNo: Joi.string()
+    }),
+    taric: Joi.string(),
+    searchTerms: Joi.string(),
+    priceListActive: Joi.boolean(),
+    ignoreDiscounts: Joi.boolean(),
+    availabilityId: Joi.number().positive()
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1281,5 +1373,6 @@ export default {
   validateCompanyInviteDomainCheck,
   validateProductCategorySortOrder,
   validateInvoiceQueryParams,
-  validateOrderUpdate
+  validateOrderUpdate,
+  validateArticleItem
 }

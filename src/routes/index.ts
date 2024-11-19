@@ -47,6 +47,10 @@ import massUnitRouter from './massUnitRouter'
 import salesUnitRouter from './salesUnitRouter'
 import productInProductCategoryRouter from './productInProductCategoryRouter'
 import invoiceRouter from './invoiceRouter'
+import inboundRouter from './jtl/inboundRouter'
+import outboundRouter from './jtl/outboundRouter'
+import itemRouter from './wawiAPI/itemRouter'
+import categoryRouter from './wawiAPI/categoryRouter'
 
 const routers = {
   authRouter,
@@ -97,7 +101,11 @@ const routers = {
   massUnitRouter,
   salesUnitRouter,
   productInProductCategoryRouter,
-  invoiceRouter
+  invoiceRouter,
+  inboundRouter,
+  outboundRouter,
+  itemRouter,
+  categoryRouter
 }
 
 export default routers

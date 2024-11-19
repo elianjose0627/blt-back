@@ -39,6 +39,10 @@ steps:
     - 'DOTNET_API_URL=${_DOTNET_API_URL}'
     - 'DOTNET_API_KEY=${_DOTNET_API_KEY}'
     - 'DOTNET_APP_SECRET=${_DOTNET_APP_SECRET}'
+    - 'WAWI_API_URL=${_WAWI_API_URL}'
+    - 'WAWI_API_KEY=${_WAWI_API_KEY}'
+    - 'WAWI_API_APP_ID=${_WAWI_API_APP_ID}'
+    - 'WAWI_API_APP_VERSION=${_WAWI_API_APP_VERSION}'
 - name: 'gcr.io/cloud-builders/npm'
   args: ['test']
 - name: 'gcr.io/cloud-builders/npm'
