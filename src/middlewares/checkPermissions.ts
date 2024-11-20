@@ -1,5 +1,5 @@
 import * as statusCodes from '../constants/statusCodes'
-import type { CustomNext, CustomRequest, CustomResponse, IAccessPermission } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse, IAccessPermission, Permission } from '../types'
 import * as userRoles from '../utils/userRoles'
 import * as permissions from '../utils/permissions'
 
@@ -8,9 +8,10 @@ const checkPermissions = (req: CustomRequest, res: CustomResponse, next: CustomN
 
   const { role, company } = currentUser
 
-  const allowed = {
+  const allowed: Record<Permission, string[]> = {
     [permissions.READ]: ['GET'],
-    [permissions.READWRITE]: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
+    [permissions.READWRITE]: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
+    [permissions.NOACCESS]: []
   }
 
   const allowedCompanyAdminModules = defaultAccessPermissions
