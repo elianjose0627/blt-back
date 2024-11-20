@@ -22,7 +22,7 @@ const withoutUser = [
   'ProductAccessControlGroup', 'ProductCategoryTagProductAccessControlGroup', 'UserProductAccessControlGroup',
   'CompanyProductAccessControlGroup', 'CompanyUserGroup', 'UserCompanyUserGroup',
   'CompanyUserGroupProductAccessControlGroup', 'TaxRate', 'MassUnit',
-  'SalesUnit', 'ProductDetail', 'ProductProductCategory', 'CompanyInviteToken'
+  'SalesUnit', 'ProductDetail', 'ProductProductCategory', 'CompanyInviteToken', 'CampaignQuota'
 ]
 
 export const includeCompanyAndOwner = {
