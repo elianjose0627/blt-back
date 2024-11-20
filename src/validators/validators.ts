@@ -1283,6 +1283,13 @@ const validateArticleItem = Joi.object({
   }).required()
 })
 
+const validateCampaignQuota = Joi.object({
+  campaignQuota: Joi.object({
+    orderedQuota: Joi.number().required(),
+    orderedDate: Joi.date().required()
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1374,5 +1381,6 @@ export default {
   validateProductCategorySortOrder,
   validateInvoiceQueryParams,
   validateOrderUpdate,
-  validateArticleItem
+  validateArticleItem,
+  validateCampaignQuota
 }

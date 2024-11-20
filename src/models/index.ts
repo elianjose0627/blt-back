@@ -71,6 +71,7 @@ export interface Database {
   CompanyInviteToken?: any
   Invoice?: any
   Country?: any
+  CampaignQuota?: any
   [key: string]: any
 }
 
