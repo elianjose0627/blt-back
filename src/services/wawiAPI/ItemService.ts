@@ -1,3 +1,4 @@
+import triggerPubSub from '../../utils/triggerPubSub'
 import BaseService from '../BaseService'
 import axios from 'axios'
 
@@ -31,6 +32,12 @@ class ItemService extends BaseService {
     apiClient.defaults.headers.common.Authorization = `${wawiApiKey}`
 
     const { data } = await apiClient.post('/items', item)
+
+    const productsTopicId = 'products'
+    const environment = String(process.env.ENVIRONMENT)
+    const productsAttributes = { environment }
+
+    await triggerPubSub(productsTopicId, 'createProducts', productsAttributes)
 
     return data
   }
