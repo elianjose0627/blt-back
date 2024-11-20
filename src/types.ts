@@ -300,6 +300,14 @@ export interface IPicture {
 export type CampaignStatus = 'draft' | 'submitted'
 export type CampaignType = 'onboarding' | 'birthday' | 'christmas' | 'marketing'
 
+export interface ICampaignQuota {
+  id: string
+  orderedQuota: number
+  orderedDate: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface ICampaign {
   id: string
   name: string
