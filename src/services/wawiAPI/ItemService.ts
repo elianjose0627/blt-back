@@ -16,7 +16,7 @@ const apiClient: any = axios.create({
     'X-AppId': wawiAppId,
     'X-AppVersion': wawiAppVersion
   },
-  timeout: 30000
+  timeout: 60000
 })
 
 class ItemService extends BaseService {
