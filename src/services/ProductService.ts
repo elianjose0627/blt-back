@@ -18,7 +18,7 @@ const apiClient: any = axios.create({
     Accept: 'application/json',
     'Content-Type': 'application/json'
   },
-  timeout: 60000
+  timeout: 30000
 })
 
 const generatePriceRangesQuery = (priceRanges: string[]): any[] => priceRanges.map(range => {
