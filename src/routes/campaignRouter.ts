@@ -16,6 +16,7 @@ import CardSettingController from '../controllers/CardSettingController'
 import CampaignOrderLimitController from '../controllers/CampaignOrderLimitController'
 import CampaignShippingDestinationController from '../controllers/CampaignShippingDestinationController'
 import CampaignAddressController from '../controllers/CampaignAddressController'
+import CampaignQuotaController from '../controllers/CampaignQuotaController'
 
 const CampaignRoutes = (): Router => {
   const campaignRouter = express.Router()
@@ -109,6 +110,16 @@ const CampaignRoutes = (): Router => {
       celebrate({
         [Segments.BODY]: validator.validateCampaignAddress
       }), asyncHandler(CampaignAddressController.insert))
+  campaignRouter.route('/campaigns/:id/quotas')
+    .post(asyncHandler(checkAdmin),
+      celebrate({
+        [Segments.BODY]: validator.validateCampaignQuota
+      }), asyncHandler(CampaignQuotaController.insert))
+    .get(asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
+      celebrate({
+        [Segments.QUERY]: validator.validateQueryParams
+      }), asyncHandler(paginate), asyncHandler(CampaignQuotaController.getAllCampaignQuotas))
   return campaignRouter
 }
 

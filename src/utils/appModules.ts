@@ -15,6 +15,7 @@ export const SECONDARYDOMAINS = 'secondaryDomains'
 export const SHIPMENTS = 'shipments'
 export const USERS = 'users'
 export const COMPANYSUBSCRIPTIONS = 'companySubscriptions'
+export const ORDERADDITIONALPRODUCTS = 'orderAdditionalProducts'
 
 export const MODULES_ARRAY = [
   'accessPermissions',
@@ -33,5 +34,6 @@ export const MODULES_ARRAY = [
   'secondaryDomains',
   'shipments',
   'users',
-  'companySubscriptions'
+  'companySubscriptions',
+  'orderAdditionalProducts'
 ]

@@ -122,9 +122,9 @@ typeof appModules.PICTURES | typeof appModules.PRIVACYRULES |
 typeof appModules.PRODUCTS | typeof appModules.RECIPIENTS |
 typeof appModules.SALUTATIONS | typeof appModules.SECONDARYDOMAINS |
 typeof appModules.SHIPMENTS | typeof appModules.USERS |
-typeof appModules.COMPANYSUBSCRIPTIONS
+typeof appModules.COMPANYSUBSCRIPTIONS | typeof appModules.ORDERADDITIONALPRODUCTS
 
-export type Permission = typeof permissions.READ | typeof permissions.READWRITE
+export type Permission = typeof permissions.READ | typeof permissions.READWRITE | typeof permissions.NOACCESS
 
 export interface AllowedCompanyModule { name: string, module: Module, permission: Permission }
 export interface IPrivacyRule {
@@ -299,6 +299,14 @@ export interface IPicture {
 
 export type CampaignStatus = 'draft' | 'submitted'
 export type CampaignType = 'onboarding' | 'birthday' | 'christmas' | 'marketing'
+
+export interface ICampaignQuota {
+  id: string
+  orderedQuota: number
+  orderedDate: Date
+  createdAt: Date
+  updatedAt: Date
+}
 
 export interface ICampaign {
   id: string
