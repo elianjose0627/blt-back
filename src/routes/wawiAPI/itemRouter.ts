@@ -6,14 +6,13 @@ import checkAuth from '../../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../../middlewares/checkUserIsVerifiedStatus'
 import validator from '../../validators/validators'
 import ProductController from '../../controllers/ProductController'
-import checkPermissions from '../../middlewares/checkPermissions'
 
 const itemRoutes = (): Router => {
   const itemRouter = express.Router()
 
   itemRouter.use('/items', checkAuth, checkUserIsVerifiedStatus, ProductController.setModule)
   itemRouter.route('/items')
-    .post(asyncHandler(checkPermissions), celebrate({
+    .post(celebrate({
       [Segments.BODY]: validator.validateArticleItem
     }, { abortEarly: false }), asyncHandler(ItemController.createItem))
   itemRouter.route('/items/:id')
