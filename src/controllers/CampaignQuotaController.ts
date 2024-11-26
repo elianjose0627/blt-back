@@ -37,7 +37,8 @@ class CampaignQuotaController extends BaseController {
       statusCode: statusCodes.OK,
       success: true,
       meta,
-      [campaignQuotaService.manyRecords()]: records.rows
+      [campaignQuotaService.manyRecords()]: records.rows,
+      totalQuota: records.totalQuota
     })
   }
 }

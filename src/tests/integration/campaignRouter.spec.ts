@@ -4082,4 +4082,157 @@ describe('Campaign actions', () => {
       expect(res.body.campaignQuotas).to.be.an('array')
     })
   })
+
+  describe('Campaign Quota Notifications Actions', () => {
+    it('Should return 201 Created when an admin successfully creates a campaign quota notification for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Quota Notification',
+            email: 'test@companymarvelsecretinvasionquotanotification.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Quota Notification',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/quota-notifications`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignQuotaNotification: {
+            threshold: 50,
+            recipients: [faker.internet.email()]
+          }
+        })
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignQuotaNotification')
+      expect(res.body.campaignQuotaNotification).to.be.an('object')
+    })
+
+    it('Should return 200 OK when an admin successfully creates a campaign quota notification that exists for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Quota Notification 2',
+            email: 'test@companymarvelsecretinvasionquotanotification2.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Quota Notification 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/quota-notifications`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignQuotaNotification: {
+            threshold: 50,
+            recipients: [faker.internet.email()]
+          }
+        })
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/quota-notifications`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignQuotaNotification: {
+            threshold: 50,
+            recipients: [faker.internet.email()]
+          }
+        })
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignQuotaNotification')
+      expect(res.body.campaignQuotaNotification).to.be.an('object')
+    })
+
+    it('Should return 200 OK when an admin successfully gets campaign quota notifications for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Quota Notification User 1',
+            email: 'test@companymarvelsecretinvasionquotanotification1.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Quota Notification',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/quota-notifications`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignQuotaNotification: {
+            threshold: 50,
+            recipients: [faker.internet.email()]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${campaignId}/quota-notifications`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'meta', 'campaignQuotaNotifications')
+      expect(res.body.campaignQuotaNotifications).to.be.an('array')
+    })
+  })
 })
