@@ -1293,7 +1293,9 @@ const validateCampaignQuota = Joi.object({
 const validateCampaignQuotaNotification = Joi.object({
   campaignQuotaNotification: Joi.object({
     threshold: Joi.number().min(0).max(100).required(),
-    recipients: Joi.array().items(Joi.string().email()).min(1).required()
+    recipients: Joi.array().items(Joi.string().email()).min(1).required(),
+    frequency: Joi.number().min(1).default(1),
+    frequencyUnit: Joi.string().valid('hour', 'hours', 'day', 'days', 'week', 'weeks', 'month', 'months').default('day')
   }).required()
 })
 

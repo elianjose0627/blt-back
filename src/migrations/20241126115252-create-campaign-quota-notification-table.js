@@ -15,6 +15,16 @@ module.exports = {
         allowNull: false,
         type: Sequelize.ARRAY(Sequelize.STRING)
       },
+      frequency: {
+        allowNull: false,
+        defaultValue: 1,
+        type: Sequelize.INTEGER
+      },
+      frequencyUnit: {
+        allowNull: false,
+        defaultValue: 'day',
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

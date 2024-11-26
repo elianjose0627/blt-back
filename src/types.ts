@@ -308,10 +308,13 @@ export interface ICampaignQuota {
   updatedAt: Date
 }
 
+export type TimeFrequencyUnit = 'hour' | 'hours' | 'day' | 'days' | 'week' | 'weeks' | 'month' | 'months'
 export interface ICampaignQuotaNotification {
   id: string
   threshold: number
   recipients: string[]
+  frequency: number
+  frequencyUnit: TimeFrequencyUnit
   createdAt: Date
   updatedAt: Date
 }

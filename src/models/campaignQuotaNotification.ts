@@ -1,17 +1,21 @@
 import { Model } from 'sequelize'
-import type { ICampaignQuotaNotification } from '../types'
+import type { ICampaignQuotaNotification, TimeFrequencyUnit } from '../types'
 
 const CampaignQuotaNotificationModel = (sequelize: any, DataTypes: any): any => {
   interface CampaignQuotaNotificationAttributes {
     id: string
     threshold: number
     recipients: string[]
+    frequency: number
+    frequencyUnit: TimeFrequencyUnit
   }
 
   class CampaignQuotaNotification extends Model<CampaignQuotaNotificationAttributes> {
     private readonly id: string
     private readonly threshold: number
     private readonly recipients: string[]
+    private readonly frequency: number
+    private readonly frequencyUnit: TimeFrequencyUnit
     private readonly createdAt: Date
     private readonly updatedAt: Date
 
@@ -28,6 +32,8 @@ const CampaignQuotaNotificationModel = (sequelize: any, DataTypes: any): any => 
         id: this.id,
         threshold: this.threshold,
         recipients: this.recipients,
+        frequency: this.frequency,
+        frequencyUnit: this.frequencyUnit,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       }
@@ -47,6 +53,16 @@ const CampaignQuotaNotificationModel = (sequelize: any, DataTypes: any): any => 
     recipients: {
       type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false
+    },
+    frequency: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
+    },
+    frequencyUnit: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'day'
     }
   }, {
     sequelize,
