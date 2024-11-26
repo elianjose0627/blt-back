@@ -308,6 +308,14 @@ export interface ICampaignQuota {
   updatedAt: Date
 }
 
+export interface ICampaignQuotaNotification {
+  id: string
+  threshold: number
+  recipients: string[]
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface ICampaign {
   id: string
   name: string
