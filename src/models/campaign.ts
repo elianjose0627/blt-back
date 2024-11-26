@@ -99,6 +99,11 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
         as: 'campaignQuotas',
         onDelete: 'CASCADE'
       })
+      Campaign.hasMany(models.CampaignQuotaNotification, {
+        foreignKey: 'campaignId',
+        as: 'campaignQuotaNotifications',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): ICampaign {

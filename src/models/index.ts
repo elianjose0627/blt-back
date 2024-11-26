@@ -72,6 +72,7 @@ export interface Database {
   Invoice?: any
   Country?: any
   CampaignQuota?: any
+  CampaignQuotaNotification?: any
   [key: string]: any
 }
 

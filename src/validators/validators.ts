@@ -1290,6 +1290,13 @@ const validateCampaignQuota = Joi.object({
   }).required()
 })
 
+const validateCampaignQuotaNotification = Joi.object({
+  campaignQuotaNotification: Joi.object({
+    threshold: Joi.number().min(0).max(100).required(),
+    recipients: Joi.array().items(Joi.string().email()).min(1).required()
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1382,5 +1389,6 @@ export default {
   validateInvoiceQueryParams,
   validateOrderUpdate,
   validateArticleItem,
-  validateCampaignQuota
+  validateCampaignQuota,
+  validateCampaignQuotaNotification
 }
