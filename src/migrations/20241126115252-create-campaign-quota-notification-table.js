@@ -22,12 +22,17 @@ module.exports = {
       },
       frequencyUnit: {
         allowNull: false,
-        defaultValue: 'day',
+        defaultValue: 'month',
         type: Sequelize.STRING
       },
       lastSentAt: {
         allowNull: true,
         type: Sequelize.DATE
+      },
+      isEnabled: {
+        allowNull: false,
+        defaultValue: true,
+        type: Sequelize.BOOLEAN
       },
       createdAt: {
         allowNull: false,

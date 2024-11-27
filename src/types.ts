@@ -316,6 +316,7 @@ export interface ICampaignQuotaNotification {
   frequency: number
   frequencyUnit: TimeFrequencyUnit
   lastSentAt: Nullable<Date>
+  isEnabled: boolean
   createdAt: Date
   updatedAt: Date
 }
