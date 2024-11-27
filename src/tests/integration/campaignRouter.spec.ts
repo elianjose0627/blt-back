@@ -4078,8 +4078,50 @@ describe('Campaign actions', () => {
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'meta', 'campaignQuotas')
+      expect(res.body).to.include.keys('statusCode', 'success', 'meta', 'campaignQuotas', 'totalQuota')
       expect(res.body.campaignQuotas).to.be.an('array')
+      expect(res.body.totalQuota).to.be.a('number')
+    })
+
+    it('Should return 200 OK when an admin successfully gets campaign quotas for a campaign with no quotas.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion No Quota User 1',
+            email: 'test@companymarvelsecretinvasionnogota1.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion No Quota',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${campaignId}/quotas`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'meta', 'campaignQuotas', 'totalQuota')
+      expect(res.body.campaignQuotas).to.be.an('array')
+      expect(res.body.totalQuota).to.be.a('number')
     })
   })
 

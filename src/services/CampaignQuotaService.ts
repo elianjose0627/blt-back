@@ -27,7 +27,7 @@ class CampaignQuotaService extends BaseService {
 
     return {
       count: records.count,
-      totalQuota,
+      totalQuota: totalQuota === null ? 0 : totalQuota,
       rows: records.rows.map((record: any) => record.toJSONFor())
     }
   }
