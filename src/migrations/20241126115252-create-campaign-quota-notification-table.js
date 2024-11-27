@@ -25,6 +25,10 @@ module.exports = {
         defaultValue: 'day',
         type: Sequelize.STRING
       },
+      lastSentAt: {
+        allowNull: true,
+        type: Sequelize.DATE
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
