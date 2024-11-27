@@ -8,6 +8,7 @@ const CampaignQuotaNotificationModel = (sequelize: any, DataTypes: any): any => 
     recipients: string[]
     frequency: number
     frequencyUnit: TimeFrequencyUnit
+    lastSentAt: Date | null
   }
 
   class CampaignQuotaNotification extends Model<CampaignQuotaNotificationAttributes> {
@@ -18,6 +19,7 @@ const CampaignQuotaNotificationModel = (sequelize: any, DataTypes: any): any => 
     private readonly frequencyUnit: TimeFrequencyUnit
     private readonly createdAt: Date
     private readonly updatedAt: Date
+    private readonly lastSentAt: Date | null
 
     static associate (models: any): any {
       CampaignQuotaNotification.belongsTo(models.Campaign, {
@@ -34,6 +36,7 @@ const CampaignQuotaNotificationModel = (sequelize: any, DataTypes: any): any => 
         recipients: this.recipients,
         frequency: this.frequency,
         frequencyUnit: this.frequencyUnit,
+        lastSentAt: this.lastSentAt,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       }
@@ -63,6 +66,10 @@ const CampaignQuotaNotificationModel = (sequelize: any, DataTypes: any): any => 
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: 'day'
+    },
+    lastSentAt: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   }, {
     sequelize,
