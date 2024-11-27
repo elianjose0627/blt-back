@@ -9,6 +9,7 @@ const CampaignQuotaNotificationModel = (sequelize: any, DataTypes: any): any => 
     frequency: number
     frequencyUnit: TimeFrequencyUnit
     lastSentAt: Date | null
+    isEnabled: boolean
   }
 
   class CampaignQuotaNotification extends Model<CampaignQuotaNotificationAttributes> {
@@ -20,6 +21,7 @@ const CampaignQuotaNotificationModel = (sequelize: any, DataTypes: any): any => 
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly lastSentAt: Date | null
+    private readonly isEnabled: boolean
 
     static associate (models: any): any {
       CampaignQuotaNotification.belongsTo(models.Campaign, {
@@ -38,7 +40,8 @@ const CampaignQuotaNotificationModel = (sequelize: any, DataTypes: any): any => 
         frequencyUnit: this.frequencyUnit,
         lastSentAt: this.lastSentAt,
         createdAt: this.createdAt,
-        updatedAt: this.updatedAt
+        updatedAt: this.updatedAt,
+        isEnabled: this.isEnabled
       }
     }
   };
@@ -65,11 +68,16 @@ const CampaignQuotaNotificationModel = (sequelize: any, DataTypes: any): any => 
     frequencyUnit: {
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: 'day'
+      defaultValue: 'month'
     },
     lastSentAt: {
       type: DataTypes.DATE,
       allowNull: true
+    },
+    isEnabled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true
     }
   }, {
     sequelize,
