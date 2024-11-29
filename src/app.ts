@@ -92,6 +92,7 @@ app.use(apiPrefix, routers.outboundRouter())
 app.use(apiPrefix, routers.itemRouter())
 app.use(apiPrefix, routers.categoryRouter())
 app.use(apiPrefix, routers.campaignQuotaRouter())
+app.use(apiPrefix, routers.campaignQuotaNotificationRouter())
 
 // Add validation middleware
 app.use(joiErrors)

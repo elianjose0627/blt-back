@@ -52,6 +52,7 @@ import outboundRouter from './jtl/outboundRouter'
 import itemRouter from './wawiAPI/itemRouter'
 import categoryRouter from './wawiAPI/categoryRouter'
 import campaignQuotaRouter from './campaignQuotaRouter'
+import campaignQuotaNotificationRouter from './campaignQuotaNotificationRouter'
 
 const routers = {
   authRouter,
@@ -107,7 +108,8 @@ const routers = {
   outboundRouter,
   itemRouter,
   categoryRouter,
-  campaignQuotaRouter
+  campaignQuotaRouter,
+  campaignQuotaNotificationRouter
 }
 
 export default routers

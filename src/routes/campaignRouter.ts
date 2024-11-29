@@ -17,6 +17,7 @@ import CampaignOrderLimitController from '../controllers/CampaignOrderLimitContr
 import CampaignShippingDestinationController from '../controllers/CampaignShippingDestinationController'
 import CampaignAddressController from '../controllers/CampaignAddressController'
 import CampaignQuotaController from '../controllers/CampaignQuotaController'
+import CampaignQuotaNotificationController from '../controllers/CampaignQuotaNotificationController'
 
 const CampaignRoutes = (): Router => {
   const campaignRouter = express.Router()
@@ -120,6 +121,16 @@ const CampaignRoutes = (): Router => {
       celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(CampaignQuotaController.getAllCampaignQuotas))
+  campaignRouter.route('/campaigns/:id/quota-notifications')
+    .post(asyncHandler(checkAdmin),
+      celebrate({
+        [Segments.BODY]: validator.validateCampaignQuotaNotification
+      }), asyncHandler(CampaignQuotaNotificationController.insert))
+    .get(asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
+      celebrate({
+        [Segments.QUERY]: validator.validateQueryParams
+      }), asyncHandler(paginate), asyncHandler(CampaignQuotaNotificationController.getAllCampaignQuotaNotifications))
   return campaignRouter
 }
 
