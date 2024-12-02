@@ -4,7 +4,15 @@ import * as userRoles from '../utils/userRoles'
 import * as permissions from '../utils/permissions'
 
 const checkPermissions = (req: CustomRequest, res: CustomResponse, next: CustomNext): any => {
-  const { user: currentUser, module, method, isOwnerOrAdmin, isOwner, accessPermissions: defaultAccessPermissions = [] } = req
+  const {
+    user: currentUser,
+    module,
+    method,
+    isOwnerOrAdmin,
+    isOwner,
+    accessPermissions: defaultAccessPermissions = [],
+    apiKeyPermissions = []
+  } = req
 
   const { role, company } = currentUser
 
@@ -12,6 +20,19 @@ const checkPermissions = (req: CustomRequest, res: CustomResponse, next: CustomN
     [permissions.READ]: ['GET'],
     [permissions.READWRITE]: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
     [permissions.NOACCESS]: []
+  }
+
+  if (apiKeyPermissions.length > 0) {
+    if (apiKeyPermissions.some(permission => permission.module === module && permission.isEnabled && allowed[permission.permission].includes(method))) {
+      return next()
+    }
+    return res.status(statusCodes.FORBIDDEN).send({
+      statusCode: statusCodes.FORBIDDEN,
+      success: false,
+      errors: {
+        message: 'You do not have the necessary permissions to perform this action'
+      }
+    })
   }
 
   const allowedCompanyAdminModules = defaultAccessPermissions

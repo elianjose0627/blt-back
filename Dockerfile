@@ -1,5 +1,5 @@
 # Pull in the official version of Node.
-FROM node:18-alpine
+FROM node:22-alpine
 
 # Create and change to the app directory.
 WORKDIR /usr/src/app

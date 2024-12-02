@@ -6,6 +6,7 @@ import * as countryList from '../utils/countries'
 import * as userRoles from '../utils/userRoles'
 import * as currencies from '../utils/currencies'
 import * as appModules from '../utils/appModules'
+import * as permissions from '../utils/permissions'
 import { productSelectedColumns } from '../utils/selectOptions'
 import { phoneValidationPattern } from '../constants/regexPatterns'
 
@@ -1300,6 +1301,21 @@ const validateCampaignQuotaNotification = Joi.object({
   }).required()
 })
 
+const validateApiKey = Joi.object({
+  apiKey: Joi.object({
+    isEnabled: Joi.boolean().default(true),
+    description: Joi.string().max(255).allow(null).allow(''),
+    permissions: Joi.array().items(Joi.object({
+      module: Joi.string().required().valid(...appModules.MODULES_ARRAY),
+      permission: Joi.string().required().valid(...[permissions.READ, permissions.READWRITE]),
+      isEnabled: Joi.boolean().default(true)
+    })).min(1).required(),
+    validFrom: Joi.date(),
+    validTo: Joi.date().allow(null).default(null),
+    revokedAt: Joi.date().allow(null).default(null)
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1393,5 +1409,6 @@ export default {
   validateOrderUpdate,
   validateArticleItem,
   validateCampaignQuota,
-  validateCampaignQuotaNotification
+  validateCampaignQuotaNotification,
+  validateApiKey
 }

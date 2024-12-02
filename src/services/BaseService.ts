@@ -23,7 +23,7 @@ const withoutUser = [
   'CompanyProductAccessControlGroup', 'CompanyUserGroup', 'UserCompanyUserGroup',
   'CompanyUserGroupProductAccessControlGroup', 'TaxRate', 'MassUnit',
   'SalesUnit', 'ProductDetail', 'ProductProductCategory', 'CompanyInviteToken',
-  'CampaignQuota', 'CampaignQuotaNotification'
+  'CampaignQuota', 'CampaignQuotaNotification', 'ApiKey'
 ]
 
 export const includeCompanyAndOwner = {
@@ -340,6 +340,15 @@ export const generateInclude = (model: string): any => {
         model: db.User,
         attributes: ['id', 'firstName', 'lastName', 'username', 'email'],
         as: 'owner'
+      }
+    ]
+  }
+  if (model === 'ApiKey') {
+    return [
+      {
+        model: db.User,
+        attributes: ['id', 'firstName', 'lastName', 'username', 'email'],
+        as: 'user'
       }
     ]
   }

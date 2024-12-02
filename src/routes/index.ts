@@ -53,6 +53,7 @@ import itemRouter from './wawiAPI/itemRouter'
 import categoryRouter from './wawiAPI/categoryRouter'
 import campaignQuotaRouter from './campaignQuotaRouter'
 import campaignQuotaNotificationRouter from './campaignQuotaNotificationRouter'
+import apiKeyRouter from './apiKeyRouter'
 
 const routers = {
   authRouter,
@@ -109,7 +110,8 @@ const routers = {
   itemRouter,
   categoryRouter,
   campaignQuotaRouter,
-  campaignQuotaNotificationRouter
+  campaignQuotaNotificationRouter,
+  apiKeyRouter
 }
 
 export default routers

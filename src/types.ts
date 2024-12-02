@@ -840,6 +840,7 @@ export interface CustomRequest extends Request {
   isOwner?: boolean
   accessPermissions?: IAccessPermission[]
   accessProductCategoryTags?: string[]
+  apiKeyPermissions?: ApiKeyPermission[]
 }
 
 export interface TokenUser {
@@ -1145,4 +1146,21 @@ export interface ICompanySubscription {
 
 export interface RequestBodyPendingOrders {
   pendingOrders: IPendingOrder[]
+}
+
+export interface ApiKeyPermission {
+  module: Module
+  permission: Permission
+  isEnabled: boolean
+}
+export interface IApiKey {
+  id: string
+  isEnabled: boolean
+  description: Nullable<string>
+  validFrom: Date
+  validTo: Nullable<Date>
+  revokedAt: Nullable<Date>
+  permissions: ApiKeyPermission[]
+  createdAt: Date
+  updatedAt: Date
 }

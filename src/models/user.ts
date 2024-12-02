@@ -83,6 +83,11 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
         through: models.UserCompanyUserGroup,
         as: 'companyUserGroups'
       })
+      User.hasMany(models.ApiKey, {
+        foreignKey: 'userId',
+        as: 'apiKeys',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): IUser {
