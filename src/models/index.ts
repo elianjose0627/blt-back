@@ -73,6 +73,7 @@ export interface Database {
   Country?: any
   CampaignQuota?: any
   CampaignQuotaNotification?: any
+  ApiKey?: any
   [key: string]: any
 }
 
