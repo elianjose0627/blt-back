@@ -349,6 +349,7 @@ export interface ICampaign {
   campaignAddresses: IAddress[]
   shippingMethodType: Nullable<number>
   shippingMethodIsDropShipping: boolean
+  totalOrderedQuota: number
 }
 
 export interface ISecondaryDomain {

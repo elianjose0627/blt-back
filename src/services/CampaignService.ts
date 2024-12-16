@@ -61,9 +61,7 @@ class CampaignService extends BaseService {
 
     return {
       count: records.count,
-      rows: records.rows.map((record: any) => {
-        return { ...record.toJSONFor(), totalOrderedQuota: record.getDataValue('totalOrderedQuota') }
-      })
+      rows: records.rows.map((record: any) => record.toJSONFor())
     }
   }
 
@@ -132,9 +130,7 @@ class CampaignService extends BaseService {
 
     return {
       count: records.count,
-      rows: records.rows.map((record: any) => {
-        return { ...record.toJSONFor(), totalOrderedQuota: record.getDataValue('totalOrderedQuota') }
-      })
+      rows: records.rows.map((record: any) => record.toJSONFor())
     }
   }
 
