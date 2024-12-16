@@ -39,7 +39,19 @@ class CampaignService extends BaseService {
       limit,
       offset,
       order: [['createdAt', 'DESC']],
-      attributes: { exclude: [] },
+      attributes: {
+        include: [
+          [
+            Sequelize.literal(`(
+              SELECT CAST(COALESCE(SUM("orderedQuota"), 0) AS INTEGER)
+              FROM "CampaignQuotas" 
+              WHERE "CampaignQuotas"."campaignId" = "Campaign"."id"
+              AND "CampaignQuotas"."deletedAt" IS NULL
+            )`),
+            'totalOrderedQuota'
+          ]
+        ]
+      },
       distinct: true,
       where: {
         companyId,
@@ -49,7 +61,9 @@ class CampaignService extends BaseService {
 
     return {
       count: records.count,
-      rows: records.rows.map((record: any) => record.toJSONFor())
+      rows: records.rows.map((record: any) => {
+        return { ...record.toJSONFor(), totalOrderedQuota: record.getDataValue('totalOrderedQuota') }
+      })
     }
   }
 
@@ -71,7 +85,19 @@ class CampaignService extends BaseService {
       limit,
       offset,
       order: [['createdAt', 'DESC']],
-      attributes: { exclude: [] },
+      attributes: {
+        include: [
+          [
+            Sequelize.literal(`(
+              SELECT CAST(COALESCE(SUM("orderedQuota"), 0) AS INTEGER)
+              FROM "CampaignQuotas" 
+              WHERE "CampaignQuotas"."campaignId" = "Campaign"."id"
+              AND "CampaignQuotas"."deletedAt" IS NULL
+            )`),
+            'totalOrderedQuota'
+          ]
+        ]
+      },
       include: [
         {
           model: db.Company,
@@ -106,7 +132,9 @@ class CampaignService extends BaseService {
 
     return {
       count: records.count,
-      rows: records.rows.map((record: any) => record.toJSONFor())
+      rows: records.rows.map((record: any) => {
+        return { ...record.toJSONFor(), totalOrderedQuota: record.getDataValue('totalOrderedQuota') }
+      })
     }
   }
 
