@@ -22,6 +22,7 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     shippingMethodType: Nullable<number>
     shippingMethodIsDropShipping: boolean
     includeStartDate: boolean
+    totalOrderedQuota: number
   }
 
   class Campaign extends Model<CampaignAttributes> {
@@ -52,6 +53,7 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     private readonly shippingMethodType: Nullable<number>
     private readonly shippingMethodIsDropShipping: boolean
     private readonly includeStartDate: boolean
+    private readonly totalOrderedQuota: number
 
     static associate (models: any): any {
       Campaign.belongsTo(models.Company, {
@@ -134,7 +136,8 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
         campaignAddresses: this.campaignAddresses,
         shippingMethodType: this.shippingMethodType,
         shippingMethodIsDropShipping: this.shippingMethodIsDropShipping,
-        includeStartDate: this.includeStartDate
+        includeStartDate: this.includeStartDate,
+        totalOrderedQuota: this.totalOrderedQuota
       }
     }
   };
@@ -216,6 +219,10 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     includeStartDate: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
+    },
+    totalOrderedQuota: {
+      type: DataTypes.VIRTUAL,
+      defaultValue: 0
     }
   }, {
     sequelize,
