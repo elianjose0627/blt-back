@@ -122,7 +122,7 @@ const CampaignRoutes = (): Router => {
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(CampaignQuotaController.getAllCampaignQuotas))
   campaignRouter.route('/campaigns/:id/quota-notifications')
-    .post(asyncHandler(checkAdmin),
+    .post(asyncHandler(checkPermissions),
       celebrate({
         [Segments.BODY]: validator.validateCampaignQuotaNotification
       }), asyncHandler(CampaignQuotaNotificationController.insert))
