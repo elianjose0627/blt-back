@@ -10,11 +10,21 @@ module.exports = {
     await queryInterface.addColumn('CampaignQuotas', 'updatedBy', {
       type: Sequelize.UUID,
       allowNull: true,
+      references: {
+        model: 'Users',
+        key: 'id',
+        as: 'updatedBy'
+        }
     })
 
     await queryInterface.addColumn('CampaignQuotas', 'createdBy', {
       type: Sequelize.UUID,
       allowNull: true,
+      references: {
+        model: 'Users',
+        key: 'id',
+        as: 'createdBy'
+        }
     })
   },
 
