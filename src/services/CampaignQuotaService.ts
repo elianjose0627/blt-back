@@ -4,11 +4,20 @@ import db from '../models'
 
 class CampaignQuotaService extends BaseService {
   async insert (data: any): Promise<any> {
-    const { campaign, campaignQuota } = data
+    const { campaign, campaignQuota, userId } = data
 
-    const response = await db[this.model].create({ ...campaignQuota, id: uuidv1(), campaignId: campaign.id })
+    const response = await db[this.model].create({ ...campaignQuota, createdBy: userId, updatedBy: userId, id: uuidv1(), campaignId: campaign.id })
 
     return response.toJSONFor()
+  }
+
+  async update (data: any): Promise<any> {
+    const { campaign, campaignQuota, userId } = data
+
+    const updateResponse = await db[this.model].update({ ...campaignQuota, updatedBy: userId, campaignId: campaign.id })
+    await updateResponse.reload()
+
+    return updateResponse.toJSONFor()
   }
 
   async getAllCampaignQuotas (limit: number, offset: number, campaignId: string): Promise<any> {
