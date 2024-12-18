@@ -1,6 +1,7 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import { faker } from '@faker-js/faker'
+import dayjs from 'dayjs'
 import app from '../../app'
 import {
   deleteTestUser, createAdminTestUser,
@@ -4023,7 +4024,8 @@ describe('Campaign actions', () => {
         .send({
           campaignQuota: {
             orderedQuota: 100,
-            orderedDate: '2023-01-15T13:00:00Z'
+            orderedDate: dayjs().toISOString(),
+            orderId: faker.random.alphaNumeric(10)
           }
         })
       expect(res).to.have.status(201)
@@ -4068,7 +4070,8 @@ describe('Campaign actions', () => {
         .send({
           campaignQuota: {
             orderedQuota: 150,
-            orderedDate: '2023-01-15T13:00:00Z'
+            orderedDate: dayjs().toISOString(),
+            orderId: faker.random.alphaNumeric(10)
           }
         })
 

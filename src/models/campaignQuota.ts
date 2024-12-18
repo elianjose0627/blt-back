@@ -6,12 +6,18 @@ const CampaignQuotaModel = (sequelize: any, DataTypes: any): any => {
     id: string
     orderedQuota: number
     orderedDate: Date
+    orderId: string
+    createdBy: string
+    updatedBy: string
   }
 
   class CampaignQuota extends Model<CampaignQuotaAttributes> {
     private readonly id: string
     private readonly orderedQuota: number
     private readonly orderedDate: Date
+    private readonly orderId: string
+    private readonly createdBy: string
+    private readonly updatedBy: string
     private readonly createdAt: Date
     private readonly updatedAt: Date
 
@@ -28,6 +34,9 @@ const CampaignQuotaModel = (sequelize: any, DataTypes: any): any => {
         id: this.id,
         orderedQuota: this.orderedQuota,
         orderedDate: this.orderedDate,
+        orderId: this.orderId,
+        createdBy: this.createdBy,
+        updatedBy: this.updatedBy,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       }
@@ -46,6 +55,18 @@ const CampaignQuotaModel = (sequelize: any, DataTypes: any): any => {
     },
     orderedDate: {
       type: DataTypes.DATE,
+      allowNull: false
+    },
+    orderId: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    createdBy: {
+      type: DataTypes.UUID,
+      allowNull: false
+    },
+    updatedBy: {
+      type: DataTypes.UUID,
       allowNull: false
     }
   }, {
