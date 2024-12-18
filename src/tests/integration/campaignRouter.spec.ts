@@ -4023,7 +4023,8 @@ describe('Campaign actions', () => {
         .send({
           campaignQuota: {
             orderedQuota: 100,
-            orderedDate: '2023-01-15T13:00:00Z'
+            orderedDate: '2023-01-15T13:00:00Z',
+            orderId: "abc124"
           }
         })
       expect(res).to.have.status(201)
@@ -4068,7 +4069,8 @@ describe('Campaign actions', () => {
         .send({
           campaignQuota: {
             orderedQuota: 150,
-            orderedDate: '2023-01-15T13:00:00Z'
+            orderedDate: '2023-01-15T13:00:00Z',
+            orderId: "abc124"
           }
         })
 
