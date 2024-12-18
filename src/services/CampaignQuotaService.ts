@@ -12,9 +12,9 @@ class CampaignQuotaService extends BaseService {
   }
 
   async update (data: any): Promise<any> {
-    const { campaign, campaignQuota, userId } = data
+    const { record, campaignQuota, userId } = data
 
-    const updateResponse = await db[this.model].update({ ...campaignQuota, updatedBy: userId, campaignId: campaign.id })
+    const updateResponse = await record.update({ ...campaignQuota, updatedBy: userId })
     await updateResponse.reload()
 
     return updateResponse.toJSONFor()

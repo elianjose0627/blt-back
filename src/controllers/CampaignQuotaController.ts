@@ -8,7 +8,7 @@ const campaignQuotaService = new CampaignQuotaService('CampaignQuota')
 
 class CampaignQuotaController extends BaseController {
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { record: campaign,user,  body: { campaignQuota } } = req
+    const { record: campaign, user, body: { campaignQuota } } = req
     const userId = user.id
 
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
@@ -23,10 +23,10 @@ class CampaignQuotaController extends BaseController {
   }
 
   async update (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { record: campaign, user, body: { campaignQuota } } = req
+    const { record, user, body: { campaignQuota } } = req
     const userId = user.id
 
-    const response = await campaignQuotaService.update({ campaign, campaignQuota, userId })
+    const response = await campaignQuotaService.update({ record, campaignQuota, userId })
 
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} updated` })
 
