@@ -1287,7 +1287,8 @@ const validateArticleItem = Joi.object({
 const validateCampaignQuota = Joi.object({
   campaignQuota: Joi.object({
     orderedQuota: Joi.number().required(),
-    orderedDate: Joi.date().required()
+    orderedDate: Joi.date().required(),
+    orderId: Joi.string().alphanum().required()
   }).required()
 })
 

@@ -304,6 +304,9 @@ export interface ICampaignQuota {
   id: string
   orderedQuota: number
   orderedDate: Date
+  orderId: string
+  createdBy: string
+  updatedBy: string
   createdAt: Date
   updatedAt: Date
 }
