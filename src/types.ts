@@ -225,7 +225,7 @@ export interface ICompany {
   logo: Nullable<MediaData>
   subscriptions: ICompanySubscription[]
   productAccessControlGroups: IProductAccessControlGroup[]
-  companyUserGroups: ICompanyUserGroup[],
+  companyUserGroups: ICompanyUserGroup[]
   shopHeader: Nullable<IShopHeader>
 }
 
