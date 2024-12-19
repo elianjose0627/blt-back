@@ -5822,4 +5822,28 @@ describe('Company actions', () => {
       expect(res.body.company).to.include.keys('id', 'customerId', 'suffix', 'name', 'email', 'phone', 'vat', 'createdAt', 'updatedAt')
     })
   })
+
+  describe('Company shop header actions', () => {
+    it('Should return 200 OK when an admin updates the shopHeader of a company.', async () => {
+      const company = await createVerifiedCompany(userIdAdmin, true)
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/companies/${String(company.id)}/shop-header`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            shopHeader: {
+              url: 'https://google.com/test.html',
+              filename: 'test.html'
+            }
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'company')
+      expect(res.body.company).to.be.an('object')
+      expect(res.body.company).to.include.keys('id', 'customerId', 'suffix', 'name', 'email', 'phone', 'vat', 'theme', 'logo', 'createdAt', 'updatedAt', 'shopHeader')
+    })
+  })
 })

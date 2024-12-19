@@ -186,6 +186,11 @@ const companyRoutes = (): Router => {
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(CompanySubscriptionController.getAllForCompany))
+  companyRouter.route('/companies/:id/shop-header')
+    .patch(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
+      celebrate({
+        [Segments.BODY]: validator.validateCompanyShopHeader
+      }), asyncHandler(CompanyController.checkCompanyDomainAndEmailDomain), asyncHandler(CompanyController.update))
   return companyRouter
 }
 

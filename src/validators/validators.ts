@@ -1317,6 +1317,15 @@ const validateApiKey = Joi.object({
   }).required()
 })
 
+const validateCompanyShopHeader = Joi.object({
+  company: Joi.object({
+    shopHeader: Joi.object({
+      url: Joi.string().uri().required(),
+      filename: Joi.string().required()
+    }).allow(null)
+  }).required()
+}).required()
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1411,5 +1420,6 @@ export default {
   validateArticleItem,
   validateCampaignQuota,
   validateCampaignQuotaNotification,
-  validateApiKey
+  validateApiKey,
+  validateCompanyShopHeader
 }
