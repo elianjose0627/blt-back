@@ -1,7 +1,7 @@
 import { Model } from 'sequelize'
 import type {
   IAccessPermission, IAddress, ICompany, ICompanySubscription,
-  ICompanyUserGroup, IProductAccessControlGroup, ISecondaryDomain, IUser, MediaData, Nullable, Theme
+  ICompanyUserGroup, IProductAccessControlGroup, ISecondaryDomain, IShopHeader, IUser, MediaData, Nullable, Theme
 } from '../types'
 
 const CompanyModel = (sequelize: any, DataTypes: any): any => {
@@ -18,6 +18,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     domainVerificationCode: { value: string, createdAt: Date }
     theme: Nullable<Theme>
     logo: Nullable<MediaData>
+    shopHeader: Nullable<IShopHeader>
   }
 
   class Company extends Model<CompanyAttributes> {
@@ -42,6 +43,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     private readonly subscriptions: ICompanySubscription[]
     private readonly productAccessControlGroups: IProductAccessControlGroup[]
     private readonly companyUserGroups: ICompanyUserGroup[]
+    private readonly shopHeader: Nullable<IShopHeader>
 
     static associate (models: any): any {
       Company.belongsTo(models.User, {
@@ -143,7 +145,8 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         logo: this.logo,
         subscriptions: this.subscriptions,
         productAccessControlGroups: this.productAccessControlGroups,
-        companyUserGroups: this.companyUserGroups
+        companyUserGroups: this.companyUserGroups,
+        shopHeader: this.shopHeader
       }
     }
   };
@@ -199,6 +202,10 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
       defaultValue: null
     },
     logo: {
+      type: DataTypes.JSON,
+      defaultValue: null
+    },
+    shopHeader: {
       type: DataTypes.JSON,
       defaultValue: null
     }

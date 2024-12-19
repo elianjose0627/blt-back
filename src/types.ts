@@ -225,7 +225,8 @@ export interface ICompany {
   logo: Nullable<MediaData>
   subscriptions: ICompanySubscription[]
   productAccessControlGroups: IProductAccessControlGroup[]
-  companyUserGroups: ICompanyUserGroup[]
+  companyUserGroups: ICompanyUserGroup[],
+  shopHeader: Nullable<IShopHeader>
 }
 
 export type AddressType = 'billing' | 'delivery' | 'billingAndDelivery' | 'return'
@@ -1167,4 +1168,9 @@ export interface IApiKey {
   permissions: ApiKeyPermission[]
   createdAt: Date
   updatedAt: Date
+}
+
+export interface IShopHeader {
+  url: string
+  filename: string
 }
