@@ -226,6 +226,7 @@ export interface ICompany {
   subscriptions: ICompanySubscription[]
   productAccessControlGroups: IProductAccessControlGroup[]
   companyUserGroups: ICompanyUserGroup[]
+  shopHeader: Nullable<IShopHeader>
 }
 
 export type AddressType = 'billing' | 'delivery' | 'billingAndDelivery' | 'return'
@@ -1167,4 +1168,9 @@ export interface IApiKey {
   permissions: ApiKeyPermission[]
   createdAt: Date
   updatedAt: Date
+}
+
+export interface IShopHeader {
+  url: string
+  filename: string
 }
