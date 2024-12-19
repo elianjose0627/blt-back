@@ -2,7 +2,7 @@
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.addColumn('PendingOrders', 'isOrderConfirmationGenerated ', {
+    await queryInterface.addColumn('PendingOrders', 'isOrderConfirmationGenerated', {
       type: Sequelize.BOOLEAN,
       allowNull: false,
       defaultValue: false
@@ -11,7 +11,7 @@ module.exports = {
 
   async down (queryInterface, Sequelize) {
     return Promise.all([
-      queryInterface.removeColumn('PendingOrders', 'isOrderConfirmationGenerated ')
+      queryInterface.removeColumn('PendingOrders', 'isOrderConfirmationGenerated')
     ])
   }
 }
