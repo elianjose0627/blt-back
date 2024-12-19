@@ -5823,7 +5823,7 @@ describe('Company actions', () => {
     })
   })
 
-  describe('Company shop header actions', ()=>{
+  describe('Company shop header actions', () => {
     it('Should return 200 OK when an admin updates the shopHeader of a company.', async () => {
       const company = await createVerifiedCompany(userIdAdmin, true)
 
