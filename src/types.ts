@@ -227,6 +227,7 @@ export interface ICompany {
   productAccessControlGroups: IProductAccessControlGroup[]
   companyUserGroups: ICompanyUserGroup[]
   shopHeader: Nullable<IShopHeader>
+  isDocumentGenerationEnabled: boolean
 }
 
 export type AddressType = 'billing' | 'delivery' | 'billingAndDelivery' | 'return'
@@ -818,6 +819,7 @@ export interface IOrder {
   shipments?: IShipment[]
   trackingId: Nullable<string>
   isVisible: boolean
+  isPackingSlipGenerated: boolean
 }
 
 export interface ICountry {
@@ -1074,6 +1076,7 @@ export interface IPendingOrder {
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
+  isOrderConfirmationGenerated: boolean
 }
 
 export interface IDuplicatePostedOrder {
