@@ -1287,7 +1287,8 @@ const validateArticleItem = Joi.object({
 const validateCampaignQuota = Joi.object({
   campaignQuota: Joi.object({
     orderedQuota: Joi.number().required(),
-    orderedDate: Joi.date().required()
+    orderedDate: Joi.date().required(),
+    orderId: Joi.string().alphanum().required()
   }).required()
 })
 
@@ -1315,6 +1316,15 @@ const validateApiKey = Joi.object({
     revokedAt: Joi.date().allow(null).default(null)
   }).required()
 })
+
+const validateCompanyShopHeader = Joi.object({
+  company: Joi.object({
+    shopHeader: Joi.object({
+      url: Joi.string().uri().required(),
+      filename: Joi.string().required()
+    }).allow(null)
+  }).required()
+}).required()
 
 export default {
   validateCreatedUser,
@@ -1410,5 +1420,6 @@ export default {
   validateArticleItem,
   validateCampaignQuota,
   validateCampaignQuotaNotification,
-  validateApiKey
+  validateApiKey,
+  validateCompanyShopHeader
 }

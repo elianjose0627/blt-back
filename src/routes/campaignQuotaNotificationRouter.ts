@@ -2,23 +2,24 @@ import express, { Router } from 'express'
 import { celebrate, Segments } from 'celebrate'
 import validator from '../validators/validators'
 import CampaignQuotaNotificationController from '../controllers/CampaignQuotaNotificationController'
+import CampaignController from '../controllers/CampaignController'
 import asyncHandler from '../middlewares/asyncHandler'
-import checkAdmin from '../middlewares/checkAdmin'
 import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
+import checkPermissions from '../middlewares/checkPermissions'
 
 const campaignQuotaNotificationRoutes = (): Router => {
   const campaignQuotaNotificationRouter = express.Router()
 
-  campaignQuotaNotificationRouter.use('/campaign-quota-notifications', checkAuth, checkUserIsVerifiedStatus, CampaignQuotaNotificationController.setModule)
+  campaignQuotaNotificationRouter.use('/campaign-quota-notifications', checkAuth, checkUserIsVerifiedStatus, CampaignController.setModule)
   campaignQuotaNotificationRouter.use('/campaign-quota-notifications/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(CampaignQuotaNotificationController.checkRecord))
   campaignQuotaNotificationRouter.route('/campaign-quota-notifications/:id')
-    .put(asyncHandler(checkAdmin), celebrate({
+    .put(asyncHandler(checkPermissions), celebrate({
       [Segments.BODY]: validator.validateCampaignQuotaNotification
     }), asyncHandler(CampaignQuotaNotificationController.update))
-    .delete(asyncHandler(checkAdmin), asyncHandler(CampaignQuotaNotificationController.delete))
+    .delete(asyncHandler(checkPermissions), asyncHandler(CampaignQuotaNotificationController.delete))
   return campaignQuotaNotificationRouter
 }
 
