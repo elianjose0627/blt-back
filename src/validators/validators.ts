@@ -1326,6 +1326,16 @@ const validateCompanyShopHeader = Joi.object({
   }).required()
 }).required()
 
+const validateDocumentQueryParams = Joi.object({
+  ...commonQueryParams,
+  sortBy: Joi.object({
+    dueDate: Joi.string().valid(...['asc', 'desc']),
+    createdAt: Joi.string().valid(...['asc', 'desc']),
+    deliveryDate: Joi.string().valid(...['asc', 'desc']),
+    documentDate: Joi.string().valid(...['asc', 'desc'])
+  })
+}).required()
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1421,5 +1431,6 @@ export default {
   validateCampaignQuota,
   validateCampaignQuotaNotification,
   validateApiKey,
-  validateCompanyShopHeader
+  validateCompanyShopHeader,
+  validateDocumentQueryParams
 }
