@@ -77,7 +77,7 @@ describe('Packing Slip actions', () => {
       expect(res.body.packingSlips).to.be.an('array')
     })
 
-    it('Should return 200 Success when an admin successfully retrieves all packingSlips with search params.', async () => {
+    it('Should return 200 Success when an admin successfully retrieves all packing slips with search params.', async () => {
       await createPackingSlip(companyId, adminUserId)
       const res = await chai
         .request(app)
@@ -89,28 +89,28 @@ describe('Packing Slip actions', () => {
       expect(res.body.packingSlips).to.be.an('array')
     })
 
-    it('Should return 200 Success when a company admin successfully retrieves all pacingSlips.', async () => {
+    it('Should return 403 Forbidden when a company admin tries to retrieve all pacing slips.', async () => {
       await createPackingSlip(companyId, companyAdminUserId)
       const res = await chai
         .request(app)
         .get('/api/packing-slips')
         .set('Authorization', `Bearer ${tokenCompanyAdmin}`)
 
-      expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'packingSlips')
-      expect(res.body.packingSlips).to.be.an('array')
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only an admin can perform this action')
     })
 
-    it('Should return 200 Success when a user successfully retrieves all packingSlips.', async () => {
+    it('Should return 403 Forbidden when a user tries to  retrieve all packing slips.', async () => {
       await createPackingSlip(companyId, userId)
       const res = await chai
         .request(app)
         .get('/api/packing-slips')
         .set('Authorization', `Bearer ${token}`)
 
-      expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'packingSlips')
-      expect(res.body.packingSlips).to.be.an('array')
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only an admin can perform this action')
     })
   })
 
@@ -130,7 +130,7 @@ describe('Packing Slip actions', () => {
       userIdPackingSlipId = userIdPackingSlip.id
     })
 
-    it('Should return 200 Success when an admin successfully retrieves an packingSlip by ID', async () => {
+    it('Should return 200 Success when an admin successfully retrieves an packing slip by ID', async () => {
       const res = await chai
         .request(app)
         .get(`/api/packing-slips/${adminPackingSlipId}`)
@@ -142,7 +142,7 @@ describe('Packing Slip actions', () => {
       expect(res.body.packingSlip.id).to.equal(adminPackingSlipId)
     })
 
-    it('Should return 200 Success when a company admin successfully retrieves an pacingSlip by id for their company', async () => {
+    it('Should return 200 Success when a company admin successfully retrieves an pacings slip by id for their company', async () => {
       const res = await chai
         .request(app)
         .get(`/api/packing-slips/${companyAdminPackingSlipId}`)
@@ -154,7 +154,7 @@ describe('Packing Slip actions', () => {
       expect(res.body.packingSlip.id).to.equal(companyAdminPackingSlipId)
     })
 
-    it('Should return 200 Success when a user successfully retrieves their own packingSlip by id', async () => {
+    it('Should return 200 Success when a user successfully retrieves their own packing slip by id', async () => {
       const res = await chai
         .request(app)
         .get(`/api/packing-slips/${userIdPackingSlipId}`)
@@ -166,7 +166,7 @@ describe('Packing Slip actions', () => {
       expect(res.body.packingSlip.id).to.equal(userIdPackingSlipId)
     })
 
-    it('Should return 403 Forbidden when a user tries to access an packingSlip that does not belong to them', async () => {
+    it('Should return 403 Forbidden when a user tries to access an packing slip that does not belong to them', async () => {
       const otherPackingSlip = await createPackingSlip(companyId, adminUserId)
       const res = await chai
         .request(app)
@@ -175,7 +175,7 @@ describe('Packing Slip actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('You are not authorized to access this packingSlip')
+      expect(res.body.errors.message).to.equal('You are not authorized to access this packing slip')
     })
   })
 })

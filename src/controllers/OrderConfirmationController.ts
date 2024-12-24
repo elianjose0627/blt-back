@@ -5,19 +5,19 @@ import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
 const orderConfirmationService = new OrderConfirmationService('OrderConfirmation')
 
-class OrderConfirmtionController extends BaseController {
+class OrderConfirmationController extends BaseController {
   async checkOwnerOrCompanyOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
-    const { user: currentUser, record: invoice } = req
+    const { user: currentUser, record: orderConfirmation } = req
 
     if (currentUser.role === userRoles.ADMIN) {
       return next()
     }
 
-    if (currentUser.role === userRoles.COMPANYADMINISTRATOR && invoice.companyId === currentUser.companyId) {
+    if (currentUser.role === userRoles.COMPANYADMINISTRATOR && orderConfirmation.companyId === currentUser.companyId) {
       return next()
     }
 
-    if (invoice.owner.id === currentUser.id) {
+    if (orderConfirmation.owner.id === currentUser.id) {
       return next()
     }
 
@@ -25,7 +25,7 @@ class OrderConfirmtionController extends BaseController {
       statusCode: statusCodes.FORBIDDEN,
       success: false,
       errors: {
-        message: 'You are not authorized to access this orderConfirmation'
+        message: 'You are not authorized to access this order confirmation'
       }
     })
   }
@@ -50,4 +50,4 @@ class OrderConfirmtionController extends BaseController {
   }
 }
 
-export default new OrderConfirmtionController(orderConfirmationService)
+export default new OrderConfirmationController(orderConfirmationService)

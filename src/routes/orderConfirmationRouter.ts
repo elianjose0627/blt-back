@@ -13,7 +13,7 @@ const orderConfirmationRoutes = (): Router => {
 
   orderConfirmationRouter.use('/order-confirmations', checkAuth, checkUserIsVerifiedStatus, OrderConfirmationController.setModule)
   orderConfirmationRouter.route('/order-confirmations')
-    .get(celebrate({
+    .get(asyncHandler(checkAdmin), celebrate({
       [Segments.QUERY]: validator.validateDocumentQueryParams
     }), asyncHandler(paginate), asyncHandler(OrderConfirmationController.getAll))
   orderConfirmationRouter.use('/order-confirmations/:id', celebrate({

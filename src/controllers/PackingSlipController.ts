@@ -7,17 +7,17 @@ const packingSlipService = new PackingSlipService('PackingSlip')
 
 class PackingSlipController extends BaseController {
   async checkOwnerOrCompanyOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
-    const { user: currentUser, record: invoice } = req
+    const { user: currentUser, record: packingSlip } = req
 
     if (currentUser.role === userRoles.ADMIN) {
       return next()
     }
 
-    if (currentUser.role === userRoles.COMPANYADMINISTRATOR && invoice.companyId === currentUser.companyId) {
+    if (currentUser.role === userRoles.COMPANYADMINISTRATOR && packingSlip.companyId === currentUser.companyId) {
       return next()
     }
 
-    if (invoice.owner.id === currentUser.id) {
+    if (packingSlip.owner.id === currentUser.id) {
       return next()
     }
 
@@ -25,7 +25,7 @@ class PackingSlipController extends BaseController {
       statusCode: statusCodes.FORBIDDEN,
       success: false,
       errors: {
-        message: 'You are not authorized to access this packingSlip'
+        message: 'You are not authorized to access this packing slip'
       }
     })
   }
