@@ -23,8 +23,7 @@ class PackingSlipService extends BaseService {
         [Op.and]: [
           {
             [Op.or]: [
-              { postedOrderId: { [Op.iLike]: `%${search}%` } },
-              { status: { [Op.iLike]: `%${search}%` } }
+              { postedOrderId: { [Op.iLike]: `%${search}%` } }
             ]
           }
         ]
