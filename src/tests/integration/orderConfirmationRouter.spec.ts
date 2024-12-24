@@ -96,9 +96,9 @@ describe('Order Confirmation actions', () => {
         .get('/api/order-confirmations')
         .set('Authorization', `Bearer ${tokenCompanyAdmin}`)
 
-      expect(res).to.have.status(403)
-      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only an admin can perform this action')
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'orderConfirmations')
+      expect(res.body.orderConfirmations).to.be.an('array')
     })
 
     it('Should return 200 Success when a user tries to retrieve all order confirmations.', async () => {
@@ -108,9 +108,9 @@ describe('Order Confirmation actions', () => {
         .get('/api/order-confirmations')
         .set('Authorization', `Bearer ${token}`)
 
-      expect(res).to.have.status(403)
-      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only an admin can perform this action')
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'orderConfirmations')
+      expect(res.body.orderConfirmations).to.be.an('array')
     })
   })
 

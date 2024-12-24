@@ -13,7 +13,7 @@ const packingSlipRoutes = (): Router => {
 
   packingSlipRouter.use('/packing-slips', checkAuth, checkUserIsVerifiedStatus, PackingSlipController.setModule)
   packingSlipRouter.route('/packing-slips')
-    .get(asyncHandler(checkAdmin), celebrate({
+    .get(celebrate({
       [Segments.QUERY]: validator.validateDocumentQueryParams
     }), asyncHandler(paginate), asyncHandler(PackingSlipController.getAll))
   packingSlipRouter.use('/packing-slips/:id', celebrate({
