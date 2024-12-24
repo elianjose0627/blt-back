@@ -1077,6 +1077,7 @@ export interface IPendingOrder {
   updatedAt?: Date
   company?: ICompany
   isOrderConfirmationGenerated: boolean
+  isInvoiceGenerated: boolean
 }
 
 export interface IDuplicatePostedOrder {

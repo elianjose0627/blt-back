@@ -36,6 +36,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     isGreetingCardSent: boolean
     created: Date
     isOrderConfirmationGenerated: boolean
+    isInvoiceGenerated: boolean
   }
 
   class PendingOrder extends Model<PendingOrderAttributes> {
@@ -75,6 +76,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly updatedAt: Date
     private readonly company: ICompany
     private readonly isOrderConfirmationGenerated: boolean
+    private readonly isInvoiceGenerated: boolean
 
     static associate (models: any): any {
       PendingOrder.belongsTo(models.Company, {
@@ -131,7 +133,8 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         company: this.company,
-        isOrderConfirmationGenerated: this.isOrderConfirmationGenerated
+        isOrderConfirmationGenerated: this.isOrderConfirmationGenerated,
+        isInvoiceGenerated: this.isInvoiceGenerated
       }
     }
   };
@@ -268,6 +271,11 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
       type: DataTypes.DATE
     },
     isOrderConfirmationGenerated: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
+    isInvoiceGenerated: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
