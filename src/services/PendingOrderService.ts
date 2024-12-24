@@ -30,7 +30,7 @@ class PendingOrderService extends BaseService {
       limit,
       offset,
       order: [['createdAt', 'DESC']],
-      attributes: { exclude: [] }
+      attributes: { exclude: ['deletedAt'] }
     })
 
     return records
