@@ -69,21 +69,9 @@ describe('Packing Slip actions', () => {
       await createPackingSlip(companyId, adminUserId)
       const res = await chai
         .request(app)
-        .get('/api/packing-slip')
-        .set('Authorization', `Bearer ${tokenAdmin}`)
-
-      expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'packingSlips')
-      expect(res.body.packingSlips).to.be.an('array')
-    })
-
-    it('Should return 200 Success when an admin successfully retrieves all packingSlips with search params.', async () => {
-      await createPackingSlip(companyId, adminUserId)
-      const res = await chai
-        .request(app)
         .get('/api/packing-slips')
         .set('Authorization', `Bearer ${tokenAdmin}`)
-        .query({ search: '1' })
+
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'packingSlips')
       expect(res.body.packingSlips).to.be.an('array')

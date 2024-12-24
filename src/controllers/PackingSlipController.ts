@@ -25,7 +25,7 @@ class PackingSlipController extends BaseController {
       statusCode: statusCodes.FORBIDDEN,
       success: false,
       errors: {
-        message: 'You are not authorized to access this invoice'
+        message: 'You are not authorized to access this packingSlip'
       }
     })
   }

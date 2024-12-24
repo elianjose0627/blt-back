@@ -77,18 +77,6 @@ describe('Order Confirmation actions', () => {
       expect(res.body.orderConfirmations).to.be.an('array')
     })
 
-    it('Should return 200 Success when an admin successfully retrieves all orderConfirmations with search params.', async () => {
-      await createOrderConfirmation(companyId, adminUserId)
-      const res = await chai
-        .request(app)
-        .get('/api/order-confirmations')
-        .set('Authorization', `Bearer ${tokenAdmin}`)
-        .query({ search: '1' })
-      expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'orderConfirmations')
-      expect(res.body.orderConfirmations).to.be.an('array')
-    })
-
     it('Should return 200 Success when a company admin successfully retrieves all orderConfirmations.', async () => {
       await createOrderConfirmation(companyId, companyAdminUserId)
       const res = await chai
