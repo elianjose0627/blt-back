@@ -227,6 +227,7 @@ export interface ICompany {
   productAccessControlGroups: IProductAccessControlGroup[]
   companyUserGroups: ICompanyUserGroup[]
   shopHeader: Nullable<IShopHeader>
+  isDocumentGenerationEnabled: boolean
 }
 
 export type AddressType = 'billing' | 'delivery' | 'billingAndDelivery' | 'return'
@@ -818,6 +819,7 @@ export interface IOrder {
   shipments?: IShipment[]
   trackingId: Nullable<string>
   isVisible: boolean
+  isPackingSlipGenerated: boolean
 }
 
 export interface ICountry {
@@ -1074,6 +1076,7 @@ export interface IPendingOrder {
   createdAt?: Date
   updatedAt?: Date
   company?: ICompany
+  isOrderConfirmationGenerated: boolean
 }
 
 export interface IDuplicatePostedOrder {
@@ -1173,4 +1176,56 @@ export interface IApiKey {
 export interface IShopHeader {
   url: string
   filename: string
+}
+
+export interface IPackingSlip {
+  id: string
+  postedOrderId: string
+  packingSlipNumber: number
+  trackingId: string
+  costCenter: string | null
+  externalOrderNumber: string
+  externalProjectNumber: string
+  dueDate: Date
+  deliveryDate: Date
+  documentDate: Date
+  isEmailSent: boolean
+  orderLineRequests: OrderLineRequest[]
+  shippingAddressRequests: ShippingAddressRequest[]
+  billingAddressRequests: BillingAddressRequest[]
+  company: ICompany
+  campaign: ICampaign
+  owner: IUser
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface IOrderConfirmation {
+  id: string
+  postedOrderId: string
+  orderConfirmationNumber: number
+  costCenter: string | null
+  externalOrderNumber: string
+  externalProjectNumber: string
+  taxRate: number
+  discountRate: number
+  totalVat: number
+  totalNet: number
+  totalGross: number
+  totalDiscount: number
+  totalShipping: number
+  amountPaid: number
+  currency: string
+  isEmailSent: boolean
+  dueDate: Date
+  deliveryDate: Date
+  documentDate: Date
+  orderLineRequests: OrderLineRequest[]
+  shippingAddressRequests: ShippingAddressRequest[]
+  billingAddressRequests: BillingAddressRequest[]
+  company: ICompany
+  campaign: ICampaign
+  owner: IUser
+  createdAt: Date
+  updatedAt: Date
 }

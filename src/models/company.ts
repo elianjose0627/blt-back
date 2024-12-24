@@ -19,6 +19,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     theme: Nullable<Theme>
     logo: Nullable<MediaData>
     shopHeader: Nullable<IShopHeader>
+    isDocumentGenerationEnabled: boolean
   }
 
   class Company extends Model<CompanyAttributes> {
@@ -44,6 +45,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     private readonly productAccessControlGroups: IProductAccessControlGroup[]
     private readonly companyUserGroups: ICompanyUserGroup[]
     private readonly shopHeader: Nullable<IShopHeader>
+    private readonly isDocumentGenerationEnabled: boolean
 
     static associate (models: any): any {
       Company.belongsTo(models.User, {
@@ -146,7 +148,8 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         subscriptions: this.subscriptions,
         productAccessControlGroups: this.productAccessControlGroups,
         companyUserGroups: this.companyUserGroups,
-        shopHeader: this.shopHeader
+        shopHeader: this.shopHeader,
+        isDocumentGenerationEnabled: this.isDocumentGenerationEnabled
       }
     }
   };
@@ -208,6 +211,11 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     shopHeader: {
       type: DataTypes.JSON,
       defaultValue: null
+    },
+    isDocumentGenerationEnabled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
     }
   }, {
     sequelize,
