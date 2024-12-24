@@ -35,6 +35,7 @@ app.use(express.urlencoded({ extended: false, limit, parameterLimit: 2000000 }))
 // Routes that bypass maintenance mode
 app.use(apiPrefix, routers.maintenanceModeRouter())
 app.use(authPrefix, routers.authRouter())
+app.use(apiPrefix, routers.webhookRouter())
 
 // Middleware to check for maintenance mode
 app.use(checkMaintenanceMode)
@@ -60,7 +61,6 @@ app.use(apiPrefix, routers.privacyRuleRouter())
 app.use(apiPrefix, routers.accessPermissionsRouter())
 app.use(apiPrefix, routers.healthcheckRouter())
 app.use(apiPrefix, routers.shippingMethodRouter())
-app.use(apiPrefix, routers.webhookRouter())
 app.use(apiPrefix, routers.pendingOrderRouter())
 app.use(apiPrefix, routers.cardTemplateRouter())
 app.use(apiPrefix, routers.greetingCardRouter())
