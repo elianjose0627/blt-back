@@ -1188,6 +1188,7 @@ export interface IProductCustomisation {
   price: number
   available: boolean
   photo: IPhoto[]
+  owner: IUser
   createdAt: Date
   updatedAt: Date
   product?: IProduct

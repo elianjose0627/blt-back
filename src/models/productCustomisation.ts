@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { IPhoto, IProduct, IProductCustomisation, ProductCustomisationType } from '../types'
+import type { IPhoto, IProduct, IProductCustomisation, IUser, ProductCustomisationType } from '../types'
 
 const ProductCustomisationModel = (sequelize: any, DataTypes: any): any => {
   interface ProductCustomisationAttributes {
@@ -18,6 +18,7 @@ const ProductCustomisationModel = (sequelize: any, DataTypes: any): any => {
     private readonly price: number
     private readonly available: boolean
     private readonly photo: IPhoto[]
+    private readonly owner: IUser
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly product: IProduct
@@ -26,6 +27,11 @@ const ProductCustomisationModel = (sequelize: any, DataTypes: any): any => {
       ProductCustomisation.belongsTo(models.Product, {
         foreignKey: 'productId',
         as: 'product',
+        onDelete: 'CASCADE'
+      })
+      ProductCustomisation.belongsTo(models.User, {
+        foreignKey: 'userId',
+        as: 'owner',
         onDelete: 'CASCADE'
       })
     }
@@ -38,6 +44,7 @@ const ProductCustomisationModel = (sequelize: any, DataTypes: any): any => {
         price: this.price,
         available: this.available,
         photo: this.photo,
+        owner: this.owner,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         product: this.product
@@ -56,7 +63,7 @@ const ProductCustomisationModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false
     },
     customisationDetail: {
-      type: DataTypes.JSONB,
+      type: DataTypes.STRING,
       allowNull: false
     },
     price: {

@@ -74,6 +74,7 @@ export interface Database {
   CampaignQuota?: any
   CampaignQuotaNotification?: any
   ApiKey?: any
+  ProductCustomisation?: any
   [key: string]: any
 }
 

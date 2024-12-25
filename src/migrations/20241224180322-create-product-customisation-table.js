@@ -12,7 +12,7 @@ module.exports = {
         allowNull: false
       },
       customisationDetail: {
-        type: Sequelize.JSONB,
+        type: Sequelize.STRING,
         allowNull: false
       },
       price: {
@@ -29,6 +29,26 @@ module.exports = {
         type: Sequelize.JSONB,
         allowNull: false
       },
+      productId: {
+        allowNull: true,
+        type: Sequelize.UUID,
+        onDelete: 'CASCADE',
+        references: {
+          model: 'Products',
+          key: 'id',
+          as: 'productId'
+        }
+      },
+      userId: {
+        allowNull: true,
+        type: Sequelize.UUID,
+        onDelete: 'CASCADE',
+        references: {
+          model: 'Users',
+          key: 'id',
+          as: 'userId'
+        }
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -40,16 +60,6 @@ module.exports = {
       deletedAt: {
         allowNull: true,
         type: Sequelize.DATE
-      },
-      productId: {
-        allowNull: true,
-        type: Sequelize.UUID,
-        onDelete: 'CASCADE',
-        references: {
-          model: 'Products',
-          key: 'id',
-          as: 'productId'
-        }
       }
     })
   },

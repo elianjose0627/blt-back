@@ -1326,6 +1326,29 @@ const validateCompanyShopHeader = Joi.object({
   }).required()
 }).required()
 
+const validateProductCustomisation = Joi.object({
+  productCustomisation: Joi.object({
+    customisationType: Joi.string().required().valid(...['print', 'engraving']),
+    customisationDetail: Joi.string().required(),
+    price: Joi.number().min(0),
+    available: Joi.boolean().optional().default(false),
+    photo: Joi.array().items(
+      Joi.object({
+        filename: Joi.string().required(),
+        url: Joi.string().uri().required()
+      }).required()
+    ).required(),
+    productId: Joi.string().uuid().required()
+  }).required()
+})
+
+const validateProductCustomisationQueryParams = Joi.object({
+  ...commonQueryParams,
+  filter: Joi.object({
+    productId: Joi.string().uuid().required()
+  }).required()
+}).required()
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1421,5 +1444,7 @@ export default {
   validateCampaignQuota,
   validateCampaignQuotaNotification,
   validateApiKey,
-  validateCompanyShopHeader
+  validateCompanyShopHeader,
+  validateProductCustomisation,
+  validateProductCustomisationQueryParams
 }
