@@ -1347,6 +1347,16 @@ const validateProductCustomisationQueryParams = Joi.object({
   filter: Joi.object({
     productId: Joi.string().uuid().required()
   }).required()
+})
+
+const validateDocumentQueryParams = Joi.object({
+  ...commonQueryParams,
+  sortBy: Joi.object({
+    dueDate: Joi.string().valid(...['asc', 'desc']),
+    createdAt: Joi.string().valid(...['asc', 'desc']),
+    deliveryDate: Joi.string().valid(...['asc', 'desc']),
+    documentDate: Joi.string().valid(...['asc', 'desc'])
+  })
 }).required()
 
 export default {
@@ -1446,5 +1456,6 @@ export default {
   validateApiKey,
   validateCompanyShopHeader,
   validateProductCustomisation,
-  validateProductCustomisationQueryParams
+  validateProductCustomisationQueryParams,
+  validateDocumentQueryParams
 }
