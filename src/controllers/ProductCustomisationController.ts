@@ -14,7 +14,7 @@ class ProductCustomisationController extends BaseController {
   checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: productCustomisation } = req
 
-    const ownerId = productCustomisation.userId
+    const ownerId = productCustomisation?.owner?.id
 
     const isOwnerOrAdmin = currentUser.id === ownerId || currentUser.role === userRoles.ADMIN
 
@@ -85,8 +85,6 @@ class ProductCustomisationController extends BaseController {
 
   async delete (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { record } = req
-    // eslint-disable-next-line no-console
-    console.log('this is record --------------------------------------------', record)
 
     const response = await this.service.delete(record)
 

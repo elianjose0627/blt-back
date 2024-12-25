@@ -38,23 +38,24 @@ describe('Product Customisation actions', () => {
       .post('/auth/login')
       .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
 
+    tokenAdmin = resAdmin.body.token
+    token = resUser.body.token
+
     const newProduct = await chai
       .request(app)
       .post('/api/products')
       .set('Authorization', `Bearer ${tokenAdmin}`)
       .send({
         product: {
-          name: 'Phone 1',
-          jfsku: '1231ph1',
-          merchantSku: '1231ph1',
+          jfsku: 'VZ9N01AKBKA',
+          name: 'Lunch Box black',
+          merchantSku: '10478',
+          productGroup: 'general',
           type: 'generic',
-          productGroup: 'technology',
-          isParent: true
+          description: 'abc test'
         }
       })
 
-    tokenAdmin = resAdmin.body.token
-    token = resUser.body.token
     productId = String(newProduct.body.product.id)
   })
 
@@ -264,7 +265,7 @@ describe('Product Customisation actions', () => {
         .send({
           productCustomisation: {
             customisationType: 'print',
-            customisationDetail: 'Two-color Print',
+            customisationDetail: 'Laser Engraving1',
             price: 100,
             available: false,
             photo: [
@@ -276,10 +277,11 @@ describe('Product Customisation actions', () => {
             productId
           }
         })
+      const productCustomisationId = resProductCustomisation.body.productCustomisation.id
 
       const res = await chai
         .request(app)
-        .delete(`/api/product-customisations/${String(resProductCustomisation.body.productCustomisation.id)}`)
+        .delete(`/api/product-customisations/${String(productCustomisationId)}`)
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(204)
@@ -313,13 +315,13 @@ describe('Product Customisation actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only an admin can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or admin can perform this action')
     })
 
     it('Should return 404 when a admin tries to delete a product customisation that does not exist.', async () => {
       const res = await chai
         .request(app)
-        .delete('/api/product-colors/88D48647-ED1C-49CF-9D53-403D7DAD8DB7')
+        .delete('/api/product-customisations/88D48647-ED1C-49CF-9D53-403D7DAD8DB7')
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(404)
@@ -336,9 +338,9 @@ describe('Product Customisation actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           productCustomisation: {
-            customisationType: 'engraving',
+            customisationType: 'print',
             customisationDetail: 'Laser Engraving',
-            price: 1000,
+            price: 100,
             available: false,
             photo: [
               {
@@ -350,7 +352,7 @@ describe('Product Customisation actions', () => {
           }
         })
 
-      const productCustomisationId = resProductCustomisation.body.productColor.id
+      const productCustomisationId = resProductCustomisation.body.productCustomisation.id
 
       const res = await chai
         .request(app)
@@ -376,8 +378,8 @@ describe('Product Customisation actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'productCustomisation')
       expect(res.body.productCustomisation).to.be.an('object')
       expect(res.body.productCustomisation).to.include.keys('id', 'customisationType', 'customisationDetail', 'price', 'available', 'photo', 'createdAt', 'updatedAt')
-      expect(res.body.productColor.customisationType).to.equal('print')
-      expect(res.body.productColor.customisationDetail).to.equal('Two-color Print')
+      expect(res.body.productCustomisation.customisationType).to.equal('print')
+      expect(res.body.productCustomisation.customisationDetail).to.equal('Two-color Print')
     })
 
     it('Should return 403 Forbidden when an non-administrator tries to update a product customisation by id.', async () => {
@@ -416,7 +418,7 @@ describe('Product Customisation actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only an admin can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner or admin can perform this action')
     })
   })
 })
