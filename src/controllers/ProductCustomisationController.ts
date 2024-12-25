@@ -14,9 +14,9 @@ class ProductCustomisationController extends BaseController {
   checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: productCustomisation } = req
 
-    const owner = productCustomisation.owner
+    const ownerId = productCustomisation.userId
 
-    const isOwnerOrAdmin = currentUser.id === owner.id || currentUser.role === userRoles.ADMIN
+    const isOwnerOrAdmin = currentUser.id === ownerId || currentUser.role === userRoles.ADMIN
 
     if (isOwnerOrAdmin) {
       req.isOwnerOrAdmin = isOwnerOrAdmin
@@ -81,6 +81,18 @@ class ProductCustomisationController extends BaseController {
       meta,
       [this.service.manyRecords()]: records.rows
     })
+  }
+
+  async delete (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record } = req
+    // eslint-disable-next-line no-console
+    console.log('this is record --------------------------------------------', record)
+
+    const response = await this.service.delete(record)
+
+    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} deleted` })
+
+    return res.status(statusCodes.NO_CONTENT).send(response)
   }
 }
 
