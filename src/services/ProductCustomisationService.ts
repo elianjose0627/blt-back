@@ -52,9 +52,9 @@ class ProductCustomisationService extends BaseService {
               { customisationType: { [Op.iLike]: `%${search}%` } },
               { customisationDetail: { [Op.iLike]: `%${search}%` } }
             ]
-          }
-        ],
-        where
+          },
+          where
+        ]
       }
     }
 

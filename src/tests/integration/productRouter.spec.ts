@@ -4167,6 +4167,78 @@ describe('Product actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success')
     })
 
+    it('Should return 200 OK when an admin adds same graduated price to a children product', async () => {
+      const resProductParent = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Shirt',
+            jfsku: 'sh123',
+            merchantSku: 'sh123',
+            type: 'generic',
+            productGroup: 'clothing',
+            isParent: true
+          }
+        })
+
+      const productParentId = resProductParent.body.product.id
+
+      const resProductChild = await chai
+        .request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            name: 'Shirt - Blue',
+            jfsku: 'sh124',
+            merchantSku: 'sh123-blue',
+            type: 'generic',
+            productGroup: 'clothing'
+          }
+        })
+
+      const productChildId = resProductChild.body.product.id
+
+      await chai
+        .request(app)
+        .patch(`/api/products/${String(productParentId)}/children`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          product: {
+            childIds: [productChildId]
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/products/${String(productParentId)}/graduated-prices`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productGraduatedPrice: {
+            firstUnit: 1,
+            lastUnit: 100,
+            price: 15.12
+          }
+        })
+
+      await chai
+        .request(app)
+        .post(`/api/products/${String(productParentId)}/children/graduated-prices`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send()
+
+      const res = await chai
+        .request(app)
+        .post(`/api/products/${String(productParentId)}/children/graduated-prices`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send()
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success')
+    })
+
     it('Should return 404 Not Found when an admin tries to add a empty graduated price to a children product', async () => {
       const resProductParent = await chai
         .request(app)

@@ -137,6 +137,32 @@ describe('Product Customisation actions', () => {
       expect(res.body.productCustomisation).to.be.an('object')
       expect(res.body.productCustomisation).to.include.keys('id', 'customisationType', 'customisationDetail', 'price', 'available', 'photo', 'createdAt', 'updatedAt')
     })
+
+    it('Should return 404 NOT FOUNT when a user creates the a product customisation with fake product ID.', async () => {
+      const res = await chai
+        .request(app)
+        .post('/api/product-customisations')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCustomisation: {
+            customisationType: 'print',
+            customisationDetail: 'Two-color Print',
+            price: 100,
+            available: false,
+            photo: [
+              {
+                url: 'https://google.com',
+                filename: 'file.jpg'
+              }
+            ],
+            productId: '88D48647-ED1C-49CF-9D53-403D7DAD8DB7'
+          }
+        })
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Product not found')
+    })
   })
 
   describe('Get all product customisations', () => {
@@ -175,6 +201,17 @@ describe('Product Customisation actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/product-customisations?filter[productId]=${productId}`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCustomisations')
+      expect(res.body.productCustomisations).to.be.an('array')
+    })
+
+    it('Should return 200 Success when a user retrieves all product customisatioins with productId and search value.', async () => {
+      const res = await chai
+        .request(app)
+        .get(`/api/product-customisations?filter[productId]=${productId}&search=engraving`)
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(200)
