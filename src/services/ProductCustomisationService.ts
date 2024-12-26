@@ -32,7 +32,7 @@ class ProductCustomisationService extends BaseService {
     return { response: response.toJSONFor(), status: 201 }
   }
 
-  async getAll (limit: number, offset: number, search?: string, filter = { productId: '' }, sortBy = { createdAt: 'DESC' }, user?: any): Promise<any> {
+  async getAll (limit: number, offset: number, search?: string, filter = { productId: '' }, user?: any): Promise<any> {
     // let records
     let where = generateFilterQuery(filter)
 

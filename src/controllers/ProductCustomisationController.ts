@@ -12,9 +12,9 @@ const productService = new ProductService('Product')
 
 class ProductCustomisationController extends BaseController {
   checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
-    const { user: currentUser, record: productCustomisation } = req
+    const { user: currentUser, record: { owner: { id } } } = req
 
-    const isOwnerOrAdmin = currentUser.id === productCustomisation?.owner?.id || currentUser.role === userRoles.ADMIN
+    const isOwnerOrAdmin = currentUser.id === id || currentUser.role === userRoles.ADMIN
 
     if (isOwnerOrAdmin) {
       req.isOwnerOrAdmin = isOwnerOrAdmin
@@ -63,9 +63,9 @@ class ProductCustomisationController extends BaseController {
   }
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { user: currentUser, query: { limit, page, offset, search, sortBy, filter } } = req
+    const { user: currentUser, query: { limit, page, offset, search, filter } } = req
 
-    const records = await productCustomisationService.getAll(limit, offset, search, filter, sortBy, currentUser)
+    const records = await productCustomisationService.getAll(limit, offset, search, filter, currentUser)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),
