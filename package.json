@@ -16,7 +16,6 @@
     "reset:db": "sequelize db:migrate:undo:all && npm run migrate",
     "seed": "sequelize db:seed:all",
     "test": "NODE_ENV=test npm run reset:db && NODE_ENV=test npm run seed && NODE_ENV=test nyc mocha --require ts-node/register --timeout 25000 src/tests/**/*.spec.ts --exit",
-    "test:one": "NODE_ENV=test npm run reset:db && NODE_ENV=test npm run seed && NODE_ENV=test nyc mocha --require ts-node/register --timeout 25000 src/tests/integration/productCustomisationRouter.spec.ts --exit",
     "coveralls-coverage": "nyc report --reporter=text-lcov | coveralls",
     "codecov-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov --disable=gcov",
     "coverage": "nyc report --reporter=lcov && npm run coveralls-coverage"

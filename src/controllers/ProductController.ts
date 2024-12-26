@@ -337,6 +337,49 @@ class ProductController extends BaseController {
     })
   }
 
+  async addGraduatedPriceToChildren (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { record: product } = req
+
+    const childrenIds: string[] = product.children.map((child: IProduct) => child.id)
+
+    if (product.isParent === false || childrenIds.length === 0) {
+      return res.status(statusCodes.NOT_FOUND).send({
+        statusCode: statusCodes.NOT_FOUND,
+        success: false,
+        errors: {
+          message: 'Child product not found'
+        }
+      })
+    }
+
+    const productGraduatedPrices = product.graduatedPrices
+
+    if (productGraduatedPrices.length === 0) {
+      return res.status(statusCodes.NOT_FOUND).send({
+        statusCode: statusCodes.NOT_FOUND,
+        success: false,
+        errors: {
+          message: 'No graduated Prices in Parent Product'
+        }
+      })
+    }
+
+    const { response, status } = await productGraduatedPriceService.insertMultiple({ childrenIds, productGraduatedPrices })
+
+    io.emit(`${String(productGraduatedPriceService.manyRecords())}`, { message: `${String(productGraduatedPriceService.manyRecords())} created` })
+
+    const statusCode: StatusCode = {
+      200: statusCodes.OK,
+      201: statusCodes.CREATED
+    }
+
+    return res.status(statusCode[status]).send({
+      statusCode: statusCode[status],
+      success: true,
+      [productGraduatedPriceService.manyRecords()]: response
+    })
+  }
+
   async getSimilarProducts (req: CustomRequest, res: CustomResponse): Promise<any> {
     const {
       query: { limit, page, offset },
