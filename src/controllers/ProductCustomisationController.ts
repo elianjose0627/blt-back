@@ -14,9 +14,7 @@ class ProductCustomisationController extends BaseController {
   checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: productCustomisation } = req
 
-    const ownerId = productCustomisation?.owner?.id
-
-    const isOwnerOrAdmin = currentUser.id === ownerId || currentUser.role === userRoles.ADMIN
+    const isOwnerOrAdmin = currentUser.id === productCustomisation?.owner?.id || currentUser.role === userRoles.ADMIN
 
     if (isOwnerOrAdmin) {
       req.isOwnerOrAdmin = isOwnerOrAdmin

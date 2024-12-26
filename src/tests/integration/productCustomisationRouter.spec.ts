@@ -219,6 +219,25 @@ describe('Product Customisation actions', () => {
       expect(res.body.productCustomisations).to.be.an('array')
     })
 
+    it('Should return 200 Success when an admin successfully retrieves all product customisatioins with params.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/product-customisations')
+        .query({
+          limit: 10,
+          page: 1,
+          search: 'engraving',
+          filter: {
+            productId
+          }
+        })
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCustomisations')
+      expect(res.body.productCustomisations).to.be.an('array')
+    })
+
     it('Should return 422 Unprocessable Entity when a admin retrieves all product customiations wihout filter.', async () => {
       const res = await chai
         .request(app)
