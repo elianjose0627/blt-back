@@ -111,7 +111,9 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
         owner: this.owner,
         orderLineRequests: this.orderLineRequests,
         shippingAddressRequests: this.shippingAddressRequests,
-        billingAddressRequests: this.billingAddressRequests
+        billingAddressRequests: this.billingAddressRequests,
+        externalOrderNumber: this.externalOrderNumber,
+        externalProjectNumber: this.externalProjectNumber
       }
     }
   };
