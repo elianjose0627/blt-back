@@ -24,7 +24,7 @@ const productCustomisationRoutes = (): Router => {
   productCustomisationRouter.route('/product-customisations/:id')
     .get(asyncHandler(ProductCustomisationController.checkOwnerOrAdmin), asyncHandler(ProductCustomisationController.get))
     .put(asyncHandler(ProductCustomisationController.checkOwnerOrAdmin), celebrate({
-      [Segments.BODY]: validator.validateProductCustomisation
+      [Segments.BODY]: validator.validateProductCustomisationForUpdate
     }), asyncHandler(ProductCustomisationController.update))
     .delete(asyncHandler(ProductCustomisationController.checkOwnerOrAdmin), asyncHandler(ProductCustomisationController.delete))
   return productCustomisationRouter

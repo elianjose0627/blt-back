@@ -1342,6 +1342,21 @@ const validateProductCustomisation = Joi.object({
   }).required()
 })
 
+const validateProductCustomisationForUpdate = Joi.object({
+  productCustomisation: Joi.object({
+    customisationType: Joi.string().required().valid(...['print', 'engraving']),
+    customisationDetail: Joi.string().required(),
+    price: Joi.number().min(0),
+    available: Joi.boolean().optional().default(false),
+    photo: Joi.array().items(
+      Joi.object({
+        filename: Joi.string().required(),
+        url: Joi.string().uri().required()
+      }).required()
+    ).required()
+  }).required()
+})
+
 const validateProductCustomisationQueryParams = Joi.object({
   ...commonQueryParams,
   filter: Joi.object({
@@ -1457,5 +1472,6 @@ export default {
   validateCompanyShopHeader,
   validateProductCustomisation,
   validateProductCustomisationQueryParams,
-  validateDocumentQueryParams
+  validateDocumentQueryParams,
+  validateProductCustomisationForUpdate
 }
