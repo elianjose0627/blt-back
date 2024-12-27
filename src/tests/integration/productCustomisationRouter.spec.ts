@@ -425,8 +425,7 @@ describe('Product Customisation actions', () => {
                 url: 'https://google.com',
                 filename: 'file.jpg'
               }
-            ],
-            productId
+            ]
           }
         })
 
@@ -467,8 +466,16 @@ describe('Product Customisation actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           productCustomisation: {
-            name: 'yellow',
-            hexCode: '#ffff00'
+            customisationType: 'engraving',
+            customisationDetail: 'Laser Engraving',
+            price: 1000,
+            available: false,
+            photo: [
+              {
+                url: 'https://google.com',
+                filename: 'file.jpg'
+              }
+            ]
           }
         })
 
