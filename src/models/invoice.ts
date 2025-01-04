@@ -32,6 +32,8 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
     orderLineRequests: OrderLineRequest[]
     shippingAddressRequests: ShippingAddressRequest[]
     billingAddressRequests: BillingAddressRequest[]
+    externalOrderNumber: number
+    externalProjectNumber: number
   }
 
   class Invoice extends Model<InvoiceAttributes> {
@@ -61,6 +63,8 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
     private readonly billingAddressRequests: BillingAddressRequest[]
     private readonly createdAt: Date
     private readonly updatedAt: Date
+    private readonly externalOrderNumber: string
+    private readonly externalProjectNumber: string
 
     static associate (models: any): any {
       Invoice.belongsTo(models.Company, {
@@ -107,7 +111,9 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
         owner: this.owner,
         orderLineRequests: this.orderLineRequests,
         shippingAddressRequests: this.shippingAddressRequests,
-        billingAddressRequests: this.billingAddressRequests
+        billingAddressRequests: this.billingAddressRequests,
+        externalOrderNumber: this.externalOrderNumber,
+        externalProjectNumber: this.externalProjectNumber
       }
     }
   };
@@ -213,6 +219,14 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
     billingAddressRequests: {
       type: DataTypes.JSONB,
       allowNull: false
+    },
+    externalOrderNumber: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    externalProjectNumber: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     sequelize,
