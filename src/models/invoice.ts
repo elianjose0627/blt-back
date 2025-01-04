@@ -222,11 +222,11 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
     },
     externalOrderNumber: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     externalProjectNumber: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     }
   }, {
     sequelize,
