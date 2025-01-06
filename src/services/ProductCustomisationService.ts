@@ -2,7 +2,6 @@ import { Op } from 'sequelize'
 import { v1 as uuidv1 } from 'uuid'
 import BaseService, { generateFilterQuery, generateInclude } from './BaseService'
 import db from '../models'
-// import * as userRoles from '../utils/userRoles'
 
 class ProductCustomisationService extends BaseService {
   async insert (data: any): Promise<any> {
@@ -33,16 +32,7 @@ class ProductCustomisationService extends BaseService {
   }
 
   async getAll (limit: number, offset: number, search?: string, filter = { productId: '' }, user?: any): Promise<any> {
-    // let records
     let where = generateFilterQuery(filter)
-
-    // const generateOrder = (sortBy: object): string[][] => {
-    //   return Object.entries(sortBy)
-    //     .filter(([_, value]) => value !== '')
-    //     .map(([key, value]) => [key, value])
-    // }
-
-    // const order = generateOrder(sortBy)
 
     if (search !== undefined && search !== '') {
       where = {
@@ -58,17 +48,6 @@ class ProductCustomisationService extends BaseService {
       }
     }
 
-    // if (user.role === userRoles.ADMIN) {
-    //   records = await db[this.model].findAndCountAll({
-    //     include: generateInclude(this.model),
-    //     limit,
-    //     offset,
-    //     order,
-    //     attributes: { exclude: [] },
-    //     where,
-    //     distinct: true
-    //   })
-    // } else {
     const records = await db[this.model].findAndCountAll({
       include: generateInclude(this.model),
       limit,
@@ -81,7 +60,7 @@ class ProductCustomisationService extends BaseService {
       },
       distinct: true
     })
-    // }
+
     return {
       count: records.count,
       rows: records.rows.map((record: any) => record.toJSONFor())
