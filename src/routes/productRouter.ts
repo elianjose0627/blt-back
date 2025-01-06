@@ -86,6 +86,10 @@ const ProductRoutes = (): Router => {
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateGraduatedPrice
     }, { abortEarly: false }), asyncHandler(ProductController.addGraduatedPrice))
+  productRouter.route('/products/:id/children/graduated-prices')
+    .post(asyncHandler(checkAdmin), celebrate({
+      [Segments.QUERY]: validator.validateUUID
+    }), asyncHandler(ProductController.addGraduatedPriceToChildren))
   return productRouter
 }
 

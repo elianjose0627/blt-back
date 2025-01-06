@@ -1181,6 +1181,25 @@ export interface IShopHeader {
   filename: string
 }
 
+export interface IPhoto {
+  url: string
+  filename: string
+}
+
+export type ProductCustomisationType = 'print' | 'engraving'
+export interface IProductCustomisation {
+  id: string
+  customisationType: ProductCustomisationType
+  customisationDetail: object
+  price: number
+  available: boolean
+  photo: IPhoto[]
+  owner: IUser
+  createdAt: Date
+  updatedAt: Date
+  product?: IProduct
+}
+
 export interface IPackingSlip {
   id: string
   postedOrderId: string
