@@ -1080,6 +1080,7 @@ export interface IPendingOrder {
   company?: ICompany
   isOrderConfirmationGenerated: boolean
   isInvoiceGenerated: boolean
+  isQueued: boolean
 }
 
 export interface IDuplicatePostedOrder {
