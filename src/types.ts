@@ -707,6 +707,8 @@ export interface IInvoice {
   costCenter: string | null
   createdAt: Date
   updatedAt: Date
+  externalOrderNumber: string
+  externalProjectNumber: string
 }
 
 export interface ShippingAddress {
