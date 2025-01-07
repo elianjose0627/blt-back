@@ -1288,7 +1288,7 @@ const validateCampaignQuota = Joi.object({
   campaignQuota: Joi.object({
     orderedQuota: Joi.number().required(),
     orderedDate: Joi.date().required(),
-    orderId: Joi.string().alphanum().required()
+    orderId: Joi.string().required()
   }).required()
 })
 
@@ -1325,6 +1325,44 @@ const validateCompanyShopHeader = Joi.object({
     }).allow(null)
   }).required()
 }).required()
+
+const validateProductCustomisation = Joi.object({
+  productCustomisation: Joi.object({
+    customisationType: Joi.string().required().valid(...['print', 'engraving']),
+    customisationDetail: Joi.string().required(),
+    price: Joi.number().min(0),
+    available: Joi.boolean().optional().default(false),
+    photo: Joi.array().items(
+      Joi.object({
+        filename: Joi.string().required(),
+        url: Joi.string().uri().required()
+      }).required()
+    ).required(),
+    productId: Joi.string().uuid().required()
+  }).required()
+})
+
+const validateProductCustomisationForUpdate = Joi.object({
+  productCustomisation: Joi.object({
+    customisationType: Joi.string().required().valid(...['print', 'engraving']),
+    customisationDetail: Joi.string().required(),
+    price: Joi.number().min(0),
+    available: Joi.boolean().optional().default(false),
+    photo: Joi.array().items(
+      Joi.object({
+        filename: Joi.string().required(),
+        url: Joi.string().uri().required()
+      }).required()
+    ).required()
+  }).required()
+})
+
+const validateProductCustomisationQueryParams = Joi.object({
+  ...commonQueryParams,
+  filter: Joi.object({
+    productId: Joi.string().uuid().required()
+  }).required()
+})
 
 const validateDocumentQueryParams = Joi.object({
   ...commonQueryParams,
@@ -1432,5 +1470,8 @@ export default {
   validateCampaignQuotaNotification,
   validateApiKey,
   validateCompanyShopHeader,
-  validateDocumentQueryParams
+  validateProductCustomisation,
+  validateProductCustomisationQueryParams,
+  validateDocumentQueryParams,
+  validateProductCustomisationForUpdate
 }
