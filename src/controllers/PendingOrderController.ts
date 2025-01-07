@@ -1,6 +1,6 @@
 import BaseController from './BaseController'
 import PendingOrderService from '../services/PendingOrderService'
-import type { CustomRequest, CustomResponse, ICampaign, IPendingOrder, Module, StatusCode } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse, ICampaign, IPendingOrder, Module, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
@@ -12,10 +12,30 @@ class PendingOrderController extends BaseController {
     return 'orders'
   }
 
-  async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { query: { limit, page, offset, search, filter } } = req
+  checkPermission (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { user: currentUser, record: { owner: { id }, companyId } } = req
 
-    const records = await pendingOrderService.getAll(limit, offset, search, filter)
+    const isOwnerOrAdmin = currentUser.id === id || currentUser.role === userRoles.ADMIN
+    const isCompanyAdminOrCampaignManger = (currentUser.role === userRoles.COMPANYADMINISTRATOR || currentUser.role === userRoles.CAMPAIGNMANAGER) && currentUser.company.id === companyId
+
+    if (isOwnerOrAdmin || isCompanyAdminOrCampaignManger) {
+      req.isOwnerOrAdmin = isOwnerOrAdmin
+      return next()
+    } else {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'You do not have the necessary permissions to perform this action'
+        }
+      })
+    }
+  }
+
+  async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { user: currentUser, query: { limit, page, offset, search, filter } } = req
+
+    const records = await pendingOrderService.getAll(limit, offset, currentUser, search, filter)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),

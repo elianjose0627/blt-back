@@ -24,14 +24,54 @@ class PendingOrderService extends BaseService {
     return records
   }
 
-  async getAll (limit: number, offset: number, search: string = '', filter = { firstname: '', lastname: '', email: '', city: '', country: '' }): Promise<any> {
-    const records = await db[this.model].findAndCountAll({
-      include: generateInclude(this.model),
-      limit,
-      offset,
-      order: [['createdAt', 'DESC']],
-      attributes: { exclude: ['deletedAt'] }
-    })
+  async getAll (limit: number, offset: number, user?: IUserExtended, search: string = '', filter = { firstname: '', lastname: '', email: '', city: '', country: '' }): Promise<any> {
+    let records
+    if (user?.role === userRoles.ADMIN) {
+      records = await db[this.model].findAndCountAll({
+        include: generateInclude(this.model),
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude: ['deletedAt'] },
+        distinct: true
+      })
+    } else if (user?.role === userRoles.COMPANYADMINISTRATOR) {
+      records = await db[this.model].findAndCountAll({
+        include: generateInclude(this.model),
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude: [] },
+        where: {
+          companyId: user?.company?.id
+        },
+        distinct: true
+      })
+    } else if (user?.role === userRoles.CAMPAIGNMANAGER) {
+      records = await db[this.model].findAndCountAll({
+        include: generateInclude(this.model),
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude: [] },
+        where: {
+          companyId: user?.company?.id
+        },
+        distinct: true
+      })
+    } else {
+      records = await db[this.model].findAndCountAll({
+        include: generateInclude(this.model),
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude: [] },
+        where: {
+          userId: user?.id
+        },
+        distinct: true
+      })
+    }
 
     return records
   }
