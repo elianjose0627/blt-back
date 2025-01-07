@@ -1,7 +1,7 @@
 import { v1 as uuidv1 } from 'uuid'
+import { Op } from 'sequelize'
 import BaseService from './BaseService'
 import db from '../models'
-import { Op } from 'sequelize'
 
 class ProductCategoryService extends BaseService {
   manyRecords (): string {
@@ -34,8 +34,9 @@ class ProductCategoryService extends BaseService {
     return { response: response.toJSONFor(), status: 201 }
   }
 
-  async getAll (limit: number, offset: number, search?: string): Promise<any> {
+  async getAll (limit: number, offset: number, search?: string, filter?: any): Promise<any> {
     let where
+    const whereFilterIsHidden = filter?.isHidden !== undefined ? { isHidden: filter.isHidden === 'true' } : {}
 
     if (search !== undefined) {
       where = {
@@ -47,7 +48,10 @@ class ProductCategoryService extends BaseService {
     const records = await db[this.model].findAndCountAll({
       limit,
       offset,
-      where,
+      where: {
+        ...where,
+        ...whereFilterIsHidden
+      },
       include: [
         {
           model: db.ProductCategoryTag,

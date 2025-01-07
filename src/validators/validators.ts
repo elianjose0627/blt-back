@@ -231,7 +231,8 @@ const commonQueryParams = {
         'string.pattern.base': '{#label} must contain valid ranges separated by commas'
       }).optional(),
     affiliation: Joi.string().optional(),
-    isBillOfMaterials: Joi.string().trim().lowercase().valid(...['true', 'false'])
+    isBillOfMaterials: Joi.string().trim().lowercase().valid(...['true', 'false']),
+    isHidden: Joi.string().trim().lowercase().valid(...['true', 'false'])
   }).optional()
 }
 const validateQueryParams = Joi.object({ ...commonQueryParams }).required()
@@ -989,7 +990,8 @@ const validateProductCategory = Joi.object({
       url: Joi.string().uri().required(),
       filename: Joi.string().required()
     }).allow(null),
-    sortIndex: Joi.number().positive().allow(0)
+    sortIndex: Joi.number().positive().allow(0),
+    isHidden: Joi.boolean().default(false)
   }).required()
 })
 

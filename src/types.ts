@@ -426,6 +426,7 @@ export interface IProductCategory {
   description: Nullable<string>
   picture: Nullable<MediaData>
   sortIndex: number
+  isHidden: boolean
   createdAt: Date
   updatedAt: Date
   productCategoryTags?: IProductCategoryTag[]
