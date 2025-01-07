@@ -1288,7 +1288,7 @@ const validateCampaignQuota = Joi.object({
   campaignQuota: Joi.object({
     orderedQuota: Joi.number().required(),
     orderedDate: Joi.date().required(),
-    orderId: Joi.string().alphanum().required()
+    orderId: Joi.string().required()
   }).required()
 })
 
@@ -1324,6 +1324,54 @@ const validateCompanyShopHeader = Joi.object({
       filename: Joi.string().required()
     }).allow(null)
   }).required()
+}).required()
+
+const validateProductCustomisation = Joi.object({
+  productCustomisation: Joi.object({
+    customisationType: Joi.string().required().valid(...['print', 'engraving']),
+    customisationDetail: Joi.string().required(),
+    price: Joi.number().min(0),
+    available: Joi.boolean().optional().default(false),
+    photo: Joi.array().items(
+      Joi.object({
+        filename: Joi.string().required(),
+        url: Joi.string().uri().required()
+      }).required()
+    ).required(),
+    productId: Joi.string().uuid().required()
+  }).required()
+})
+
+const validateProductCustomisationForUpdate = Joi.object({
+  productCustomisation: Joi.object({
+    customisationType: Joi.string().required().valid(...['print', 'engraving']),
+    customisationDetail: Joi.string().required(),
+    price: Joi.number().min(0),
+    available: Joi.boolean().optional().default(false),
+    photo: Joi.array().items(
+      Joi.object({
+        filename: Joi.string().required(),
+        url: Joi.string().uri().required()
+      }).required()
+    ).required()
+  }).required()
+})
+
+const validateProductCustomisationQueryParams = Joi.object({
+  ...commonQueryParams,
+  filter: Joi.object({
+    productId: Joi.string().uuid().required()
+  }).required()
+})
+
+const validateDocumentQueryParams = Joi.object({
+  ...commonQueryParams,
+  sortBy: Joi.object({
+    dueDate: Joi.string().valid(...['asc', 'desc']),
+    createdAt: Joi.string().valid(...['asc', 'desc']),
+    deliveryDate: Joi.string().valid(...['asc', 'desc']),
+    documentDate: Joi.string().valid(...['asc', 'desc'])
+  })
 }).required()
 
 export default {
@@ -1421,5 +1469,9 @@ export default {
   validateCampaignQuota,
   validateCampaignQuotaNotification,
   validateApiKey,
-  validateCompanyShopHeader
+  validateCompanyShopHeader,
+  validateProductCustomisation,
+  validateProductCustomisationQueryParams,
+  validateDocumentQueryParams,
+  validateProductCustomisationForUpdate
 }

@@ -54,6 +54,9 @@ import categoryRouter from './wawiAPI/categoryRouter'
 import campaignQuotaRouter from './campaignQuotaRouter'
 import campaignQuotaNotificationRouter from './campaignQuotaNotificationRouter'
 import apiKeyRouter from './apiKeyRouter'
+import productCustomisationRouter from './productCustomisationRouter'
+import orderConfirmationRouter from './orderConfirmationRouter'
+import packingSlipRouter from './packingSlipRouter'
 
 const routers = {
   authRouter,
@@ -111,7 +114,10 @@ const routers = {
   categoryRouter,
   campaignQuotaRouter,
   campaignQuotaNotificationRouter,
-  apiKeyRouter
+  apiKeyRouter,
+  productCustomisationRouter,
+  orderConfirmationRouter,
+  packingSlipRouter
 }
 
 export default routers

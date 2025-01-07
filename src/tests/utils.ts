@@ -1585,3 +1585,159 @@ export const createToken = async (): Promise<any> => {
     refreshToken: generateToken({ id: uuidv4(), email: faker.internet.email(), role: userRoles.USER, logoutTime: null, isVerified: true }, 'login')
   })
 }
+
+export const createPackingSlip = async (companyId: string, userId: string): Promise<any> => {
+  const packingSlip = await db.PackingSlip.create({
+    id: uuidv4(),
+    postedOrderId: uuidv4(),
+    trackingId: '123456789',
+    externalOrderNumber: '300-EBS0006442',
+    externalProjectNumber: '300P70501320000',
+    dueDate: dayjs.utc().add(1, 'day'),
+    deliveryDate: dayjs.utc().add(1, 'day'),
+    documentDate: dayjs.utc(),
+    costCenter: '123456',
+    companyId,
+    userId,
+    orderLineRequests: [
+      {
+        type: 0,
+        itemVAT: 0,
+        discount: 0,
+        itemName: 'Tasse - Kitty Mug - 1c - navy - Kurita - Muster',
+        quantity: 2,
+        itemNetSale: 0,
+        articleNumber: '1005',
+        netPurchasePrice: 0
+      }
+    ],
+    shippingAddressRequests: [
+      {
+        fax: '',
+        iso: '',
+        email: faker.internet.email(),
+        phone: '',
+        place: faker.address.city(),
+        state: '',
+        title: '',
+        mobile: '',
+        street: faker.address.streetAddress(),
+        company: '',
+        country: faker.address.country(),
+        zipCode: faker.address.zipCode(),
+        lastName: faker.name.lastName(),
+        firstName: faker.name.firstName(),
+        telephone: '',
+        salutation: 'Mr',
+        addressAddition: '',
+        companyAddition: ''
+      }
+    ],
+    billingAddressRequests: [
+      {
+        fax: '',
+        iso: '',
+        email: faker.internet.email(),
+        phone: '',
+        place: faker.address.city(),
+        state: '',
+        title: '',
+        mobile: '',
+        street: faker.address.streetAddress(),
+        company: '',
+        country: faker.address.country(),
+        zipCode: faker.address.zipCode(),
+        lastName: faker.name.lastName(),
+        firstName: faker.name.firstName(),
+        telephone: '',
+        salutation: 'Mr',
+        addressAddition: '',
+        companyAddition: ''
+      }
+    ]
+  })
+
+  return packingSlip
+}
+
+export const createOrderConfirmation = async (companyId: string, userId: string): Promise<any> => {
+  const orderConfimtion = await db.OrderConfirmation.create({
+    id: uuidv4(),
+    postedOrderId: uuidv4(),
+    externalOrderNumber: '300-EBS0006442',
+    externalProjectNumber: '300P70501320000',
+    taxRate: 19,
+    discountRate: 0,
+    totalVat: 0,
+    totalNet: 0,
+    totalGross: 0,
+    totalDiscount: 0,
+    totalShipping: 0,
+    amountPaid: 0,
+    currency: 'EUR',
+    dueDate: dayjs.utc().add(1, 'day'),
+    deliveryDate: dayjs.utc().add(1, 'day'),
+    documentDate: dayjs.utc(),
+    costCenter: '123456',
+    companyId,
+    userId,
+    orderLineRequests: [
+      {
+        type: 0,
+        itemVAT: 0,
+        discount: 0,
+        itemName: 'Tasse - Kitty Mug - 1c - navy - Kurita - Muster',
+        quantity: 2,
+        itemNetSale: 0,
+        articleNumber: '1005',
+        netPurchasePrice: 0
+      }
+    ],
+    shippingAddressRequests: [
+      {
+        fax: '',
+        iso: '',
+        email: faker.internet.email(),
+        phone: '',
+        place: faker.address.city(),
+        state: '',
+        title: '',
+        mobile: '',
+        street: faker.address.streetAddress(),
+        company: '',
+        country: faker.address.country(),
+        zipCode: faker.address.zipCode(),
+        lastName: faker.name.lastName(),
+        firstName: faker.name.firstName(),
+        telephone: '',
+        salutation: 'Mr',
+        addressAddition: '',
+        companyAddition: ''
+      }
+    ],
+    billingAddressRequests: [
+      {
+        fax: '',
+        iso: '',
+        email: faker.internet.email(),
+        phone: '',
+        place: faker.address.city(),
+        state: '',
+        title: '',
+        mobile: '',
+        street: faker.address.streetAddress(),
+        company: '',
+        country: faker.address.country(),
+        zipCode: faker.address.zipCode(),
+        lastName: faker.name.lastName(),
+        firstName: faker.name.firstName(),
+        telephone: '',
+        salutation: 'Mr',
+        addressAddition: '',
+        companyAddition: ''
+      }
+    ]
+  })
+
+  return orderConfimtion
+}

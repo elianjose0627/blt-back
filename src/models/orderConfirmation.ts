@@ -1,6 +1,6 @@
 import { Model } from 'sequelize'
 import type {
-  IInvoice,
+  IOrderConfirmation,
   ICompany,
   ICampaign,
   IUser,
@@ -9,11 +9,14 @@ import type {
   BillingAddressRequest
 } from '../types'
 
-const InvoiceModel = (sequelize: any, DataTypes: any): any => {
-  interface InvoiceAttributes {
+const OrderConfirmationModel = (sequelize: any, DataTypes: any): any => {
+  interface OrderConfirmationAttributes {
     id: string
     postedOrderId: string
-    invoiceNumber: number
+    orderConfirmationNumber: number
+    costCenter: string | null
+    externalOrderNumber: string
+    externalProjectNumber: string
     taxRate: number
     discountRate: number
     totalVat: number
@@ -23,23 +26,22 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
     totalShipping: number
     amountPaid: number
     currency: string
-    status: string
     isEmailSent: boolean
     dueDate: Date
     deliveryDate: Date
     documentDate: Date
-    costCenter: string | null
     orderLineRequests: OrderLineRequest[]
     shippingAddressRequests: ShippingAddressRequest[]
     billingAddressRequests: BillingAddressRequest[]
-    externalOrderNumber: number
-    externalProjectNumber: number
   }
 
-  class Invoice extends Model<InvoiceAttributes> {
+  class OrderConfirmation extends Model<OrderConfirmationAttributes> {
     private readonly id: string
     private readonly postedOrderId: string
-    private readonly invoiceNumber: number
+    private readonly orderConfirmationNumber: number
+    private readonly costCenter: string | null
+    private readonly externalOrderNumber: string
+    private readonly externalProjectNumber: string
     private readonly taxRate: number
     private readonly discountRate: number
     private readonly totalVat: number
@@ -49,46 +51,44 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
     private readonly totalShipping: number
     private readonly amountPaid: number
     private readonly currency: string
-    private readonly status: string
     private readonly isEmailSent: boolean
     private readonly dueDate: Date
     private readonly deliveryDate: Date
     private readonly documentDate: Date
-    private readonly costCenter: string | null
-    private readonly company: ICompany
-    private readonly campaign: ICampaign
-    private readonly owner: IUser
     private readonly orderLineRequests: OrderLineRequest[]
     private readonly shippingAddressRequests: ShippingAddressRequest[]
     private readonly billingAddressRequests: BillingAddressRequest[]
+    private readonly company: ICompany
+    private readonly campaign: ICampaign
+    private readonly owner: IUser
     private readonly createdAt: Date
     private readonly updatedAt: Date
-    private readonly externalOrderNumber: string
-    private readonly externalProjectNumber: string
 
     static associate (models: any): any {
-      Invoice.belongsTo(models.Company, {
+      OrderConfirmation.belongsTo(models.Company, {
         foreignKey: 'companyId',
         as: 'company',
         onDelete: 'CASCADE'
       })
-      Invoice.belongsTo(models.Campaign, {
+      OrderConfirmation.belongsTo(models.Campaign, {
         foreignKey: 'campaignId',
         as: 'campaign',
         onDelete: 'CASCADE'
       })
-      Invoice.belongsTo(models.User, {
+      OrderConfirmation.belongsTo(models.User, {
         foreignKey: 'userId',
         as: 'owner',
         onDelete: 'CASCADE'
       })
     }
 
-    toJSONFor (): IInvoice {
+    toJSONFor (): IOrderConfirmation {
       return {
         id: this.id,
         postedOrderId: this.postedOrderId,
-        invoiceNumber: this.invoiceNumber,
+        orderConfirmationNumber: this.orderConfirmationNumber,
+        externalOrderNumber: this.externalOrderNumber,
+        externalProjectNumber: this.externalProjectNumber,
         taxRate: this.taxRate,
         discountRate: this.discountRate,
         totalVat: this.totalVat,
@@ -97,7 +97,6 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
         totalDiscount: this.totalDiscount,
         totalShipping: this.totalShipping,
         currency: this.currency,
-        status: this.status,
         isEmailSent: this.isEmailSent,
         dueDate: this.dueDate,
         deliveryDate: this.deliveryDate,
@@ -111,14 +110,12 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
         owner: this.owner,
         orderLineRequests: this.orderLineRequests,
         shippingAddressRequests: this.shippingAddressRequests,
-        billingAddressRequests: this.billingAddressRequests,
-        externalOrderNumber: this.externalOrderNumber,
-        externalProjectNumber: this.externalProjectNumber
+        billingAddressRequests: this.billingAddressRequests
       }
     }
   };
 
-  Invoice.init({
+  OrderConfirmation.init({
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
@@ -129,11 +126,19 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
       unique: true,
       allowNull: false
     },
-    invoiceNumber: {
+    orderConfirmationNumber: {
       type: DataTypes.INTEGER,
       unique: true,
       allowNull: false,
       autoIncrement: true
+    },
+    externalOrderNumber: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    externalProjectNumber: {
+      type: DataTypes.STRING,
+      allowNull: false
     },
     taxRate: {
       type: DataTypes.FLOAT,
@@ -179,11 +184,6 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false,
       defaultValue: 'EUR'
     },
-    status: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: 'open'
-    },
     isEmailSent: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
@@ -219,22 +219,14 @@ const InvoiceModel = (sequelize: any, DataTypes: any): any => {
     billingAddressRequests: {
       type: DataTypes.JSONB,
       allowNull: false
-    },
-    externalOrderNumber: {
-      type: DataTypes.STRING,
-      allowNull: true
-    },
-    externalProjectNumber: {
-      type: DataTypes.STRING,
-      allowNull: true
     }
   }, {
     sequelize,
     paranoid: true,
-    modelName: 'Invoice'
+    modelName: 'OrderConfirmation'
   })
 
-  return Invoice
+  return OrderConfirmation
 }
 
-module.exports = InvoiceModel
+module.exports = OrderConfirmationModel
