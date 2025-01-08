@@ -215,6 +215,28 @@ class PendingOrderService extends BaseService {
 
     return response
   }
+
+  async update (data: any): Promise<any> {
+    const { pendingOrder, currentUser, record } = data
+    const { company } = currentUser
+
+    const updateData = {
+      ...pendingOrder,
+      customerId: company?.customerId ?? 0,
+      companyId: company?.id,
+      updatedBy: currentUser.email
+    }
+
+    const response = await record.update(updateData, { returning: true })
+
+    const pendingOrdersTopicId = 'pending-orders'
+    const environment = String(process.env.ENVIRONMENT)
+    const pendingOrdersAttributes = { environment }
+
+    await triggerPubSub(pendingOrdersTopicId, 'postPendingOrders', pendingOrdersAttributes)
+
+    return { response: response.toJSONFor(), status: 200 }
+  }
 }
 
 export default PendingOrderService

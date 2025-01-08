@@ -32,6 +32,24 @@ class PendingOrderController extends BaseController {
     }
   }
 
+  checkIsPostedOrQueued (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { record: pendingOrder } = req
+
+    const isPostedOrQueued = pendingOrder.isPosted === true || pendingOrder.isQueued === true
+
+    if (isPostedOrQueued) {
+      return next()
+    } else {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'You can not perform this action for the posted or queued order'
+        }
+      })
+    }
+  }
+
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { user: currentUser, query: { limit, page, offset, search, filter } } = req
 
@@ -158,6 +176,23 @@ class PendingOrderController extends BaseController {
       statusCode: statusCodes.CREATED,
       success: true,
       pendingOrders: response
+    })
+  }
+
+  async update (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { body: { pendingOrders }, user: currentUser, record } = req
+    const { response, status } = await pendingOrderService.update({ pendingOrder: pendingOrders[0], currentUser, record })
+    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} updated` })
+
+    const statusCode: StatusCode = {
+      200: statusCodes.OK,
+      201: statusCodes.CREATED
+    }
+
+    return res.status(statusCode[status]).send({
+      statusCode: statusCode[status],
+      success: true,
+      [this.service.singleRecord()]: response
     })
   }
 }
