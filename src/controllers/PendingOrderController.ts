@@ -37,7 +37,7 @@ class PendingOrderController extends BaseController {
 
     const isPostedOrQueued = pendingOrder.isPosted === true || pendingOrder.isQueued === true
 
-    if (isPostedOrQueued) {
+    if (!isPostedOrQueued) {
       return next()
     } else {
       return res.status(statusCodes.FORBIDDEN).send({
