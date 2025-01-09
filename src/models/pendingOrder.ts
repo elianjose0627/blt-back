@@ -38,6 +38,8 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     isOrderConfirmationGenerated: boolean
     isInvoiceGenerated: boolean
     isQueued: boolean
+    jtlId: number
+    jtlNumber: string
   }
 
   class PendingOrder extends Model<PendingOrderAttributes> {
@@ -79,6 +81,8 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly isOrderConfirmationGenerated: boolean
     private readonly isInvoiceGenerated: boolean
     private readonly isQueued: boolean
+    private readonly jtlId: number
+    private readonly jtlNumber: string
 
     static associate (models: any): any {
       PendingOrder.belongsTo(models.Company, {
@@ -137,7 +141,9 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
         company: this.company,
         isOrderConfirmationGenerated: this.isOrderConfirmationGenerated,
         isInvoiceGenerated: this.isInvoiceGenerated,
-        isQueued: this.isQueued
+        isQueued: this.isQueued,
+        jtlId: this.jtlId,
+        jtlNumber: this.jtlNumber
       }
     }
   };
@@ -287,6 +293,14 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
+    },
+    jtlId: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    jtlNumber: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     sequelize,

@@ -1081,6 +1081,8 @@ export interface IPendingOrder {
   isOrderConfirmationGenerated: boolean
   isInvoiceGenerated: boolean
   isQueued: boolean
+  jtlId: number
+  jtlNumber: string
 }
 
 export interface IDuplicatePostedOrder {
