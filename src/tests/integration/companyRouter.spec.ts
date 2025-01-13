@@ -5846,4 +5846,199 @@ describe('Company actions', () => {
       expect(res.body.company).to.include.keys('id', 'customerId', 'suffix', 'name', 'email', 'phone', 'vat', 'theme', 'logo', 'createdAt', 'updatedAt', 'shopHeader')
     })
   })
+
+  describe('Company product category actions', () => {
+    it('Should return 201 Created when an admin creates a product category for a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company14productcategories.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      const res = await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/product-categories`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          productCategory: {
+            name: 'Test Product Category',
+            description: 'Test Product Category Description',
+            isHidden: false
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCategory')
+      expect(res.body.productCategory).to.be.an('object')
+      expect(res.body.productCategory).to.include.keys('id', 'name', 'description', 'isHidden', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 200 OK when an admin retrieves all product categories for a company.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company14productcategories2.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/product-categories`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          productCategory: {
+            name: 'Test Product Category',
+            description: 'Test Product Category Description',
+            isHidden: false
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(resCompany.body.company.id)}/product-categories`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCategories')
+      expect(res.body.productCategories).to.be.an('array')
+    })
+
+    it('Should return 200 OK when an admin retrieves all product categories for a company with filter params.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company14productcategories3.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/product-categories`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          productCategory: {
+            name: 'Test Product Category',
+            description: 'Test Product Category Description',
+            isHidden: true
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(resCompany.body.company.id)}/product-categories`)
+        .set('Authorization', `Bearer ${token}`)
+        .query({
+          filter: {
+            isHidden: 'true'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCategories')
+      expect(res.body.productCategories).to.be.an('array')
+        .lengthOf(1)
+    })
+
+    it('Should return 200 OK when an admin retrieves all product categories for a company with search params.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company14productcategories4.com'
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/product-categories`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          productCategory: {
+            name: 'Test Product Category Searched 144',
+            description: 'Test Product Category Description',
+            isHidden: false
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(resCompany.body.company.id)}/product-categories`)
+        .set('Authorization', `Bearer ${token}`)
+        .query({
+          search: 'Test Product Category Searched 144'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCategories')
+      expect(res.body.productCategories).to.be.an('array').lengthOf(1)
+    })
+
+    it('Should return 200 OK when an admin retrieves all product categories for a company without default categories.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company',
+            email: 'test@company14productcategories5.com',
+            defaultProductCategoriesHidden: true
+          }
+        })
+
+      await verifyCompanyDomain(String(resCompany.body.company.id))
+
+      await chai
+        .request(app)
+        .post(`/api/companies/${String(resCompany.body.company.id)}/product-categories`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          productCategory: {
+            name: 'Test Product Category',
+            description: 'Test Product Category Description',
+            isHidden: false
+          }
+        })
+      await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          productCategory: {
+            name: 'Test Product Category',
+            description: 'Test Product Category Description',
+            isHidden: false
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${String(resCompany.body.company.id)}/product-categories`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCategories')
+      expect(res.body.productCategories).to.be.an('array').lengthOf(1)
+    })
+  })
 })

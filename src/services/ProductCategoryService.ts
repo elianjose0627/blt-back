@@ -18,7 +18,8 @@ class ProductCategoryService extends BaseService {
 
     response = await db[this.model].findOne({
       where: {
-        name: productCategory.name
+        name: productCategory.name,
+        companyId: productCategory.companyId
       },
       paranoid: false // To get soft deleted record
     })
@@ -86,6 +87,49 @@ class ProductCategoryService extends BaseService {
 
     const response = await Promise.all(updatePromises)
     return response
+  }
+
+  async getAllForCompany (limit: number, offset: number, companyId: string, defaultProductCategoriesHidden: boolean, search?: string, filter?: any): Promise<any> {
+    let where
+    const whereFilterIsHidden = filter?.isHidden !== undefined ? { isHidden: filter.isHidden === 'true' } : {}
+
+    if (search !== undefined) {
+      where = {
+        name: { [Op.iLike]: `%${search}%` }
+      }
+    }
+
+    const records = await db[this.model].findAndCountAll({
+      limit,
+      offset,
+      where: {
+        ...where,
+        ...whereFilterIsHidden,
+        [Op.or]: [
+          { companyId },
+          ...(defaultProductCategoriesHidden ? [] : [{ companyId: null }])
+        ]
+      },
+      include: [
+        {
+          model: db.ProductCategoryTag,
+          attributes: ['id', 'name', 'type'],
+          as: 'productCategoryTags',
+          where: {
+            type: 'category'
+          },
+          required: false
+        }
+      ],
+      order: [['sortIndex', 'ASC'], ['createdAt', 'DESC']],
+      attributes: { exclude: [] },
+      distinct: true
+    })
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
   }
 }
 

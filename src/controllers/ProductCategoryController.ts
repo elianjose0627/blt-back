@@ -1,16 +1,37 @@
 import BaseController from './BaseController'
 import ProductCategoryService from '../services/ProductCategoryService'
-import { CustomRequest, CustomResponse, StatusCode } from '../types'
+import { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
+import * as userRoles from '../utils/userRoles'
 
 const productCategoryService = new ProductCategoryService('ProductCategory')
 
 class ProductCategoryController extends BaseController {
-  async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { body: { productCategory } } = req
+  checkOwnerOrAdminOrEmployee (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { user: currentUser, record: { companyId, company } } = req
 
-    const { response, status } = await productCategoryService.insert({ productCategory })
+    const isOwnerOrAdmin = currentUser.id === company?.owner?.id || currentUser.role === userRoles.ADMIN
+    const isEmployee = Boolean(companyId) && currentUser?.companyId === companyId
+
+    if (isOwnerOrAdmin || (isEmployee)) {
+      req.isOwnerOrAdmin = isOwnerOrAdmin
+      return next()
+    } else {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'Only the owner, admin or employee can perform this action'
+        }
+      })
+    }
+  }
+
+  async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { params: { id }, body: { productCategory } } = req
+
+    const { response, status } = await productCategoryService.insert({ productCategory: id === undefined ? productCategory : { ...productCategory, companyId: id } })
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 
     const statusCode: StatusCode = {
@@ -32,6 +53,25 @@ class ProductCategoryController extends BaseController {
     io.emit(`${String(productCategoryService.recordName())}`, { message: `${String(productCategoryService.recordName())} updated` })
 
     return res.status(statusCodes.NO_CONTENT).send(response)
+  }
+
+  async getAllForCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { params: { id }, query: { limit, page, offset, search, filter }, record: company } = req
+
+    const records = await productCategoryService.getAllForCompany(limit, offset, id, company.defaultProductCategoriesHidden, search, filter)
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / limit),
+      perPage: limit,
+      page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      productCategories: records.rows
+    })
   }
 }
 

@@ -33,6 +33,11 @@ const ProductCategoryModel = (sequelize: any, DataTypes: any): any => {
         through: models.ProductProductCategory,
         as: 'products'
       })
+      ProductCategory.belongsTo(models.Company, {
+        foreignKey: 'companyId',
+        as: 'company',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): IProductCategory {
