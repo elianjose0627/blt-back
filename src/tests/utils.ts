@@ -1130,6 +1130,60 @@ export const pendingOrders = [
   }
 ]
 
+export const pendingOrderForUpdate = [
+  {
+    costCenter: '',
+    platform: 0,
+    language: 0,
+    currency: 'EUR',
+    orderNo: '0',
+    inetorderno: 0,
+    shippingId: 21,
+    shipped: '2025-07-29 10:35:11.0000000',
+    deliverydate: '2025-07-31 10:35:11.0000000',
+    note: '',
+    description: 'Updated Description',
+    paymentType: 0,
+    paymentTarget: 0,
+    discount: 0.00,
+    orderStatus: 0,
+    orderLineRequests: [
+      {
+        itemName: 'Tasse - Kitty Mug - 1c - navy - Kurita - Muster',
+        articleNumber: '1005',
+        itemNetSale: 0.00,
+        itemVAT: 0.00,
+        quantity: 2,
+        type: 0,
+        discount: 0.00,
+        netPurchasePrice: 0.00
+      }
+    ],
+    shippingAddressRequests: [
+      {
+        salutation: 'Mr',
+        firstName: 'Felix',
+        lastName: 'Ixkes',
+        title: '',
+        company: '',
+        companyAddition: '',
+        street: 'Flügelstraße 6',
+        addressAddition: '',
+        zipCode: '40227',
+        place: 'Düsseldorf',
+        phone: '',
+        state: '',
+        country: 'Germany',
+        iso: '',
+        telephone: '',
+        mobile: '',
+        fax: '',
+        email: 'christoph@biglittlethings.de'
+      }
+    ]
+  }
+]
+
 export const createEmailTemplateType = async (name = 'Reset Password Test', description = 'A template for password reset', type = 'resetPasswordTest', placeholders = ['firstname']): Promise<string> => {
   const res = await db.EmailTemplateType.create({
     id: uuidv4(),

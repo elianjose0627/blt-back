@@ -1083,6 +1083,7 @@ export interface IPendingOrder {
   isQueued: boolean
   jtlId: number
   jtlNumber: string
+  owner: IUser
 }
 
 export interface IDuplicatePostedOrder {

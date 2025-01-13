@@ -28,9 +28,9 @@ const pendingOrderRoutes = (): Router => {
   }, { abortEarly: false }), asyncHandler(PendingOrderController.checkRecord))
   pendingOrderRouter.route('/pending-orders/:id')
     .get(asyncHandler(PendingOrderController.checkPermission), asyncHandler(PendingOrderController.get))
-    .put(asyncHandler(PendingOrderController.checkPermission), asyncHandler(PendingOrderController.checkIsPostedOrQueued), celebrate({
+    .put(asyncHandler(PendingOrderController.checkPermission), celebrate({
       [Segments.BODY]: validator.validatePendingOrders
-    }), asyncHandler(PendingOrderController.update))
+    }), asyncHandler(PendingOrderController.checkIsPostedOrQueued), asyncHandler(PendingOrderController.update))
     .delete(asyncHandler(PendingOrderController.checkPermission), asyncHandler(PendingOrderController.checkIsPostedOrQueued), asyncHandler(PendingOrderController.delete))
 
   return pendingOrderRouter

@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { IPendingOrder, OrderLineRequest, ShippingAddressRequest, PaymentInformationRequest, ICompany, Nullable, BillingAddressRequest } from '../types'
+import type { IPendingOrder, OrderLineRequest, ShippingAddressRequest, PaymentInformationRequest, ICompany, Nullable, BillingAddressRequest, IUser } from '../types'
 
 const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
   interface PendingOrderAttributes {
@@ -83,6 +83,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly isQueued: boolean
     private readonly jtlId: number
     private readonly jtlNumber: string
+    private readonly owner: IUser
 
     static associate (models: any): any {
       PendingOrder.belongsTo(models.Company, {
@@ -143,7 +144,8 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
         isInvoiceGenerated: this.isInvoiceGenerated,
         isQueued: this.isQueued,
         jtlId: this.jtlId,
-        jtlNumber: this.jtlNumber
+        jtlNumber: this.jtlNumber,
+        owner: this.owner
       }
     }
   };
