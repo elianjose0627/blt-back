@@ -338,7 +338,7 @@ describe('A user', () => {
 
       expect(res).to.have.status(422)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('A validation error has occured')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
     })
 
     it('Should return 422 when a user tries to use a username with spaces.', async () => {
@@ -350,7 +350,7 @@ describe('A user', () => {
 
       expect(res).to.have.status(422)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('A validation error has occured')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
     })
 
     it('Should return 422 when a user tries to use an empty username.', async () => {
@@ -362,7 +362,7 @@ describe('A user', () => {
 
       expect(res).to.have.status(422)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('A validation error has occured')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
       expect(res.body.errors.details[0].username).to.equal('user.username cannot contain spaces')
     })
   })

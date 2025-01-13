@@ -579,7 +579,7 @@ describe('Product actions', () => {
       expect(res).to.have.status(422)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.success).to.be.equal(false)
-      expect(res.body.errors.message).to.equal('A validation error has occured')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
     })
 
     it('Should return 403 when a non-admin retrieves all products.', async () => {
@@ -948,7 +948,7 @@ describe('Product actions', () => {
 
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.success).to.equal(false)
-      expect(res.body.errors.message).to.equal('A validation error has occured')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
     })
 
     it('Should return 200 OK when an administrator updates a product by id.', async () => {

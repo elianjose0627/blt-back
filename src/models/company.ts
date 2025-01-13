@@ -20,6 +20,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     logo: Nullable<MediaData>
     shopHeader: Nullable<IShopHeader>
     isDocumentGenerationEnabled: boolean
+    defaultProductCategoriesHidden: boolean
   }
 
   class Company extends Model<CompanyAttributes> {
@@ -46,6 +47,7 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
     private readonly companyUserGroups: ICompanyUserGroup[]
     private readonly shopHeader: Nullable<IShopHeader>
     private readonly isDocumentGenerationEnabled: boolean
+    private readonly defaultProductCategoriesHidden: boolean
 
     static associate (models: any): any {
       Company.belongsTo(models.User, {
@@ -123,6 +125,11 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         as: 'companyInviteTokens',
         onDelete: 'CASCADE'
       })
+      Company.hasMany(models.ProductCategory, {
+        foreignKey: 'companyId',
+        as: 'productCategories',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): ICompany {
@@ -149,7 +156,8 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
         productAccessControlGroups: this.productAccessControlGroups,
         companyUserGroups: this.companyUserGroups,
         shopHeader: this.shopHeader,
-        isDocumentGenerationEnabled: this.isDocumentGenerationEnabled
+        isDocumentGenerationEnabled: this.isDocumentGenerationEnabled,
+        defaultProductCategoriesHidden: this.defaultProductCategoriesHidden
       }
     }
   };
@@ -213,6 +221,11 @@ const CompanyModel = (sequelize: any, DataTypes: any): any => {
       defaultValue: null
     },
     isDocumentGenerationEnabled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
+    defaultProductCategoriesHidden: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false

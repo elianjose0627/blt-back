@@ -288,7 +288,9 @@ const validateCreatedCompany = Joi.object({
       }),
     vat: Joi.string().optional().max(24).allow('').allow(null),
     domain: Joi.string().domain().allow('').allow(null),
-    customerId: Joi.number().optional().allow('').allow(null)
+    customerId: Joi.number().optional().allow('').allow(null),
+    isDocumentGenerationEnabled: Joi.boolean().optional().default(false),
+    defaultProductCategoriesHidden: Joi.boolean().optional().default(false)
   }).required()
 }).required()
 
@@ -303,7 +305,9 @@ const validateUpdatedCompany = Joi.object({
       }),
     vat: Joi.string().optional().max(24).allow('').allow(null),
     domain: Joi.string().domain().allow('').allow(null),
-    customerId: Joi.number().optional().allow('').allow(null)
+    customerId: Joi.number().optional().allow('').allow(null),
+    isDocumentGenerationEnabled: Joi.boolean().optional().default(false),
+    defaultProductCategoriesHidden: Joi.boolean().optional().default(false)
   }).required()
 }).required()
 
@@ -991,6 +995,20 @@ const validateProductCategory = Joi.object({
       filename: Joi.string().required()
     }).allow(null),
     sortIndex: Joi.number().positive().allow(0),
+    isHidden: Joi.boolean().default(false),
+    companyId: Joi.string().uuid().allow(null).default(null)
+  }).required()
+})
+
+const validateProductCategoryForCompany = Joi.object({
+  productCategory: Joi.object({
+    name: Joi.string().lowercase().required().max(64),
+    description: Joi.string().max(255).allow(null).allow(''),
+    picture: Joi.object({
+      url: Joi.string().uri().required(),
+      filename: Joi.string().required()
+    }).allow(null),
+    sortIndex: Joi.number().positive().allow(0),
     isHidden: Joi.boolean().default(false)
   }).required()
 })
@@ -1475,5 +1493,6 @@ export default {
   validateProductCustomisation,
   validateProductCustomisationQueryParams,
   validateDocumentQueryParams,
-  validateProductCustomisationForUpdate
+  validateProductCustomisationForUpdate,
+  validateProductCategoryForCompany
 }
