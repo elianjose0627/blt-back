@@ -288,6 +288,7 @@ export const generateInclude = (model: string): any => {
   }
   if (model === 'ProductCategory') {
     return ([
+      includeCompanyAndOwner,
       {
         model: db.ProductCategoryTag,
         attributes: {

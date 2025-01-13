@@ -223,6 +223,18 @@ module.exports = {
       updatedAt,
       deletedAt: null,
       companyId: null
+    },
+    {
+      id: 'CD3989BC-7E4F-4C17-BA73-8BCAA2BEE1BD',
+      name: 'Company Administrator Read Write Product Categories',
+      module: 'productCategories',
+      role: 'CompanyAdministrator',
+      permission: 'readwrite',
+      isEnabled: 'TRUE',
+      createdAt,
+      updatedAt,
+      deletedAt: null,
+      companyId: null
     }
   ], {}),
   down: async (queryInterface) => {

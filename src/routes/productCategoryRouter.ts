@@ -9,6 +9,7 @@ import paginate from '../middlewares/pagination'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import ProductCategoryTagController from '../controllers/ProductCategoryTagController'
 import ProductInProductCategoryController from '../controllers/ProductInProductCategoryController'
+import checkPermissions from '../middlewares/checkPermissions'
 
 const productCategoryRoutes = (): Router => {
   const productCategoryRouter = express.Router()
@@ -29,10 +30,12 @@ const productCategoryRoutes = (): Router => {
   }, { abortEarly: false }), asyncHandler(ProductCategoryController.checkRecord))
   productCategoryRouter.route('/product-categories/:id')
     .get(asyncHandler(ProductCategoryController.get))
-    .put(asyncHandler(checkAdmin), celebrate({
-      [Segments.BODY]: validator.validateProductCategory
-    }), asyncHandler(ProductCategoryController.update))
-    .delete(asyncHandler(checkAdmin), asyncHandler(ProductCategoryController.delete))
+    .put(asyncHandler(ProductCategoryController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions), celebrate({
+        [Segments.BODY]: validator.validateProductCategory
+      }), asyncHandler(ProductCategoryController.update))
+    .delete(asyncHandler(ProductCategoryController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions), asyncHandler(ProductCategoryController.delete))
   productCategoryRouter.route('/product-categories/:id/tags')
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateProductCategoryTag

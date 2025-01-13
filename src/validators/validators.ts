@@ -231,7 +231,8 @@ const commonQueryParams = {
         'string.pattern.base': '{#label} must contain valid ranges separated by commas'
       }).optional(),
     affiliation: Joi.string().optional(),
-    isBillOfMaterials: Joi.string().trim().lowercase().valid(...['true', 'false'])
+    isBillOfMaterials: Joi.string().trim().lowercase().valid(...['true', 'false']),
+    isHidden: Joi.string().trim().lowercase().valid(...['true', 'false'])
   }).optional()
 }
 const validateQueryParams = Joi.object({ ...commonQueryParams }).required()
@@ -287,7 +288,9 @@ const validateCreatedCompany = Joi.object({
       }),
     vat: Joi.string().optional().max(24).allow('').allow(null),
     domain: Joi.string().domain().allow('').allow(null),
-    customerId: Joi.number().optional().allow('').allow(null)
+    customerId: Joi.number().optional().allow('').allow(null),
+    isDocumentGenerationEnabled: Joi.boolean().optional().default(false),
+    defaultProductCategoriesHidden: Joi.boolean().optional().default(false)
   }).required()
 }).required()
 
@@ -302,7 +305,9 @@ const validateUpdatedCompany = Joi.object({
       }),
     vat: Joi.string().optional().max(24).allow('').allow(null),
     domain: Joi.string().domain().allow('').allow(null),
-    customerId: Joi.number().optional().allow('').allow(null)
+    customerId: Joi.number().optional().allow('').allow(null),
+    isDocumentGenerationEnabled: Joi.boolean().optional().default(false),
+    defaultProductCategoriesHidden: Joi.boolean().optional().default(false)
   }).required()
 }).required()
 
@@ -991,7 +996,22 @@ const validateProductCategory = Joi.object({
       url: Joi.string().uri().required(),
       filename: Joi.string().required()
     }).allow(null),
-    sortIndex: Joi.number().positive().allow(0)
+    sortIndex: Joi.number().positive().allow(0),
+    isHidden: Joi.boolean().default(false),
+    companyId: Joi.string().uuid().allow(null).default(null)
+  }).required()
+})
+
+const validateProductCategoryForCompany = Joi.object({
+  productCategory: Joi.object({
+    name: Joi.string().lowercase().required().max(64),
+    description: Joi.string().max(255).allow(null).allow(''),
+    picture: Joi.object({
+      url: Joi.string().uri().required(),
+      filename: Joi.string().required()
+    }).allow(null),
+    sortIndex: Joi.number().positive().allow(0),
+    isHidden: Joi.boolean().default(false)
   }).required()
 })
 
@@ -1290,7 +1310,7 @@ const validateCampaignQuota = Joi.object({
   campaignQuota: Joi.object({
     orderedQuota: Joi.number().required(),
     orderedDate: Joi.date().required(),
-    orderId: Joi.string().alphanum().required()
+    orderId: Joi.string().required()
   }).required()
 })
 
@@ -1475,5 +1495,6 @@ export default {
   validateProductCustomisation,
   validateProductCustomisationQueryParams,
   validateDocumentQueryParams,
-  validateProductCustomisationForUpdate
+  validateProductCustomisationForUpdate,
+  validateProductCategoryForCompany
 }

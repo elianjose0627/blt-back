@@ -1,13 +1,18 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
+import { faker } from '@faker-js/faker'
 import app from '../../app'
 import {
   deleteTestUser,
   createAdminTestUser,
   verifyUser,
   iversAtKreeDotKrPassword,
-  sheHulkAtStarkIndustriesPassword
+  sheHulkAtStarkIndustriesPassword,
+  verifyCompanyDomain,
+  createCompanyAdministrator,
+  createVerifiedUser
 } from '../utils'
+import * as userRoles from '../../utils/userRoles'
 
 const { expect } = chai
 
@@ -96,6 +101,33 @@ describe('Product Category actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .query({
           search: 'electricals'
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCategories')
+      expect(res.body.productCategories).to.be.an('array').lengthOf.above(0)
+    })
+
+    it('Should return 200 when a admin retrieves all product categories with filter params.', async () => {
+      await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'guitars',
+            sortIndex: 0,
+            isHidden: true
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get('/api/product-categories')
+        .set('Authorization', `Bearer ${token}`)
+        .query({
+          filter: {
+            isHidden: 'true'
+          }
         })
 
       expect(res).to.have.status(200)
@@ -284,7 +316,7 @@ describe('Product Category actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only an admin can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner, admin or employee can perform this action')
     })
 
     it('Should return 200 OK when an administrator deletes a product category by id.', async () => {
@@ -308,6 +340,104 @@ describe('Product Category actions', () => {
       expect(res).to.have.status(204)
     })
 
+    it('Should return 200 OK when an company administrator deletes a product category that belongs to the company.', async () => {
+      const randomPassword = faker.internet.password()
+      const companyAdmin = await createCompanyAdministrator('test@company14productcategorieswithpermissions.com', randomPassword)
+
+      const companyId = String(companyAdmin.companyId)
+      await verifyCompanyDomain(companyId)
+
+      await createVerifiedUser('test2@company14productcategorieswithpermissions.com', randomPassword)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'test2@company14productcategorieswithpermissions.com',
+            actionType: 'add',
+            role: userRoles.COMPANYADMINISTRATOR
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'test2@company14productcategorieswithpermissions.com', password: randomPassword } })
+
+      const tokenCompanyAdministrator = String(resCompanyAdministrator.body.token)
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'Equipment',
+            companyId
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      const res = await chai
+        .request(app)
+        .delete(`/api/product-categories/${String(productCategoryId)}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+
+      expect(res).to.have.status(204)
+    })
+
+    it('Should return 403 Forbidden when an company administrator tries to delete a product category that belongs to the company.', async () => {
+      const randomPassword = faker.internet.password()
+      const companyAdmin = await createCompanyAdministrator('test@company15productcategorieswithpermissions.com', randomPassword)
+
+      const companyId = String(companyAdmin.companyId)
+      await verifyCompanyDomain(companyId)
+
+      await createVerifiedUser('test2@company15productcategorieswithpermissions.com', randomPassword)
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'test2@company15productcategorieswithpermissions.com',
+            actionType: 'add',
+            role: userRoles.CAMPAIGNMANAGER
+          }
+        })
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'test2@company15productcategorieswithpermissions.com', password: randomPassword } })
+
+      const tokenCampaignManager = String(resCampaignManager.body.token)
+      const resProductCategory = await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'Equipment',
+            companyId
+          }
+        })
+
+      const productCategoryId = resProductCategory.body.productCategory.id
+
+      const res = await chai
+        .request(app)
+        .delete(`/api/product-categories/${String(productCategoryId)}`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
+    })
+
     it('Should return 403 Forbidden when an non-administrator tries to delete a product category by id.', async () => {
       const resProductCategory = await chai
         .request(app)
@@ -328,7 +458,7 @@ describe('Product Category actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only an admin can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner, admin or employee can perform this action')
     })
   })
 
