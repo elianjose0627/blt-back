@@ -20,7 +20,9 @@ import {
   iversAtKreeDotKrPassword,
   sheHulkAtStarkIndustriesPassword,
   nickFuryPassword,
-  happyHoganPassword
+  happyHoganPassword,
+  postedPendingOrder,
+  queuedPendingOrder
 } from '../utils'
 
 const { expect } = chai
@@ -752,6 +754,263 @@ describe('Pending Orders actions', () => {
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
+    })
+  })
+
+  describe('Get a pending order by pending order id', () => {
+    let pendingOrderId: string
+
+    beforeEach(async () => {
+      const pendingOrder = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(token)}`)
+        .send({
+          pendingOrders
+        })
+
+      pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+    })
+
+    it('Should return 200 Success when an admin successfully retrieves an pending order by ID', async () => {
+      const res = await chai
+        .request(app)
+        .get(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrder')
+      expect(res.body.pendingOrder).to.be.an('object')
+      expect(res.body.pendingOrder.id).to.equal(pendingOrderId)
+    })
+
+    it('Should return 200 Success when a company admin successfully retrieves an pending order by id for their company', async () => {
+      const res = await chai
+        .request(app)
+        .get(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrder')
+      expect(res.body.pendingOrder).to.be.an('object')
+      expect(res.body.pendingOrder.id).to.equal(pendingOrderId)
+    })
+
+    it('Should return 200 Success when a campaign manager successfully retrieves an pending order by id for their campaign', async () => {
+      const res = await chai
+        .request(app)
+        .get(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrder')
+      expect(res.body.pendingOrder).to.be.an('object')
+      expect(res.body.pendingOrder.id).to.equal(pendingOrderId)
+    })
+
+    it('Should return 200 Success when a user successfully retrieves their own pending order by id', async () => {
+      const res = await chai
+        .request(app)
+        .get(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrder')
+      expect(res.body.pendingOrder).to.be.an('object')
+      expect(res.body.pendingOrder.id).to.equal(pendingOrderId)
+    })
+
+    it('Should return 403 Forbidden when a user tries to access an pending order that does not belong to them', async () => {
+      const newPendingOrder = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(tokenCompanyAdmin)}`)
+        .send({
+          pendingOrders
+        })
+
+      const newPendingOrderId = String(newPendingOrder.body.pendingOrders[0].id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/pending-orders/${newPendingOrderId}`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
+    })
+  })
+
+  describe('Delete Pending Order', () => {
+    it('Should return 204 when a admin deletes a pending order.', async () => {
+      const pendingOrder = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(token)}`)
+        .send({
+          pendingOrders
+        })
+
+      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+
+      const res = await chai
+        .request(app)
+        .delete(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(204)
+    })
+
+    it('Should return 204 when a campany admin deletes a pending order.', async () => {
+      const pendingOrder = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(token)}`)
+        .send({
+          pendingOrders
+        })
+
+      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+
+      const res = await chai
+        .request(app)
+        .delete(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdmin}`)
+
+      expect(res).to.have.status(204)
+    })
+
+    it('Should return 204 when a campaign manager deletes a pending order.', async () => {
+      const pendingOrder = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(token)}`)
+        .send({
+          pendingOrders
+        })
+
+      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+
+      const res = await chai
+        .request(app)
+        .delete(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+
+      expect(res).to.have.status(204)
+    })
+
+    it('Should return 204 when a user deletes a pending order.', async () => {
+      const pendingOrder = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(token)}`)
+        .send({
+          pendingOrders
+        })
+
+      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+
+      const res = await chai
+        .request(app)
+        .delete(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(204)
+    })
+
+    it('Should return 403 Forbidden when a non-owner-user tries to delete a pending order.', async () => {
+      const pendingOrder = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(tokenCampaignManager)}`)
+        .send({
+          pendingOrders
+        })
+
+      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+
+      const res = await chai
+        .request(app)
+        .delete(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
+    })
+
+    it('Should return 404 when a admin tries to delete a pending order that does not exist.', async () => {
+      const res = await chai
+        .request(app)
+        .delete('/api/pending-orders/88D48647-ED1C-49CF-9D53-403D7DAD8DB7')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('PendingOrder not found')
+    })
+
+    it('Should return 403 Forbidden when a admin tries to delete a posted pending order.', async () => {
+      const pendingOrder = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(token)}`)
+        .send({
+          pendingOrders
+        })
+
+      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+
+      const updatedPendingOrder = await chai
+        .request(app)
+        .put(`/api/pending-orders/${String(pendingOrderId)}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          pendingOrders: postedPendingOrder
+        })
+
+      const updatedPendingOrderId = String(updatedPendingOrder.body.pendingOrder.id)
+
+      const res = await chai
+        .request(app)
+        .delete(`/api/pending-orders/${updatedPendingOrderId}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You can not perform this action for the posted or queued order')
+    })
+
+    it('Should return 403 Forbidden when a admin tries to delete a queued pending order.', async () => {
+      const pendingOrder = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(token)}`)
+        .send({
+          pendingOrders
+        })
+
+      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+
+      const updatedPendingOrder = await chai
+        .request(app)
+        .put(`/api/pending-orders/${String(pendingOrderId)}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          pendingOrders: queuedPendingOrder
+        })
+
+      const updatedPendingOrderId = String(updatedPendingOrder.body.pendingOrder.id)
+
+      const res = await chai
+        .request(app)
+        .delete(`/api/pending-orders/${updatedPendingOrderId}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You can not perform this action for the posted or queued order')
     })
   })
 })
