@@ -12,7 +12,7 @@ class ProductCategoryController extends BaseController {
     const { user: currentUser, record: { companyId, company } } = req
 
     const isOwnerOrAdmin = currentUser.id === company?.owner?.id || currentUser.role === userRoles.ADMIN
-    const isEmployee = Boolean(companyId) && currentUser?.companyId === companyId
+    const isEmployee = Boolean(companyId) && currentUser.companyId === companyId
 
     if (isOwnerOrAdmin || (isEmployee)) {
       req.isOwnerOrAdmin = isOwnerOrAdmin

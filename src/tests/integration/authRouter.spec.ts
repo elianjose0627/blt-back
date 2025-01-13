@@ -351,7 +351,7 @@ describe('Auth Actions', () => {
     expect(res).to.have.status(422)
     expect(res.body).to.include.keys('statusCode', 'success', 'errors')
     expect(res.body.success).to.equal(false)
-    expect(res.body.errors.message).to.equal('A validation error has occured')
+    expect(res.body.errors.message).to.equal('A validation error has occurred')
   })
 
   it('should return 422 when a user tries to sign up with an email domain that is blocked', async () => {

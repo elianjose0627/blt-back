@@ -1806,7 +1806,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(422)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('A validation error has occured')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
     })
 
     it('Should return 201 Created when a campaign manager for a company successfully creates a campaign.', async () => {
@@ -4955,7 +4955,7 @@ describe('Company actions', () => {
 
       expect(res).to.have.status(422)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('A validation error has occured')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
     })
 
     it('Should return 201 Created when an admin successfully creates an access permission for a default role with the override option.', async () => {
