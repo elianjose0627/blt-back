@@ -30,13 +30,13 @@ const joiErrors = (err: any, req: CustomRequest, res: CustomResponse, next: Cust
 
   const errorArray = errorDetails.map((detail: any) => ({ [detail.context.key]: detail.message.replace(/"/g, '') }))
 
-  logger.error({ message: 'A validation error has occured', details: errorArray })
+  logger.error({ message: 'A validation error has occurred', details: errorArray })
 
   return res.status(statusCodes.UNPROCESSABLE_ENTITY).json({
     statusCode: statusCodes.UNPROCESSABLE_ENTITY,
     success: false,
     errors: {
-      message: 'A validation error has occured',
+      message: 'A validation error has occurred',
       details: errorArray
     }
   })

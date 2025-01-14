@@ -228,6 +228,7 @@ export interface ICompany {
   companyUserGroups: ICompanyUserGroup[]
   shopHeader: Nullable<IShopHeader>
   isDocumentGenerationEnabled: boolean
+  defaultProductCategoriesHidden: boolean
 }
 
 export type AddressType = 'billing' | 'delivery' | 'billingAndDelivery' | 'return'
@@ -426,6 +427,7 @@ export interface IProductCategory {
   description: Nullable<string>
   picture: Nullable<MediaData>
   sortIndex: number
+  isHidden: boolean
   createdAt: Date
   updatedAt: Date
   productCategoryTags?: IProductCategoryTag[]

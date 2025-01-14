@@ -1,7 +1,7 @@
 import { v1 as uuidv1 } from 'uuid'
+import { Op } from 'sequelize'
 import BaseService from './BaseService'
 import db from '../models'
-import { Op } from 'sequelize'
 
 class ProductCategoryService extends BaseService {
   manyRecords (): string {
@@ -18,7 +18,8 @@ class ProductCategoryService extends BaseService {
 
     response = await db[this.model].findOne({
       where: {
-        name: productCategory.name
+        name: productCategory.name,
+        companyId: productCategory.companyId
       },
       paranoid: false // To get soft deleted record
     })
@@ -34,8 +35,9 @@ class ProductCategoryService extends BaseService {
     return { response: response.toJSONFor(), status: 201 }
   }
 
-  async getAll (limit: number, offset: number, search?: string): Promise<any> {
+  async getAll (limit: number, offset: number, search?: string, filter?: any): Promise<any> {
     let where
+    const whereFilterIsHidden = filter?.isHidden !== undefined ? { isHidden: filter.isHidden === 'true' } : {}
 
     if (search !== undefined) {
       where = {
@@ -47,7 +49,10 @@ class ProductCategoryService extends BaseService {
     const records = await db[this.model].findAndCountAll({
       limit,
       offset,
-      where,
+      where: {
+        ...where,
+        ...whereFilterIsHidden
+      },
       include: [
         {
           model: db.ProductCategoryTag,
@@ -82,6 +87,49 @@ class ProductCategoryService extends BaseService {
 
     const response = await Promise.all(updatePromises)
     return response
+  }
+
+  async getAllForCompany (limit: number, offset: number, companyId: string, defaultProductCategoriesHidden: boolean, search?: string, filter?: any): Promise<any> {
+    let where
+    const whereFilterIsHidden = filter?.isHidden !== undefined ? { isHidden: filter.isHidden === 'true' } : {}
+
+    if (search !== undefined) {
+      where = {
+        name: { [Op.iLike]: `%${search}%` }
+      }
+    }
+
+    const records = await db[this.model].findAndCountAll({
+      limit,
+      offset,
+      where: {
+        ...where,
+        ...whereFilterIsHidden,
+        [Op.or]: [
+          { companyId },
+          ...(defaultProductCategoriesHidden ? [] : [{ companyId: null }])
+        ]
+      },
+      include: [
+        {
+          model: db.ProductCategoryTag,
+          attributes: ['id', 'name', 'type'],
+          as: 'productCategoryTags',
+          where: {
+            type: 'category'
+          },
+          required: false
+        }
+      ],
+      order: [['sortIndex', 'ASC'], ['createdAt', 'DESC']],
+      attributes: { exclude: [] },
+      distinct: true
+    })
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
   }
 }
 

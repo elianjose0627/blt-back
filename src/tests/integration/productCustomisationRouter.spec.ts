@@ -246,7 +246,7 @@ describe('Product Customisation actions', () => {
 
       expect(res).to.have.status(422)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('A validation error has occured')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
     })
 
     it('Should return 422 Unprocessable Entity when a admin retrieves all product customiations wihout productId.', async () => {
@@ -257,7 +257,7 @@ describe('Product Customisation actions', () => {
 
       expect(res).to.have.status(422)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('A validation error has occured')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
     })
 
     it('Should return 422 Unprocessable Entity when a user retrieves all product customiations wihout filter.', async () => {
@@ -268,7 +268,7 @@ describe('Product Customisation actions', () => {
 
       expect(res).to.have.status(422)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('A validation error has occured')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
     })
 
     it('Should return 422 Unprocessable Entity when a user retrieves all product customiations wihout productId.', async () => {
@@ -279,7 +279,7 @@ describe('Product Customisation actions', () => {
 
       expect(res).to.have.status(422)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('A validation error has occured')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
     })
   })
 
