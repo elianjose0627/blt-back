@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { IProductCategory, IProductCategoryTag, MediaData, Nullable } from '../types'
+import type { ICompany, IProductCategory, IProductCategoryTag, MediaData, Nullable } from '../types'
 
 const ProductCategoryModel = (sequelize: any, DataTypes: any): any => {
   interface ProductCategoryAttributes {
@@ -21,6 +21,7 @@ const ProductCategoryModel = (sequelize: any, DataTypes: any): any => {
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly productCategoryTags: IProductCategoryTag[]
+    private readonly company: Pick<ICompany, 'id' | 'name'>
 
     static associate (models: any): any {
       ProductCategory.hasMany(models.ProductCategoryTag, {
@@ -50,7 +51,8 @@ const ProductCategoryModel = (sequelize: any, DataTypes: any): any => {
         isHidden: this.isHidden,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
-        productCategoryTags: this.productCategoryTags
+        productCategoryTags: this.productCategoryTags,
+        company: this.company
       }
     }
   };

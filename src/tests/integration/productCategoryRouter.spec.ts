@@ -84,6 +84,81 @@ describe('Product Category actions', () => {
       expect(res.body.productCategories).to.be.an('array')
     })
 
+    it('Should return 200 when a company admin retrieves all product categories where default product categories are hidden.', async () => {
+      const randomPassword = faker.internet.password()
+      const companyAdmin = await createCompanyAdministrator('test@defaultproductcategories.com', randomPassword)
+
+      const companyId = String(companyAdmin.companyId)
+      await verifyCompanyDomain(companyId)
+      await chai
+        .request(app)
+        .put(`/api/companies/${companyId}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          company: {
+            defaultProductCategoriesHidden: true
+          }
+        })
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'test@defaultproductcategories.com', password: randomPassword } })
+
+      const tokenCompanyAdministrator = String(resCompanyAdministrator.body.token)
+      await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'Equipment',
+            companyId
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCategories')
+      expect(res.body.productCategories).to.be.an('array').lengthOf(1)
+    })
+
+    it('Should return 200 when a company admin retrieves all product categories where default product categories are not hidden.', async () => {
+      const randomPassword = faker.internet.password()
+      const companyAdmin = await createCompanyAdministrator('test@defaultproductcategoriesnothidden.com', randomPassword)
+
+      const companyId = String(companyAdmin.companyId)
+      await verifyCompanyDomain(companyId)
+
+      const resCompanyAdministrator = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'test@defaultproductcategoriesnothidden.com', password: randomPassword } })
+
+      const tokenCompanyAdministrator = String(resCompanyAdministrator.body.token)
+      await chai
+        .request(app)
+        .post('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCategory: {
+            name: 'Equipment',
+            companyId
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get('/api/product-categories')
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCategories')
+      expect(res.body.productCategories).to.be.an('array').lengthOf.above(1)
+    })
+
     it('Should return 200 when a admin retrieves all product categories with search params.', async () => {
       await chai
         .request(app)
