@@ -2,6 +2,7 @@ import { v1 as uuidv1 } from 'uuid'
 import { Op } from 'sequelize'
 import BaseService from './BaseService'
 import db from '../models'
+import * as userRoles from '../utils/userRoles'
 
 class ProductCategoryService extends BaseService {
   manyRecords (): string {
@@ -35,15 +36,27 @@ class ProductCategoryService extends BaseService {
     return { response: response.toJSONFor(), status: 201 }
   }
 
-  async getAll (limit: number, offset: number, search?: string, filter?: any): Promise<any> {
+  async getAll (limit: number, offset: number, search?: string, filter?: any, user?: any): Promise<any> {
     let where
     const whereFilterIsHidden = filter?.isHidden !== undefined ? { isHidden: filter.isHidden === 'true' } : {}
+    const whereCompanyId = user.role === userRoles.ADMIN
+      ? {}
+      : {
+          companyId: user.company === null
+            ? null
+            : user.company.defaultProductCategoriesHidden === false
+              ? {
+                  [Op.or]: [
+                    { [Op.is]: null },
+                    { [Op.eq]: user.company.id }
+                  ]
+                }
+              : user.company.id
+        }
 
     if (search !== undefined) {
       where = {
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${search}%` } }
-        ]
+        name: { [Op.iLike]: `%${search}%` }
       }
     }
     const records = await db[this.model].findAndCountAll({
@@ -51,7 +64,8 @@ class ProductCategoryService extends BaseService {
       offset,
       where: {
         ...where,
-        ...whereFilterIsHidden
+        ...whereFilterIsHidden,
+        ...whereCompanyId
       },
       include: [
         {
@@ -62,9 +76,15 @@ class ProductCategoryService extends BaseService {
             type: 'category'
           },
           required: false
+        },
+        {
+          model: db.Company,
+          attributes: ['id', 'name'],
+          as: 'company',
+          required: false
         }
       ],
-      order: [['sortIndex', 'ASC'], ['createdAt', 'DESC']],
+      order: [['companyId', 'DESC'], ['sortIndex', 'ASC'], ['createdAt', 'DESC']],
       attributes: { exclude: [] },
       distinct: true
     })
@@ -81,7 +101,7 @@ class ProductCategoryService extends BaseService {
     const updatePromises = productCategories.map(productCategory =>
       db[this.model].update(
         { sortIndex: productCategory.sortIndex },
-        { where: { id: productCategory.productCategoryId } }
+        { where: { id: productCategory.productCategoryId, companyId: null } }
       )
     )
 
