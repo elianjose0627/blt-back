@@ -55,6 +55,23 @@ class ProductCategoryController extends BaseController {
     return res.status(statusCodes.NO_CONTENT).send(response)
   }
 
+  async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { query: { limit, page, offset, search, filter }, user } = req
+    const records = await productCategoryService.getAll(limit, offset, search, filter, user)
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / limit),
+      perPage: limit,
+      page
+    }
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      [productCategoryService.manyRecords()]: records.rows
+    })
+  }
+
   async getAllForCompany (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { params: { id }, query: { limit, page, offset, search, filter }, record: company } = req
 
