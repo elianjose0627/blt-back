@@ -431,6 +431,7 @@ export interface IProductCategory {
   createdAt: Date
   updatedAt: Date
   productCategoryTags?: IProductCategoryTag[]
+  company?: Pick<ICompany, 'id' | 'name'>
 }
 
 export interface IProductGraduatedPrice {
