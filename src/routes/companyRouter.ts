@@ -19,6 +19,7 @@ import checkPermissions from '../middlewares/checkPermissions'
 import checkBlockedDomain from '../middlewares/checkBlockedDomain'
 import CompanySubscriptionController from '../controllers/CompanySubscriptionController'
 import checkCompanySubscription from '../middlewares/checkCompanySubscription'
+import ProductCategoryController from '../controllers/ProductCategoryController'
 
 const companyRoutes = (): Router => {
   const companyRouter = express.Router()
@@ -191,6 +192,17 @@ const companyRoutes = (): Router => {
       celebrate({
         [Segments.BODY]: validator.validateCompanyShopHeader
       }), asyncHandler(CompanyController.checkCompanyDomainAndEmailDomain), asyncHandler(CompanyController.update))
+  companyRouter.route('/companies/:id/product-categories')
+    .get(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
+      asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
+        [Segments.QUERY]: validator.validateQueryParams
+      }), asyncHandler(paginate), asyncHandler(ProductCategoryController.getAllForCompany))
+    .post(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
+      asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
+        [Segments.BODY]: validator.validateProductCategoryForCompany
+      }, { abortEarly: false }), asyncHandler(ProductCategoryController.insert))
   return companyRouter
 }
 

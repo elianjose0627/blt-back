@@ -141,7 +141,7 @@ describe('Access Permissions actions', () => {
 
       expect(res).to.have.status(422)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('A validation error has occured')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
     })
 
     it('Should return 404 Not Found when an admin tries to create an access permission with a non-existent company.', async () => {
@@ -184,7 +184,7 @@ describe('Access Permissions actions', () => {
 
       expect(res).to.have.status(422)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('A validation error has occured')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
     })
 
     it('Should return 422 Unprocessable Entity when an admin tries to create a readwrite access permission for a readonly module.', async () => {
@@ -207,7 +207,7 @@ describe('Access Permissions actions', () => {
 
       expect(res).to.have.status(422)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('A validation error has occured')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
     })
   })
 
