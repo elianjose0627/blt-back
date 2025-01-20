@@ -824,7 +824,6 @@ export interface IOrder {
   shipments?: IShipment[]
   trackingId: Nullable<string>
   isVisible: boolean
-  isPackingSlipGenerated: boolean
 }
 
 export interface ICountry {
@@ -1083,6 +1082,7 @@ export interface IPendingOrder {
   company?: ICompany
   isOrderConfirmationGenerated: boolean
   isInvoiceGenerated: boolean
+  isPackingSlipGenerated: boolean
 }
 
 export interface IDuplicatePostedOrder {
@@ -1207,7 +1207,7 @@ export interface IPackingSlip {
   id: string
   postedOrderId: string
   packingSlipNumber: number
-  trackingId: string
+  trackingId: Nullable<string>
   costCenter: string | null
   externalOrderNumber: string
   externalProjectNumber: string
