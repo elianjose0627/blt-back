@@ -45,7 +45,7 @@ class PendingOrderController extends BaseController {
     }
 
     const {
-      isQuotaEnabled, isExceedQuotaEnabled, usedQuota, quota, correctionQuota,
+      isQuotaEnabled, isExceedQuotaEnabled, usedQuota, totalOrderedQuota, correctionQuota,
       campaignOrderLimits, isBulkCreateEnabled
     } = campaign as ICampaign
 
@@ -63,12 +63,12 @@ class PendingOrderController extends BaseController {
     const totalUsedQuota = usedQuota + correctionQuota
     const allowedRoles = [userRoles.ADMIN]
 
-    if (!allowedRoles.includes(currentUser.role) && (isQuotaEnabled && !isExceedQuotaEnabled) && (totalUsedQuota + pendingOrdersQuantity) > quota) {
+    if (!allowedRoles.includes(currentUser.role) && (isQuotaEnabled && !isExceedQuotaEnabled) && (totalUsedQuota + pendingOrdersQuantity) > totalOrderedQuota) {
       return res.status(statusCodes.TOO_MANY_REQUESTS).send({
         statusCode: statusCodes.TOO_MANY_REQUESTS,
         success: false,
         errors: {
-          message: `Campaign quota has been exceeded by ${(totalUsedQuota + pendingOrdersQuantity) - quota}`
+          message: `Campaign quota has been exceeded by ${(totalUsedQuota + pendingOrdersQuantity) - totalOrderedQuota}`
         }
       })
     }
