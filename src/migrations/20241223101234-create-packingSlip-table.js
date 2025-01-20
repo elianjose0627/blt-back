@@ -21,7 +21,7 @@ module.exports = {
       },
       trackingId: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       costCenter: {
         type: Sequelize.STRING,
