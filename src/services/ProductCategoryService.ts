@@ -139,9 +139,15 @@ class ProductCategoryService extends BaseService {
             type: 'category'
           },
           required: false
+        },
+        {
+          model: db.Company,
+          attributes: ['id', 'name'],
+          as: 'company',
+          required: false
         }
       ],
-      order: [['sortIndex', 'ASC'], ['createdAt', 'DESC']],
+      order: [['companyId', 'ASC'], ['sortIndex', 'ASC'], ['createdAt', 'DESC']],
       attributes: { exclude: [] },
       distinct: true
     })
