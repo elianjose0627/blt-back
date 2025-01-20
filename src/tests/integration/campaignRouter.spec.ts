@@ -2597,6 +2597,18 @@ describe('Campaign actions', () => {
 
       const campaignId = String(resCampaign.body.campaign.id)
 
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/quotas`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignQuota: {
+            orderedQuota: 10,
+            orderedDate: '2023-01-15T13:00:00Z',
+            orderId: '123'
+          }
+        })
+
       const res = await chai
         .request(app)
         .post(`/api/campaigns/${campaignId}/pending-orders`)
@@ -2643,6 +2655,18 @@ describe('Campaign actions', () => {
         })
 
       const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/quotas`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignQuota: {
+            orderedQuota: 5,
+            orderedDate: '2023-01-15T13:00:00Z',
+            orderId: '123'
+          }
+        })
 
       const resPendingOrders = await chai
         .request(app)
@@ -2703,6 +2727,18 @@ describe('Campaign actions', () => {
 
       const campaignId = String(resCampaign.body.campaign.id)
 
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/quotas`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignQuota: {
+            orderedQuota: 4,
+            orderedDate: '2023-01-15T13:00:00Z',
+            orderId: '123'
+          }
+        })
+
       const res = await chai
         .request(app)
         .post(`/api/campaigns/${campaignId}/pending-orders`)
@@ -2749,6 +2785,18 @@ describe('Campaign actions', () => {
         })
 
       const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/quotas`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignQuota: {
+            orderedQuota: 4,
+            orderedDate: '2023-01-15T13:00:00Z',
+            orderId: '123'
+          }
+        })
 
       const resPendingOrders = await chai
         .request(app)
@@ -2810,6 +2858,18 @@ describe('Campaign actions', () => {
 
       const campaignId = String(resCampaign.body.campaign.id)
 
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/quotas`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignQuota: {
+            orderedQuota: 10,
+            orderedDate: '2023-01-15T13:00:00Z',
+            orderId: '123'
+          }
+        })
+
       const res = await chai
         .request(app)
         .post(`/api/campaigns/${campaignId}/pending-orders`)
@@ -2856,6 +2916,18 @@ describe('Campaign actions', () => {
         })
 
       const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/quotas`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignQuota: {
+            quota: 10,
+            orderedDate: '2023-01-15T13:00:00Z',
+            orderId: '123'
+          }
+        })
 
       const res = await chai
         .request(app)
