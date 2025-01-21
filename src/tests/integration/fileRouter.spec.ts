@@ -35,7 +35,6 @@ describe('GETEC file actions', () => {
     it('Should return 201 Created when an admin successfully created pending order.', async () => {
       const basicAuth = Buffer.from(`${username}:${password}`).toString('base64')
       const filePath = path.join(__dirname, '../test.xml')
-      console.log('filePath', filePath)
       const res = await chai
         .request(app)
         .post('/api/file/upload')

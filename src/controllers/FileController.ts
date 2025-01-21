@@ -29,7 +29,6 @@ class FileController extends BaseController {
         const xmlContent = file.buffer.toString('utf-8')
         const parsedFileData = await parseXml(xmlContent)
         if (parsedFileData.status === false) {
-          console.log('first file controller', parsedFileData)
           return res.status(statusCodes.BAD_REQUEST).send({
             statusCode: statusCodes.BAD_REQUEST,
             success: false,
@@ -55,7 +54,6 @@ class FileController extends BaseController {
         pendingOrders: response
       })
     } catch (error: any) {
-      console.log('first file controller second', error)
       return res.status(statusCodes.BAD_REQUEST).send({
         statusCode: statusCodes.BAD_REQUEST,
         success: false,

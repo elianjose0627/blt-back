@@ -36,10 +36,6 @@ export const parseXml = async (xmlContent: string): Promise<any> => {
     }
     const xmlData = parser.parse(xmlContent)
 
-    console.log('first-------------------------------', xmlData.QxCBL.xCBLPayload.embedded)
-
-    console.log('second--------------------------------', xmlData.QxCBL.xCBLPayload.embedded.Order.OrderHeader.OrderNumber.BuyerOrderNumber)
-
     const pendingOrder = {
       platform: 0,
       language: 0,
@@ -50,7 +46,8 @@ export const parseXml = async (xmlContent: string): Promise<any> => {
       // companyId: process.env.ORDER_DETAIL_COMPANY_ID,
       orderNo: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderHeader.OrderNumber.BuyerOrderNumber,
       inetorderno: 0,
-      shippingId: process.env.ORDER_DETAIL_SHIPPING_ID,
+      // shippingId: process.env.ORDER_DETAIL_SHIPPING_ID,
+      shippingId: 7,
       shipped: dayjs(xmlData.QxCBL.xCBLPayload.embedded.Order.OrderHeader.OrderDates.RequestedDeliverByDate, 'DD.MM.YYYY').format(),
       deliverydate: dayjs(xmlData.QxCBL.xCBLPayload.embedded.Order.OrderHeader.OrderDates.RequestedDeliverByDate, 'DD.MM.YYYY').format(),
       note: '',
