@@ -31,7 +31,7 @@ chai.use(chaiHttp)
 
 let tokenAdmin: string
 let token: string
-let tokenCompanyAdmin: string
+let tokenCompanyAdministrator: string
 let tokenCampaignManager: string
 
 describe('Pending Orders actions', () => {
@@ -47,21 +47,21 @@ describe('Pending Orders actions', () => {
       .post('/auth/login')
       .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
 
-    const resCompanyAdmin = await chai
+    const resCompanyAdministrator = await chai
       .request(app)
       .post('/auth/login')
       .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
 
     tokenAdmin = resAdmin.body.token
-    tokenCompanyAdmin = resCompanyAdmin.body.token
+    tokenCompanyAdministrator = resCompanyAdministrator.body.token
 
     // get company invite link
-    const companyId = resCompanyAdmin.body.user.company.id
+    const companyId = resCompanyAdministrator.body.user.company.id
     await verifyCompanyDomain(companyId)
     const resInviteLink = await chai
       .request(app)
       .get(`/api/companies/${String(companyId)}/invite-link`)
-      .set('Authorization', `Bearer ${tokenCompanyAdmin}`)
+      .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
 
     // create user
     await chai
@@ -119,7 +119,7 @@ describe('Pending Orders actions', () => {
       const res = await chai
         .request(app)
         .get('/api/pending-orders')
-        .set('Authorization', `Bearer ${tokenCompanyAdmin}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
@@ -682,55 +682,55 @@ describe('Pending Orders actions', () => {
       expect(res.body.pendingOrder.description).to.equal('Updated Description')
     })
 
-    // it('Should return 200 OK when company admin update an order', async () => {
-    //   const pendingOrder = await chai
-    //     .request(app)
-    //     .post('/api/pending-orders')
-    //     .set('Authorization', `Bearer ${String(token)}`)
-    //     .send({
-    //       pendingOrders
-    //     })
+    it('Should return 200 OK when company admin update an order', async () => {
+      const pendingOrder = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(token)}`)
+        .send({
+          pendingOrders
+        })
 
-    //   const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
 
-    //   const res = await chai
-    //     .request(app)
-    //     .put(`/api/pending-orders/${pendingOrderId}`)
-    //     .set('Authorization', `Bearer ${String(tokenCompanyAdmin)}`)
-    //     .send({
-    //       pendingOrders: pendingOrderForUpdate
-    //     })
+      const res = await chai
+        .request(app)
+        .put(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${String(tokenCompanyAdministrator)}`)
+        .send({
+          pendingOrders: pendingOrderForUpdate
+        })
 
-    //   expect(res).to.have.status(200)
-    //   expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrder')
-    //   expect(res.body.pendingOrder).to.be.an('object')
-    //   expect(res.body.pendingOrder.description).to.equal('Updated Description')
-    // })
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrder')
+      expect(res.body.pendingOrder).to.be.an('object')
+      expect(res.body.pendingOrder.description).to.equal('Updated Description')
+    })
 
-    // it('Should return 200 OK when campaign manager update an order', async () => {
-    //   const pendingOrder = await chai
-    //     .request(app)
-    //     .post('/api/pending-orders')
-    //     .set('Authorization', `Bearer ${String(token)}`)
-    //     .send({
-    //       pendingOrders
-    //     })
+    it('Should return 200 OK when campaign manager update an order', async () => {
+      const pendingOrder = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(token)}`)
+        .send({
+          pendingOrders
+        })
 
-    //   const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
 
-    //   const res = await chai
-    //     .request(app)
-    //     .put(`/api/pending-orders/${pendingOrderId}`)
-    //     .set('Authorization', `Bearer ${String(tokenCampaignManager)}`)
-    //     .send({
-    //       pendingOrders: pendingOrderForUpdate
-    //     })
+      const res = await chai
+        .request(app)
+        .put(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${String(tokenCampaignManager)}`)
+        .send({
+          pendingOrders: pendingOrderForUpdate
+        })
 
-    //   expect(res).to.have.status(200)
-    //   expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrder')
-    //   expect(res.body.pendingOrder).to.be.an('object')
-    //   expect(res.body.pendingOrder.description).to.equal('Updated Description')
-    // })
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrder')
+      expect(res.body.pendingOrder).to.be.an('object')
+      expect(res.body.pendingOrder.description).to.equal('Updated Description')
+    })
 
     it('Should return 403 FOBBIDDEN when another user update an order', async () => {
       const pendingOrder = await chai
@@ -784,29 +784,29 @@ describe('Pending Orders actions', () => {
       expect(res.body.pendingOrder.id).to.equal(pendingOrderId)
     })
 
-    // it('Should return 200 Success when a company admin successfully retrieves an pending order by id for their company', async () => {
-    //   const res = await chai
-    //     .request(app)
-    //     .get(`/api/pending-orders/${pendingOrderId}`)
-    //     .set('Authorization', `Bearer ${tokenCompanyAdmin}`)
+    it('Should return 200 Success when a company admin successfully retrieves an pending order by id for their company', async () => {
+      const res = await chai
+        .request(app)
+        .get(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
 
-    //   expect(res).to.have.status(200)
-    //   expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrder')
-    //   expect(res.body.pendingOrder).to.be.an('object')
-    //   expect(res.body.pendingOrder.id).to.equal(pendingOrderId)
-    // })
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrder')
+      expect(res.body.pendingOrder).to.be.an('object')
+      expect(res.body.pendingOrder.id).to.equal(pendingOrderId)
+    })
 
-    // it('Should return 200 Success when a campaign manager successfully retrieves an pending order by id for their campaign', async () => {
-    //   const res = await chai
-    //     .request(app)
-    //     .get(`/api/pending-orders/${pendingOrderId}`)
-    //     .set('Authorization', `Bearer ${tokenCampaignManager}`)
+    it('Should return 200 Success when a campaign manager successfully retrieves an pending order by id for their campaign', async () => {
+      const res = await chai
+        .request(app)
+        .get(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
 
-    //   expect(res).to.have.status(200)
-    //   expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrder')
-    //   expect(res.body.pendingOrder).to.be.an('object')
-    //   expect(res.body.pendingOrder.id).to.equal(pendingOrderId)
-    // })
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrder')
+      expect(res.body.pendingOrder).to.be.an('object')
+      expect(res.body.pendingOrder.id).to.equal(pendingOrderId)
+    })
 
     it('Should return 200 Success when a user successfully retrieves their own pending order by id', async () => {
       const res = await chai
@@ -824,7 +824,7 @@ describe('Pending Orders actions', () => {
       const newPendingOrder = await chai
         .request(app)
         .post('/api/pending-orders')
-        .set('Authorization', `Bearer ${String(tokenCompanyAdmin)}`)
+        .set('Authorization', `Bearer ${String(tokenCompanyAdministrator)}`)
         .send({
           pendingOrders
         })
@@ -862,43 +862,43 @@ describe('Pending Orders actions', () => {
       expect(res).to.have.status(204)
     })
 
-    // it('Should return 204 when a campany admin deletes a pending order.', async () => {
-    //   const pendingOrder = await chai
-    //     .request(app)
-    //     .post('/api/pending-orders')
-    //     .set('Authorization', `Bearer ${String(token)}`)
-    //     .send({
-    //       pendingOrders
-    //     })
+    it('Should return 204 when a campany admin deletes a pending order.', async () => {
+      const pendingOrder = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(token)}`)
+        .send({
+          pendingOrders
+        })
 
-    //   const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
 
-    //   const res = await chai
-    //     .request(app)
-    //     .delete(`/api/pending-orders/${pendingOrderId}`)
-    //     .set('Authorization', `Bearer ${tokenCompanyAdmin}`)
+      const res = await chai
+        .request(app)
+        .delete(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
 
-    //   expect(res).to.have.status(204)
-    // })
+      expect(res).to.have.status(204)
+    })
 
-    // it('Should return 204 when a campaign manager deletes a pending order.', async () => {
-    //   const pendingOrder = await chai
-    //     .request(app)
-    //     .post('/api/pending-orders')
-    //     .set('Authorization', `Bearer ${String(token)}`)
-    //     .send({
-    //       pendingOrders
-    //     })
+    it('Should return 204 when a campaign manager deletes a pending order.', async () => {
+      const pendingOrder = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(token)}`)
+        .send({
+          pendingOrders
+        })
 
-    //   const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
 
-    //   const res = await chai
-    //     .request(app)
-    //     .delete(`/api/pending-orders/${pendingOrderId}`)
-    //     .set('Authorization', `Bearer ${tokenCampaignManager}`)
+      const res = await chai
+        .request(app)
+        .delete(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
 
-    //   expect(res).to.have.status(204)
-    // })
+      expect(res).to.have.status(204)
+    })
 
     it('Should return 204 when a user deletes a pending order.', async () => {
       const pendingOrder = await chai
