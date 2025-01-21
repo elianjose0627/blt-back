@@ -11,8 +11,7 @@ const uploadFileToGCP = async (req: Request, res: Response, next: CustomNext): P
         statusCode: statusCodes.NOT_FOUND,
         success: false,
         errors: {
-          message: 'Not Found Error',
-          error: 'No files uploaded.'
+          message: 'No files uploaded.'
         }
       })
     }
@@ -27,8 +26,7 @@ const uploadFileToGCP = async (req: Request, res: Response, next: CustomNext): P
       statusCode: statusCodes.BAD_REQUEST,
       success: false,
       errors: {
-        message: 'Internal Server Error',
-        error: error.message
+        message: error.message
       }
     })
   }
