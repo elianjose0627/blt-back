@@ -97,6 +97,7 @@ app.use(apiPrefix, routers.apiKeyRouter())
 app.use(apiPrefix, routers.productCustomisationRouter())
 app.use(apiPrefix, routers.orderConfirmationRouter())
 app.use(apiPrefix, routers.packingSlipRouter())
+app.use(apiPrefix, routers.fileRouter())
 
 // Add validation middleware
 app.use(joiErrors)
