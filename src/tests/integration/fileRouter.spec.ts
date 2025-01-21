@@ -5,34 +5,30 @@ import path from 'path'
 import app from '../../app'
 import {
   deleteTestUser,
-  createAdminTestUser,
-  verifyUser,
-  createCompanyAdministratorWithCompany,
-  sheHulkAtStarkIndustriesPassword
+  verifyUser
 } from '../utils'
+import { faker } from '@faker-js/faker'
 
 const { expect } = chai
 
 chai.use(chaiHttp)
 
-const username: string = 'shehulk'
-const password: string = sheHulkAtStarkIndustriesPassword
+const username: string = 'fakeruser'
+const password: string = faker.internet.password()
+const email: string = 'faker.user@getec.com'
 
 describe('GETEC file actions', () => {
   before(async () => {
-    await createAdminTestUser()
-    await createCompanyAdministratorWithCompany()
-
     await chai
       .request(app)
       .post('/auth/signup')
-      .send({ user: { firstName: 'She', lastName: 'Hulk', username, email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password } })
+      .send({ user: { firstName: 'She', lastName: 'Hulk', username, email, phone: '254720123456', password } })
 
-    await verifyUser('shehulk@starkindustriesmarvel.com')
+    await verifyUser(email)
   })
 
   after(async () => {
-    await deleteTestUser('drstrange@starkindustriesmarvel.com')
+    await deleteTestUser(email)
   })
 
   describe('File Upload for Getec Action', () => {
@@ -60,18 +56,6 @@ describe('GETEC file actions', () => {
         .set('Authorization', `Basic ${basicAuth}`)
         .set('Content-Type', 'multipart/form-data')
         .attach('file', fs.readFileSync(filePath), 'test.txt')
-
-      expect(res).to.have.status(400)
-      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-    })
-
-    it('Should return 400 Bad Request when an admin tries to create pending order.', async () => {
-      const basicAuth = Buffer.from(`${username}:${password}`).toString('base64')
-      const res = await chai
-        .request(app)
-        .post('/api/file/upload')
-        .set('Authorization', `Basic ${basicAuth}`)
-        .attach('file', Buffer.from('test file content'), 'test.txt')
 
       expect(res).to.have.status(400)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')

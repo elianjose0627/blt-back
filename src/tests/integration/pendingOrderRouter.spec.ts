@@ -17,10 +17,6 @@ import {
   createProduct,
   createProductWithMinimumOrderQuantity,
   createProductWithGraduatedPricesAndIsExceedStockEnabledIsTrue,
-  iversAtKreeDotKrPassword,
-  sheHulkAtStarkIndustriesPassword,
-  nickFuryPassword,
-  happyHoganPassword,
   postedPendingOrder,
   queuedPendingOrder
 } from '../utils'
@@ -34,23 +30,31 @@ let token: string
 let tokenCompanyAdministrator: string
 let tokenCampaignManager: string
 
+const email1 = 'gues@modo.com'
+const password1 = faker.internet.password()
+const email2 = 'guses@yahoo.com'
+const password2 = faker.internet.password()
+const email3 = 'faker.internet@google.com'
+const password3 = faker.internet.password()
+const email4 = 'guesmia@getec.com'
+const password4 = faker.internet.password()
+
 describe('Pending Orders actions', () => {
   before(async () => {
-    await createAdminTestUser()
-    await createCompanyAdministrator()
+    await createAdminTestUser(email1, password1)
+    await createCompanyAdministrator(email2, password2)
     await createProduct()
     await createProductWithMinimumOrderQuantity()
     await createProductWithGraduatedPricesAndIsExceedStockEnabledIsTrue()
-
     const resAdmin = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'ivers@kree.kr', password: iversAtKreeDotKrPassword } })
+      .send({ user: { email: email1, password: password1 } })
 
     const resCompanyAdministrator = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'nickfury@starkindustriesmarvel.com', password: nickFuryPassword } })
+      .send({ user: { email: email2, password: password2 } })
 
     tokenAdmin = resAdmin.body.token
     tokenCompanyAdministrator = resCompanyAdministrator.body.token
@@ -70,14 +74,14 @@ describe('Pending Orders actions', () => {
       .query({
         companyId: resInviteLink.body.company.inviteLink.split('=')[1]
       })
-      .send({ user: { firstName: 'She', lastName: 'Hulk', email: 'shehulk@starkindustriesmarvel.com', phone: '254720123456', password: sheHulkAtStarkIndustriesPassword } })
+      .send({ user: { firstName: 'She', lastName: 'Hulk', email: email3, phone: '254720123456', password: password3 } })
 
-    await verifyUser('shehulk@starkindustriesmarvel.com')
+    await verifyUser(email3)
 
     const resUser = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'shehulk@starkindustriesmarvel.com', password: sheHulkAtStarkIndustriesPassword } })
+      .send({ user: { email: email3, password: password3 } })
 
     // create comapaign manager
     await chai
@@ -86,21 +90,24 @@ describe('Pending Orders actions', () => {
       .query({
         companyId: resInviteLink.body.company.roles.campaignManager.shortInviteLink.split('=')[1]
       })
-      .send({ user: { firstName: 'Happy', lastName: 'Hogan', email: 'happyhogan@starkindustriesmarvel.com', phone: '254720123456', password: happyHoganPassword } })
+      .send({ user: { firstName: 'Happy', lastName: 'Hogan', email: email4, phone: '254720123456', password: password4 } })
 
-    await verifyUser('happyhogan@starkindustriesmarvel.com')
+    await verifyUser(email4)
 
     const resCampaignManager = await chai
       .request(app)
       .post('/auth/login')
-      .send({ user: { email: 'happyhogan@starkindustriesmarvel.com', password: happyHoganPassword } })
+      .send({ user: { email: email4, password: password4 } })
 
     token = resUser.body.token
     tokenCampaignManager = resCampaignManager.body.token
   })
 
   after(async () => {
-    await deleteTestUser('drstrange@starkindustriesmarvel.com')
+    await deleteTestUser(email1)
+    await deleteTestUser(email2)
+    await deleteTestUser(email3)
+    await deleteTestUser(email4)
   })
 
   describe('Get all pending orders', () => {
