@@ -6,7 +6,8 @@ import type {
   IUser,
   OrderLineRequest,
   ShippingAddressRequest,
-  BillingAddressRequest
+  BillingAddressRequest,
+  Nullable
 } from '../types'
 
 const PackingSlipModel = (sequelize: any, DataTypes: any): any => {
@@ -14,7 +15,7 @@ const PackingSlipModel = (sequelize: any, DataTypes: any): any => {
     id: string
     postedOrderId: string
     packingSlipNumber: number
-    trackingId: string
+    trackingId: Nullable<string>
     costCenter: string | null
     externalOrderNumber: number
     externalProjectNumber: number
@@ -31,7 +32,7 @@ const PackingSlipModel = (sequelize: any, DataTypes: any): any => {
     private readonly id: string
     private readonly postedOrderId: string
     private readonly packingSlipNumber: number
-    private readonly trackingId: string
+    private readonly trackingId: Nullable<string>
     private readonly costCenter: string | null
     private readonly externalOrderNumber: string
     private readonly externalProjectNumber: string
@@ -110,7 +111,7 @@ const PackingSlipModel = (sequelize: any, DataTypes: any): any => {
     },
     trackingId: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     costCenter: {
       type: DataTypes.STRING,

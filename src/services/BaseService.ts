@@ -1,5 +1,5 @@
 import { v1 as uuidv1 } from 'uuid'
-import { Op } from 'sequelize'
+import { Op, Sequelize } from 'sequelize'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import db from '../models'
@@ -469,7 +469,22 @@ class BaseService {
       : generateInclude(this.model)
 
     const record = await db[this.model].findOne({
-      attributes: { exclude: [...excluded] },
+      attributes: {
+        exclude: [...excluded],
+        include: this.model === 'Campaign'
+          ? [
+              [
+                Sequelize.literal(`(
+                  SELECT CAST(COALESCE(SUM("orderedQuota"), 0) AS INTEGER)
+                  FROM "CampaignQuotas" 
+                  WHERE "CampaignQuotas"."campaignId" = "Campaign"."id"
+                  AND "CampaignQuotas"."deletedAt" IS NULL
+                )`),
+                'totalOrderedQuota'
+              ]
+            ]
+          : []
+      },
       include: included,
       where: {
         id

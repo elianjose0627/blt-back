@@ -40,6 +40,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     isQueued: boolean
     jtlId: number
     jtlNumber: string
+    isPackingSlipGenerated: boolean
   }
 
   class PendingOrder extends Model<PendingOrderAttributes> {
@@ -84,6 +85,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly jtlId: number
     private readonly jtlNumber: string
     private readonly owner: IUser
+    private readonly isPackingSlipGenerated: boolean
 
     static associate (models: any): any {
       PendingOrder.belongsTo(models.Company, {
@@ -145,7 +147,8 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
         isQueued: this.isQueued,
         jtlId: this.jtlId,
         jtlNumber: this.jtlNumber,
-        owner: this.owner
+        owner: this.owner,
+        isPackingSlipGenerated: this.isPackingSlipGenerated
       }
     }
   };
@@ -303,6 +306,11 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     jtlNumber: {
       type: DataTypes.STRING,
       allowNull: true
+    },
+    isPackingSlipGenerated: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
     }
   }, {
     sequelize,
