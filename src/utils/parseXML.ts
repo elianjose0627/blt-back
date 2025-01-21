@@ -36,6 +36,8 @@ export const parseXml = async (xmlContent: string): Promise<any> => {
     }
     const xmlData = parser.parse(xmlContent)
 
+    console.log('first-------------------------------', xmlData)
+
     const pendingOrder = {
       platform: 0,
       language: 0,

@@ -34,13 +34,13 @@ describe('GETEC file actions', () => {
   describe('File Upload for Getec Action', () => {
     it('Should return 201 Created when an admin successfully created pending order.', async () => {
       const basicAuth = Buffer.from(`${username}:${password}`).toString('base64')
-      const filePath = path.join(__dirname, '../test.txt')
+      const filePath = path.join(__dirname, '../test.xml')
       const res = await chai
         .request(app)
         .post('/api/file/upload')
         .set('Authorization', `Basic ${basicAuth}`)
         .set('Content-Type', 'multipart/form-data')
-        .attach('file', fs.readFileSync(filePath), 'test.txt')
+        .attach('file', fs.readFileSync(filePath), 'test.xml')
 
       expect(res).to.have.status(201)
       expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')

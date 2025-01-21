@@ -22,7 +22,6 @@ const uploadFileToGCP = async (req: Request, res: Response, next: CustomNext): P
 
     return next()
   } catch (error: any) {
-    console.log('first upload file to gcp0', error)
     return res.status(statusCodes.BAD_REQUEST).send({
       statusCode: statusCodes.BAD_REQUEST,
       success: false,
