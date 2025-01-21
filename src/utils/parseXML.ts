@@ -36,7 +36,9 @@ export const parseXml = async (xmlContent: string): Promise<any> => {
     }
     const xmlData = parser.parse(xmlContent)
 
-    console.log('first-------------------------------', xmlData)
+    console.log('first-------------------------------', xmlData.QxCBL.xCBLPayload.embedded)
+
+    console.log('second--------------------------------', xmlData.QxCBL.xCBLPayload.embedded.Order.OrderHeader.OrderNumber.BuyerOrderNumber)
 
     const pendingOrder = {
       platform: 0,
