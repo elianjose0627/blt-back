@@ -4,6 +4,7 @@ import fs from 'fs'
 import path from 'path'
 import app from '../../app'
 import {
+  createCompanyAdministratorWithCompany,
   deleteTestUser,
   verifyUser
 } from '../utils'
@@ -19,12 +20,20 @@ const email: string = 'faker.user@getec.com'
 
 describe('GETEC file actions', () => {
   before(async () => {
+    const res = await createCompanyAdministratorWithCompany(email, password, '123')
+    await verifyUser(email)
+    const res2 = await chai
+      .request(app)
+      .post('/auth/login')
+      .send({ user: { email, password } })
+
+    const token = res2.body.token
+
     await chai
       .request(app)
-      .post('/auth/signup')
-      .send({ user: { firstName: 'She', lastName: 'Hulk', username, email, phone: '254720123456', password } })
-
-    await verifyUser(email)
+      .put(`/api/users/${String(res.id)}`)
+      .set('Authorization', `Bearer ${String(token)}`)
+      .send({ user: { username } })
   })
 
   after(async () => {
