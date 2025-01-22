@@ -26,7 +26,8 @@ class PendingOrderService extends BaseService {
 
   async getAll (limit: number, offset: number, user?: IUserExtended, search: string = '', filter = { firstname: '', lastname: '', email: '', city: '', country: '' }): Promise<any> {
     let records
-    if (user?.role === userRoles.ADMIN) {
+    if (user === undefined) return { }
+    if (user.role === userRoles.ADMIN) {
       records = await db[this.model].findAndCountAll({
         include: generateInclude(this.model),
         limit,
@@ -35,7 +36,7 @@ class PendingOrderService extends BaseService {
         attributes: { exclude: ['deletedAt'] },
         distinct: true
       })
-    } else if (user?.role === userRoles.COMPANYADMINISTRATOR) {
+    } else if (user.role === userRoles.COMPANYADMINISTRATOR) {
       records = await db[this.model].findAndCountAll({
         include: generateInclude(this.model),
         limit,
@@ -47,7 +48,7 @@ class PendingOrderService extends BaseService {
         },
         distinct: true
       })
-    } else if (user?.role === userRoles.CAMPAIGNMANAGER) {
+    } else if (user.role === userRoles.CAMPAIGNMANAGER) {
       records = await db[this.model].findAndCountAll({
         include: generateInclude(this.model),
         limit,
@@ -218,12 +219,9 @@ class PendingOrderService extends BaseService {
 
   async update (data: any): Promise<any> {
     const { pendingOrder, currentUser, record } = data
-    const { company } = currentUser
 
     const updateData = {
       ...pendingOrder,
-      customerId: company?.customerId ?? 0,
-      companyId: company?.id,
       updatedBy: currentUser.email
     }
 
