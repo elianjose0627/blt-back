@@ -35,7 +35,6 @@ export const parseXml = async (xmlContent: string): Promise<any> => {
       throw new Error(isValid.err.msg.replace('.', '') + ` in line ${isValid.err.line} and column ${isValid.err.col}`)
     }
     const xmlData = parser.parse(xmlContent)
-
     const pendingOrder = {
       platform: 0,
       language: 0,

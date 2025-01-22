@@ -24,9 +24,8 @@ class PendingOrderService extends BaseService {
     return records
   }
 
-  async getAll (limit: number, offset: number, user?: IUserExtended, search: string = '', filter = { firstname: '', lastname: '', email: '', city: '', country: '' }): Promise<any> {
+  async getAll (limit: number, offset: number, user?: any, search: string = '', filter = { firstname: '', lastname: '', email: '', city: '', country: '' }): Promise<any> {
     let records
-    if (user === undefined) return { }
     if (user.role === userRoles.ADMIN) {
       records = await db[this.model].findAndCountAll({
         include: generateInclude(this.model),
@@ -44,7 +43,7 @@ class PendingOrderService extends BaseService {
         order: [['createdAt', 'DESC']],
         attributes: { exclude: [] },
         where: {
-          companyId: user?.company?.id
+          companyId: user.company.id
         },
         distinct: true
       })
@@ -56,7 +55,7 @@ class PendingOrderService extends BaseService {
         order: [['createdAt', 'DESC']],
         attributes: { exclude: [] },
         where: {
-          companyId: user?.company?.id
+          companyId: user.company.id
         },
         distinct: true
       })
@@ -68,7 +67,7 @@ class PendingOrderService extends BaseService {
         order: [['createdAt', 'DESC']],
         attributes: { exclude: [] },
         where: {
-          userId: user?.id
+          userId: user.id
         },
         distinct: true
       })
