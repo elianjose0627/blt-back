@@ -8,21 +8,11 @@ import { parseXml } from '../utils/parseXML'
 import { StatusCode } from '../types'
 
 const fileService = new FileService('file')
-
 class FileController extends BaseController {
   async insertPendingOrder (req: Request, res: Response): Promise<any> {
-    const { user: currentUser, files } = req
+    const { user: currentUser } = req
+    const files: Express.Multer.File[] = req.files as Express.Multer.File[]
     try {
-      if (files === undefined || !Array.isArray(files) || files.length === 0) {
-        return res.status(statusCodes.NOT_FOUND).send({
-          statusCode: statusCodes.NOT_FOUND,
-          success: false,
-          errors: {
-            message: 'No files uploaded.'
-          }
-        })
-      }
-
       const parsedData = []
       for (const file of files) {
         // Parse XML content

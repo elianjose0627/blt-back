@@ -1,5 +1,6 @@
 import multer from 'multer'
-import { CustomRequest } from '../types'
+import { CustomNext, CustomRequest, CustomResponse } from '../types'
+import * as statusCodes from '../constants/statusCodes'
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -12,4 +13,28 @@ const upload = multer({
   }
 })
 
-export const uploadFile = upload.any()
+const uploadFile = upload.any()
+
+export const uploadToMemory = async (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> => {
+  uploadFile(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      return res.status(statusCodes.BAD_REQUEST).send({
+        statusCode: statusCodes.BAD_REQUEST,
+        success: false,
+        errors: {
+          message: err.message
+        }
+      })
+    } else if (err instanceof Error) {
+      return res.status(statusCodes.BAD_REQUEST).send({
+        statusCode: statusCodes.BAD_REQUEST,
+        success: false,
+        errors: {
+          message: err.message
+        }
+      })
+    }
+
+    return next()
+  })
+}

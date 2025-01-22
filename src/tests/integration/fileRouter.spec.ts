@@ -75,6 +75,20 @@ describe('GETEC file actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
     })
 
+    it('Should return 400 Bad Request when an admin tries to create pending order with invalid file type.', async () => {
+      const basicAuth = Buffer.from(`${username}:${password}`).toString('base64')
+      const filePath = path.join(__dirname, '../bulkPendingOrders.json')
+      const res = await chai
+        .request(app)
+        .post('/api/file/upload')
+        .set('Authorization', `Basic ${basicAuth}`)
+        .set('Content-Type', 'multipart/form-data')
+        .attach('file', fs.readFileSync(filePath), 'bulkPendingOrders.json')
+
+      expect(res).to.have.status(400)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+    })
+
     it('should return 401 when a non-admin tries to upload a file', async () => {
       const res = await chai
         .request(app)

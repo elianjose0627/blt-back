@@ -12,7 +12,7 @@ class FileService extends BaseService {
       id: uuidv1(),
       userId: currentUser.id,
       campaignId: currentUser.campaignId,
-      customerId: currentUser.company?.customerId ?? 0,
+      customerId: currentUser.company.customerId,
       companyId: currentUser.companyId,
       created: dayjs.utc().format(),
       // createdBy: currentUser.email,

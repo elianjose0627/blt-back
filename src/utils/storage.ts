@@ -11,7 +11,7 @@ const storage = new Storage(
     }
   }
 )
-const bucketName = 'getec-order' // Replace with your bucket name
+const bucketName = 'getec-order'
 
 export const uploadToGCS = async (fileName: string, fileBuffer: Buffer): Promise<string> => {
   const bucket = storage.bucket(bucketName)
