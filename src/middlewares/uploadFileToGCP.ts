@@ -7,13 +7,7 @@ import { CustomNext } from '../types'
 const uploadFileToGCP = async (req: Request, res: Response, next: CustomNext): Promise<any> => {
   try {
     if (req.files === undefined || !Array.isArray(req.files) || req.files.length === 0) {
-      return res.status(statusCodes.NOT_FOUND).send({
-        statusCode: statusCodes.NOT_FOUND,
-        success: false,
-        errors: {
-          message: 'No files uploaded.'
-        }
-      })
+      throw new Error('No files uploaded.')
     }
     for (const file of req.files) {
       const fileName = `${dayjs().format('YYYY_MM_DD')}_${file.originalname}`

@@ -17,15 +17,7 @@ const uploadFile = upload.any()
 
 export const uploadToMemory = async (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> => {
   uploadFile(req, res, function (err) {
-    if (err instanceof multer.MulterError) {
-      return res.status(statusCodes.BAD_REQUEST).send({
-        statusCode: statusCodes.BAD_REQUEST,
-        success: false,
-        errors: {
-          message: err.message
-        }
-      })
-    } else if (err instanceof Error) {
+    if (err instanceof Error) {
       return res.status(statusCodes.BAD_REQUEST).send({
         statusCode: statusCodes.BAD_REQUEST,
         success: false,

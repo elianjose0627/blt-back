@@ -1,6 +1,6 @@
 import { Storage } from '@google-cloud/storage'
 
-const privateKey = process.env.FIREBASE_PRIVATE_KEY?.split(String.raw`\n`).join('\n')
+const privateKey = (process.env.FIREBASE_PRIVATE_KEY as string).split(String.raw`\n`).join('\n')
 
 const storage = new Storage(
   {

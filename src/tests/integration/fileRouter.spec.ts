@@ -98,7 +98,21 @@ describe('GETEC file actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
     })
 
-    it('should return 401 when a non-admin tries to upload a file', async () => {
+    it('Should return 400 Bad Request when an admin tries to create pending order with invalid xml schema file.', async () => {
+      const basicAuth = Buffer.from(`${username}:${password}`).toString('base64')
+      const filePath = path.join(__dirname, '../testValidationError.xml')
+      const res = await chai
+        .request(app)
+        .post('/api/file/upload')
+        .set('Authorization', `Basic ${basicAuth}`)
+        .set('Content-Type', 'multipart/form-data')
+        .attach('file', fs.readFileSync(filePath), 'testValidationError.xml')
+
+      expect(res).to.have.status(400)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+    })
+
+    it('should return 401 UNAUTHORIZED when a non-admin tries to upload a file', async () => {
       const res = await chai
         .request(app)
         .post('/api/file/upload')
@@ -110,7 +124,7 @@ describe('GETEC file actions', () => {
       expect(res.body.errors.message).to.equal('Invalid Username or Password')
     })
 
-    it('should return 401 when a admin tries to upload a file with wrong password', async () => {
+    it('should return 401 UNAUTHORIZED when a admin tries to upload a file with wrong password', async () => {
       const res = await chai
         .request(app)
         .post('/api/file/upload')
@@ -122,7 +136,7 @@ describe('GETEC file actions', () => {
       expect(res.body.errors.message).to.equal('Invalid Username or Password')
     })
 
-    it('should return 401 when admin tries to upload a file with invalid auth type', async () => {
+    it('should return 401 UNAUTHORIZED when admin tries to upload a file with invalid auth type', async () => {
       const res = await chai
         .request(app)
         .post('/api/file/upload')
@@ -134,13 +148,13 @@ describe('GETEC file actions', () => {
       expect(res.body.errors.message).to.equal('Invalid Auth Type')
     })
 
-    it('should return 404 Not Found when admin tries to upload a file without file', async () => {
+    it('should return 400 Bad Request when admin tries to upload a file without file', async () => {
       const res = await chai
         .request(app)
         .post('/api/file/upload')
         .set('Authorization', `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`)
 
-      expect(res).to.have.status(404)
+      expect(res).to.have.status(400)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('No files uploaded.')
     })

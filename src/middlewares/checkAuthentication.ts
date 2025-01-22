@@ -38,9 +38,8 @@ const include = [
 
 const checkAuthentication = (req: CustomRequest, res: CustomResponse, next: CustomNext): any => {
   const authHeader = req.headers.authorization
-  const hasCustomBasicAuth = authHeader?.startsWith('Basic ')
 
-  if (authHeader !== undefined && hasCustomBasicAuth === true) {
+  if (authHeader?.startsWith('Basic ') === true) {
     const secretKey = authHeader.split(' ')[1]
     const username = decodeString(secretKey, 'base64').split(':')[0]
     const password = decodeString(secretKey, 'base64').split(':')[1]
@@ -67,17 +66,11 @@ const checkAuthentication = (req: CustomRequest, res: CustomResponse, next: Cust
           }
         })
       } else {
-        return res.status(statusCodes.UNAUTHORIZED).send({
-          statusCode: statusCodes.UNAUTHORIZED,
-          success: false,
-          errors: {
-            message: 'Invalid Username or Password'
-          }
-        })
+        throw new Error('Invalid Username or Password')
       }
     }).catch((error: any) => {
-      return res.status(statusCodes.SERVER_ERROR).send({
-        statusCode: statusCodes.SERVER_ERROR,
+      return res.status(statusCodes.UNAUTHORIZED).send({
+        statusCode: statusCodes.UNAUTHORIZED,
         success: false,
         errors: {
           message: error.message
