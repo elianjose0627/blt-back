@@ -455,7 +455,7 @@ const validateJoinCompany = Joi.object({
 
 const validateSalutation = Joi.object({
   salutation: Joi.object({
-    title: Joi.string().required().max(8)
+    title: Joi.string().required().max(16)
   }).required()
 }).required()
 
