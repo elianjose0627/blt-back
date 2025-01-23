@@ -57,6 +57,7 @@ import apiKeyRouter from './apiKeyRouter'
 import productCustomisationRouter from './productCustomisationRouter'
 import orderConfirmationRouter from './orderConfirmationRouter'
 import packingSlipRouter from './packingSlipRouter'
+import titleRouter from './titleRouter'
 
 const routers = {
   authRouter,
@@ -117,7 +118,8 @@ const routers = {
   apiKeyRouter,
   productCustomisationRouter,
   orderConfirmationRouter,
-  packingSlipRouter
+  packingSlipRouter,
+  titleRouter
 }
 
 export default routers

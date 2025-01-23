@@ -455,7 +455,7 @@ const validateJoinCompany = Joi.object({
 
 const validateSalutation = Joi.object({
   salutation: Joi.object({
-    title: Joi.string().required().max(16)
+    name: Joi.string().required().max(64)
   }).required()
 }).required()
 
@@ -1394,6 +1394,12 @@ const validateDocumentQueryParams = Joi.object({
   })
 }).required()
 
+const validateTitle = Joi.object({
+  title: Joi.object({
+    name: Joi.string().required().max(32)
+  }).required()
+}).required()
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1494,5 +1500,6 @@ export default {
   validateProductCustomisationQueryParams,
   validateDocumentQueryParams,
   validateProductCustomisationForUpdate,
-  validateProductCategoryForCompany
+  validateProductCategoryForCompany,
+  validateTitle
 }

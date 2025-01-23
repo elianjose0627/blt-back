@@ -97,7 +97,14 @@ export interface IShipment {
 
 export interface ISalutation {
   id: string
-  title: string
+  name: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ITitle {
+  id: string
+  name: string
   createdAt: Date
   updatedAt: Date
 }

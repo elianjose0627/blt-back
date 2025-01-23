@@ -1,13 +1,13 @@
 import { Model } from 'sequelize'
-import type { ISalutation } from '../types'
+import type { ITitle } from '../types'
 
-const SalutationModel = (sequelize: any, DataTypes: any): any => {
-  interface SalutationAttributes {
+const TitleModel = (sequelize: any, DataTypes: any): any => {
+  interface TitleAttributes {
     id: string
     name: string
   }
 
-  class Salutation extends Model<SalutationAttributes> {
+  class Title extends Model<TitleAttributes> {
     private readonly id: string
     private readonly name: string
     private readonly createdAt: Date
@@ -17,7 +17,7 @@ const SalutationModel = (sequelize: any, DataTypes: any): any => {
 
     }
 
-    toJSONFor (): ISalutation {
+    toJSONFor (): ITitle {
       return {
         id: this.id,
         name: this.name,
@@ -27,7 +27,7 @@ const SalutationModel = (sequelize: any, DataTypes: any): any => {
     }
   };
 
-  Salutation.init({
+  Title.init({
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
@@ -40,10 +40,10 @@ const SalutationModel = (sequelize: any, DataTypes: any): any => {
   }, {
     sequelize,
     paranoid: true,
-    modelName: 'Salutation'
+    modelName: 'Title'
   })
 
-  return Salutation
+  return Title
 }
 
-module.exports = SalutationModel
+module.exports = TitleModel
