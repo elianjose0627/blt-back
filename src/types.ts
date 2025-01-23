@@ -47,6 +47,7 @@ export interface LoginTime {
 
 export interface IUser {
   id: string
+  title?: string
   salutation?: string
   location?: any
   firstName: string
@@ -97,7 +98,14 @@ export interface IShipment {
 
 export interface ISalutation {
   id: string
-  title: string
+  name: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ITitle {
+  id: string
+  name: string
   createdAt: Date
   updatedAt: Date
 }
@@ -247,6 +255,7 @@ export interface IAddress {
   id: string
   companyName?: string
   salutation?: Nullable<string>
+  title?: Nullable<string>
   firstName?: Nullable<string>
   lastName?: Nullable<string>
   email?: string
@@ -271,6 +280,7 @@ export interface IRecipient {
   id: string
   companyName: Nullable<string>
   salutation: Nullable<string>
+  title: Nullable<string>
   firstName: Nullable<string>
   lastName: Nullable<string>
   email: string

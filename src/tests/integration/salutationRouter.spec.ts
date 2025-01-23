@@ -77,14 +77,14 @@ describe('Salutation actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           salutation: {
-            title: 'Mr'
+            name: 'Dear'
           }
         })
 
       expect(res).to.have.status(201)
       expect(res.body).to.include.keys('statusCode', 'success', 'salutation')
       expect(res.body.salutation).to.be.an('object')
-      expect(res.body.salutation).to.include.keys('id', 'title', 'createdAt', 'updatedAt')
+      expect(res.body.salutation).to.include.keys('id', 'name', 'createdAt', 'updatedAt')
     })
 
     it('Should return 200 OK when a user creates the same salutation.', async () => {
@@ -94,14 +94,14 @@ describe('Salutation actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           salutation: {
-            title: 'Mr'
+            name: 'Dear'
           }
         })
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'salutation')
       expect(res.body.salutation).to.be.an('object')
-      expect(res.body.salutation).to.include.keys('id', 'title', 'createdAt', 'updatedAt')
+      expect(res.body.salutation).to.include.keys('id', 'name', 'createdAt', 'updatedAt')
     })
 
     it('Should return 204 when a admin deletes a salutation.', async () => {
@@ -111,7 +111,7 @@ describe('Salutation actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           salutation: {
-            title: 'Miss'
+            name: 'Hey'
           }
         })
 
@@ -143,7 +143,7 @@ describe('Salutation actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           salutation: {
-            title: 'Mrs'
+            name: 'Hello'
           }
         })
 
@@ -157,7 +157,7 @@ describe('Salutation actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'salutation')
       expect(res.body.salutation).to.be.an('object')
-      expect(res.body.salutation).to.include.keys('id', 'title', 'createdAt', 'updatedAt')
+      expect(res.body.salutation).to.include.keys('id', 'name', 'createdAt', 'updatedAt')
     })
 
     it('Should return 200 OK when an administrator gets a salutation by id.', async () => {
@@ -167,7 +167,7 @@ describe('Salutation actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           salutation: {
-            title: 'Mx'
+            name: 'Greetings'
           }
         })
 
@@ -181,7 +181,7 @@ describe('Salutation actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'salutation')
       expect(res.body.salutation).to.be.an('object')
-      expect(res.body.salutation).to.include.keys('id', 'title', 'createdAt', 'updatedAt')
+      expect(res.body.salutation).to.include.keys('id', 'name', 'createdAt', 'updatedAt')
     })
 
     it('Should return 200 OK when an administrator updates a salutation by id.', async () => {
@@ -191,7 +191,7 @@ describe('Salutation actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           salutation: {
-            title: 'Mx'
+            name: 'Greetings'
           }
         })
 
@@ -203,15 +203,15 @@ describe('Salutation actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           salutation: {
-            title: 'Mx.'
+            name: 'Greetings.'
           }
         })
 
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'salutation')
       expect(res.body.salutation).to.be.an('object')
-      expect(res.body.salutation).to.include.keys('id', 'title', 'createdAt', 'updatedAt')
-      expect(res.body.salutation.title).to.equal('Mx.')
+      expect(res.body.salutation).to.include.keys('id', 'name', 'createdAt', 'updatedAt')
+      expect(res.body.salutation.name).to.equal('Greetings.')
     })
 
     it('Should return 403 Forbidden when an non-administrator tries to update a salutation by id.', async () => {
@@ -221,7 +221,7 @@ describe('Salutation actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           salutation: {
-            title: 'Mx'
+            name: 'Greetings'
           }
         })
 
@@ -233,7 +233,7 @@ describe('Salutation actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           salutation: {
-            title: 'Mx.'
+            name: 'Greetings.'
           }
         })
 
@@ -249,7 +249,7 @@ describe('Salutation actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           salutation: {
-            title: 'Dr'
+            name: 'Good Morning'
           }
         })
 
@@ -270,7 +270,7 @@ describe('Salutation actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           salutation: {
-            title: 'Dr'
+            name: 'Good Morning'
           }
         })
 
