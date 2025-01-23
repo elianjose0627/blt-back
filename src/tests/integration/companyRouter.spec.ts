@@ -3770,6 +3770,64 @@ describe('Company actions', () => {
       expect(res.body.users).to.not.include.keys('isGhost')
     })
 
+    it('Should return 200 Success when an owner successfully retrieves all users of a company by role.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Best Company',
+            email: 'testbest@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .query({
+          filter: {
+            role: 'User'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'users')
+      expect(res.body.users).to.be.an('array')
+      expect(res.body.users).to.not.include.keys('isGhost')
+      expect(res.body.users.every((user: any) => user.role === 'User')).to.equal(true)
+    })
+
+    it('Should return 422 Unprocessable Entity when owner tries to fetch users with an invalid filter.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Best Company',
+            email: 'testbest@company.com'
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/companies/${companyId}/users`)
+        .set('Authorization', `Bearer ${token}`)
+        .query({
+          filter: {
+            role: 'NonExistentRole'
+          }
+        })
+
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
+    })
+
     it('Should return 200 Success when a company admin who is an employee successfully retrieves all users of a company.', async () => {
       await deleteTestUser('nickfury@starkindustriesmarvel.com')
       await createCompanyAdministrator()
