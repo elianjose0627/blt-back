@@ -205,6 +205,8 @@ const commonQueryParams = {
     firstname: Joi.string().optional(),
     lastname: Joi.string().optional(),
     email: Joi.string().email().optional(),
+    role: Joi.string()
+      .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER, userRoles.ADMIN]).optional(),
     city: Joi.string().optional(),
     country: Joi.string().length(2).optional(),
     company: Joi.string().optional(),
