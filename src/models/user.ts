@@ -7,6 +7,7 @@ import * as userRoles from '../utils/userRoles'
 const UserModel = (sequelize: any, DataTypes: any): any => {
   interface UserAttributes {
     id: string
+    title: string
     salutation: string
     firstName: string
     lastName: string
@@ -31,6 +32,7 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
   }
   class User extends Model<UserAttributes> {
     private readonly id: string
+    private readonly title: string
     private readonly salutation: string
     private readonly firstName: string
     private readonly lastName: string
@@ -93,6 +95,7 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
     toJSONFor (): IUser {
       return {
         id: this.id,
+        title: this.title,
         salutation: this.salutation,
         firstName: this.firstName,
         lastName: this.lastName,
@@ -135,6 +138,10 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
       type: DataTypes.UUID,
       primaryKey: true,
       allowNull: false
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     salutation: {
       type: DataTypes.STRING,

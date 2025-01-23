@@ -6,6 +6,7 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
     id: string
     companyName: string
     salutation: string
+    title: string
     firstName: string
     lastName: string
     email: string
@@ -25,6 +26,7 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
   class Recipient extends Model<RecipientAttributes> {
     private readonly id: string
     private readonly salutation: string
+    private readonly title: string
     private readonly companyName: string
     private readonly firstName: string
     private readonly lastName: string
@@ -57,6 +59,7 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
         id: this.id,
         companyName: this.companyName,
         salutation: this.salutation,
+        title: this.title,
         firstName: this.firstName,
         lastName: this.lastName,
         email: this.email,
@@ -89,6 +92,10 @@ const RecipientModel = (sequelize: any, DataTypes: any): any => {
       allowNull: true
     },
     salutation: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    title: {
       type: DataTypes.STRING,
       allowNull: true
     },
