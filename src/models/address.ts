@@ -6,6 +6,7 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
     id: string
     companyName: string
     salutation: string
+    title: string
     firstName: string
     lastName: string
     email: string
@@ -25,6 +26,7 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
     private readonly id: string
     private readonly companyName: string
     private readonly salutation: string
+    private readonly title: string
     private readonly firstName: string
     private readonly lastName: string
     private readonly email: string
@@ -60,6 +62,7 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
         id: this.id,
         companyName: this.companyName,
         salutation: this.salutation,
+        title: this.title,
         firstName: this.firstName,
         lastName: this.lastName,
         email: this.email,
@@ -87,6 +90,10 @@ const AddressModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false
     },
     salutation: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    title: {
       type: DataTypes.STRING,
       allowNull: true
     },
