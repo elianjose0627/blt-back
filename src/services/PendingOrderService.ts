@@ -8,8 +8,27 @@ import * as userRoles from '../utils/userRoles'
 import * as statusCodes from '../constants/statusCodes'
 import { IDuplicatePostedOrder, IPendingOrder, IUserExtended } from '../types'
 import { Platform } from '../enums/platform'
+import { Op } from 'sequelize'
 
 dayjs.extend(utc)
+
+const where = {
+  [Op.or]: [
+    {
+      [Op.or]: [
+        { isPosted: false },
+        { isQueued: false }
+      ]
+    },
+    {
+      [Op.and]: [
+        { isPosted: true },
+        { isQueued: true },
+        { orderStatus: 0 }
+      ]
+    }
+  ]
+}
 
 class PendingOrderService extends BaseService {
   async findPendingOrders (userId: string, campaignId: string): Promise<any> {
@@ -33,7 +52,8 @@ class PendingOrderService extends BaseService {
         offset,
         order: [['createdAt', 'DESC']],
         attributes: { exclude: ['deletedAt'] },
-        distinct: true
+        distinct: true,
+        where
       })
     } else if (user.role === userRoles.COMPANYADMINISTRATOR) {
       records = await db[this.model].findAndCountAll({
@@ -43,7 +63,8 @@ class PendingOrderService extends BaseService {
         order: [['createdAt', 'DESC']],
         attributes: { exclude: [] },
         where: {
-          companyId: user.company.id
+          companyId: user.company.id,
+          ...where
         },
         distinct: true
       })
@@ -55,7 +76,8 @@ class PendingOrderService extends BaseService {
         order: [['createdAt', 'DESC']],
         attributes: { exclude: [] },
         where: {
-          companyId: user.company.id
+          companyId: user.company.id,
+          ...where
         },
         distinct: true
       })
@@ -67,7 +89,8 @@ class PendingOrderService extends BaseService {
         order: [['createdAt', 'DESC']],
         attributes: { exclude: [] },
         where: {
-          userId: user.id
+          userId: user.id,
+          ...where
         },
         distinct: true
       })
@@ -233,6 +256,34 @@ class PendingOrderService extends BaseService {
     await triggerPubSub(pendingOrdersTopicId, 'postPendingOrders', pendingOrdersAttributes)
 
     return { response: response.toJSONFor(), status: 200 }
+  }
+
+  async insertGETECPendingOrder (data: any): Promise<any> {
+    const { currentUser, parsedData } = data
+    const bulkInsertData = parsedData.map((pendingOrder: any) => ({
+      ...pendingOrder,
+      id: uuidv1(),
+      userId: currentUser.id,
+      campaignId: currentUser.campaignId,
+      customerId: currentUser.company.customerId,
+      companyId: currentUser.companyId,
+      created: dayjs.utc().format(),
+      createdBy: currentUser.email,
+      updatedBy: currentUser.email,
+      createdByFullName: `${String(currentUser.firstName)} ${String(currentUser.lastName)}`
+    }))
+
+    const response = await db.PendingOrder.bulkCreate(bulkInsertData, { returning: true })
+
+    const pendingOrdersTopicId = 'pending-orders'
+    const environment = String(process.env.ENVIRONMENT)
+    const pendingOrdersAttributes = { environment }
+
+    await triggerPubSub(pendingOrdersTopicId, 'postPendingOrders', pendingOrdersAttributes)
+    return {
+      response,
+      status: 201
+    }
   }
 }
 

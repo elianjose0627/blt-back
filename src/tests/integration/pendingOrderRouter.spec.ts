@@ -1,8 +1,10 @@
 import chai from 'chai'
 import chaiHttp from 'chai-http'
 import dayjs from 'dayjs'
-import app from '../../app'
+import fs from 'fs'
+import path from 'path'
 import { faker } from '@faker-js/faker'
+import app from '../../app'
 import {
   deleteTestUser,
   createAdminTestUser,
@@ -38,6 +40,9 @@ const email3 = 'faker.internet@google.com'
 const password3 = faker.internet.password()
 const email4 = 'guesmia@getec.com'
 const password4 = faker.internet.password()
+const email5 = 'faker.user@getec.com'
+const password5 = faker.internet.password()
+const username5 = 'fakeruser'
 
 describe('Pending Orders actions', () => {
   before(async () => {
@@ -101,6 +106,21 @@ describe('Pending Orders actions', () => {
 
     token = resUser.body.token
     tokenCampaignManager = resCampaignManager.body.token
+
+    const res = await createCompanyAdministratorWithCompany(email5, password5, '123')
+    await verifyUser(email5)
+    const res2 = await chai
+      .request(app)
+      .post('/auth/login')
+      .send({ user: { email: email5, password: password5 } })
+
+    const token5 = res2.body.token
+
+    await chai
+      .request(app)
+      .put(`/api/users/${String(res.id)}`)
+      .set('Authorization', `Bearer ${String(token5)}`)
+      .send({ user: { username: username5 } })
   })
 
   after(async () => {
@@ -108,6 +128,7 @@ describe('Pending Orders actions', () => {
     await deleteTestUser(email2)
     await deleteTestUser(email3)
     await deleteTestUser(email4)
+    await deleteTestUser(email5)
   })
 
   describe('Get all pending orders', () => {
@@ -1018,6 +1039,126 @@ describe('Pending Orders actions', () => {
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('You can not perform this action for the posted or queued order')
+    })
+  })
+
+  describe('Upload a file and create a pending order for Getec Action', () => {
+    it('Should return 201 Created when an admin successfully created pending order.', async () => {
+      const basicAuth = Buffer.from(`${username5}:${password5}`).toString('base64')
+      const filePath = path.join(__dirname, '../test.xml')
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders/upload')
+        .set('Authorization', `Basic ${basicAuth}`)
+        .set('Content-Type', 'multipart/form-data')
+        .attach('file', fs.readFileSync(filePath), 'test.xml')
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+    })
+
+    it('Should return 400 Bad Request when an admin tries to create pending order with xml file without some items.', async () => {
+      const basicAuth = Buffer.from(`${username5}:${password5}`).toString('base64')
+      const filePath = path.join(__dirname, '../testWithError.xml')
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders/upload')
+        .set('Authorization', `Basic ${basicAuth}`)
+        .set('Content-Type', 'multipart/form-data')
+        .attach('file', fs.readFileSync(filePath), 'testWithError.xml')
+
+      expect(res).to.have.status(400)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+    })
+
+    it('Should return 400 Bad Request when an admin tries to create pending order with invalid xml file.', async () => {
+      const basicAuth = Buffer.from(`${username5}:${password5}`).toString('base64')
+      const filePath = path.join(__dirname, '../testError.xml')
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders/upload')
+        .set('Authorization', `Basic ${basicAuth}`)
+        .set('Content-Type', 'multipart/form-data')
+        .attach('file', fs.readFileSync(filePath), 'testError.xml')
+
+      expect(res).to.have.status(400)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+    })
+
+    it('Should return 400 Bad Request when an admin tries to create pending order with invalid file type.', async () => {
+      const basicAuth = Buffer.from(`${username5}:${password5}`).toString('base64')
+      const filePath = path.join(__dirname, '../bulkPendingOrders.json')
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders/upload')
+        .set('Authorization', `Basic ${basicAuth}`)
+        .set('Content-Type', 'multipart/form-data')
+        .attach('file', fs.readFileSync(filePath), 'bulkPendingOrders.json')
+
+      expect(res).to.have.status(400)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+    })
+
+    it('Should return 400 Bad Request when an admin tries to create pending order with invalid xml schema file.', async () => {
+      const basicAuth = Buffer.from(`${username5}:${password5}`).toString('base64')
+      const filePath = path.join(__dirname, '../testValidationError.xml')
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders/upload')
+        .set('Authorization', `Basic ${basicAuth}`)
+        .set('Content-Type', 'multipart/form-data')
+        .attach('file', fs.readFileSync(filePath), 'testValidationError.xml')
+
+      expect(res).to.have.status(400)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+    })
+
+    it('should return 401 UNAUTHORIZED when a non-admin tries to upload a file', async () => {
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders/upload')
+        .set('Authorization', `Basic ${Buffer.from('nonadmin:password').toString('base64')}`)
+        .attach('file', Buffer.from('test file content'), 'test.txt')
+
+      expect(res).to.have.status(401)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Invalid Username or Password')
+    })
+
+    it('should return 401 UNAUTHORIZED when a admin tries to upload a file with wrong password', async () => {
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders/upload')
+        .set('Authorization', `Basic ${Buffer.from(`${username5}:password`).toString('base64')}`)
+        .attach('file', Buffer.from('test file content'), 'test.txt')
+
+      expect(res).to.have.status(401)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Invalid Username or Password')
+    })
+
+    it('should return 401 UNAUTHORIZED when admin tries to upload a file with invalid auth type', async () => {
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders/upload')
+        .set('Authorization', 'Bearer testtoken')
+        .attach('file', Buffer.from('test file content'), 'test.txt')
+
+      expect(res).to.have.status(401)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('jwt malformed')
+    })
+
+    it('should return 400 Bad Request when admin tries to upload a file without file', async () => {
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders/upload')
+        .set('Authorization', `Basic ${Buffer.from(`${username5}:${password5}`).toString('base64')}`)
+
+      expect(res).to.have.status(400)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('No files uploaded.')
     })
   })
 })

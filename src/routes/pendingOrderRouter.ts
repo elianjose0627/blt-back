@@ -7,6 +7,8 @@ import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import paginate from '../middlewares/pagination'
 import checkProductOrderQuantity from '../middlewares/checkProductOrderQuantity'
+import { uploadToMemory } from '../middlewares/uploadFile'
+import uploadFileToGCP from '../middlewares/uploadFileToGCP'
 
 const pendingOrderRoutes = (): Router => {
   const pendingOrderRouter = express.Router()
@@ -23,6 +25,8 @@ const pendingOrderRoutes = (): Router => {
     .post(celebrate({
       [Segments.BODY]: validator.validatePostedOrders
     }), asyncHandler(PendingOrderController.duplicate))
+  pendingOrderRouter.route('/pending-orders/upload')
+    .post(asyncHandler(uploadToMemory), asyncHandler(uploadFileToGCP), asyncHandler(PendingOrderController.insertGETECPendingOrder))
   pendingOrderRouter.use('/pending-orders/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(PendingOrderController.checkRecord))
