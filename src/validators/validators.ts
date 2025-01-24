@@ -1005,6 +1005,20 @@ const validateProductCategory = Joi.object({
   }).required()
 })
 
+const validateProductCategoryUpdate = Joi.object({
+  productCategory: Joi.object({
+    name: Joi.string().lowercase().required().max(64),
+    description: Joi.string().max(255).allow(null).allow(''),
+    picture: Joi.object({
+      url: Joi.string().uri().required(),
+      filename: Joi.string().required()
+    }).allow(null),
+    sortIndex: Joi.number().positive().allow(0),
+    isHidden: Joi.boolean(),
+    companyId: Joi.string().uuid().allow(null)
+  }).required()
+})
+
 const validateProductCategoryForCompany = Joi.object({
   productCategory: Joi.object({
     name: Joi.string().lowercase().required().max(64),
@@ -1511,5 +1525,6 @@ export default {
   validateProductCustomisationForUpdate,
   validateProductCategoryForCompany,
   validateTitle,
-  validatePostedOrderId
+  validatePostedOrderId,
+  validateProductCategoryUpdate
 }
