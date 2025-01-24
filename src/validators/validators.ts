@@ -1394,6 +1394,16 @@ const validateDocumentQueryParams = Joi.object({
   })
 }).required()
 
+const validateTitle = Joi.object({
+  title: Joi.object({
+    name: Joi.string().required().max(32)
+  }).required()
+}).required()
+
+const validatePostedOrderId = Joi.object({
+  postedOrderId: Joi.string().regex(/^\d+$/).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1494,5 +1504,7 @@ export default {
   validateProductCustomisationQueryParams,
   validateDocumentQueryParams,
   validateProductCustomisationForUpdate,
-  validateProductCategoryForCompany
+  validateProductCategoryForCompany,
+  validateTitle,
+  validatePostedOrderId
 }
