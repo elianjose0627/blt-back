@@ -3778,7 +3778,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Best Company',
-            email: 'testbest@company.com'
+            email: 'testbest1@company.com'
           }
         })
       const companyId = String(resCompany.body.company.id)
@@ -3808,7 +3808,7 @@ describe('Company actions', () => {
         .send({
           company: {
             name: 'Test Best Company',
-            email: 'testbest@company.com'
+            email: 'testbest2@company.com'
           }
         })
       const companyId = String(resCompany.body.company.id)
