@@ -44,6 +44,18 @@ class OrderController extends BaseController {
       [this.service.singleRecord()]: response
     })
   }
+
+  async getOrderByPostedOrderId (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { params: { postedOrderId } } = req
+
+    const order = await orderService.getOrderByPostedOrderId(postedOrderId)
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      order
+    })
+  }
 }
 
 export default new OrderController(orderService)

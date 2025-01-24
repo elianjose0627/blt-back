@@ -40,7 +40,7 @@ module.exports = {
         allowNull: false
       },
       attributes: {
-        type: Sequelize.JSON,
+        type: Sequelize.JSONB,
         allowNull: true
       },
       priority: {
