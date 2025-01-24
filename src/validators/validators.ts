@@ -68,7 +68,8 @@ const validateLogin = Joi.object({
 
 const validateUpdatedUser = Joi.object({
   user: Joi.object({
-    salutation: Joi.string().optional().allow('').allow(null).max(8),
+    salutation: Joi.string().optional().allow('').allow(null).max(64),
+    title: Joi.string().optional().allow('').allow(null).max(32),
     firstName: Joi.string().optional().max(64),
     lastName: Joi.string().optional().max(64),
     username: Joi.string().lowercase().optional().allow(null).max(64).regex(/^\S+$/)
@@ -320,7 +321,8 @@ const validateDomain = Joi.object({
 const validateCreatedAddress = Joi.object({
   address: Joi.object({
     id: Joi.string().uuid().optional().default(null).allow(null),
-    salutation: Joi.string().optional().allow('').allow(null).max(8),
+    salutation: Joi.string().optional().allow('').allow(null).max(64),
+    title: Joi.string().optional().allow('').allow(null).max(32),
     firstName: Joi.string().optional().allow('').allow(null).max(64),
     lastName: Joi.string().optional().allow('').allow(null).max(64),
     companyName: Joi.string().allow(null),
@@ -343,7 +345,8 @@ const validateCreatedAddress = Joi.object({
 
 const validateUpdatedAddress = Joi.object({
   address: Joi.object({
-    salutation: Joi.string().optional().allow('').allow(null).max(8),
+    salutation: Joi.string().optional().allow('').allow(null).max(64),
+    title: Joi.string().optional().allow('').allow(null).max(32),
     firstName: Joi.string().optional().allow('').allow(null).max(64),
     lastName: Joi.string().optional().allow('').allow(null).max(64),
     companyName: Joi.string().allow(null),
@@ -367,7 +370,8 @@ const validateUpdatedAddress = Joi.object({
 const validateCreatedRecipient = Joi.object({
   recipient: Joi.object({
     companyName: Joi.string().optional().allow('').allow(null).max(64),
-    salutation: Joi.string().optional().allow('').allow(null).max(8),
+    salutation: Joi.string().optional().allow('').allow(null).max(64),
+    title: Joi.string().optional().allow('').allow(null).max(32),
     firstName: Joi.string().optional().allow('').allow(null).max(64),
     lastName: Joi.string().optional().allow('').allow(null).max(64),
     email: Joi.string().email().lowercase().optional().allow('').allow(null).max(128),
@@ -391,7 +395,8 @@ const validateCreatedRecipient = Joi.object({
 const validateUpdatedRecipient = Joi.object({
   recipient: Joi.object({
     companyName: Joi.string().optional().allow('').allow(null).max(64),
-    salutation: Joi.string().optional().allow('').allow(null).max(8),
+    salutation: Joi.string().optional().allow('').allow(null).max(64),
+    title: Joi.string().optional().allow('').allow(null).max(32),
     firstName: Joi.string().optional().allow('').allow(null).max(64),
     lastName: Joi.string().optional().allow('').allow(null).max(64),
     email: Joi.string().email().lowercase().optional().allow('').allow(null).max(128),
@@ -455,7 +460,7 @@ const validateJoinCompany = Joi.object({
 
 const validateSalutation = Joi.object({
   salutation: Joi.object({
-    title: Joi.string().required().max(16)
+    name: Joi.string().required().max(64)
   }).required()
 }).required()
 
@@ -1000,6 +1005,20 @@ const validateProductCategory = Joi.object({
   }).required()
 })
 
+const validateProductCategoryUpdate = Joi.object({
+  productCategory: Joi.object({
+    name: Joi.string().lowercase().required().max(64),
+    description: Joi.string().max(255).allow(null).allow(''),
+    picture: Joi.object({
+      url: Joi.string().uri().required(),
+      filename: Joi.string().required()
+    }).allow(null),
+    sortIndex: Joi.number().positive().allow(0),
+    isHidden: Joi.boolean(),
+    companyId: Joi.string().uuid().allow(null)
+  }).required()
+})
+
 const validateProductCategoryForCompany = Joi.object({
   productCategory: Joi.object({
     name: Joi.string().lowercase().required().max(64),
@@ -1506,5 +1525,6 @@ export default {
   validateProductCustomisationForUpdate,
   validateProductCategoryForCompany,
   validateTitle,
-  validatePostedOrderId
+  validatePostedOrderId,
+  validateProductCategoryUpdate
 }
