@@ -3770,15 +3770,15 @@ describe('Company actions', () => {
       expect(res.body.users).to.not.include.keys('isGhost')
     })
 
-    it('Should return 200 Success when an owner successfully retrieves all users of a company by role.', async () => {
+    it('Should return 200 Success when an admin successfully retrieves all users of a company by role.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           company: {
-            name: 'Test Best Company',
-            email: 'testbest1@company.com'
+            name: 'Test1 Best Company',
+            email: 'test.best1@company.com'
           }
         })
       const companyId = String(resCompany.body.company.id)
@@ -3786,7 +3786,7 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/users`)
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
         .query({
           filter: {
             role: 'User'
@@ -3800,15 +3800,15 @@ describe('Company actions', () => {
       expect(res.body.users.every((user: any) => user.role === 'User')).to.equal(true)
     })
 
-    it('Should return 422 Unprocessable Entity when owner tries to fetch users with an invalid filter.', async () => {
+    it('Should return 422 Unprocessable Entity when admin tries to fetch users with an invalid filter.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           company: {
-            name: 'Test Best Company',
-            email: 'testbest2@company.com'
+            name: 'Test2 Best Company',
+            email: 'test.best2@company.com'
           }
         })
       const companyId = String(resCompany.body.company.id)
@@ -3816,7 +3816,7 @@ describe('Company actions', () => {
       const res = await chai
         .request(app)
         .get(`/api/companies/${companyId}/users`)
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
         .query({
           filter: {
             role: 'NonExistentRole'
