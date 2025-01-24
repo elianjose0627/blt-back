@@ -292,7 +292,7 @@ describe('Order actions', () => {
               {
                 jfsku: 'VZ9N01SJN9E',
                 outboundItemId: '222495',
-                name: 'Zeppelin Box - Apriil 2023',
+                name: 'Zeppelin Box - April 2023',
                 merchantSku: '1552',
                 quantity: 1,
                 itemType: 'BillOfMaterials',
@@ -340,6 +340,99 @@ describe('Order actions', () => {
       expect(res.body.order).to.be.an('object')
       expect(res.body.order).to.include.keys('id', 'isVisible')
       expect(res.body.order.isVisible).to.equal(false)
+    })
+  })
+
+  describe('Get order by posted order id', () => {
+    it('Should return 200 OK when a company admin gets an order by posted order id.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/orders/1234567890/attributes')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'order')
+      expect(res.body.order).to.equal(null)
+    })
+
+    it('Should return 200 OK when a company admin gets an order by posted order id.', async () => {
+      const postedOrderId = '30669643093901312'
+      await chai
+        .request(app)
+        .post('/api/orders')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          order: {
+            outboundId: 'VZ9N11ZZY4',
+            fulfillerId: 'NDZ2',
+            merchantOutboundNumber: 'AU-2025-21635-001',
+            warehouseId: 'NDZ204DE-12589-0002',
+            status: 'Acknowledged',
+            shippingAddress: {
+              lastname: faker.name.lastName(),
+              city: faker.address.city(),
+              email: faker.internet.email(),
+              firstname: faker.name.firstName(),
+              street: faker.address.streetAddress(),
+              zip: faker.address.zipCode(),
+              country: faker.address.country()
+            },
+            items: [
+              {
+                jfsku: 'VZ9N01SJN9E',
+                outboundItemId: '222495',
+                name: 'Zeppelin Box - April 2023',
+                merchantSku: '1552',
+                quantity: 1,
+                itemType: 'BillOfMaterials',
+                quantityOpen: 1,
+                externalNumber: '',
+                price: 0,
+                vat: 19
+              }
+            ],
+            senderAddress: {
+              company: faker.company.name(),
+              city: faker.address.city(),
+              email: faker.internet.email(),
+              street: faker.address.streetAddress(),
+              zip: faker.address.zipCode(),
+              country: faker.address.country(),
+              phone: faker.phone.number()
+            },
+            attributes: [
+              {
+                key: 'order_id',
+                value: postedOrderId,
+                attributeType: 'String'
+              },
+              {
+                key: 'FFN-Externe-Nummer',
+                value: postedOrderId,
+                attributeType: 'String'
+              }
+            ],
+            priority: 0,
+            currency: 'EUR',
+            externalNote: 'Mit DHL versenden. Versanddatum: 20.04.2023',
+            salesChannel: 'XML-Import',
+            desiredDeliveryDate: '2024-04-19T22:00:00.000+00:00',
+            shippingMethodId: 'NDZ20AAFC64A2SER',
+            shippingType: 'Standard',
+            shippingFee: 0,
+            orderValue: 0,
+            attachments: []
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/orders/${postedOrderId}/attributes`)
+        .set('Authorization', `Bearer ${tokenCompanyAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'order')
+      expect(res.body.order).to.be.an('object')
     })
   })
 })

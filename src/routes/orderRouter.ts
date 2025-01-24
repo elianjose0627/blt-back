@@ -19,6 +19,10 @@ const orderRoutes = (): Router => {
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.BODY]: validator.validateOrder
     }), asyncHandler(OrderController.insert))
+  orderRouter.route('/orders/:postedOrderId/attributes')
+    .get(celebrate({
+      [Segments.PARAMS]: validator.validatePostedOrderId
+    }), asyncHandler(OrderController.getOrderByPostedOrderId))
   orderRouter.use('/orders/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(OrderController.checkRecord))
