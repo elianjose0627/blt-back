@@ -20,7 +20,9 @@ import {
   createProductWithMinimumOrderQuantity,
   createProductWithGraduatedPricesAndIsExceedStockEnabledIsTrue,
   postedPendingOrder,
-  queuedPendingOrder
+  queuedPendingOrder,
+  sharonCarterPassword,
+  createCampaignManager
 } from '../utils'
 
 const { expect } = chai
@@ -43,6 +45,7 @@ const password4 = faker.internet.password()
 const email5 = 'faker.user@getec.com'
 const password5 = faker.internet.password()
 const username5 = 'fakeruser'
+const campaignManagerPassword = faker.internet.password()
 
 describe('Pending Orders actions', () => {
   before(async () => {
@@ -51,6 +54,8 @@ describe('Pending Orders actions', () => {
     await createProduct()
     await createProductWithMinimumOrderQuantity()
     await createProductWithGraduatedPricesAndIsExceedStockEnabledIsTrue()
+    await createCompanyAdministratorWithCompany('sharoncarterthree@starkindustriesmarvel2.com')
+    await createCampaignManager('drminerva@kree.kr', campaignManagerPassword)
     const resAdmin = await chai
       .request(app)
       .post('/auth/login')
@@ -88,7 +93,7 @@ describe('Pending Orders actions', () => {
       .post('/auth/login')
       .send({ user: { email: email3, password: password3 } })
 
-    // create comapaign manager
+    // create campaign manager
     await chai
       .request(app)
       .post('/auth/signup')
@@ -760,7 +765,7 @@ describe('Pending Orders actions', () => {
       expect(res.body.pendingOrder.description).to.equal('Updated Description')
     })
 
-    it('Should return 403 FOBBIDDEN when another user update an order', async () => {
+    it('Should return 403 FORBIDDEN when another user updates an order', async () => {
       const pendingOrder = await chai
         .request(app)
         .post('/api/pending-orders')
@@ -872,15 +877,45 @@ describe('Pending Orders actions', () => {
 
   describe('Delete Pending Order', () => {
     it('Should return 204 when a admin deletes a pending order.', async () => {
-      const pendingOrder = await chai
+      const resCompany = await chai
         .request(app)
-        .post('/api/pending-orders')
-        .set('Authorization', `Bearer ${String(token)}`)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Pending Orders Two',
+            email: 'test@companymarvelpendingorderstwo.com',
+            customerId: 123
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const resPendingOrder = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
         .send({
           pendingOrders
         })
 
-      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+      const pendingOrderId = String(resPendingOrder.body.pendingOrders[0].id)
 
       const res = await chai
         .request(app)
@@ -890,54 +925,182 @@ describe('Pending Orders actions', () => {
       expect(res).to.have.status(204)
     })
 
-    it('Should return 204 when a campany admin deletes a pending order.', async () => {
-      const pendingOrder = await chai
+    it('Should return 204 when a company admin deletes a pending order.', async () => {
+      const resCompany = await chai
         .request(app)
-        .post('/api/pending-orders')
-        .set('Authorization', `Bearer ${String(token)}`)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Pending Orders Three',
+            email: 'testpendingorders@starkindustriesmarvel2.com',
+            customerId: 373,
+            domain: 'starkindustriesmarvel2.com'
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'sharoncarterthree@starkindustriesmarvel2.com',
+            actionType: 'add'
+          }
+        })
+
+      const resCompanyAdmin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'sharoncarterthree@starkindustriesmarvel2.com', password: sharonCarterPassword } })
+
+      const tokenCompanyAdminTwo = resCompanyAdmin.body.token
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const resPendingOrder = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
         .send({
           pendingOrders
         })
 
-      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+      const pendingOrderId = String(resPendingOrder.body.pendingOrders[0].id)
 
       const res = await chai
         .request(app)
         .delete(`/api/pending-orders/${pendingOrderId}`)
-        .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
+        .set('Authorization', `Bearer ${String(tokenCompanyAdminTwo)}`)
 
       expect(res).to.have.status(204)
     })
 
     it('Should return 204 when a campaign manager deletes a pending order.', async () => {
-      const pendingOrder = await chai
+      const resCompany = await chai
         .request(app)
-        .post('/api/pending-orders')
-        .set('Authorization', `Bearer ${String(token)}`)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Pending Orders Four',
+            email: 'testkreenation@kree.kr',
+            customerId: 123,
+            domain: 'kree.kr'
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      await chai
+        .request(app)
+        .patch(`/api/companies/${String(companyId)}/users`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            email: 'drminerva@kree.kr',
+            actionType: 'add'
+          }
+        })
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'drminerva@kree.kr', password: campaignManagerPassword } })
+
+      const tokenCampaignManagerTwo = resCampaignManager.body.token
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const resPendingOrder = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
         .send({
           pendingOrders
         })
 
-      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+      const pendingOrderId = String(resPendingOrder.body.pendingOrders[0].id)
 
       const res = await chai
         .request(app)
         .delete(`/api/pending-orders/${pendingOrderId}`)
-        .set('Authorization', `Bearer ${tokenCampaignManager}`)
+        .set('Authorization', `Bearer ${String(tokenCampaignManagerTwo)}`)
 
       expect(res).to.have.status(204)
     })
 
     it('Should return 204 when a user deletes a pending order.', async () => {
-      const pendingOrder = await chai
+      const resCompany = await chai
         .request(app)
-        .post('/api/pending-orders')
-        .set('Authorization', `Bearer ${String(token)}`)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Pending Orders Five',
+            email: 'test@companymarvelpendingordersfive.com',
+            customerId: 123
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const resPendingOrder = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
         .send({
           pendingOrders
         })
 
-      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+      const pendingOrderId = String(resPendingOrder.body.pendingOrders[0].id)
 
       const res = await chai
         .request(app)
@@ -948,20 +1111,50 @@ describe('Pending Orders actions', () => {
     })
 
     it('Should return 403 Forbidden when a non-owner-user tries to delete a pending order.', async () => {
-      const pendingOrder = await chai
+      const resCompany = await chai
         .request(app)
-        .post('/api/pending-orders')
-        .set('Authorization', `Bearer ${String(tokenCampaignManager)}`)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Pending Orders Six',
+            email: 'test@companymarvelpendingorderssix.com',
+            customerId: 123
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const resPendingOrder = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${String(token)}`)
         .send({
           pendingOrders
         })
 
-      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+      const pendingOrderId = String(resPendingOrder.body.pendingOrders[0].id)
 
       const res = await chai
         .request(app)
         .delete(`/api/pending-orders/${pendingOrderId}`)
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${tokenCampaignManager}`)
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
@@ -979,16 +1172,66 @@ describe('Pending Orders actions', () => {
       expect(res.body.errors.message).to.equal('PendingOrder not found')
     })
 
-    it('Should return 403 Forbidden when a admin tries to delete a posted pending order.', async () => {
-      const pendingOrder = await chai
+    it('Should return 403 when a admin tries to delete a catalogue pending order.', async () => {
+      const resPendingOrder = await chai
         .request(app)
         .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(tokenCampaignManager)}`)
+        .send({
+          pendingOrders
+        })
+
+      const pendingOrderId = String(resPendingOrder.body.pendingOrders[0].id)
+
+      const res = await chai
+        .request(app)
+        .delete(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You cannot perform this action for a catalogue pending order')
+    })
+
+    it('Should return 403 Forbidden when a admin tries to delete a posted pending order.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Pending Orders Seven',
+            email: 'test@companymarvelpendingordersseven.com',
+            customerId: 123
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+      const resPendingOrder = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
         .set('Authorization', `Bearer ${String(token)}`)
         .send({
           pendingOrders
         })
 
-      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+      const pendingOrderId = String(resPendingOrder.body.pendingOrders[0].id)
 
       const updatedPendingOrder = await chai
         .request(app)
@@ -1007,19 +1250,49 @@ describe('Pending Orders actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('You can not perform this action for the posted or queued order')
+      expect(res.body.errors.message).to.equal('You cannot perform this action for a posted or queued order')
     })
 
     it('Should return 403 Forbidden when a admin tries to delete a queued pending order.', async () => {
-      const pendingOrder = await chai
+      const resCompany = await chai
         .request(app)
-        .post('/api/pending-orders')
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Pending Orders Eight',
+            email: 'test@companymarvelpendingorderseight.com',
+            customerId: 123
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const resPendingOrder = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
         .set('Authorization', `Bearer ${String(token)}`)
         .send({
           pendingOrders
         })
 
-      const pendingOrderId = String(pendingOrder.body.pendingOrders[0].id)
+      const pendingOrderId = String(resPendingOrder.body.pendingOrders[0].id)
 
       const updatedPendingOrder = await chai
         .request(app)
@@ -1038,7 +1311,7 @@ describe('Pending Orders actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('You can not perform this action for the posted or queued order')
+      expect(res.body.errors.message).to.equal('You cannot perform this action for a posted or queued order')
     })
   })
 
@@ -1142,12 +1415,12 @@ describe('Pending Orders actions', () => {
       const res = await chai
         .request(app)
         .post('/api/pending-orders/upload')
-        .set('Authorization', 'Bearer testtoken')
+        .set('Authorization', 'Bearer token')
         .attach('file', Buffer.from('test file content'), 'test.txt')
 
       expect(res).to.have.status(401)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('jwt malformed')
+      expect(res.body.errors.message).to.equal('Invalid Authorization Header')
     })
 
     it('should return 400 Bad Request when admin tries to upload a file without file', async () => {

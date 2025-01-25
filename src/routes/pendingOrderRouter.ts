@@ -9,10 +9,13 @@ import paginate from '../middlewares/pagination'
 import checkProductOrderQuantity from '../middlewares/checkProductOrderQuantity'
 import { uploadToMemory } from '../middlewares/uploadFile'
 import uploadFileToGCP from '../middlewares/uploadFileToGCP'
+import checkAuthBasic from '../middlewares/checkAuthBasic'
 
 const pendingOrderRoutes = (): Router => {
   const pendingOrderRouter = express.Router()
 
+  pendingOrderRouter.route('/pending-orders/upload')
+    .post(checkAuthBasic, checkUserIsVerifiedStatus, PendingOrderController.setModule, asyncHandler(uploadToMemory), asyncHandler(uploadFileToGCP), asyncHandler(PendingOrderController.insertGETECPendingOrder))
   pendingOrderRouter.use('/pending-orders', checkAuth, checkUserIsVerifiedStatus, PendingOrderController.setModule)
   pendingOrderRouter.route('/pending-orders')
     .get(celebrate({
@@ -25,8 +28,6 @@ const pendingOrderRoutes = (): Router => {
     .post(celebrate({
       [Segments.BODY]: validator.validatePostedOrders
     }), asyncHandler(PendingOrderController.duplicate))
-  pendingOrderRouter.route('/pending-orders/upload')
-    .post(asyncHandler(uploadToMemory), asyncHandler(uploadFileToGCP), asyncHandler(PendingOrderController.insertGETECPendingOrder))
   pendingOrderRouter.use('/pending-orders/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(PendingOrderController.checkRecord))
@@ -35,7 +36,10 @@ const pendingOrderRoutes = (): Router => {
     .put(asyncHandler(PendingOrderController.checkPermission), celebrate({
       [Segments.BODY]: validator.validatePendingOrders
     }), asyncHandler(PendingOrderController.checkIsPostedOrQueued), asyncHandler(PendingOrderController.update))
-    .delete(asyncHandler(PendingOrderController.checkPermission), asyncHandler(PendingOrderController.checkIsPostedOrQueued), asyncHandler(PendingOrderController.delete))
+    .delete(asyncHandler(PendingOrderController.checkPermission),
+      asyncHandler(PendingOrderController.checkIsCataloguePendingOrder),
+      asyncHandler(PendingOrderController.checkIsPostedOrQueued),
+      asyncHandler(PendingOrderController.delete))
 
   return pendingOrderRouter
 }

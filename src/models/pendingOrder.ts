@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { IPendingOrder, OrderLineRequest, ShippingAddressRequest, PaymentInformationRequest, ICompany, Nullable, BillingAddressRequest, IUser } from '../types'
+import type { IPendingOrder, OrderLineRequest, ShippingAddressRequest, PaymentInformationRequest, ICompany, Nullable, BillingAddressRequest, IUser, ICampaign } from '../types'
 
 const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
   interface PendingOrderAttributes {
@@ -46,9 +46,6 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
   class PendingOrder extends Model<PendingOrderAttributes> {
     private readonly id: string
     private readonly customerId: string
-    private readonly userId: string
-    private readonly campaignId: string
-    private readonly companyId: string
     private readonly platform: number
     private readonly language: number
     private readonly currency: string
@@ -86,6 +83,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly jtlNumber: string
     private readonly owner: IUser
     private readonly isPackingSlipGenerated: boolean
+    private readonly campaign: ICampaign
 
     static associate (models: any): any {
       PendingOrder.belongsTo(models.Company, {
@@ -109,9 +107,6 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
       return {
         id: this.id,
         customerId: this.customerId,
-        userId: this.userId,
-        campaignId: this.campaignId,
-        companyId: this.companyId,
         platform: this.platform,
         language: this.language,
         currency: this.currency,
@@ -148,7 +143,8 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
         jtlId: this.jtlId,
         jtlNumber: this.jtlNumber,
         owner: this.owner,
-        isPackingSlipGenerated: this.isPackingSlipGenerated
+        isPackingSlipGenerated: this.isPackingSlipGenerated,
+        campaign: this.campaign
       }
     }
   };

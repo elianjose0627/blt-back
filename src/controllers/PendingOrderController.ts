@@ -17,9 +17,9 @@ class PendingOrderController extends BaseController {
     const { user: currentUser, record: { owner: { id }, companyId } } = req
 
     const isOwnerOrAdmin = currentUser.id === id || currentUser.role === userRoles.ADMIN
-    const isCompanyAdminOrCampaignManger = (currentUser.role === userRoles.COMPANYADMINISTRATOR || currentUser.role === userRoles.CAMPAIGNMANAGER) && currentUser.company.id === companyId
+    const isCompanyAdminOrCampaignManagerAndEmployee = (currentUser.role === userRoles.COMPANYADMINISTRATOR || currentUser.role === userRoles.CAMPAIGNMANAGER) && currentUser.company.id === companyId
 
-    if (isOwnerOrAdmin || isCompanyAdminOrCampaignManger) {
+    if (isOwnerOrAdmin || isCompanyAdminOrCampaignManagerAndEmployee) {
       req.isOwnerOrAdmin = isOwnerOrAdmin
       return next()
     } else {
@@ -45,10 +45,25 @@ class PendingOrderController extends BaseController {
         statusCode: statusCodes.FORBIDDEN,
         success: false,
         errors: {
-          message: 'You can not perform this action for the posted or queued order'
+          message: 'You cannot perform this action for a posted or queued order'
         }
       })
     }
+  }
+
+  checkIsCataloguePendingOrder (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { record: pendingOrder } = req
+
+    if (pendingOrder.campaignId === null) {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'You cannot perform this action for a catalogue pending order'
+        }
+      })
+    }
+    return next()
   }
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {

@@ -95,11 +95,20 @@ export const generateInclude = (model: string): any => {
   if (model === 'PendingOrder') {
     return (
       [
-        includeCompanyAndOwner,
+        {
+          model: db.Company,
+          attributes: ['id', 'customerId', 'name'],
+          as: 'company'
+        },
         {
           model: db.User,
-          attributes: ['id', 'firstName', 'lastName', 'username', 'email'],
+          attributes: ['id', 'firstName', 'lastName', 'email'],
           as: 'owner'
+        },
+        {
+          model: db.Campaign,
+          attributes: ['id', 'name'],
+          as: 'campaign'
         }
       ]
     )
