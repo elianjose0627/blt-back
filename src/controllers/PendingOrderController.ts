@@ -1,9 +1,10 @@
 import BaseController from './BaseController'
 import PendingOrderService from '../services/PendingOrderService'
-import type { CustomRequest, CustomResponse, ICampaign, IPendingOrder, Module, StatusCode } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse, ICampaign, IPendingOrder, Module, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
+import { parseXml } from '../utils/parseXML'
 
 const pendingOrderService = new PendingOrderService('PendingOrder')
 
@@ -12,10 +13,63 @@ class PendingOrderController extends BaseController {
     return 'orders'
   }
 
-  async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { query: { limit, page, offset, search, filter } } = req
+  checkPermission (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { user: currentUser, record: { owner: { id }, companyId } } = req
 
-    const records = await pendingOrderService.getAll(limit, offset, search, filter)
+    const isOwnerOrAdmin = currentUser.id === id || currentUser.role === userRoles.ADMIN
+    const isCompanyAdminOrCampaignManagerAndEmployee = (currentUser.role === userRoles.COMPANYADMINISTRATOR || currentUser.role === userRoles.CAMPAIGNMANAGER) && currentUser.company.id === companyId
+
+    if (isOwnerOrAdmin || isCompanyAdminOrCampaignManagerAndEmployee) {
+      req.isOwnerOrAdmin = isOwnerOrAdmin
+      return next()
+    } else {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'You do not have the necessary permissions to perform this action'
+        }
+      })
+    }
+  }
+
+  checkIsPostedOrQueued (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { record: pendingOrder } = req
+
+    const isPostedOrQueued = pendingOrder.isPosted === true || pendingOrder.isQueued === true
+
+    if (!isPostedOrQueued) {
+      return next()
+    } else {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'You cannot perform this action for a posted or queued order'
+        }
+      })
+    }
+  }
+
+  checkIsCataloguePendingOrder (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { record: pendingOrder } = req
+
+    if (pendingOrder.campaignId === null) {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'You cannot perform this action for a catalogue pending order'
+        }
+      })
+    }
+    return next()
+  }
+
+  async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { user: currentUser, query: { limit, page, offset, search, filter } } = req
+
+    const records = await pendingOrderService.getAll(limit, offset, currentUser, search, filter)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),
@@ -137,8 +191,70 @@ class PendingOrderController extends BaseController {
     return res.status(statusCodes.CREATED).send({
       statusCode: statusCodes.CREATED,
       success: true,
-      pendingOrders: response
+      [pendingOrderService.manyRecords()]: response
     })
+  }
+
+  async update (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { body: { pendingOrders }, user: currentUser, record } = req
+    const { response, status } = await pendingOrderService.update({ pendingOrder: pendingOrders[0], currentUser, record })
+    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} updated` })
+
+    const statusCode: StatusCode = {
+      200: statusCodes.OK,
+      201: statusCodes.CREATED
+    }
+
+    return res.status(statusCode[status]).send({
+      statusCode: statusCode[status],
+      success: true,
+      [this.service.singleRecord()]: response
+    })
+  }
+
+  async insertGETECPendingOrder (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { user: currentUser } = req
+    const files: Express.Multer.File[] = req.files as Express.Multer.File[]
+    try {
+      const parsedData = []
+      for (const file of files) {
+        // Parse XML content
+        const xmlContent = file.buffer.toString('utf-8')
+        const parsedFileData = await parseXml(xmlContent)
+        if (parsedFileData.status === false) {
+          return res.status(statusCodes.BAD_REQUEST).send({
+            statusCode: statusCodes.BAD_REQUEST,
+            success: false,
+            errors: {
+              message: parsedFileData.message
+            }
+          })
+        }
+        parsedData.push(parsedFileData.xmlDoc)
+      }
+
+      const { response, status } = await pendingOrderService.insertGETECPendingOrder({ currentUser, parsedData })
+      io.emit('pendingOrders', { message: 'pendingOrders created' })
+
+      const statusCode: StatusCode = {
+        200: statusCodes.OK,
+        201: statusCodes.CREATED
+      }
+
+      return res.status(statusCode[status]).send({
+        statusCode: statusCode[status],
+        success: true,
+        [pendingOrderService.manyRecords()]: response
+      })
+    } catch (error: any) {
+      return res.status(statusCodes.BAD_REQUEST).send({
+        statusCode: statusCodes.BAD_REQUEST,
+        success: false,
+        errors: {
+          message: error.message
+        }
+      })
+    }
   }
 }
 

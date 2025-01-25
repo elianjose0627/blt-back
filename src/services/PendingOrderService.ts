@@ -8,8 +8,27 @@ import * as userRoles from '../utils/userRoles'
 import * as statusCodes from '../constants/statusCodes'
 import { IDuplicatePostedOrder, IPendingOrder, IUserExtended } from '../types'
 import { Platform } from '../enums/platform'
+import { Op } from 'sequelize'
 
 dayjs.extend(utc)
+
+const where = {
+  [Op.or]: [
+    {
+      [Op.or]: [
+        { isPosted: false },
+        { isQueued: false }
+      ]
+    },
+    {
+      [Op.and]: [
+        { isPosted: true },
+        { isQueued: true },
+        { orderStatus: 0 }
+      ]
+    }
+  ]
+}
 
 class PendingOrderService extends BaseService {
   async findPendingOrders (userId: string, campaignId: string): Promise<any> {
@@ -24,14 +43,59 @@ class PendingOrderService extends BaseService {
     return records
   }
 
-  async getAll (limit: number, offset: number, search: string = '', filter = { firstname: '', lastname: '', email: '', city: '', country: '' }): Promise<any> {
-    const records = await db[this.model].findAndCountAll({
-      include: generateInclude(this.model),
-      limit,
-      offset,
-      order: [['createdAt', 'DESC']],
-      attributes: { exclude: ['deletedAt'] }
-    })
+  async getAll (limit: number, offset: number, user?: any, search: string = '', filter = { firstname: '', lastname: '', email: '', city: '', country: '' }): Promise<any> {
+    let records
+    const exclude = ['deletedAt', 'companyId', 'userId', 'campaignId']
+    if (user.role === userRoles.ADMIN) {
+      records = await db[this.model].findAndCountAll({
+        include: generateInclude(this.model),
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude },
+        distinct: true,
+        where
+      })
+    } else if (user.role === userRoles.COMPANYADMINISTRATOR) {
+      records = await db[this.model].findAndCountAll({
+        include: generateInclude(this.model),
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude },
+        where: {
+          companyId: user.company.id,
+          ...where
+        },
+        distinct: true
+      })
+    } else if (user.role === userRoles.CAMPAIGNMANAGER) {
+      records = await db[this.model].findAndCountAll({
+        include: generateInclude(this.model),
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude },
+        where: {
+          companyId: user.company.id,
+          ...where
+        },
+        distinct: true
+      })
+    } else {
+      records = await db[this.model].findAndCountAll({
+        include: generateInclude(this.model),
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude },
+        where: {
+          userId: user.id,
+          ...where
+        },
+        distinct: true
+      })
+    }
 
     return records
   }
@@ -174,6 +238,53 @@ class PendingOrderService extends BaseService {
     await triggerPubSub(topicId, 'postPendingOrders', attributes)
 
     return response
+  }
+
+  async update (data: any): Promise<any> {
+    const { pendingOrder, currentUser, record } = data
+
+    const updateData = {
+      ...pendingOrder,
+      updatedBy: currentUser.email
+    }
+
+    const response = await record.update(updateData, { returning: true })
+
+    const pendingOrdersTopicId = 'pending-orders'
+    const environment = String(process.env.ENVIRONMENT)
+    const pendingOrdersAttributes = { environment }
+
+    await triggerPubSub(pendingOrdersTopicId, 'postPendingOrders', pendingOrdersAttributes)
+
+    return { response: response.toJSONFor(), status: 200 }
+  }
+
+  async insertGETECPendingOrder (data: any): Promise<any> {
+    const { currentUser, parsedData } = data
+    const bulkInsertData = parsedData.map((pendingOrder: any) => ({
+      ...pendingOrder,
+      id: uuidv1(),
+      userId: currentUser.id,
+      campaignId: currentUser.campaignId,
+      customerId: currentUser.company.customerId,
+      companyId: currentUser.companyId,
+      created: dayjs.utc().format(),
+      createdBy: currentUser.email,
+      updatedBy: currentUser.email,
+      createdByFullName: `${String(currentUser.firstName)} ${String(currentUser.lastName)}`
+    }))
+
+    const response = await db.PendingOrder.bulkCreate(bulkInsertData, { returning: true })
+
+    const pendingOrdersTopicId = 'pending-orders'
+    const environment = String(process.env.ENVIRONMENT)
+    const pendingOrdersAttributes = { environment }
+
+    await triggerPubSub(pendingOrdersTopicId, 'postPendingOrders', pendingOrdersAttributes)
+    return {
+      response,
+      status: 201
+    }
   }
 }
 

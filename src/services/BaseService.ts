@@ -9,7 +9,7 @@ dayjs.extend(utc)
 
 const includeCompany = [
   'Address', 'CostCenter',
-  'AccessPermission', 'PendingOrder'
+  'AccessPermission'
 ]
 const withoutUser = [
   'BundleItem', 'Salutation', 'Picture',
@@ -88,6 +88,28 @@ export const generateInclude = (model: string): any => {
     return (
       [
         includeCompanyAndOwner
+      ]
+    )
+  }
+
+  if (model === 'PendingOrder') {
+    return (
+      [
+        {
+          model: db.Company,
+          attributes: ['id', 'customerId', 'name'],
+          as: 'company'
+        },
+        {
+          model: db.User,
+          attributes: ['id', 'firstName', 'lastName', 'email'],
+          as: 'owner'
+        },
+        {
+          model: db.Campaign,
+          attributes: ['id', 'name'],
+          as: 'campaign'
+        }
       ]
     )
   }
