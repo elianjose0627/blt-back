@@ -45,9 +45,6 @@ steps:
     - 'WAWI_API_APP_VERSION=${_WAWI_API_APP_VERSION}'
     - 'GETEC_CAMPAIGN_ID=${_GETEC_CAMPAIGN_ID}'
     - 'GETEC_STORAGE_BUCKET=${_GETEC_STORAGE_BUCKET}'
-    - 'FIREBASE_PROJECT_ID=${_FIREBASE_PROJECT_ID}'
-    - 'FIREBASE_PRIVATE_KEY=${_FIREBASE_PRIVATE_KEY}'
-    - 'FIREBASE_CLIENT_EMAIL=${_FIREBASE_CLIENT_EMAIL}'
 - name: 'gcr.io/cloud-builders/npm'
   args: ['test']
 - name: 'gcr.io/cloud-builders/npm'
