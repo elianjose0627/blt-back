@@ -126,6 +126,33 @@ class OrderService extends BaseService {
 
     return { response: response.toJSONFor(), status: 201 }
   }
+
+  async getOrderByPostedOrderId (postedOrderId: string): Promise<any> {
+    const order = await db[this.model].findOne({
+      attributes: ['id', 'status', 'outboundId'],
+      where: {
+        [Op.or]: [
+          {
+            attributes: {
+              [Op.contains]: [{
+                key: 'order_id',
+                value: postedOrderId
+              }]
+            }
+          },
+          {
+            attributes: {
+              [Op.contains]: [{
+                key: 'FFN-Externe-Nummer',
+                value: postedOrderId
+              }]
+            }
+          }
+        ]
+      }
+    })
+    return order
+  }
 }
 
 export default OrderService

@@ -205,6 +205,8 @@ const commonQueryParams = {
     firstname: Joi.string().optional(),
     lastname: Joi.string().optional(),
     email: Joi.string().email().optional(),
+    role: Joi.string()
+      .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER, userRoles.ADMIN]).optional(),
     city: Joi.string().optional(),
     country: Joi.string().length(2).optional(),
     company: Joi.string().optional(),
@@ -1007,6 +1009,20 @@ const validateProductCategory = Joi.object({
   }).required()
 })
 
+const validateProductCategoryUpdate = Joi.object({
+  productCategory: Joi.object({
+    name: Joi.string().lowercase().required().max(64),
+    description: Joi.string().max(255).allow(null).allow(''),
+    picture: Joi.object({
+      url: Joi.string().uri().required(),
+      filename: Joi.string().required()
+    }).allow(null),
+    sortIndex: Joi.number().positive().allow(0),
+    isHidden: Joi.boolean(),
+    companyId: Joi.string().uuid().allow(null)
+  }).required()
+})
+
 const validateProductCategoryForCompany = Joi.object({
   productCategory: Joi.object({
     name: Joi.string().lowercase().required().max(64),
@@ -1503,6 +1519,10 @@ const validateTitle = Joi.object({
   }).required()
 }).required()
 
+const validatePostedOrderId = Joi.object({
+  postedOrderId: Joi.string().regex(/^\d+$/).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1605,5 +1625,7 @@ export default {
   validateProductCustomisationForUpdate,
   validateProductCategoryForCompany,
   validateCommonPendingOrder,
-  validateTitle
+  validateTitle,
+  validatePostedOrderId,
+  validateProductCategoryUpdate
 }

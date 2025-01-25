@@ -153,7 +153,7 @@ const OrderModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false
     },
     attributes: {
-      type: DataTypes.JSON,
+      type: DataTypes.JSONB,
       allowNull: true
     },
     priority: {
