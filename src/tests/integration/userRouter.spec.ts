@@ -225,6 +225,38 @@ describe('A user', () => {
       expect(res.body.users.every((user: any) => user.role === 'User')).to.equal(true)
     })
 
+    it('Should return 200 Success, on successfully retrieving users when admin tries to fetch all users by role with search params.', async () => {
+      await chai
+        .request(app)
+        .post('/api/users')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            firstName: 'Vincent',
+            lastName: 'Chase',
+            email: 'vchase@entourage.com',
+            phone: '254720123456',
+            password: faker.internet.password(),
+            role: userRoles.USER
+          }
+        })
+      const res = await chai
+        .request(app)
+        .get('/api/users')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .query({
+          search: 'Vincent',
+          filter: {
+            role: 'User'
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'meta', 'users')
+      expect(res.body.users).to.be.an('array')
+      expect(res.body.users.every((user: any) => user.role === 'User' && user.firstName === 'Vincent')).to.equal(true)
+    })
+
     it('Should return 422 Unprocessable Entity when admin tries to fetch users with an invalid filter.', async () => {
       const res = await chai
         .request(app)
