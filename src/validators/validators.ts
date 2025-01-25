@@ -701,7 +701,7 @@ const commonPendingOrderSchema = {
   platform: Joi.number().equal(0),
   language: Joi.number().equal(0),
   currency: Joi.string(),
-  orderNo: Joi.string().equal('0'),
+  orderNo: Joi.string(),
   inetorderno: Joi.number().equal(0),
   shippingId: Joi.number(),
   shipped: Joi.date().min(dayjs().utc().subtract(1, 'day').toDate()),
@@ -714,8 +714,8 @@ const commonPendingOrderSchema = {
   discount: Joi.number().equal(0),
   orderStatus: Joi.number().equal(0),
   quantity: Joi.number().positive().default(1),
-  isPosted: Joi.boolean(),
-  isQueued: Joi.boolean(),
+  isPosted: Joi.boolean().equal(false),
+  isQueued: Joi.boolean().equal(false),
   orderLineRequests: Joi.array().items(
     Joi.object({
       itemName: Joi.string(),
@@ -1417,101 +1417,7 @@ const validateDocumentQueryParams = Joi.object({
   })
 }).required()
 
-const validateCommonPendingOrder = Joi.object({
-  platform: Joi.number(),
-  language: Joi.number(),
-  currency: Joi.string(),
-  orderNo: Joi.string(),
-  inetorderno: Joi.number(),
-  shippingId: Joi.number(),
-  shipped: Joi.date().min(dayjs().utc().subtract(1, 'day').toDate()),
-  deliverydate: Joi.date().min(Joi.ref('shipped')),
-  note: Joi.string().allow('').allow(null),
-  description: Joi.string().allow('').allow(null),
-  costCenter: Joi.string().allow('').allow(null),
-  paymentType: Joi.number(),
-  paymentTarget: Joi.number(),
-  discount: Joi.number(),
-  orderStatus: Joi.number(),
-  quantity: Joi.number().positive().default(1),
-  isPosted: Joi.boolean(),
-  isQueued: Joi.boolean(),
-  createdBy: Joi.string(),
-  createdByFullName: Joi.string(),
-  orderLineRequests: Joi.array().items(
-    Joi.object({
-      itemName: Joi.string(),
-      articleNumber: Joi.string(),
-      itemNetSale: Joi.number(),
-      itemVAT: Joi.number(),
-      quantity: Joi.number().positive(),
-      type: Joi.number(),
-      discount: Joi.number(),
-      netPurchasePrice: Joi.number()
-    })
-  ).min(1).required(),
-  shippingAddressRequests: Joi.array().items(
-    Joi.object({
-      salutation: Joi.string().allow('').allow(null),
-      firstName: Joi.string(),
-      lastName: Joi.string(),
-      title: Joi.string().allow('').allow(null),
-      company: Joi.string().allow('').allow(null),
-      companyAddition: Joi.string().allow('').allow(null),
-      street: Joi.string(),
-      addressAddition: Joi.string().allow('').allow(null),
-      zipCode: Joi.string(),
-      place: Joi.string(),
-      phone: Joi.string().allow('').allow(null),
-      state: Joi.string().allow('').allow(null),
-      country: Joi.string(),
-      iso: Joi.string().allow('').allow(null),
-      telephone: Joi.string().allow('').allow(null),
-      mobile: Joi.string().allow('').allow(null),
-      fax: Joi.string().allow('').allow(null),
-      email: Joi.string(),
-      costCenter: Joi.string().allow('').allow(null).default(null),
-      startDate: Joi.date().allow(null).default(null)
-    })
-  ).min(1).required(),
-  billingAddressRequests: Joi.array().items(
-    Joi.object({
-      salutation: Joi.string().allow('').allow(null),
-      firstName: Joi.string().allow('').allow(null),
-      lastName: Joi.string().allow('').allow(null),
-      title: Joi.string().allow('').allow(null),
-      company: Joi.string().allow('').allow(null),
-      companyAddition: Joi.string().allow('').allow(null),
-      street: Joi.string(),
-      addressAddition: Joi.string().allow('').allow(null),
-      zipCode: Joi.string(),
-      place: Joi.string(),
-      phone: Joi.string().allow('').allow(null),
-      state: Joi.string().allow('').allow(null),
-      country: Joi.string(),
-      iso: Joi.string().allow('').allow(null),
-      telephone: Joi.string().allow('').allow(null),
-      mobile: Joi.string().allow('').allow(null),
-      fax: Joi.string().allow('').allow(null),
-      email: Joi.string(),
-      costCenter: Joi.string().allow('').allow(null)
-    })
-  ).optional(),
-  paymentInformationRequests: Joi.array().items(
-    Joi.object({
-      bankName: Joi.string(),
-      blz: Joi.string(),
-      accountno: Joi.string(),
-      cardno: Joi.string(),
-      validity: Joi.date(),
-      cvv: Joi.string(),
-      cardType: Joi.string(),
-      owner: Joi.string(),
-      iban: Joi.string(),
-      bic: Joi.string()
-    })
-  )
-})
+const validatePendingOrder = Joi.object({ ...commonPendingOrderSchema }).required()
 
 const validateTitle = Joi.object({
   title: Joi.object({
@@ -1624,8 +1530,8 @@ export default {
   validateDocumentQueryParams,
   validateProductCustomisationForUpdate,
   validateProductCategoryForCompany,
-  validateCommonPendingOrder,
   validateTitle,
   validatePostedOrderId,
-  validateProductCategoryUpdate
+  validateProductCategoryUpdate,
+  validatePendingOrder
 }

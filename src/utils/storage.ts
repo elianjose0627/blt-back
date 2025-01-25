@@ -11,7 +11,7 @@ const storage = new Storage(
     }
   }
 )
-const bucketName = 'getec-order'
+const bucketName = String(process.env.GETEC_STORAGE_BUCKET)
 
 export const uploadToGCS = async (fileName: string, fileBuffer: Buffer): Promise<string> => {
   const bucket = storage.bucket(bucketName)

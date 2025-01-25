@@ -19,10 +19,10 @@ import {
   createProduct,
   createProductWithMinimumOrderQuantity,
   createProductWithGraduatedPricesAndIsExceedStockEnabledIsTrue,
-  postedPendingOrder,
-  queuedPendingOrder,
   sharonCarterPassword,
-  createCampaignManager
+  createCampaignManager,
+  createPostedPendingOrder,
+  createQueuedPendingOrder
 } from '../utils'
 
 const { expect } = chai
@@ -33,6 +33,7 @@ let tokenAdmin: string
 let token: string
 let tokenCompanyAdministrator: string
 let tokenCampaignManager: string
+let userIdAdmin: string
 
 const email1 = 'gues@modo.com'
 const password1 = faker.internet.password()
@@ -68,6 +69,7 @@ describe('Pending Orders actions', () => {
 
     tokenAdmin = resAdmin.body.token
     tokenCompanyAdministrator = resCompanyAdministrator.body.token
+    userIdAdmin = resAdmin.body.user.id
 
     // get company invite link
     const companyId = resCompanyAdministrator.body.user.company.id
@@ -1223,25 +1225,9 @@ describe('Pending Orders actions', () => {
         })
 
       const campaignId = String(resCampaign.body.campaign.id)
-      const resPendingOrder = await chai
-        .request(app)
-        .post(`/api/campaigns/${campaignId}/pending-orders`)
-        .set('Authorization', `Bearer ${String(token)}`)
-        .send({
-          pendingOrders
-        })
+      const postedPendingOrder = await createPostedPendingOrder(companyId, userIdAdmin, campaignId)
 
-      const pendingOrderId = String(resPendingOrder.body.pendingOrders[0].id)
-
-      const updatedPendingOrder = await chai
-        .request(app)
-        .put(`/api/pending-orders/${String(pendingOrderId)}`)
-        .set('Authorization', `Bearer ${tokenAdmin}`)
-        .send({
-          pendingOrders: postedPendingOrder
-        })
-
-      const updatedPendingOrderId = String(updatedPendingOrder.body.pendingOrder.id)
+      const updatedPendingOrderId = String(postedPendingOrder.id)
 
       const res = await chai
         .request(app)
@@ -1284,25 +1270,9 @@ describe('Pending Orders actions', () => {
 
       const campaignId = String(resCampaign.body.campaign.id)
 
-      const resPendingOrder = await chai
-        .request(app)
-        .post(`/api/campaigns/${campaignId}/pending-orders`)
-        .set('Authorization', `Bearer ${String(token)}`)
-        .send({
-          pendingOrders
-        })
+      const queuedPendingOrder = await createQueuedPendingOrder(companyId, userIdAdmin, campaignId)
 
-      const pendingOrderId = String(resPendingOrder.body.pendingOrders[0].id)
-
-      const updatedPendingOrder = await chai
-        .request(app)
-        .put(`/api/pending-orders/${String(pendingOrderId)}`)
-        .set('Authorization', `Bearer ${tokenAdmin}`)
-        .send({
-          pendingOrders: queuedPendingOrder
-        })
-
-      const updatedPendingOrderId = String(updatedPendingOrder.body.pendingOrder.id)
+      const updatedPendingOrderId = String(queuedPendingOrder.id)
 
       const res = await chai
         .request(app)
@@ -1315,8 +1285,54 @@ describe('Pending Orders actions', () => {
     })
   })
 
-  describe('Upload a file and create a pending order for Getec Action', () => {
-    it('Should return 201 Created when an admin successfully created pending order.', async () => {
+  describe('Upload a file and create a pending order for GETEC Actions', () => {
+    it('Should return 201 Created when an admin successfully creates a pending order with campaign id set.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'GETEC Pending Orders',
+            email: 'test@getecpendingorders.com',
+            customerId: 123
+          }
+        })
+
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+      process.env.GETEC_CAMPAIGN_ID = campaignId
+      const basicAuth = Buffer.from(`${username5}:${password5}`).toString('base64')
+      const filePath = path.join(__dirname, '../test.xml')
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders/upload')
+        .set('Authorization', `Basic ${basicAuth}`)
+        .set('Content-Type', 'multipart/form-data')
+        .attach('file', fs.readFileSync(filePath), 'test.xml')
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+    })
+
+    it('Should return 201 Created when an admin successfully creates a pending order without campaign id set.', async () => {
+      delete process.env.GETEC_CAMPAIGN_ID
       const basicAuth = Buffer.from(`${username5}:${password5}`).toString('base64')
       const filePath = path.join(__dirname, '../test.xml')
       const res = await chai

@@ -68,17 +68,17 @@
                   <Agency>
                     <AgencyCoded>AssignedByBuyerOrBuyersAgent</AgencyCoded>
                   </Agency>
-                  <Ident>susanne.hoffmann</Ident>
+                  <Ident>anne.mane</Ident>
                 </Identifier>
               </ContactID>
-              <ContactName>Susanne Hoffmann</ContactName>
+              <ContactName>Anne Mane</ContactName>
               <ListOfContactNumber>
                 <ContactNumber>
-                  <ContactNumberValue>susanne.hoffmann@getec.de</ContactNumberValue>
+                  <ContactNumberValue>anne.mane@getec.de</ContactNumberValue>
                   <ContactNumberTypeCoded>EmailAddress</ContactNumberTypeCoded>
                 </ContactNumber>
                 <ContactNumber>
-                  <ContactNumberValue>+49/391/2568 760</ContactNumberValue>
+                  <ContactNumberValue>+49/111/1111 111</ContactNumberValue>
                   <ContactNumberTypeCoded>TelephoneNumber</ContactNumberTypeCoded>
                 </ContactNumber>
               </ListOfContactNumber>
@@ -135,17 +135,17 @@
                   <Agency>
                     <AgencyCoded>AssignedByBuyerOrBuyersAgent</AgencyCoded>
                   </Agency>
-                  <Ident>susanne.hoffmann</Ident>
+                  <Ident>anne.mane</Ident>
                 </Identifier>
               </ContactID>
-              <ContactName>Susanne Hoffmann</ContactName>
+              <ContactName>Anne Mane</ContactName>
               <ListOfContactNumber>
                 <ContactNumber>
-                  <ContactNumberValue>susanne.hoffmann@getec.de</ContactNumberValue>
+                  <ContactNumberValue>anne.mane@getec.de</ContactNumberValue>
                   <ContactNumberTypeCoded>EmailAddress</ContactNumberTypeCoded>
                 </ContactNumber>
                 <ContactNumber>
-                  <ContactNumberValue>+49/391/2568 760</ContactNumberValue>
+                  <ContactNumberValue>+49/111/1111 111</ContactNumberValue>
                   <ContactNumberTypeCoded>TelephoneNumber</ContactNumberTypeCoded>
                 </ContactNumber>
               </ListOfContactNumber>
@@ -300,7 +300,7 @@ Eintritt: 15.01.25
                 <ExternalAddressID>12459132</ExternalAddressID>
                 <Name1>GETEC Wärme &amp; Effizienz GmbH</Name1>
                 <Street>Albert-Vater-Straße 50</Street>
-                <InhouseMail>Susanne Hoffmann</InhouseMail>
+                <InhouseMail>Anne Mane</InhouseMail>
                 <PostalCode>39108</PostalCode>
                 <City>Magdeburg</City>
                 <Country>
@@ -472,7 +472,7 @@ Eintritt: 15.01.25
                 <ExternalAddressID>12459132</ExternalAddressID>
                 <Name1>GETEC Wärme &amp; Effizienz GmbH</Name1>
                 <Street>Albert-Vater-Straße 50</Street>
-                <InhouseMail>Susanne Hoffmann</InhouseMail>
+                <InhouseMail>Anne Mane</InhouseMail>
                 <PostalCode>39108</PostalCode>
                 <City>Magdeburg</City>
                 <Country>

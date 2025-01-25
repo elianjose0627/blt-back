@@ -261,11 +261,20 @@ class PendingOrderService extends BaseService {
 
   async insertGETECPendingOrder (data: any): Promise<any> {
     const { currentUser, parsedData } = data
+    const getecCampaignId = process.env.GETEC_CAMPAIGN_ID ?? null
     const bulkInsertData = parsedData.map((pendingOrder: any) => ({
       ...pendingOrder,
       id: uuidv1(),
+      platform: 0,
+      language: 0,
+      orderStatus: 0,
+      isPosted: false,
+      isQueued: false,
+      paymentType: 0,
+      paymentTarget: 0,
+      discount: 0,
       userId: currentUser.id,
-      campaignId: currentUser.campaignId,
+      campaignId: getecCampaignId,
       customerId: currentUser.company.customerId,
       companyId: currentUser.companyId,
       created: dayjs.utc().format(),

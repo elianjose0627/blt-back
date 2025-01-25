@@ -1905,3 +1905,31 @@ export const createOrderConfirmation = async (companyId: string, userId: string)
 
   return orderConfimtion
 }
+
+export const createPostedPendingOrder = async (companyId: string, userId: string, campaignId: string): Promise<any> => {
+  const pendingOrder = await db.PendingOrder.create({
+    id: uuidv4(),
+    customerId: '123',
+    companyId,
+    userId,
+    created: dayjs.utc(),
+    campaignId,
+    ...postedPendingOrder[0]
+  })
+
+  return pendingOrder
+}
+
+export const createQueuedPendingOrder = async (companyId: string, userId: string, campaignId: string): Promise<any> => {
+  const pendingOrder = await db.PendingOrder.create({
+    id: uuidv4(),
+    customerId: '123',
+    companyId,
+    userId,
+    created: dayjs.utc(),
+    campaignId,
+    ...queuedPendingOrder[0]
+  })
+
+  return pendingOrder
+}
