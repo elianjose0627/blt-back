@@ -1439,6 +1439,17 @@ describe('Pending Orders actions', () => {
       expect(res.body.errors.message).to.equal('Invalid Authorization Header')
     })
 
+    it('should return 401 UNAUTHORIZED when admin tries to upload a file with invalid auth type', async () => {
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders/upload')
+        .attach('file', Buffer.from('test file content'), 'test.txt')
+
+      expect(res).to.have.status(401)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Invalid Authorization Header')
+    })
+
     it('should return 400 Bad Request when admin tries to upload a file without file', async () => {
       const res = await chai
         .request(app)
