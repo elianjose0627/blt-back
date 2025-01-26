@@ -714,8 +714,6 @@ const commonPendingOrderSchema = {
   discount: Joi.number().equal(0),
   orderStatus: Joi.number().equal(0),
   quantity: Joi.number().positive().default(1),
-  isPosted: Joi.boolean().equal(false),
-  isQueued: Joi.boolean().equal(false),
   orderLineRequests: Joi.array().items(
     Joi.object({
       itemName: Joi.string(),
