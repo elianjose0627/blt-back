@@ -193,12 +193,12 @@ const companyRoutes = (): Router => {
         [Segments.BODY]: validator.validateCompanyShopHeader
       }), asyncHandler(CompanyController.checkCompanyDomainAndEmailDomain), asyncHandler(CompanyController.update))
   companyRouter.route('/companies/:id/product-categories')
-    .get(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
+    .get(ProductCategoryController.setModule, asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions),
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(ProductCategoryController.getAllForCompany))
-    .post(asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
+    .post(ProductCategoryController.setModule, asyncHandler(CompanyController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions),
       asyncHandler(CompanyController.checkCompanyDomainVerification), celebrate({
         [Segments.BODY]: validator.validateProductCategoryForCompany
