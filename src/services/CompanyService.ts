@@ -112,13 +112,22 @@ class CompanyService extends BaseService {
     return { response: response.toJSONFor(user), status: 201 }
   }
 
-  async getAllUsers (limit: number, offset: number, companyId: string, user: any): Promise<any> {
+  async getAllUsers (limit: number, offset: number, companyId: string, user: any, filter?: any): Promise<any> {
+    let where
+    const role = filter?.role
+    if (role !== undefined) {
+      where = { role }
+    } else {
+      where = { }
+    }
+
     const records = await db.User.findAndCountAll({
       limit,
       offset,
       where: {
         companyId,
-        isGhost: false
+        isGhost: false,
+        ...where
       },
       order: [['createdAt', 'DESC']],
       attributes: { exclude: [] },

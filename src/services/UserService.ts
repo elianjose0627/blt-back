@@ -476,34 +476,45 @@ class UserService extends BaseService {
     }
   }
 
-  async getAll (limit: number, offset: number, search?: string): Promise<any> {
-    let users
+  async getAll (limit: number, offset: number, search?: string, filter?: any): Promise<any> {
+    let where
+    const role = filter?.role
     if (search !== undefined) {
-      users = await db[this.model].findAndCountAll({
-        include,
-        where: {
+      if (role !== undefined) {
+        where = {
+          [Op.or]: [
+            { email: { [Op.iLike]: `%${search}%` } },
+            { firstName: { [Op.iLike]: `%${search}%` } },
+            { lastName: { [Op.iLike]: `%${search}%` } }
+          ],
+          role
+        }
+      } else {
+        where = {
           [Op.or]: [
             { email: { [Op.iLike]: `%${search}%` } },
             { firstName: { [Op.iLike]: `%${search}%` } },
             { lastName: { [Op.iLike]: `%${search}%` } }
           ]
-        },
-        limit,
-        offset,
-        order: [
-          ['createdAt', 'DESC']
-        ],
-        distinct: true
-      })
+        }
+      }
     } else {
-      users = await db[this.model].findAndCountAll({
-        limit,
-        offset,
-        order: [['createdAt', 'DESC']],
-        include,
-        distinct: true
-      })
+      if (role !== undefined) {
+        where = { role }
+      } else {
+        where = {}
+      }
     }
+    const users = await db[this.model].findAndCountAll({
+      include,
+      where,
+      limit,
+      offset,
+      order: [
+        ['createdAt', 'DESC']
+      ],
+      distinct: true
+    })
 
     return {
       count: users.count,
