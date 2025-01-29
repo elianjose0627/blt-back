@@ -76,7 +76,10 @@ const checkAuthBasic = (req: CustomRequest, res: CustomResponse, next: CustomNex
         }
       ],
       where: {
-        username
+        [Op.or]: [
+          { username },
+          { email: username }
+        ]
       }
     }).then((user: any) => {
       if (user !== null) {
