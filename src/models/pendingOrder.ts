@@ -249,19 +249,19 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
       allowNull: true
     },
     orderLineRequests: {
-      type: DataTypes.JSON,
+      type: DataTypes.JSONB,
       allowNull: false
     },
     shippingAddressRequests: {
-      type: DataTypes.JSON,
+      type: DataTypes.JSONB,
       allowNull: true
     },
     billingAddressRequests: {
-      type: DataTypes.JSON,
+      type: DataTypes.JSONB,
       allowNull: true
     },
     paymentInformationRequests: {
-      type: DataTypes.JSON,
+      type: DataTypes.JSONB,
       allowNull: true
     },
     isPosted: {

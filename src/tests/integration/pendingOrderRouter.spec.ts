@@ -22,8 +22,13 @@ import {
   sharonCarterPassword,
   createCampaignManager,
   createPostedPendingOrder,
-  createQueuedPendingOrder
+  createQueuedPendingOrder,
+  createPrivacyRule,
+  pendingOrderWithBillingAddress,
+  pendingOrderWithMissingDataPoints
 } from '../utils'
+import * as userRoles from '../../utils/userRoles'
+import * as appModules from '../../utils/appModules'
 
 const { expect } = chai
 
@@ -102,7 +107,7 @@ describe('Pending Orders actions', () => {
       .query({
         companyId: resInviteLink.body.company.roles.campaignManager.shortInviteLink.split('=')[1]
       })
-      .send({ user: { firstName: 'Happy', lastName: 'Hogan', email: email4, phone: '254720123456', password: password4 } })
+      .send({ user: { firstName: faker.name.firstName(), lastName: faker.name.lastName(), email: email4, phone: '254720123456', password: password4 } })
 
     await verifyUser(email4)
 
@@ -181,6 +186,515 @@ describe('Pending Orders actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
       expect(res.body.pendingOrders).to.be.an('array')
+    })
+
+    it('Should return 200 Success when a campaign manager successfully retrieves all pending orders with privacy rules.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Privacy Rules',
+            email: 'test@companymarvelsecretinvasionprivacyrules.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      const email = 'test2@companymarvelsecretinvasionprivacyrules.com'
+      const password = faker.internet.password()
+
+      await verifyCompanyDomain(String(companyId))
+      const resInviteLink = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${token}`)
+
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .query({
+          companyId: resInviteLink.body.company.roles.campaignManager.shortInviteLink.split('=')[1]
+        })
+        .send({ user: { firstName: faker.name.firstName(), lastName: faker.name.lastName(), email, password } })
+
+      await verifyUser(email)
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email, password } })
+
+      const campaignManagerToken = resCampaignManager.body.token
+
+      await createPrivacyRule(companyId, appModules.ORDERS, userRoles.CAMPAIGNMANAGER)
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Privacy Rules',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders: [pendingOrderWithBillingAddress]
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(campaignManagerToken)}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+      expect(res.body.pendingOrders[0].shippingAddressRequests[0].place).to.include('*')
+      expect(res.body.pendingOrders[0].shippingAddressRequests[0].email).to.include('*')
+      expect(res.body.pendingOrders[0].shippingAddressRequests[0].street).to.include('*')
+      expect(res.body.pendingOrders[0].shippingAddressRequests[0].zipCode).to.include('*')
+      expect(res.body.pendingOrders[0].shippingAddressRequests[0].country).to.include('*')
+    })
+
+    it('Should return 200 Success when a campaign manager successfully retrieves all pending orders with missing data points and privacy rules.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Privacy Rules',
+            email: 'test10@companymarvelsecretinvasionprivacyrules.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      const email = 'test12@companymarvelsecretinvasionprivacyrules.com'
+      const password = faker.internet.password()
+
+      await verifyCompanyDomain(String(companyId))
+      const resInviteLink = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${token}`)
+
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .query({
+          companyId: resInviteLink.body.company.roles.campaignManager.shortInviteLink.split('=')[1]
+        })
+        .send({ user: { firstName: faker.name.firstName(), lastName: faker.name.lastName(), email, password } })
+
+      await verifyUser(email)
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email, password } })
+
+      const campaignManagerToken = resCampaignManager.body.token
+
+      await createPrivacyRule(companyId, appModules.ORDERS, userRoles.CAMPAIGNMANAGER)
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Privacy Rules',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders: [pendingOrderWithMissingDataPoints]
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(campaignManagerToken)}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+    })
+
+    it('Should return 200 Success when an admin successfully retrieves all pending orders with billing addresses.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Privacy Rules',
+            email: 'test20@companymarvelsecretinvasionprivacyrules.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Privacy Rules',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders: [pendingOrderWithBillingAddress]
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(tokenAdmin)}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+    })
+
+    it('Should return 200 Success when a campaign manager successfully retrieves pending orders without a billing address and with a privacy rule.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Privacy Rules',
+            email: 'test33@companymarvelsecretinvasionprivacyrules.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      const email = 'test34@companymarvelsecretinvasionprivacyrules.com'
+      const password = faker.internet.password()
+
+      await verifyCompanyDomain(String(companyId))
+      const resInviteLink = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${token}`)
+
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .query({
+          companyId: resInviteLink.body.company.roles.campaignManager.shortInviteLink.split('=')[1]
+        })
+        .send({ user: { firstName: faker.name.firstName(), lastName: faker.name.lastName(), email, password } })
+
+      await verifyUser(email)
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email, password } })
+
+      const campaignManagerToken = resCampaignManager.body.token
+
+      await createPrivacyRule(companyId, appModules.ORDERS, userRoles.CAMPAIGNMANAGER)
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Privacy Rules',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders: pendingOrders.slice(0, 1)
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/pending-orders')
+        .set('Authorization', `Bearer ${String(campaignManagerToken)}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+    })
+
+    it('Should return 200 Success when a campaign manager successfully retrieves a pending order by id with privacy rules.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Privacy Rules',
+            email: 'test3@companymarvelsecretinvasionprivacyrules.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      const email = 'test4@companymarvelsecretinvasionprivacyrules.com'
+      const password = faker.internet.password()
+
+      await verifyCompanyDomain(String(companyId))
+      const resInviteLink = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${token}`)
+
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .query({
+          companyId: resInviteLink.body.company.roles.campaignManager.shortInviteLink.split('=')[1]
+        })
+        .send({ user: { firstName: faker.name.firstName(), lastName: faker.name.lastName(), email, password } })
+
+      await verifyUser(email)
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email, password } })
+
+      const campaignManagerToken = resCampaignManager.body.token
+
+      await createPrivacyRule(companyId, appModules.ORDERS, userRoles.CAMPAIGNMANAGER)
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Privacy Rules',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const resPendingOrders = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders: [pendingOrderWithBillingAddress]
+        })
+
+      const pendingOrderId = String(resPendingOrders.body.pendingOrders[0].id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${String(campaignManagerToken)}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrder')
+      expect(res.body.pendingOrder).to.be.an('object')
+      expect(res.body.pendingOrder.id).to.be.equal(pendingOrderId)
+      expect(res.body.pendingOrder.shippingAddressRequests).to.be.an('array')
+      expect(res.body.pendingOrder.shippingAddressRequests[0].place).to.include('*')
+      expect(res.body.pendingOrder.shippingAddressRequests[0].email).to.include('*')
+      expect(res.body.pendingOrder.shippingAddressRequests[0].street).to.include('*')
+      expect(res.body.pendingOrder.shippingAddressRequests[0].zipCode).to.include('*')
+      expect(res.body.pendingOrder.shippingAddressRequests[0].country).to.include('*')
+    })
+
+    it('Should return 200 Success when a campaign manager successfully retrieves a pending order by id with missing data points and privacy rules.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Privacy Rules',
+            email: 'test13@companymarvelsecretinvasionprivacyrules.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      const email = 'test14@companymarvelsecretinvasionprivacyrules.com'
+      const password = faker.internet.password()
+
+      await verifyCompanyDomain(String(companyId))
+      const resInviteLink = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${token}`)
+
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .query({
+          companyId: resInviteLink.body.company.roles.campaignManager.shortInviteLink.split('=')[1]
+        })
+        .send({ user: { firstName: faker.name.firstName(), lastName: faker.name.lastName(), email, password } })
+
+      await verifyUser(email)
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email, password } })
+
+      const campaignManagerToken = resCampaignManager.body.token
+
+      await createPrivacyRule(companyId, appModules.ORDERS, userRoles.CAMPAIGNMANAGER)
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Privacy Rules',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const resPendingOrders = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders: [pendingOrderWithMissingDataPoints]
+        })
+
+      const pendingOrderId = String(resPendingOrders.body.pendingOrders[0].id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${String(campaignManagerToken)}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrder')
+      expect(res.body.pendingOrder).to.be.an('object')
+      expect(res.body.pendingOrder.id).to.be.equal(pendingOrderId)
+      expect(res.body.pendingOrder.shippingAddressRequests).to.be.an('array')
+    })
+
+    it('Should return 200 Success when a campaign manager successfully retrieves a pending order by id without a billing address and with a privacy rule.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Privacy Rules',
+            email: 'test23@companymarvelsecretinvasionprivacyrules.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      const email = 'test24@companymarvelsecretinvasionprivacyrules.com'
+      const password = faker.internet.password()
+
+      await verifyCompanyDomain(String(companyId))
+      const resInviteLink = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${token}`)
+
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .query({
+          companyId: resInviteLink.body.company.roles.campaignManager.shortInviteLink.split('=')[1]
+        })
+        .send({ user: { firstName: faker.name.firstName(), lastName: faker.name.lastName(), email, password } })
+
+      await verifyUser(email)
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email, password } })
+
+      const campaignManagerToken = resCampaignManager.body.token
+
+      await createPrivacyRule(companyId, appModules.ORDERS, userRoles.CAMPAIGNMANAGER)
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Privacy Rules',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const resPendingOrders = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders: pendingOrders.slice(0, 1)
+        })
+
+      const pendingOrderId = String(resPendingOrders.body.pendingOrders[0].id)
+
+      const res = await chai
+        .request(app)
+        .get(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${String(campaignManagerToken)}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrder')
+      expect(res.body.pendingOrder).to.be.an('object')
+      expect(res.body.pendingOrder.id).to.be.equal(pendingOrderId)
+      expect(res.body.pendingOrder.shippingAddressRequests).to.be.an('array')
+      expect(res.body.pendingOrder.billingAddressRequests).to.be.equal(null)
     })
   })
 
@@ -789,6 +1303,84 @@ describe('Pending Orders actions', () => {
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
+    })
+
+    it('Should return 403 Forbidden when a campaign manager tries to update a pending order with a privacy rule.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Privacy Rules',
+            email: 'test43@companymarvelsecretinvasionprivacyrules.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+      const email = 'test44@companymarvelsecretinvasionprivacyrules.com'
+      const password = faker.internet.password()
+
+      await verifyCompanyDomain(String(companyId))
+      const resInviteLink = await chai
+        .request(app)
+        .get(`/api/companies/${String(companyId)}/invite-link`)
+        .set('Authorization', `Bearer ${token}`)
+
+      await chai
+        .request(app)
+        .post('/auth/signup')
+        .query({
+          companyId: resInviteLink.body.company.roles.campaignManager.shortInviteLink.split('=')[1]
+        })
+        .send({ user: { firstName: faker.name.firstName(), lastName: faker.name.lastName(), email, password } })
+
+      await verifyUser(email)
+
+      const resCampaignManager = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email, password } })
+
+      const campaignManagerToken = resCampaignManager.body.token
+
+      await createPrivacyRule(companyId, appModules.ORDERS, userRoles.CAMPAIGNMANAGER)
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Privacy Rules',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const resPendingOrders = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/pending-orders`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders: pendingOrders.slice(0, 1)
+        })
+
+      const pendingOrderId = String(resPendingOrders.body.pendingOrders[0].id)
+
+      const res = await chai
+        .request(app)
+        .put(`/api/pending-orders/${pendingOrderId}`)
+        .set('Authorization', `Bearer ${String(campaignManagerToken)}`)
+        .send({
+          pendingOrders: pendingOrderForUpdate
+        })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You are not allowed to update this pending order because of a privacy rule')
     })
   })
 

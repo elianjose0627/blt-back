@@ -1,12 +1,15 @@
 import BaseController from './BaseController'
 import PendingOrderService from '../services/PendingOrderService'
+import PrivacyRuleService from '../services/PrivacyRuleService'
 import type { CustomNext, CustomRequest, CustomResponse, ICampaign, IPendingOrder, Module, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
+import * as appModules from '../utils/appModules'
 import { parseXml } from '../utils/parseXML'
 
 const pendingOrderService = new PendingOrderService('PendingOrder')
+const privacyRuleService = new PrivacyRuleService('PrivacyRule')
 
 class PendingOrderController extends BaseController {
   moduleName (): Module {
@@ -64,6 +67,17 @@ class PendingOrderController extends BaseController {
       })
     }
     return next()
+  }
+
+  async get (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { user: currentUser, params: { id } } = req
+
+    const record = await pendingOrderService.get(id, currentUser)
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      [pendingOrderService.singleRecord()]: record
+    })
   }
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
@@ -199,6 +213,19 @@ class PendingOrderController extends BaseController {
     const { body: { pendingOrders }, user: currentUser, record } = req
     const { response, status } = await pendingOrderService.update({ pendingOrder: pendingOrders[0], currentUser, record })
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} updated` })
+
+    const { id: userId, companyId, role } = currentUser
+    const privacyRule = companyId !== null ? await privacyRuleService.find(companyId, role, appModules.ORDERS) : null
+
+    if (privacyRule !== null && record.userId !== userId) {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'You are not allowed to update this pending order because of a privacy rule'
+        }
+      })
+    }
 
     const statusCode: StatusCode = {
       200: statusCodes.OK,

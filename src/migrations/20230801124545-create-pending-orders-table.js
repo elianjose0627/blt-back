@@ -80,15 +80,15 @@ module.exports = {
         allowNull: true
       },
       orderLineRequests: {
-        type: Sequelize.JSON,
+        type: Sequelize.JSONB,
         allowNull: false
       },
       shippingAddressRequests: {
-        type: Sequelize.JSON,
+        type: Sequelize.JSONB,
         allowNull: true
       },
       paymentInformationRequests: {
-        type: Sequelize.JSON,
+        type: Sequelize.JSONB,
         allowNull: true
       },
       isPosted: {

@@ -449,7 +449,8 @@ class BaseService {
   }
 
   async findById (id: string, paranoid = true): Promise<any> {
-    const excluded = this.model === 'User' ? [] : ['userId']
+    const modelsWithUserId = ['PendingOrder', 'User']
+    const excluded = modelsWithUserId.includes(this.model) ? [] : ['userId']
     const included = (this.model === 'User')
       ? [
           {

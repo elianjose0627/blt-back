@@ -971,7 +971,7 @@ export const pendingOrders = [
         telephone: '',
         mobile: '',
         fax: '',
-        email: 'christoph@biglittlethings.de'
+        email: 'testuser@biglittlethings.de'
       }
     ]
   },
@@ -1178,7 +1178,7 @@ export const pendingOrderForUpdate = [
         telephone: '',
         mobile: '',
         fax: '',
-        email: 'christoph@biglittlethings.de'
+        email: 'testuser@biglittlethings.de'
       }
     ]
   }
@@ -1232,7 +1232,7 @@ export const postedPendingOrder = [
         telephone: '',
         mobile: '',
         fax: '',
-        email: 'christoph@biglittlethings.de'
+        email: 'testuser@biglittlethings.de'
       }
     ],
     isPosted: true
@@ -1287,7 +1287,7 @@ export const queuedPendingOrder = [
         telephone: '',
         mobile: '',
         fax: '',
-        email: 'christoph@biglittlethings.de'
+        email: 'testuser@biglittlethings.de'
       }
     ],
     isQueued: true
@@ -1932,4 +1932,142 @@ export const createQueuedPendingOrder = async (companyId: string, userId: string
   })
 
   return pendingOrder
+}
+
+export const pendingOrderWithBillingAddress = {
+  costCenter: '',
+  platform: 0,
+  language: 0,
+  currency: 'EUR',
+  orderNo: '0',
+  inetorderno: 0,
+  shippingId: 21,
+  shipped: dayjs.utc().add(1, 'day'),
+  deliverydate: dayjs.utc().add(1, 'day'),
+  note: '',
+  description: ' +',
+  paymentType: 0,
+  paymentTarget: 0,
+  discount: 0.00,
+  orderStatus: 0,
+  orderLineRequests: [
+    {
+      itemName: 'Welcome Box - Techstarter',
+      articleNumber: '1498',
+      itemNetSale: 0.00,
+      itemVAT: 0.00,
+      quantity: 1,
+      type: 0,
+      discount: 0.00,
+      netPurchasePrice: 0.00
+    }
+  ],
+  shippingAddressRequests: [
+    {
+      salutation: 'Mr',
+      firstName: 'Felix',
+      lastName: 'Ixkes',
+      title: '',
+      company: '',
+      companyAddition: '',
+      street: 'Flügelstraße 6',
+      addressAddition: '',
+      zipCode: '40227',
+      place: 'Düsseldorf',
+      phone: '',
+      state: '',
+      country: 'Germany',
+      iso: '',
+      telephone: '',
+      mobile: '',
+      fax: '',
+      email: 'testuser@biglittlethings.de'
+    }
+  ],
+  billingAddressRequests: [
+    {
+      salutation: 'Mr',
+      firstName: 'Felix',
+      lastName: 'Ixkes',
+      title: '',
+      company: '',
+      companyAddition: '',
+      street: 'Flügelstraße 6',
+      addressAddition: '',
+      zipCode: '40227',
+      place: 'Düsseldorf',
+      phone: '',
+      state: '',
+      country: 'Germany',
+      iso: '',
+      telephone: '',
+      mobile: '',
+      fax: '',
+      email: 'testuser@biglittlethings.de'
+    }
+  ]
+}
+
+export const pendingOrderWithMissingDataPoints = {
+  costCenter: '',
+  platform: 0,
+  language: 0,
+  currency: 'EUR',
+  orderNo: '0',
+  inetorderno: 0,
+  shippingId: 21,
+  shipped: dayjs.utc().add(1, 'day'),
+  deliverydate: dayjs.utc().add(1, 'day'),
+  note: '',
+  description: ' +',
+  paymentType: 0,
+  paymentTarget: 0,
+  discount: 0.00,
+  orderStatus: 0,
+  orderLineRequests: [
+    {
+      itemName: 'Welcome Box - Techstarter',
+      articleNumber: '1498',
+      itemNetSale: 0.00,
+      itemVAT: 0.00,
+      quantity: 1,
+      type: 0,
+      discount: 0.00,
+      netPurchasePrice: 0.00
+    }
+  ],
+  shippingAddressRequests: [
+    {
+      salutation: 'Mr',
+      firstName: 'Felix',
+      lastName: 'Ixkes',
+      title: '',
+      company: '',
+      companyAddition: '',
+      addressAddition: '',
+      phone: '',
+      state: '',
+      iso: '',
+      telephone: '',
+      mobile: '',
+      fax: ''
+    }
+  ],
+  billingAddressRequests: [
+    {
+      salutation: 'Mr',
+      firstName: 'Felix',
+      lastName: 'Ixkes',
+      title: '',
+      company: '',
+      companyAddition: '',
+      addressAddition: '',
+      phone: '',
+      state: '',
+      iso: '',
+      telephone: '',
+      mobile: '',
+      fax: ''
+    }
+  ]
 }

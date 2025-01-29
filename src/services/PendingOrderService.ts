@@ -1,14 +1,15 @@
 import { v1 as uuidv1 } from 'uuid'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import { Op } from 'sequelize'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 import triggerPubSub from '../utils/triggerPubSub'
 import * as userRoles from '../utils/userRoles'
 import * as statusCodes from '../constants/statusCodes'
-import { IDuplicatePostedOrder, IPendingOrder, IUserExtended } from '../types'
+import { BillingAddressRequest, IDuplicatePostedOrder, IPendingOrder, IUserExtended, ShippingAddressRequest } from '../types'
 import { Platform } from '../enums/platform'
-import { Op } from 'sequelize'
+import * as appModules from '../utils/appModules'
 
 dayjs.extend(utc)
 
@@ -43,9 +44,57 @@ class PendingOrderService extends BaseService {
     return records
   }
 
+  async get (id: string, user?: any): Promise<any> {
+    const record = await db[this.model].findOne({
+      where: { id },
+      include: generateInclude(this.model),
+      attributes: { exclude: ['deletedAt', 'companyId', 'campaignId', 'paymentInformationRequests'] }
+    })
+
+    const companyId = user.companyId
+    const privacyRule = companyId !== null
+      ? await db.PrivacyRule.findOne({
+        where: {
+          companyId,
+          role: user.role,
+          isEnabled: true,
+          module: appModules.ORDERS
+        }
+      })
+      : null
+
+    if (privacyRule !== null && record.userId !== user.id) {
+      record.shippingAddressRequests = record.shippingAddressRequests.map((shippingAddressRequest: ShippingAddressRequest) => {
+        return {
+          ...shippingAddressRequest,
+          place: shippingAddressRequest.place?.replace(/./g, '*'),
+          email: shippingAddressRequest.email?.replace(/.(?=.*@)/g, '*'),
+          street: shippingAddressRequest.street?.replace(/./g, '*'),
+          zipCode: shippingAddressRequest.zipCode?.replace(/./g, '*'),
+          country: shippingAddressRequest.country?.replace(/./g, '*')
+        }
+      })
+
+      record.billingAddressRequests = record.billingAddressRequests !== null
+        ? record.billingAddressRequests.map((billingAddressRequest: BillingAddressRequest) => {
+          return {
+            ...billingAddressRequest,
+            place: billingAddressRequest.place?.replace(/./g, '*'),
+            email: billingAddressRequest.email?.replace(/.(?=.*@)/g, '*'),
+            street: billingAddressRequest.street?.replace(/./g, '*'),
+            zipCode: billingAddressRequest.zipCode?.replace(/./g, '*'),
+            country: billingAddressRequest.country?.replace(/./g, '*')
+          }
+        })
+        : null
+    }
+    return record.toJSONFor()
+  }
+
   async getAll (limit: number, offset: number, user?: any, search: string = '', filter = { firstname: '', lastname: '', email: '', city: '', country: '' }): Promise<any> {
     let records
-    const exclude = ['deletedAt', 'companyId', 'userId', 'campaignId']
+    const exclude = ['deletedAt', 'companyId', 'campaignId', 'paymentInformationRequests']
+
     if (user.role === userRoles.ADMIN) {
       records = await db[this.model].findAndCountAll({
         include: generateInclude(this.model),
@@ -97,7 +146,53 @@ class PendingOrderService extends BaseService {
       })
     }
 
-    return records
+    const companyId = user.companyId
+    const privacyRule = companyId !== null
+      ? await db.PrivacyRule.findOne({
+        where: {
+          companyId,
+          role: user.role,
+          isEnabled: true,
+          module: appModules.ORDERS
+        }
+      })
+      : null
+
+    const count = records.count
+
+    records = records.rows.map((record: any) => {
+      if (privacyRule !== null && record.userId !== user.id) {
+        record.shippingAddressRequests = record.shippingAddressRequests.map((shippingAddressRequest: ShippingAddressRequest) => {
+          return {
+            ...shippingAddressRequest,
+            place: shippingAddressRequest.place?.replace(/./g, '*'),
+            email: shippingAddressRequest.email?.replace(/.(?=.*@)/g, '*'),
+            street: shippingAddressRequest.street?.replace(/./g, '*'),
+            zipCode: shippingAddressRequest.zipCode?.replace(/./g, '*'),
+            country: shippingAddressRequest.country?.replace(/./g, '*')
+          }
+        })
+
+        record.billingAddressRequests = record.billingAddressRequests !== null
+          ? record.billingAddressRequests.map((billingAddressRequest: BillingAddressRequest) => {
+            return {
+              ...billingAddressRequest,
+              place: billingAddressRequest.place?.replace(/./g, '*'),
+              email: billingAddressRequest.email?.replace(/.(?=.*@)/g, '*'),
+              street: billingAddressRequest.street?.replace(/./g, '*'),
+              zipCode: billingAddressRequest.zipCode?.replace(/./g, '*'),
+              country: billingAddressRequest.country?.replace(/./g, '*')
+            }
+          })
+          : null
+      }
+      return record.toJSONFor()
+    })
+
+    return {
+      count,
+      rows: records
+    }
   }
 
   async insert (data: any): Promise<any> {
