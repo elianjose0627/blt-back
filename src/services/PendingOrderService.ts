@@ -10,6 +10,7 @@ import * as statusCodes from '../constants/statusCodes'
 import { BillingAddressRequest, IDuplicatePostedOrder, IPendingOrder, IUserExtended, ShippingAddressRequest } from '../types'
 import { Platform } from '../enums/platform'
 import * as appModules from '../utils/appModules'
+import Joi from 'joi'
 
 dayjs.extend(utc)
 
@@ -356,7 +357,11 @@ class PendingOrderService extends BaseService {
 
   async insertGETECPendingOrder (data: any): Promise<any> {
     const { currentUser, parsedData } = data
-    const getecCampaignId = process.env.GETEC_CAMPAIGN_ID ?? null
+
+    const uuidSchema = Joi.string().uuid()
+    const { error } = uuidSchema.validate(process.env.GETEC_CAMPAIGN_ID)
+    const getecCampaignId = error !== undefined ? null : process.env.GETEC_CAMPAIGN_ID
+
     const bulkInsertData = parsedData.map((pendingOrder: any) => ({
       ...pendingOrder,
       id: uuidv1(),
@@ -386,7 +391,7 @@ class PendingOrderService extends BaseService {
 
     await triggerPubSub(pendingOrdersTopicId, 'postPendingOrders', pendingOrdersAttributes)
     return {
-      response,
+      response: response.map((response: any) => response.toJSONFor()),
       status: 201
     }
   }

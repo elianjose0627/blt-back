@@ -1939,6 +1939,38 @@ describe('Pending Orders actions', () => {
       expect(res.body.pendingOrders).to.be.an('array')
     })
 
+    it('Should return 201 Created when an admin successfully creates a pending order without campaign id set and campaign id is not a valid uuid.', async () => {
+      process.env.GETEC_CAMPAIGN_ID = 'invalid-uuid'
+      const basicAuth = Buffer.from(`${username5}:${password5}`).toString('base64')
+      const filePath = path.join(__dirname, '../test.xml')
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders/upload')
+        .set('Authorization', `Basic ${basicAuth}`)
+        .set('Content-Type', 'multipart/form-data')
+        .attach('file', fs.readFileSync(filePath), 'test.xml')
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+    })
+
+    it('Should return 201 Created when an admin successfully creates a pending order without campaign id set and campaign id is empty.', async () => {
+      process.env.GETEC_CAMPAIGN_ID = ''
+      const basicAuth = Buffer.from(`${username5}:${password5}`).toString('base64')
+      const filePath = path.join(__dirname, '../test.xml')
+      const res = await chai
+        .request(app)
+        .post('/api/pending-orders/upload')
+        .set('Authorization', `Basic ${basicAuth}`)
+        .set('Content-Type', 'multipart/form-data')
+        .attach('file', fs.readFileSync(filePath), 'test.xml')
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array')
+    })
+
     it('Should return 400 Bad Request when an admin tries to create pending order with xml file without some items.', async () => {
       const basicAuth = Buffer.from(`${username5}:${password5}`).toString('base64')
       const filePath = path.join(__dirname, '../testWithError.xml')
