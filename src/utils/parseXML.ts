@@ -58,6 +58,7 @@ export const parseXml = async (xmlContent: string): Promise<any> => {
       })),
       shippingAddressRequests: [{
         salutation: '',
+        title: '',
         firstName: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderHeader.OrderParty.ShipToParty.Party.ReceivingContact.Contact.ContactName.split(' ')[0],
         lastName: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderHeader.OrderParty.ShipToParty.Party.ReceivingContact.Contact.ContactName.split(' ')[1],
         company: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderHeader.OrderParty.ShipToParty.Party.NameAddress.Name1,
