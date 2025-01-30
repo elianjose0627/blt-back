@@ -1392,11 +1392,14 @@ const validateCompanyShopHeader = Joi.object({
 
 const validateProductCustomisation = Joi.object({
   productCustomisation: Joi.object({
-    customisationType: Joi.string().required().valid(...['print', 'engraving']),
+    customisationType: Joi.string().required().valid(...['print', 'engraving', 'branding']),
     customisationDetail: Joi.string().required(),
     price: Joi.number().min(0),
     available: Joi.boolean().optional().default(false),
-    photo: Joi.array().items(
+    isApproved: Joi.boolean().default(false),
+    designStatus: Joi.string().required(),
+    color: Joi.string().required(),
+    photos: Joi.array().items(
       Joi.object({
         filename: Joi.string().required(),
         url: Joi.string().uri().required()
@@ -1406,13 +1409,24 @@ const validateProductCustomisation = Joi.object({
   }).required()
 })
 
+const validateProductCustomisationChat = Joi.object({
+  productCustomisationChat: Joi.object({
+    message: Joi.string().required(),
+    attachment: Joi.array().items(
+      Joi.object({
+        filename: Joi.string().required(),
+        url: Joi.string().uri().required()
+      }).required()
+    ).optional()
+  }).required()
+})
+
 const validateProductCustomisationForUpdate = Joi.object({
   productCustomisation: Joi.object({
-    customisationType: Joi.string().required().valid(...['print', 'engraving']),
-    customisationDetail: Joi.string().required(),
-    price: Joi.number().min(0),
-    available: Joi.boolean().optional().default(false),
-    photo: Joi.array().items(
+    isApproved: Joi.boolean().default(false),
+    designStatus: Joi.string().required(),
+    color: Joi.string().required(),
+    photos: Joi.array().items(
       Joi.object({
         filename: Joi.string().required(),
         url: Joi.string().uri().required()
@@ -1565,5 +1579,6 @@ export default {
   validateProductCategoryUpdate,
   validatePendingOrder,
   validatePendingOrderUpdate,
-  validateCampaignAdditionalProductSetting
+  validateCampaignAdditionalProductSetting,
+  validateProductCustomisationChat
 }

@@ -371,6 +371,34 @@ export const generateInclude = (model: string): any => {
       }
     ]
   }
+  if (model === 'ProductCustomisation') {
+    return [
+      {
+        model: db.User,
+        attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role', 'updatedAt', 'createdAt'],
+        as: 'owner',
+        include: [
+          {
+            model: db.Address,
+            attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type'],
+            as: 'addresses'
+          }
+        ]
+      },
+      {
+        model: db.ProductCustomisationChat,
+        attributes: ['id', 'message', 'attachment'],
+        include: [
+          {
+            model: db.User,
+            attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role', 'updatedAt', 'createdAt'],
+            as: 'owner'
+          }
+        ],
+        as: 'chats'
+      }
+    ]
+  }
   if (model === 'ApiKey') {
     return [
       {

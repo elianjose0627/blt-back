@@ -75,6 +75,7 @@ export interface Database {
   CampaignQuotaNotification?: any
   ApiKey?: any
   ProductCustomisation?: any
+  ProductCustomisationChat?: any
   [key: string]: any
 }
 

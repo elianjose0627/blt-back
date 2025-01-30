@@ -22,11 +22,16 @@ const productCustomisationRoutes = (): Router => {
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(ProductCustomisationController.checkRecord))
   productCustomisationRouter.route('/product-customisations/:id')
-    .get(asyncHandler(ProductCustomisationController.checkOwnerOrAdmin), asyncHandler(ProductCustomisationController.get))
+    .get(asyncHandler(ProductCustomisationController.get))
     .put(asyncHandler(ProductCustomisationController.checkOwnerOrAdmin), celebrate({
       [Segments.BODY]: validator.validateProductCustomisationForUpdate
     }), asyncHandler(ProductCustomisationController.update))
     .delete(asyncHandler(ProductCustomisationController.checkOwnerOrAdmin), asyncHandler(ProductCustomisationController.delete))
+  productCustomisationRouter.route('/product-customisations/:id/chat')
+    .get(asyncHandler(ProductCustomisationController.getAllChat))
+    .post(celebrate({
+      [Segments.BODY]: validator.validateProductCustomisationChat
+    }), asyncHandler(ProductCustomisationController.insertChat))
   return productCustomisationRouter
 }
 

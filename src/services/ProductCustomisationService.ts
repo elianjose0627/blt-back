@@ -1,4 +1,3 @@
-import { Op } from 'sequelize'
 import { v1 as uuidv1 } from 'uuid'
 import BaseService, { generateFilterQuery, generateInclude } from './BaseService'
 import db from '../models'
@@ -10,12 +9,11 @@ class ProductCustomisationService extends BaseService {
 
     const productId = productCustomisation.productId
     const userId = user.id
+    const companyId = user.company.id
 
     response = await db[this.model].findOne({
       where: {
-        productId,
-        customisationType: productCustomisation.customisationType,
-        customisationDetail: productCustomisation.customisationDetail
+        productId
       },
       paranoid: false
     })
@@ -26,27 +24,13 @@ class ProductCustomisationService extends BaseService {
       return { response: updatedResponse.toJSONFor(), status: 200 }
     }
 
-    response = await db[this.model].create({ ...productCustomisation, id: uuidv1(), userId })
+    response = await db[this.model].create({ ...productCustomisation, id: uuidv1(), userId, companyId })
 
     return { response: response.toJSONFor(), status: 201 }
   }
 
   async getAll (limit: number, offset: number, search?: string, filter = { productId: '' }, user?: any): Promise<any> {
-    let where = generateFilterQuery(filter)
-
-    if (search !== undefined && search !== '') {
-      where = {
-        [Op.and]: [
-          {
-            [Op.or]: [
-              { customisationType: { [Op.iLike]: `%${search}%` } },
-              { customisationDetail: { [Op.iLike]: `%${search}%` } }
-            ]
-          },
-          where
-        ]
-      }
-    }
+    const where = generateFilterQuery(filter)
 
     const records = await db[this.model].findAndCountAll({
       include: generateInclude(this.model),
@@ -65,6 +49,47 @@ class ProductCustomisationService extends BaseService {
       count: records.count,
       rows: records.rows.map((record: any) => record.toJSONFor())
     }
+  }
+
+  async getAllChat (productCustomisationId: string): Promise<any> {
+    const records = await db.ProductCustomisationChat.findAndCountAll({
+      include: generateInclude(this.model),
+      order: [['createdAt', 'DESC']],
+      attributes: { exclude: [] },
+      where: {
+        productCustomisationId
+      },
+      distinct: true
+    })
+
+    return {
+      count: records.count,
+      rows: records.rows.map((record: any) => record.toJSONFor())
+    }
+  }
+
+  async insertChat (data: any): Promise<any> {
+    const { user, productCustomisationChat, productCustomisationId } = data
+    // let response: any
+
+    const userId = user.id
+
+    // response = await db[this.model].findOne({
+    //   where: {
+    //     productCustomisationId
+    //   },
+    //   paranoid: false
+    // })
+
+    // if (response !== null) {
+    //   await response.restore()
+    //   const updatedResponse = await response.update({ ...productCustomisationChat, userId })
+    //   return { response: updatedResponse.toJSONFor(), status: 200 }
+    // }
+
+    const response = await db.ProductCustomisationChat.create({ ...productCustomisationChat, id: uuidv1(), userId, productCustomisationId })
+
+    return { response: response.toJSONFor(), status: 201 }
   }
 }
 

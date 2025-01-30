@@ -1200,23 +1200,33 @@ export interface IShopHeader {
   filename: string
 }
 
-export interface IPhoto {
-  url: string
-  filename: string
-}
-
-export type ProductCustomisationType = 'print' | 'engraving'
+export type ProductCustomisationType = 'print' | 'engraving' | 'branding'
 export interface IProductCustomisation {
   id: string
   customisationType: ProductCustomisationType
   customisationDetail: object
   price: number
   available: boolean
-  photo: IPhoto[]
+  isApproved: boolean
+  designStatus: string
+  color: string
+  photos: MediaData[]
+  owner: IUser
+  company: ICompany
+  createdAt: Date
+  updatedAt: Date
+  chats: IProductCustomisationChat[]
+  product?: IProduct
+}
+
+export interface IProductCustomisationChat {
+  id: string
+  message: string
+  attachment: Nullable<MediaData>
+  productCustomisation: IProductCustomisation
   owner: IUser
   createdAt: Date
   updatedAt: Date
-  product?: IProduct
 }
 
 export interface IPackingSlip {

@@ -90,6 +90,36 @@ class ProductCustomisationController extends BaseController {
 
     return res.status(statusCodes.NO_CONTENT).send(response)
   }
+
+  async getAllChat (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { id: productCustomisationId } = req.params
+
+    const records = await productCustomisationService.getAllChat(productCustomisationId)
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      ProductCustomisationChats: records.rows
+    })
+  }
+
+  async insertChat (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { user, body: { productCustomisationChat }, params: { id: productCustomisationId } } = req
+
+    const { response, status } = await productCustomisationService.insertChat({ user, productCustomisationChat, productCustomisationId })
+    io.emit('ProductCustomisationChats', { message: 'ProductCustomisationChats created' })
+
+    const statusCode: StatusCode = {
+      200: statusCodes.OK,
+      201: statusCodes.CREATED
+    }
+
+    return res.status(statusCode[status]).send({
+      statusCode: statusCode[status],
+      success: true,
+      ProductCustomisationChats: response
+    })
+  }
 }
 
 export default new ProductCustomisationController(productCustomisationService)
