@@ -926,20 +926,13 @@ export const updatePendingOrderWithPostedOrderId = async (id: string, postedOrde
 export const pendingOrders = [
   {
     costCenter: '',
-    platform: 0,
-    language: 0,
     currency: 'EUR',
     orderNo: '0',
-    inetorderno: 0,
     shippingId: 21,
     shipped: dayjs.utc().add(1, 'day'),
     deliverydate: dayjs.utc().add(1, 'day'),
     note: '',
     description: ' +',
-    paymentType: 0,
-    paymentTarget: 0,
-    discount: 0.00,
-    orderStatus: 0,
     orderLineRequests: [
       {
         itemName: 'Welcome Box - Techstarter',
@@ -977,20 +970,13 @@ export const pendingOrders = [
   },
   {
     costCenter: '',
-    platform: 0,
-    language: 0,
     currency: 'EUR',
     orderNo: '0',
-    inetorderno: 0,
     shippingId: 21,
     shipped: dayjs.utc().add(1, 'day'),
     deliverydate: dayjs.utc().add(1, 'day'),
     note: '',
     description: ' +',
-    paymentType: 0,
-    paymentTarget: 0,
-    discount: 0.00,
-    orderStatus: 0,
     orderLineRequests: [
       {
         itemName: 'Welcome Box - Techstarter',
@@ -1028,20 +1014,13 @@ export const pendingOrders = [
   },
   {
     costCenter: '',
-    platform: 0,
-    language: 0,
     currency: 'EUR',
     orderNo: '0',
-    inetorderno: 0,
     shippingId: 21,
     shipped: dayjs.utc().add(1, 'day'),
     deliverydate: dayjs.utc().add(1, 'day'),
     note: '',
     description: ' +',
-    paymentType: 0,
-    paymentTarget: 0,
-    discount: 0.00,
-    orderStatus: 0,
     orderLineRequests: [
       {
         itemName: 'Welcome Box - Techstarter',
@@ -1079,20 +1058,13 @@ export const pendingOrders = [
   },
   {
     costCenter: '',
-    platform: 0,
-    language: 0,
     currency: 'EUR',
     orderNo: '0',
-    inetorderno: 0,
     shippingId: 21,
     shipped: dayjs.utc().add(1, 'day'),
     deliverydate: dayjs.utc().add(1, 'day'),
     note: '',
     description: ' +',
-    paymentType: 0,
-    paymentTarget: 0,
-    discount: 0.00,
-    orderStatus: 0,
     orderLineRequests: [
       {
         itemName: 'Welcome Box - Techstarter',
@@ -1133,20 +1105,13 @@ export const pendingOrders = [
 export const pendingOrderForUpdate = [
   {
     costCenter: '',
-    platform: 0,
-    language: 0,
     currency: 'EUR',
     orderNo: '0',
-    inetorderno: 0,
     shippingId: 21,
     shipped: '2025-07-29 10:35:11.0000000',
     deliverydate: '2025-07-31 10:35:11.0000000',
     note: '',
     description: 'Updated Description',
-    paymentType: 0,
-    paymentTarget: 0,
-    discount: 0.00,
-    orderStatus: 0,
     orderLineRequests: [
       {
         itemName: 'Tasse - Kitty Mug - 1c - navy - Kurita - Muster',
@@ -1187,20 +1152,13 @@ export const pendingOrderForUpdate = [
 export const postedPendingOrder = [
   {
     costCenter: '',
-    platform: 0,
-    language: 0,
     currency: 'EUR',
     orderNo: '0',
-    inetorderno: 0,
     shippingId: 21,
     shipped: '2025-07-29 10:35:11.0000000',
     deliverydate: '2025-07-31 10:35:11.0000000',
     note: '',
     description: 'Updated Description',
-    paymentType: 0,
-    paymentTarget: 0,
-    discount: 0.00,
-    orderStatus: 0,
     orderLineRequests: [
       {
         itemName: 'Tasse - Kitty Mug - 1c - navy - Kurita - Muster',
@@ -1242,20 +1200,13 @@ export const postedPendingOrder = [
 export const queuedPendingOrder = [
   {
     costCenter: '',
-    platform: 0,
-    language: 0,
     currency: 'EUR',
     orderNo: '0',
-    inetorderno: 0,
     shippingId: 21,
     shipped: '2025-07-29 10:35:11.0000000',
     deliverydate: '2025-07-31 10:35:11.0000000',
     note: '',
     description: 'Updated Description',
-    paymentType: 0,
-    paymentTarget: 0,
-    discount: 0.00,
-    orderStatus: 0,
     orderLineRequests: [
       {
         itemName: 'Tasse - Kitty Mug - 1c - navy - Kurita - Muster',
@@ -1909,6 +1860,9 @@ export const createOrderConfirmation = async (companyId: string, userId: string)
 export const createPostedPendingOrder = async (companyId: string, userId: string, campaignId: string): Promise<any> => {
   const pendingOrder = await db.PendingOrder.create({
     id: uuidv4(),
+    platform: 0,
+    language: 0,
+    inetorderno: 0,
     customerId: '123',
     companyId,
     userId,
@@ -1923,6 +1877,9 @@ export const createPostedPendingOrder = async (companyId: string, userId: string
 export const createQueuedPendingOrder = async (companyId: string, userId: string, campaignId: string): Promise<any> => {
   const pendingOrder = await db.PendingOrder.create({
     id: uuidv4(),
+    platform: 0,
+    language: 0,
+    inetorderno: 0,
     customerId: '123',
     companyId,
     userId,
@@ -1936,20 +1893,13 @@ export const createQueuedPendingOrder = async (companyId: string, userId: string
 
 export const pendingOrderWithBillingAddress = {
   costCenter: '',
-  platform: 0,
-  language: 0,
   currency: 'EUR',
   orderNo: '0',
-  inetorderno: 0,
   shippingId: 21,
   shipped: dayjs.utc().add(1, 'day'),
   deliverydate: dayjs.utc().add(1, 'day'),
   note: '',
   description: ' +',
-  paymentType: 0,
-  paymentTarget: 0,
-  discount: 0.00,
-  orderStatus: 0,
   orderLineRequests: [
     {
       itemName: 'Welcome Box - Techstarter',
@@ -2010,20 +1960,13 @@ export const pendingOrderWithBillingAddress = {
 
 export const pendingOrderWithMissingDataPoints = {
   costCenter: '',
-  platform: 0,
-  language: 0,
   currency: 'EUR',
   orderNo: '0',
-  inetorderno: 0,
   shippingId: 21,
   shipped: dayjs.utc().add(1, 'day'),
   deliverydate: dayjs.utc().add(1, 'day'),
   note: '',
   description: ' +',
-  paymentType: 0,
-  paymentTarget: 0,
-  discount: 0.00,
-  orderStatus: 0,
   orderLineRequests: [
     {
       itemName: 'Welcome Box - Techstarter',

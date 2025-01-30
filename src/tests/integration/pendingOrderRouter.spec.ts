@@ -155,6 +155,71 @@ describe('Pending Orders actions', () => {
       expect(res.body.pendingOrders).to.be.an('array')
     })
 
+    it('Should return 200 Success when an admin successfully retrieves all pending orders with search params.', async () => {
+      await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders: [
+            {
+              costCenter: '',
+              currency: 'EUR',
+              orderNo: '0',
+              shippingId: 21,
+              shipped: dayjs.utc().add(1, 'day'),
+              deliverydate: dayjs.utc().add(1, 'day'),
+              note: '',
+              description: ' +',
+              orderLineRequests: [
+                {
+                  itemName: 'Welcome Box - Techstarter',
+                  articleNumber: '1498',
+                  itemNetSale: 0.00,
+                  itemVAT: 0.00,
+                  quantity: 1,
+                  type: 0,
+                  discount: 0.00,
+                  netPurchasePrice: 0.00
+                }
+              ],
+              shippingAddressRequests: [
+                {
+                  salutation: '',
+                  firstName: faker.name.firstName(),
+                  lastName: faker.name.lastName(),
+                  title: '',
+                  company: '',
+                  companyAddition: '',
+                  street: faker.address.streetAddress(),
+                  addressAddition: '',
+                  zipCode: faker.address.zipCode(),
+                  place: faker.address.city(),
+                  phone: '',
+                  state: '',
+                  country: 'Italy',
+                  iso: '',
+                  telephone: '',
+                  mobile: '',
+                  fax: '',
+                  email: faker.internet.email()
+                }
+              ]
+            }
+          ]
+        })
+
+      const res = await chai
+        .request(app)
+        .get('/api/pending-orders')
+        .query({ search: 'Italy' })
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array').lengthOf(1)
+    })
+
     it('Should return 200 Success when a company administrator successfully retrieves all pending orders.', async () => {
       const res = await chai
         .request(app)

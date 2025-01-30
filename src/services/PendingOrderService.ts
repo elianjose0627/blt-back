@@ -1,7 +1,7 @@
 import { v1 as uuidv1 } from 'uuid'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { Op } from 'sequelize'
+import { Op, Sequelize } from 'sequelize'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 import triggerPubSub from '../utils/triggerPubSub'
@@ -96,6 +96,25 @@ class PendingOrderService extends BaseService {
     let records
     const exclude = ['deletedAt', 'companyId', 'campaignId', 'paymentInformationRequests']
 
+    const searchWhere: any = {}
+    if (search !== '') {
+      searchWhere[Op.or] = [
+        Sequelize.literal(
+          `EXISTS (
+            SELECT 1 FROM jsonb_array_elements("shippingAddressRequests") AS shippingAddressRequest
+            WHERE shippingAddressRequest->>'firstName' ILIKE '%${search}%'
+            OR shippingAddressRequest->>'lastName' ILIKE '%${search}%'
+            OR shippingAddressRequest->>'email' ILIKE '%${search}%'
+            OR shippingAddressRequest->>'place' ILIKE '%${search}%'
+            OR shippingAddressRequest->>'street' ILIKE '%${search}%'
+            OR shippingAddressRequest->>'zipCode' ILIKE '%${search}%'
+            OR shippingAddressRequest->>'country' ILIKE '%${search}%'
+            OR shippingAddressRequest->>'company' ILIKE '%${search}%'
+          )`
+        )
+      ]
+    }
+
     if (user.role === userRoles.ADMIN) {
       records = await db[this.model].findAndCountAll({
         include: generateInclude(this.model),
@@ -104,7 +123,10 @@ class PendingOrderService extends BaseService {
         order: [['createdAt', 'DESC']],
         attributes: { exclude },
         distinct: true,
-        where
+        where: {
+          ...where,
+          ...searchWhere
+        }
       })
     } else if (user.role === userRoles.COMPANYADMINISTRATOR) {
       records = await db[this.model].findAndCountAll({
@@ -115,7 +137,8 @@ class PendingOrderService extends BaseService {
         attributes: { exclude },
         where: {
           companyId: user.company.id,
-          ...where
+          ...where,
+          ...searchWhere
         },
         distinct: true
       })
@@ -128,7 +151,8 @@ class PendingOrderService extends BaseService {
         attributes: { exclude },
         where: {
           companyId: user.company.id,
-          ...where
+          ...where,
+          ...searchWhere
         },
         distinct: true
       })
@@ -141,7 +165,8 @@ class PendingOrderService extends BaseService {
         attributes: { exclude },
         where: {
           userId: user.id,
-          ...where
+          ...where,
+          ...searchWhere
         },
         distinct: true
       })
@@ -202,6 +227,13 @@ class PendingOrderService extends BaseService {
     const bulkInsertData = pendingOrders.map((pendingOrder: any) => ({
       ...pendingOrder,
       id: uuidv1(),
+      paymentType: 0,
+      paymentTarget: 0,
+      discount: 0.00,
+      orderStatus: 0,
+      inetorderno: 0,
+      platform: 0,
+      language: 0,
       userId: currentUser.id,
       campaignId: campaign.id,
       customerId: campaign.company.customerId,
@@ -237,6 +269,12 @@ class PendingOrderService extends BaseService {
     const bulkInsertData = pendingOrders.map((pendingOrder: any) => ({
       ...pendingOrder,
       id: uuidv1(),
+      paymentType: 0,
+      paymentTarget: 0,
+      discount: 0.00,
+      orderStatus: 0,
+      inetorderno: 0,
+      language: 0,
       platform: Platform.None,
       userId: currentUser.id,
       campaignId: null,
@@ -269,7 +307,7 @@ class PendingOrderService extends BaseService {
       where: {
         postedOrderId: postedOrderIds
       },
-      attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isPosted', 'isGreetingCardSent'] },
+      attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isPosted', 'isQueued', 'isGreetingCardSent', 'isInvoiceGenerated', 'isOrderConfirmationGenerated', 'isPackingSlipGenerated', 'jtlId', 'jtlNumber'] },
       raw: true
     })
 
@@ -311,7 +349,8 @@ class PendingOrderService extends BaseService {
         createdBy: currentUser.email,
         updatedBy: currentUser.email,
         createdByFullName: `${String(currentUser.firstName)} ${String(currentUser.lastName)}`,
-        postedOrderId: null
+        postedOrderId: null,
+        orderStatus: 0
       })
     })
 
@@ -372,7 +411,8 @@ class PendingOrderService extends BaseService {
       isQueued: false,
       paymentType: 0,
       paymentTarget: 0,
-      discount: 0,
+      discount: 0.00,
+      inetorderno: 0,
       userId: currentUser.id,
       campaignId: getecCampaignId,
       customerId: currentUser.company.customerId,
