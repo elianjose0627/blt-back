@@ -400,6 +400,7 @@ class PendingOrderService extends BaseService {
     const uuidSchema = Joi.string().uuid()
     const { error } = uuidSchema.validate(process.env.GETEC_CAMPAIGN_ID)
     const getecCampaignId = error !== undefined ? null : process.env.GETEC_CAMPAIGN_ID
+    const getecCustomerId = String(process.env.GETEC_CUSTOMER_ID)
 
     const bulkInsertData = parsedData.map((pendingOrder: any) => ({
       ...pendingOrder,
@@ -415,7 +416,7 @@ class PendingOrderService extends BaseService {
       inetorderno: 0,
       userId: currentUser.id,
       campaignId: getecCampaignId,
-      customerId: currentUser.company.customerId,
+      customerId: getecCustomerId,
       companyId: currentUser.companyId,
       created: dayjs.utc().format(),
       createdBy: currentUser.email,
