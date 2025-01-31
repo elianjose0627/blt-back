@@ -1279,3 +1279,142 @@ export interface ICampaignAdditionalProductSetting {
   updatedAt?: Date
   campaign?: Pick<ICampaign, 'id' | 'name'>
 }
+
+export interface ISupplierProduct {
+  id: string
+  masterCode: string
+  masterId: string
+  typeOfProducts: string
+  commodityCode: string
+  numberOfPrintPositions: string
+  countryOfOrigin: string
+  brand: string
+  productName: string
+  categoryCode: string
+  productClass: string
+  dimensions: string
+  length: number
+  lengthUnit: string
+  width: number
+  widthUnit: string
+  height: number
+  heightUnit: string
+  volume: number
+  volumeUnit: string
+  grossWeight: number
+  grossWeightUnit: string
+  netWeight: number
+  netWeightUnit: string
+  innerCartonQuantity: number
+  outerCartonQuantity: number
+  cartonLength: number
+  cartonLengthUnit: string
+  cartonWidth: number
+  cartonWidthUnit: string
+  cartonHeight: number
+  cartonHeightUnit: string
+  cartonVolume: number
+  cartonVolumeUnit: string
+  cartonGrossWeight: number
+  cartonGrossWeightUnit: string
+  timestamp: Date
+  shortDescription: string
+  longDescription: string
+  material: string
+  printable: string
+  createdAt: Date
+  updatedAt: Date
+}
+export interface ISupplierProductDigitalAsset {
+  id: string
+  supplierProductId: string
+  supplierProductVariantId: string
+  url: string
+  urlHighress: string
+  type: string
+  subtype: string
+  for: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ISupplierProductVariant {
+  id: string
+  supplierProductId: string
+  variantId: string
+  sku: string
+  releaseDate: Date
+  discontinuedDate: Date
+  productPropositionCategory: string
+  categoryLevel1: string
+  categoryLevel2: string
+  categoryLevel3: string
+  colorDescription: string
+  colorGroup: string
+  plcStatus: string
+  plcStatusDescription: string
+  gtin: string
+  colorCode: string
+  pmsColor: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ISupplierProductStock {
+  id: string
+  supplierProductId: string
+  sku: string
+  firstArrivalDate: Date
+  quantity: number
+  firstArrivalQuantity: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ISupplierProductPriceList {
+  id: string
+  supplierProductVariantId: string
+  sku: string
+  variantId: string
+  price: number
+  currency: string
+  validUntil: Date
+  scale: object
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ISupplierProductPrintDataProduct {
+  id: string
+  masterCode: string
+  masterId: string
+  itemColorNumbers: string[]
+  printManipulation: string
+  printTemplate: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ISupplierProductPrintDataProductPrintingPosition {
+  id: string
+  positionId: string
+  printSizeUnit: string
+  maxPrintSizeHeight: number
+  maxPrintSizeWidth: number
+  rotation: number
+  printPositionType: string
+  printingTechniques: object
+  points: object
+  images: object
+  supplierProductPrintDataProductId: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ISupplierProductPrintingTechniqueDescription {
+  id: string
+  printingTechniqueDescriptionId: string
+  name: object
+  createdAt: Date
+  updatedAt: Date
+}
