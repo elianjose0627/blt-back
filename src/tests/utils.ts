@@ -926,20 +926,13 @@ export const updatePendingOrderWithPostedOrderId = async (id: string, postedOrde
 export const pendingOrders = [
   {
     costCenter: '',
-    platform: 0,
-    language: 0,
     currency: 'EUR',
     orderNo: '0',
-    inetorderno: 0,
     shippingId: 21,
     shipped: dayjs.utc().add(1, 'day'),
     deliverydate: dayjs.utc().add(1, 'day'),
     note: '',
     description: ' +',
-    paymentType: 0,
-    paymentTarget: 0,
-    discount: 0.00,
-    orderStatus: 0,
     orderLineRequests: [
       {
         itemName: 'Welcome Box - Techstarter',
@@ -971,26 +964,19 @@ export const pendingOrders = [
         telephone: '',
         mobile: '',
         fax: '',
-        email: 'christoph@biglittlethings.de'
+        email: 'testuser@biglittlethings.de'
       }
     ]
   },
   {
     costCenter: '',
-    platform: 0,
-    language: 0,
     currency: 'EUR',
     orderNo: '0',
-    inetorderno: 0,
     shippingId: 21,
     shipped: dayjs.utc().add(1, 'day'),
     deliverydate: dayjs.utc().add(1, 'day'),
     note: '',
     description: ' +',
-    paymentType: 0,
-    paymentTarget: 0,
-    discount: 0.00,
-    orderStatus: 0,
     orderLineRequests: [
       {
         itemName: 'Welcome Box - Techstarter',
@@ -1028,20 +1014,13 @@ export const pendingOrders = [
   },
   {
     costCenter: '',
-    platform: 0,
-    language: 0,
     currency: 'EUR',
     orderNo: '0',
-    inetorderno: 0,
     shippingId: 21,
     shipped: dayjs.utc().add(1, 'day'),
     deliverydate: dayjs.utc().add(1, 'day'),
     note: '',
     description: ' +',
-    paymentType: 0,
-    paymentTarget: 0,
-    discount: 0.00,
-    orderStatus: 0,
     orderLineRequests: [
       {
         itemName: 'Welcome Box - Techstarter',
@@ -1079,20 +1058,13 @@ export const pendingOrders = [
   },
   {
     costCenter: '',
-    platform: 0,
-    language: 0,
     currency: 'EUR',
     orderNo: '0',
-    inetorderno: 0,
     shippingId: 21,
     shipped: dayjs.utc().add(1, 'day'),
     deliverydate: dayjs.utc().add(1, 'day'),
     note: '',
     description: ' +',
-    paymentType: 0,
-    paymentTarget: 0,
-    discount: 0.00,
-    orderStatus: 0,
     orderLineRequests: [
       {
         itemName: 'Welcome Box - Techstarter',
@@ -1127,6 +1099,149 @@ export const pendingOrders = [
         email: 'paul@biglittlethings.de'
       }
     ]
+  }
+]
+
+export const pendingOrderForUpdate = [
+  {
+    costCenter: '',
+    currency: 'EUR',
+    orderNo: '0',
+    shippingId: 21,
+    shipped: '2025-07-29 10:35:11.0000000',
+    deliverydate: '2025-07-31 10:35:11.0000000',
+    note: '',
+    description: 'Updated Description',
+    orderLineRequests: [
+      {
+        itemName: 'Tasse - Kitty Mug - 1c - navy - Kurita - Muster',
+        articleNumber: '1005',
+        itemNetSale: 0.00,
+        itemVAT: 0.00,
+        quantity: 2,
+        type: 0,
+        discount: 0.00,
+        netPurchasePrice: 0.00
+      }
+    ],
+    shippingAddressRequests: [
+      {
+        salutation: 'Mr',
+        firstName: 'Felix',
+        lastName: 'Ixkes',
+        title: '',
+        company: '',
+        companyAddition: '',
+        street: 'Flügelstraße 6',
+        addressAddition: '',
+        zipCode: '40227',
+        place: 'Düsseldorf',
+        phone: '',
+        state: '',
+        country: 'Germany',
+        iso: '',
+        telephone: '',
+        mobile: '',
+        fax: '',
+        email: 'testuser@biglittlethings.de'
+      }
+    ]
+  }
+]
+
+export const postedPendingOrder = [
+  {
+    costCenter: '',
+    currency: 'EUR',
+    orderNo: '0',
+    shippingId: 21,
+    shipped: '2025-07-29 10:35:11.0000000',
+    deliverydate: '2025-07-31 10:35:11.0000000',
+    note: '',
+    description: 'Updated Description',
+    orderLineRequests: [
+      {
+        itemName: 'Tasse - Kitty Mug - 1c - navy - Kurita - Muster',
+        articleNumber: '1005',
+        itemNetSale: 0.00,
+        itemVAT: 0.00,
+        quantity: 2,
+        type: 0,
+        discount: 0.00,
+        netPurchasePrice: 0.00
+      }
+    ],
+    shippingAddressRequests: [
+      {
+        salutation: 'Mr',
+        firstName: 'Felix',
+        lastName: 'Ixkes',
+        title: '',
+        company: '',
+        companyAddition: '',
+        street: 'Flügelstraße 6',
+        addressAddition: '',
+        zipCode: '40227',
+        place: 'Düsseldorf',
+        phone: '',
+        state: '',
+        country: 'Germany',
+        iso: '',
+        telephone: '',
+        mobile: '',
+        fax: '',
+        email: 'testuser@biglittlethings.de'
+      }
+    ],
+    isPosted: true
+  }
+]
+
+export const queuedPendingOrder = [
+  {
+    costCenter: '',
+    currency: 'EUR',
+    orderNo: '0',
+    shippingId: 21,
+    shipped: '2025-07-29 10:35:11.0000000',
+    deliverydate: '2025-07-31 10:35:11.0000000',
+    note: '',
+    description: 'Updated Description',
+    orderLineRequests: [
+      {
+        itemName: 'Tasse - Kitty Mug - 1c - navy - Kurita - Muster',
+        articleNumber: '1005',
+        itemNetSale: 0.00,
+        itemVAT: 0.00,
+        quantity: 2,
+        type: 0,
+        discount: 0.00,
+        netPurchasePrice: 0.00
+      }
+    ],
+    shippingAddressRequests: [
+      {
+        salutation: 'Mr',
+        firstName: 'Felix',
+        lastName: 'Ixkes',
+        title: '',
+        company: '',
+        companyAddition: '',
+        street: 'Flügelstraße 6',
+        addressAddition: '',
+        zipCode: '40227',
+        place: 'Düsseldorf',
+        phone: '',
+        state: '',
+        country: 'Germany',
+        iso: '',
+        telephone: '',
+        mobile: '',
+        fax: '',
+        email: 'testuser@biglittlethings.de'
+      }
+    ],
+    isQueued: true
   }
 ]
 
@@ -1740,4 +1855,162 @@ export const createOrderConfirmation = async (companyId: string, userId: string)
   })
 
   return orderConfimtion
+}
+
+export const createPostedPendingOrder = async (companyId: string, userId: string, campaignId: string): Promise<any> => {
+  const pendingOrder = await db.PendingOrder.create({
+    id: uuidv4(),
+    platform: 0,
+    language: 0,
+    inetorderno: 0,
+    customerId: '123',
+    companyId,
+    userId,
+    created: dayjs.utc(),
+    campaignId,
+    ...postedPendingOrder[0]
+  })
+
+  return pendingOrder
+}
+
+export const createQueuedPendingOrder = async (companyId: string, userId: string, campaignId: string): Promise<any> => {
+  const pendingOrder = await db.PendingOrder.create({
+    id: uuidv4(),
+    platform: 0,
+    language: 0,
+    inetorderno: 0,
+    customerId: '123',
+    companyId,
+    userId,
+    created: dayjs.utc(),
+    campaignId,
+    ...queuedPendingOrder[0]
+  })
+
+  return pendingOrder
+}
+
+export const pendingOrderWithBillingAddress = {
+  costCenter: '',
+  currency: 'EUR',
+  orderNo: '0',
+  shippingId: 21,
+  shipped: dayjs.utc().add(1, 'day'),
+  deliverydate: dayjs.utc().add(1, 'day'),
+  note: '',
+  description: ' +',
+  orderLineRequests: [
+    {
+      itemName: 'Welcome Box - Techstarter',
+      articleNumber: '1498',
+      itemNetSale: 0.00,
+      itemVAT: 0.00,
+      quantity: 1,
+      type: 0,
+      discount: 0.00,
+      netPurchasePrice: 0.00
+    }
+  ],
+  shippingAddressRequests: [
+    {
+      salutation: 'Mr',
+      firstName: 'Felix',
+      lastName: 'Ixkes',
+      title: '',
+      company: '',
+      companyAddition: '',
+      street: 'Flügelstraße 6',
+      addressAddition: '',
+      zipCode: '40227',
+      place: 'Düsseldorf',
+      phone: '',
+      state: '',
+      country: 'Germany',
+      iso: '',
+      telephone: '',
+      mobile: '',
+      fax: '',
+      email: 'testuser@biglittlethings.de'
+    }
+  ],
+  billingAddressRequests: [
+    {
+      salutation: 'Mr',
+      firstName: 'Felix',
+      lastName: 'Ixkes',
+      title: '',
+      company: '',
+      companyAddition: '',
+      street: 'Flügelstraße 6',
+      addressAddition: '',
+      zipCode: '40227',
+      place: 'Düsseldorf',
+      phone: '',
+      state: '',
+      country: 'Germany',
+      iso: '',
+      telephone: '',
+      mobile: '',
+      fax: '',
+      email: 'testuser@biglittlethings.de'
+    }
+  ]
+}
+
+export const pendingOrderWithMissingDataPoints = {
+  costCenter: '',
+  currency: 'EUR',
+  orderNo: '0',
+  shippingId: 21,
+  shipped: dayjs.utc().add(1, 'day'),
+  deliverydate: dayjs.utc().add(1, 'day'),
+  note: '',
+  description: ' +',
+  orderLineRequests: [
+    {
+      itemName: 'Welcome Box - Techstarter',
+      articleNumber: '1498',
+      itemNetSale: 0.00,
+      itemVAT: 0.00,
+      quantity: 1,
+      type: 0,
+      discount: 0.00,
+      netPurchasePrice: 0.00
+    }
+  ],
+  shippingAddressRequests: [
+    {
+      salutation: 'Mr',
+      firstName: 'Felix',
+      lastName: 'Ixkes',
+      title: '',
+      company: '',
+      companyAddition: '',
+      addressAddition: '',
+      phone: '',
+      state: '',
+      iso: '',
+      telephone: '',
+      mobile: '',
+      fax: ''
+    }
+  ],
+  billingAddressRequests: [
+    {
+      salutation: 'Mr',
+      firstName: 'Felix',
+      lastName: 'Ixkes',
+      title: '',
+      company: '',
+      companyAddition: '',
+      addressAddition: '',
+      phone: '',
+      state: '',
+      iso: '',
+      telephone: '',
+      mobile: '',
+      fax: ''
+    }
+  ]
 }

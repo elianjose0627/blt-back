@@ -1,15 +1,36 @@
 import { v1 as uuidv1 } from 'uuid'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import { Op, Sequelize } from 'sequelize'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 import triggerPubSub from '../utils/triggerPubSub'
 import * as userRoles from '../utils/userRoles'
 import * as statusCodes from '../constants/statusCodes'
-import { IDuplicatePostedOrder, IPendingOrder, IUserExtended } from '../types'
+import { BillingAddressRequest, IDuplicatePostedOrder, IPendingOrder, IUserExtended, ShippingAddressRequest } from '../types'
 import { Platform } from '../enums/platform'
+import * as appModules from '../utils/appModules'
+import Joi from 'joi'
 
 dayjs.extend(utc)
+
+const where = {
+  [Op.or]: [
+    {
+      [Op.or]: [
+        { isPosted: false },
+        { isQueued: false }
+      ]
+    },
+    {
+      [Op.and]: [
+        { isPosted: true },
+        { isQueued: true },
+        { orderStatus: 0 }
+      ]
+    }
+  ]
+}
 
 class PendingOrderService extends BaseService {
   async findPendingOrders (userId: string, campaignId: string): Promise<any> {
@@ -24,16 +45,180 @@ class PendingOrderService extends BaseService {
     return records
   }
 
-  async getAll (limit: number, offset: number, search: string = '', filter = { firstname: '', lastname: '', email: '', city: '', country: '' }): Promise<any> {
-    const records = await db[this.model].findAndCountAll({
+  async get (id: string, user?: any): Promise<any> {
+    const record = await db[this.model].findOne({
+      where: { id },
       include: generateInclude(this.model),
-      limit,
-      offset,
-      order: [['createdAt', 'DESC']],
-      attributes: { exclude: ['deletedAt'] }
+      attributes: { exclude: ['deletedAt', 'companyId', 'campaignId', 'paymentInformationRequests'] }
     })
 
-    return records
+    const companyId = user.companyId
+    const privacyRule = companyId !== null
+      ? await db.PrivacyRule.findOne({
+        where: {
+          companyId,
+          role: user.role,
+          isEnabled: true,
+          module: appModules.ORDERS
+        }
+      })
+      : null
+
+    if (privacyRule !== null && record.userId !== user.id) {
+      record.shippingAddressRequests = record.shippingAddressRequests.map((shippingAddressRequest: ShippingAddressRequest) => {
+        return {
+          ...shippingAddressRequest,
+          place: shippingAddressRequest.place?.replace(/./g, '*'),
+          email: shippingAddressRequest.email?.replace(/.(?=.*@)/g, '*'),
+          street: shippingAddressRequest.street?.replace(/./g, '*'),
+          zipCode: shippingAddressRequest.zipCode?.replace(/./g, '*'),
+          country: shippingAddressRequest.country?.replace(/./g, '*')
+        }
+      })
+
+      record.billingAddressRequests = record.billingAddressRequests !== null
+        ? record.billingAddressRequests.map((billingAddressRequest: BillingAddressRequest) => {
+          return {
+            ...billingAddressRequest,
+            place: billingAddressRequest.place?.replace(/./g, '*'),
+            email: billingAddressRequest.email?.replace(/.(?=.*@)/g, '*'),
+            street: billingAddressRequest.street?.replace(/./g, '*'),
+            zipCode: billingAddressRequest.zipCode?.replace(/./g, '*'),
+            country: billingAddressRequest.country?.replace(/./g, '*')
+          }
+        })
+        : null
+    }
+    return record.toJSONFor()
+  }
+
+  async getAll (limit: number, offset: number, user?: any, search: string = '', filter = { firstname: '', lastname: '', email: '', city: '', country: '' }): Promise<any> {
+    let records
+    const exclude = ['deletedAt', 'companyId', 'campaignId', 'paymentInformationRequests']
+
+    const searchWhere: any = {}
+    if (search !== '') {
+      searchWhere[Op.or] = [
+        Sequelize.literal(
+          `EXISTS (
+            SELECT 1 FROM jsonb_array_elements("shippingAddressRequests") AS shippingAddressRequest
+            WHERE shippingAddressRequest->>'firstName' ILIKE '%${search}%'
+            OR shippingAddressRequest->>'lastName' ILIKE '%${search}%'
+            OR shippingAddressRequest->>'email' ILIKE '%${search}%'
+            OR shippingAddressRequest->>'place' ILIKE '%${search}%'
+            OR shippingAddressRequest->>'street' ILIKE '%${search}%'
+            OR shippingAddressRequest->>'zipCode' ILIKE '%${search}%'
+            OR shippingAddressRequest->>'country' ILIKE '%${search}%'
+            OR shippingAddressRequest->>'company' ILIKE '%${search}%'
+          )`
+        )
+      ]
+    }
+
+    if (user.role === userRoles.ADMIN) {
+      records = await db[this.model].findAndCountAll({
+        include: generateInclude(this.model),
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude },
+        distinct: true,
+        where: {
+          ...where,
+          ...searchWhere
+        }
+      })
+    } else if (user.role === userRoles.COMPANYADMINISTRATOR) {
+      records = await db[this.model].findAndCountAll({
+        include: generateInclude(this.model),
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude },
+        where: {
+          companyId: user.company.id,
+          ...where,
+          ...searchWhere
+        },
+        distinct: true
+      })
+    } else if (user.role === userRoles.CAMPAIGNMANAGER) {
+      records = await db[this.model].findAndCountAll({
+        include: generateInclude(this.model),
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude },
+        where: {
+          companyId: user.company.id,
+          ...where,
+          ...searchWhere
+        },
+        distinct: true
+      })
+    } else {
+      records = await db[this.model].findAndCountAll({
+        include: generateInclude(this.model),
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        attributes: { exclude },
+        where: {
+          userId: user.id,
+          ...where,
+          ...searchWhere
+        },
+        distinct: true
+      })
+    }
+
+    const companyId = user.companyId
+    const privacyRule = companyId !== null
+      ? await db.PrivacyRule.findOne({
+        where: {
+          companyId,
+          role: user.role,
+          isEnabled: true,
+          module: appModules.ORDERS
+        }
+      })
+      : null
+
+    const count = records.count
+
+    records = records.rows.map((record: any) => {
+      if (privacyRule !== null && record.userId !== user.id) {
+        record.shippingAddressRequests = record.shippingAddressRequests.map((shippingAddressRequest: ShippingAddressRequest) => {
+          return {
+            ...shippingAddressRequest,
+            place: shippingAddressRequest.place?.replace(/./g, '*'),
+            email: shippingAddressRequest.email?.replace(/.(?=.*@)/g, '*'),
+            street: shippingAddressRequest.street?.replace(/./g, '*'),
+            zipCode: shippingAddressRequest.zipCode?.replace(/./g, '*'),
+            country: shippingAddressRequest.country?.replace(/./g, '*')
+          }
+        })
+
+        record.billingAddressRequests = record.billingAddressRequests !== null
+          ? record.billingAddressRequests.map((billingAddressRequest: BillingAddressRequest) => {
+            return {
+              ...billingAddressRequest,
+              place: billingAddressRequest.place?.replace(/./g, '*'),
+              email: billingAddressRequest.email?.replace(/.(?=.*@)/g, '*'),
+              street: billingAddressRequest.street?.replace(/./g, '*'),
+              zipCode: billingAddressRequest.zipCode?.replace(/./g, '*'),
+              country: billingAddressRequest.country?.replace(/./g, '*')
+            }
+          })
+          : null
+      }
+      return record.toJSONFor()
+    })
+
+    return {
+      count,
+      rows: records
+    }
   }
 
   async insert (data: any): Promise<any> {
@@ -42,6 +227,13 @@ class PendingOrderService extends BaseService {
     const bulkInsertData = pendingOrders.map((pendingOrder: any) => ({
       ...pendingOrder,
       id: uuidv1(),
+      paymentType: 0,
+      paymentTarget: 0,
+      discount: 0.00,
+      orderStatus: 0,
+      inetorderno: 0,
+      platform: 0,
+      language: 0,
       userId: currentUser.id,
       campaignId: campaign.id,
       customerId: campaign.company.customerId,
@@ -77,6 +269,12 @@ class PendingOrderService extends BaseService {
     const bulkInsertData = pendingOrders.map((pendingOrder: any) => ({
       ...pendingOrder,
       id: uuidv1(),
+      paymentType: 0,
+      paymentTarget: 0,
+      discount: 0.00,
+      orderStatus: 0,
+      inetorderno: 0,
+      language: 0,
       platform: Platform.None,
       userId: currentUser.id,
       campaignId: null,
@@ -109,7 +307,7 @@ class PendingOrderService extends BaseService {
       where: {
         postedOrderId: postedOrderIds
       },
-      attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isPosted', 'isGreetingCardSent'] },
+      attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'isPosted', 'isQueued', 'isGreetingCardSent', 'isInvoiceGenerated', 'isOrderConfirmationGenerated', 'isPackingSlipGenerated', 'jtlId', 'jtlNumber'] },
       raw: true
     })
 
@@ -151,7 +349,8 @@ class PendingOrderService extends BaseService {
         createdBy: currentUser.email,
         updatedBy: currentUser.email,
         createdByFullName: `${String(currentUser.firstName)} ${String(currentUser.lastName)}`,
-        postedOrderId: null
+        postedOrderId: null,
+        orderStatus: 0
       })
     })
 
@@ -174,6 +373,67 @@ class PendingOrderService extends BaseService {
     await triggerPubSub(topicId, 'postPendingOrders', attributes)
 
     return response
+  }
+
+  async update (data: any): Promise<any> {
+    const { pendingOrder, currentUser, record } = data
+
+    const updateData = {
+      ...pendingOrder,
+      updatedBy: currentUser.email
+    }
+
+    const response = await record.update(updateData, { returning: true })
+
+    const pendingOrdersTopicId = 'pending-orders'
+    const environment = String(process.env.ENVIRONMENT)
+    const pendingOrdersAttributes = { environment }
+
+    await triggerPubSub(pendingOrdersTopicId, 'postPendingOrders', pendingOrdersAttributes)
+
+    return { response: response.toJSONFor(), status: 200 }
+  }
+
+  async insertGETECPendingOrder (data: any): Promise<any> {
+    const { currentUser, parsedData } = data
+
+    const uuidSchema = Joi.string().uuid()
+    const { error } = uuidSchema.validate(process.env.GETEC_CAMPAIGN_ID)
+    const getecCampaignId = error !== undefined ? null : process.env.GETEC_CAMPAIGN_ID
+
+    const bulkInsertData = parsedData.map((pendingOrder: any) => ({
+      ...pendingOrder,
+      id: uuidv1(),
+      platform: 0,
+      language: 0,
+      orderStatus: 0,
+      isPosted: false,
+      isQueued: false,
+      paymentType: 0,
+      paymentTarget: 0,
+      discount: 0.00,
+      inetorderno: 0,
+      userId: currentUser.id,
+      campaignId: getecCampaignId,
+      customerId: currentUser.company.customerId,
+      companyId: currentUser.companyId,
+      created: dayjs.utc().format(),
+      createdBy: currentUser.email,
+      updatedBy: currentUser.email,
+      createdByFullName: `${String(currentUser.firstName)} ${String(currentUser.lastName)}`
+    }))
+
+    const response = await db.PendingOrder.bulkCreate(bulkInsertData, { returning: true })
+
+    const pendingOrdersTopicId = 'pending-orders'
+    const environment = String(process.env.ENVIRONMENT)
+    const pendingOrdersAttributes = { environment }
+
+    await triggerPubSub(pendingOrdersTopicId, 'postPendingOrders', pendingOrdersAttributes)
+    return {
+      response: response.map((response: any) => response.toJSONFor()),
+      status: 201
+    }
   }
 }
 

@@ -40,6 +40,7 @@ describe('Profile actions', () => {
 
     tokenAdmin = resAdmin.body.token
     token = res1.body.token
+    userIdAdmin = resAdmin.body.user.id
     tokenCompanyAdministrator = resCompanyAdministrator.body.token
     userId = res1.body.user.id
   })

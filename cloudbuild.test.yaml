@@ -43,6 +43,8 @@ steps:
     - 'WAWI_API_KEY=${_WAWI_API_KEY}'
     - 'WAWI_API_APP_ID=${_WAWI_API_APP_ID}'
     - 'WAWI_API_APP_VERSION=${_WAWI_API_APP_VERSION}'
+    - 'GETEC_CAMPAIGN_ID=${_GETEC_CAMPAIGN_ID}'
+    - 'GETEC_STORAGE_BUCKET=${_GETEC_STORAGE_BUCKET}'
 - name: 'gcr.io/cloud-builders/npm'
   args: ['test']
 - name: 'gcr.io/cloud-builders/npm'
