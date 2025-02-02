@@ -53,7 +53,11 @@ class ProductCustomisationService extends BaseService {
 
   async getAllChat (productCustomisationId: string): Promise<any> {
     const records = await db.ProductCustomisationChat.findAndCountAll({
-      include: generateInclude(this.model),
+      include: {
+        model: db.User,
+        attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role', 'updatedAt', 'createdAt'],
+        as: 'owner'
+      },
       order: [['createdAt', 'DESC']],
       attributes: { exclude: [] },
       where: {

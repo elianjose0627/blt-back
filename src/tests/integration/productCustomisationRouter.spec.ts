@@ -484,4 +484,133 @@ describe('Product Customisation actions', () => {
       expect(res.body.errors.message).to.equal('Only the owner or admin can perform this action')
     })
   })
+
+  describe('Create and Get a product customiation chat', () => {
+    it('Should return 201 CREATED when an user create chat', async () => {
+      const resProductCustomisation = await chai
+        .request(app)
+        .post('/api/product-customisations')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          productCustomisation: {
+            customisationType: 'print',
+            customisationDetail: 'Laser Engraving',
+            price: 100,
+            available: false,
+            photo: [
+              {
+                url: 'https://google.com',
+                filename: 'file.jpg'
+              }
+            ],
+            productId
+          }
+        })
+
+      const productCustomisationId = resProductCustomisation.body.productCustomisation.id
+      const res = await chai
+        .request(app)
+        .post(`/api/product-customisations/${String(productCustomisationId)}/chat`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          productCustomisationChat: {
+            message: 'Add the new logo to the bottom o the aarticle and make it as big as possible',
+            attachment: [
+              {
+                url: 'https://google.com',
+                filename: 'file.jpg'
+              }
+            ]
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'ProductCustomisationChat')
+      expect(res.body.ProductCustomisationChat).to.be.an('object')
+      expect(res.body.productCustomisation).to.include.keys('id', 'message', 'attachment', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 201 CREATED when an user create chat without attachment', async () => {
+      const resProductCustomisation = await chai
+        .request(app)
+        .post('/api/product-customisations')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          productCustomisation: {
+            customisationType: 'print',
+            customisationDetail: 'Laser Engraving',
+            price: 100,
+            available: false,
+            photo: [
+              {
+                url: 'https://google.com',
+                filename: 'file.jpg'
+              }
+            ],
+            productId
+          }
+        })
+
+      const productCustomisationId = resProductCustomisation.body.productCustomisation.id
+      const res = await chai
+        .request(app)
+        .post(`/api/product-customisations/${String(productCustomisationId)}/chat`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          productCustomisationChat: {
+            message: 'Add the new logo to the bottom o the aarticle and make it as big as possible',
+            attachment: []
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'ProductCustomisationChat')
+      expect(res.body.ProductCustomisationChat).to.be.an('object')
+      expect(res.body.productCustomisation).to.include.keys('id', 'message', 'attachment', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 200 OK when an user get all chat', async () => {
+      const resProductCustomisation = await chai
+        .request(app)
+        .post('/api/product-customisations')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          productCustomisation: {
+            customisationType: 'print',
+            customisationDetail: 'Laser Engraving',
+            price: 100,
+            available: false,
+            photo: [
+              {
+                url: 'https://google.com',
+                filename: 'file.jpg'
+              }
+            ],
+            productId
+          }
+        })
+
+      const productCustomisationId = resProductCustomisation.body.productCustomisation.id
+      await chai
+        .request(app)
+        .post(`/api/product-customisations/${String(productCustomisationId)}/chat`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          productCustomisationChat: {
+            message: 'Test Message',
+            attachment: []
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/product-customisations/${String(productCustomisationId)}/chat`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'ProductCustomisationChats')
+      expect(res.body.ProductCustomisationChats).to.be.an('array')
+      expect(res.body.ProductCustomisationChats[0].message).to.include.keys('message')
+    })
+  })
 })

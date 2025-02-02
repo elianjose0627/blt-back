@@ -1416,8 +1416,8 @@ const validateProductCustomisationChat = Joi.object({
       Joi.object({
         filename: Joi.string().required(),
         url: Joi.string().uri().required()
-      }).required()
-    ).optional()
+      })
+    )
   }).required()
 })
 

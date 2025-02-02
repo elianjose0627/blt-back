@@ -117,7 +117,7 @@ class ProductCustomisationController extends BaseController {
     return res.status(statusCode[status]).send({
       statusCode: statusCode[status],
       success: true,
-      ProductCustomisationChats: response
+      ProductCustomisationChat: response
     })
   }
 }
