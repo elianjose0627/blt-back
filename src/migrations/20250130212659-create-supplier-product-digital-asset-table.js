@@ -17,6 +17,15 @@ module.exports = {
         },
         onDelete: 'CASCADE'
       },
+      supplierProductVariantId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: {
+          model: 'SupplierProductVariants',
+          key: 'id'
+        },
+        onDelete: 'CASCADE'
+      },
       url: {
         type: Sequelize.STRING,
         allowNull: false
@@ -39,13 +48,15 @@ module.exports = {
       },
       createdAt: {
         type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW
+        allowNull: false
       },
       updatedAt: {
         type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW
+        allowNull: false
+      },
+      deletedAt: {
+        allowNull: true,
+        type: Sequelize.DATE
       }
     })
   },

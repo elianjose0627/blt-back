@@ -2,19 +2,31 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('SupplierProductPrintingTechniqueDescriptions', {
+    await queryInterface.createTable('SupplierProductPrintDataProducts', {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
         allowNull: false
       },
-      printingTechniqueDescriptionId: {
+      masterCode: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      name: {
+      masterId: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      itemColorNumbers: {
         type: Sequelize.JSONB,
         allowNull: false
+      },
+      printManipulation: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      printTemplate: {
+        type: Sequelize.STRING,
+        allowNull: true
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -32,6 +44,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('SupplierProductPrintingTechniqueDescriptions')
+    await queryInterface.dropTable('SupplierProductPrintDataProducts')
   }
 }

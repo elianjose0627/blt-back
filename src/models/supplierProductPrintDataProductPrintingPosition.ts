@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { ISupplierProductPrintDataProductPrintingPosition } from '../types'
+import type { ISupplierProductPrintDataImage, ISupplierProductPrintDataPoint, ISupplierProductPrintDataPrintingTechnique, ISupplierProductPrintDataProductPrintingPosition } from '../types'
 
 const SupplierProductPrintDataProductPrintingPositionModel = (sequelize: any, DataTypes: any): any => {
   interface SupplierProductPrintDataProductPrintingPositionAttributes {
@@ -24,9 +24,9 @@ const SupplierProductPrintDataProductPrintingPositionModel = (sequelize: any, Da
     private readonly maxPrintSizeWidth: number
     private readonly rotation: number
     private readonly printPositionType: string
-    private readonly printingTechniques: object
-    private readonly points: object
-    private readonly images: object
+    private readonly printingTechniques: ISupplierProductPrintDataPrintingTechnique[]
+    private readonly points: ISupplierProductPrintDataPoint[]
+    private readonly images: ISupplierProductPrintDataImage[]
     private readonly supplierProductPrintDataProductId: string
     private readonly createdAt: Date
     private readonly updatedAt: Date

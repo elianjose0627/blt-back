@@ -1,27 +1,27 @@
 import { Model } from 'sequelize'
-import type { ISupplierProductPriceList } from '../types'
+import type { ISupplierProductPriceList, ISupplierProductPriceListScale } from '../types'
 
 const SupplierProductPriceListModel = (sequelize: any, DataTypes: any): any => {
   interface SupplierProductPriceListAttributes {
     id: string
-    supplierProductVariantId: string
+    // supplierProductVariantId: string
     sku: string
     variantId: string
     price: number
     currency: string
     validUntil: Date
-    scale: object
+    scale: ISupplierProductPriceListScale[]
   }
 
   class SupplierProductPriceList extends Model<SupplierProductPriceListAttributes> {
     private readonly id: string
-    private readonly supplierProductVariantId: string
+    // private readonly supplierProductVariantId: string
     private readonly sku: string
     private readonly variantId: string
     private readonly price: number
     private readonly currency: string
     private readonly validUntil: Date
-    private readonly scale: object
+    private readonly scale: ISupplierProductPriceListScale[]
     private readonly createdAt: Date
     private readonly updatedAt: Date
 
@@ -36,7 +36,7 @@ const SupplierProductPriceListModel = (sequelize: any, DataTypes: any): any => {
     toJSONFor (): ISupplierProductPriceList {
       return {
         id: this.id,
-        supplierProductVariantId: this.supplierProductVariantId,
+        // supplierProductVariantId: this.supplierProductVariantId,
         sku: this.sku,
         variantId: this.variantId,
         price: this.price,
@@ -55,11 +55,11 @@ const SupplierProductPriceListModel = (sequelize: any, DataTypes: any): any => {
       primaryKey: true,
       allowNull: false
     },
-    supplierProductVariantId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: { model: 'SupplierProductVariants', key: 'id' }
-    },
+    // supplierProductVariantId: {
+    //   type: DataTypes.UUID,
+    //   allowNull: false,
+    //   references: { model: 'SupplierProductVariants', key: 'id' }
+    // },
     sku: {
       type: DataTypes.STRING,
       allowNull: true

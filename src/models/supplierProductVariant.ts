@@ -49,12 +49,6 @@ const SupplierProductVariantModel = (sequelize: any, DataTypes: any): any => {
         as: 'supplierProduct',
         onDelete: 'CASCADE'
       })
-
-      SupplierProductVariant.hasOne(models.SupplierProductPriceList, {
-        foreignKey: 'supplierProductVariantId',
-        as: 'priceLists',
-        onDelete: 'CASCADE'
-      })
     }
 
     toJSONFor (): ISupplierProductVariant {

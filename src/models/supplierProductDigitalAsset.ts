@@ -62,7 +62,7 @@ const SupplierProductDigitalAssetModel = (sequelize: any, DataTypes: any): any =
     },
     supplierProductVariantId: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
       references: { model: 'SupplierProductVariants', key: 'id' }
     },
     url: {

@@ -104,11 +104,11 @@ const SupplierProductModel = (sequelize: any, DataTypes: any): any => {
         onDelete: 'CASCADE'
       })
 
-      SupplierProduct.hasOne(models.SupplierProductStock, {
-        foreignKey: 'supplierProductId',
-        as: 'stock',
-        onDelete: 'CASCADE'
-      })
+      // SupplierProduct.hasOne(models.SupplierProductStock, {
+      //   foreignKey: 'supplierProductId',
+      //   as: 'stock',
+      //   onDelete: 'CASCADE'
+      // })
     }
 
     toJSONFor (): ISupplierProduct {

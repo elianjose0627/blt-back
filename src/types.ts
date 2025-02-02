@@ -1362,24 +1362,31 @@ export interface ISupplierProductVariant {
 
 export interface ISupplierProductStock {
   id: string
-  supplierProductId: string
+  // supplierProductId: string
   sku: string
   firstArrivalDate: Date
   quantity: number
   firstArrivalQuantity: number
+  nextArrivalDate: Date
+  nextArrivalQuantity: number
   createdAt: Date
   updatedAt: Date
 }
 
+export interface ISupplierProductPriceListScale {
+  minimumQuantity: number
+  price: number
+}
+
 export interface ISupplierProductPriceList {
   id: string
-  supplierProductVariantId: string
+  // supplierProductVariantId: string
   sku: string
   variantId: string
   price: number
   currency: string
   validUntil: Date
-  scale: object
+  scale: ISupplierProductPriceListScale[]
   createdAt: Date
   updatedAt: Date
 }
@@ -1395,6 +1402,22 @@ export interface ISupplierProductPrintDataProduct {
   updatedAt: Date
 }
 
+export interface ISupplierProductPrintDataPrintingTechnique {
+  default: boolean
+  id: string
+  maxColours: string
+}
+
+export interface ISupplierProductPrintDataPoint {
+  distanceFromLeft: number
+  distanceFromTop: number
+  sequenceNo: number
+}
+export interface ISupplierProductPrintDataImage {
+  printPositionImageBlank: string
+  printPositionImageWithArea: string
+  variantColor: string
+}
 export interface ISupplierProductPrintDataProductPrintingPosition {
   id: string
   positionId: string
@@ -1403,14 +1426,13 @@ export interface ISupplierProductPrintDataProductPrintingPosition {
   maxPrintSizeWidth: number
   rotation: number
   printPositionType: string
-  printingTechniques: object
-  points: object
-  images: object
+  printingTechniques: ISupplierProductPrintDataPrintingTechnique[]
+  points: ISupplierProductPrintDataPoint[]
+  images: ISupplierProductPrintDataImage[]
   supplierProductPrintDataProductId: string
   createdAt: Date
   updatedAt: Date
 }
-
 export interface ISupplierProductPrintingTechniqueDescription {
   id: string
   printingTechniqueDescriptionId: string

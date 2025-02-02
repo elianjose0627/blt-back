@@ -54,7 +54,7 @@ const SupplierProductPrintDataProductModel = (sequelize: any, DataTypes: any): a
       allowNull: false
     },
     masterId: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING,
       allowNull: true
     },
     itemColorNumbers: {

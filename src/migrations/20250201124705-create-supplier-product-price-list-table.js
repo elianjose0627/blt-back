@@ -2,43 +2,44 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('SupplierProductStocks', {
+    await queryInterface.createTable('SupplierProductPriceLists', {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
         allowNull: false
       },
-      // supplierProductId: {
+      // supplierProductVariantId: {
       //   type: Sequelize.UUID,
       //   allowNull: false,
       //   references: {
-      //     model: 'SupplierProducts',
+      //     model: 'SupplierProductVariants',
       //     key: 'id'
       //   },
       //   onDelete: 'CASCADE'
       // },
       sku: {
         type: Sequelize.STRING,
+        allowNull: true
+      },
+      variantId: {
+        type: Sequelize.STRING,
         allowNull: false
       },
-      firstArrivalDate: {
-        type: Sequelize.DATE,
-        allowNull: true
-      },
-      quantity: {
-        type: Sequelize.INTEGER,
+      price: {
+        type: Sequelize.FLOAT,
         allowNull: false
       },
-      firstArrivalQuantity: {
-        type: Sequelize.INTEGER,
-        allowNull: true
+      currency: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: 'EUR'
       },
-      nextArrivalDate: {
+      validUntil: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: false
       },
-      nextArrivalQuantity: {
-        type: Sequelize.INTEGER,
+      scale: {
+        type: Sequelize.JSONB,
         allowNull: true
       },
       createdAt: {
@@ -50,13 +51,13 @@ module.exports = {
         allowNull: false
       },
       deletedAt: {
-        allowNull: true,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: true
       }
     })
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('SupplierProductStocks')
+    await queryInterface.dropTable('SupplierProductPriceLists')
   }
 }
