@@ -74,8 +74,10 @@ describe('Product Customisation actions', () => {
             customisationType: 'print',
             customisationDetail: 'Two-color Print',
             price: 100,
-            available: false,
-            photo: [
+            isApproved: false,
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
               {
                 url: 'https://google.com',
                 filename: 'file.jpg'
@@ -88,7 +90,7 @@ describe('Product Customisation actions', () => {
       expect(res).to.have.status(201)
       expect(res.body).to.include.keys('statusCode', 'success', 'productCustomisation')
       expect(res.body.productCustomisation).to.be.an('object')
-      expect(res.body.productCustomisation).to.include.keys('id', 'customisationType', 'customisationDetail', 'price', 'available', 'photo', 'createdAt', 'updatedAt')
+      expect(res.body.productCustomisation).to.include.keys('id', 'customisationType', 'customisationDetail', 'price', 'available', 'designStatus', 'color', 'photos', 'createdAt', 'updatedAt')
     })
 
     it('Should return 200 OK when a user creates the same product customisation.', async () => {
@@ -101,8 +103,10 @@ describe('Product Customisation actions', () => {
             customisationType: 'print',
             customisationDetail: 'Two-color Print',
             price: 100,
-            available: false,
-            photo: [
+            isApproved: false,
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
               {
                 url: 'https://google.com',
                 filename: 'file.jpg'
@@ -121,8 +125,10 @@ describe('Product Customisation actions', () => {
             customisationType: 'print',
             customisationDetail: 'Two-color Print',
             price: 100,
-            available: false,
-            photo: [
+            isApproved: false,
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
               {
                 url: 'https://google.com',
                 filename: 'file.jpg'
@@ -135,7 +141,7 @@ describe('Product Customisation actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'productCustomisation')
       expect(res.body.productCustomisation).to.be.an('object')
-      expect(res.body.productCustomisation).to.include.keys('id', 'customisationType', 'customisationDetail', 'price', 'available', 'photo', 'createdAt', 'updatedAt')
+      expect(res.body.productCustomisation).to.include.keys('id', 'customisationType', 'customisationDetail', 'price', 'available', 'designStatus', 'color', 'photos', 'createdAt', 'updatedAt')
     })
 
     it('Should return 404 NOT FOUNT when a user creates the a product customisation with fake product ID.', async () => {
@@ -148,8 +154,10 @@ describe('Product Customisation actions', () => {
             customisationType: 'print',
             customisationDetail: 'Two-color Print',
             price: 100,
-            available: false,
-            photo: [
+            isApproved: false,
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
               {
                 url: 'https://google.com',
                 filename: 'file.jpg'
@@ -176,8 +184,10 @@ describe('Product Customisation actions', () => {
             customisationType: 'print',
             customisationDetail: 'Two-color Print',
             price: 100,
-            available: false,
-            photo: [
+            isApproved: false,
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
               {
                 url: 'https://google.com',
                 filename: 'file.jpg'
@@ -294,8 +304,10 @@ describe('Product Customisation actions', () => {
             customisationType: 'print',
             customisationDetail: 'Two-color Print',
             price: 100,
-            available: false,
-            photo: [
+            isApproved: false,
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
               {
                 url: 'https://google.com',
                 filename: 'file.jpg'
@@ -321,10 +333,12 @@ describe('Product Customisation actions', () => {
         .send({
           productCustomisation: {
             customisationType: 'print',
-            customisationDetail: 'Laser Engraving1',
+            customisationDetail: 'Two-color Print',
             price: 100,
-            available: false,
-            photo: [
+            isApproved: false,
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
               {
                 url: 'https://google.com',
                 filename: 'file.jpg'
@@ -350,11 +364,13 @@ describe('Product Customisation actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productCustomisation: {
-            customisationType: 'engraving',
-            customisationDetail: 'Laser Engraving',
-            price: 1000,
-            available: false,
-            photo: [
+            customisationType: 'print',
+            customisationDetail: 'Two-color Print',
+            price: 100,
+            isApproved: false,
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
               {
                 url: 'https://google.com',
                 filename: 'file.jpg'
@@ -394,11 +410,13 @@ describe('Product Customisation actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           productCustomisation: {
-            customisationType: 'print',
-            customisationDetail: 'Laser Engraving',
+            customisationType: 'engraving',
+            customisationDetail: 'Laizer engraving',
             price: 100,
-            available: false,
-            photo: [
+            isApproved: false,
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
               {
                 url: 'https://google.com',
                 filename: 'file.jpg'
@@ -418,9 +436,11 @@ describe('Product Customisation actions', () => {
           productCustomisation: {
             customisationType: 'print',
             customisationDetail: 'Two-color Print',
-            price: 1000,
-            available: false,
-            photo: [
+            price: 100,
+            isApproved: false,
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
               {
                 url: 'https://google.com',
                 filename: 'file.jpg'
@@ -432,7 +452,7 @@ describe('Product Customisation actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'productCustomisation')
       expect(res.body.productCustomisation).to.be.an('object')
-      expect(res.body.productCustomisation).to.include.keys('id', 'customisationType', 'customisationDetail', 'price', 'available', 'photo', 'createdAt', 'updatedAt')
+      expect(res.body.productCustomisation).to.include.keys('id', 'customisationType', 'customisationDetail', 'price', 'available', 'designStatus', 'color', 'photos', 'createdAt', 'updatedAt')
       expect(res.body.productCustomisation.customisationType).to.equal('print')
       expect(res.body.productCustomisation.customisationDetail).to.equal('Two-color Print')
     })
@@ -448,7 +468,9 @@ describe('Product Customisation actions', () => {
             customisationDetail: 'Laser Engraving',
             price: 1000,
             available: false,
-            photo: [
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
               {
                 url: 'https://google.com',
                 filename: 'file.jpg'
@@ -470,7 +492,9 @@ describe('Product Customisation actions', () => {
             customisationDetail: 'Laser Engraving',
             price: 1000,
             available: false,
-            photo: [
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
               {
                 url: 'https://google.com',
                 filename: 'file.jpg'
@@ -497,7 +521,9 @@ describe('Product Customisation actions', () => {
             customisationDetail: 'Laser Engraving',
             price: 100,
             available: false,
-            photo: [
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
               {
                 url: 'https://google.com',
                 filename: 'file.jpg'
@@ -541,7 +567,9 @@ describe('Product Customisation actions', () => {
             customisationDetail: 'Laser Engraving',
             price: 100,
             available: false,
-            photo: [
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
               {
                 url: 'https://google.com',
                 filename: 'file.jpg'
@@ -580,7 +608,9 @@ describe('Product Customisation actions', () => {
             customisationDetail: 'Laser Engraving',
             price: 100,
             available: false,
-            photo: [
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
               {
                 url: 'https://google.com',
                 filename: 'file.jpg'
