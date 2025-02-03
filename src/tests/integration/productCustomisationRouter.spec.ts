@@ -55,7 +55,6 @@ describe('Product Customisation actions', () => {
           description: 'abc test'
         }
       })
-
     productId = String(newProduct.body.product.id)
   })
 
@@ -436,7 +435,7 @@ describe('Product Customisation actions', () => {
           productCustomisation: {
             customisationType: 'print',
             customisationDetail: 'Two-color Print',
-            price: 100,
+            price: 200,
             isApproved: false,
             designStatus: 'Laser Engraving',
             color: 'red',
@@ -454,7 +453,7 @@ describe('Product Customisation actions', () => {
       expect(res.body.productCustomisation).to.be.an('object')
       expect(res.body.productCustomisation).to.include.keys('id', 'customisationType', 'customisationDetail', 'price', 'available', 'designStatus', 'color', 'photos', 'createdAt', 'updatedAt')
       expect(res.body.productCustomisation.customisationType).to.equal('print')
-      expect(res.body.productCustomisation.customisationDetail).to.equal('Two-color Print')
+      expect(res.body.productCustomisation.price).to.equal(200)
     })
 
     it('Should return 403 Forbidden when an non-administrator tries to update a product customisation by id.', async () => {
@@ -553,7 +552,7 @@ describe('Product Customisation actions', () => {
       expect(res).to.have.status(201)
       expect(res.body).to.include.keys('statusCode', 'success', 'ProductCustomisationChat')
       expect(res.body.ProductCustomisationChat).to.be.an('object')
-      expect(res.body.productCustomisation).to.include.keys('id', 'message', 'attachment', 'createdAt', 'updatedAt')
+      expect(res.body.ProductCustomisationChat).to.include.keys('id', 'message', 'attachment', 'createdAt', 'updatedAt')
     })
 
     it('Should return 201 CREATED when an user create chat without attachment', async () => {
@@ -594,7 +593,7 @@ describe('Product Customisation actions', () => {
       expect(res).to.have.status(201)
       expect(res.body).to.include.keys('statusCode', 'success', 'ProductCustomisationChat')
       expect(res.body.ProductCustomisationChat).to.be.an('object')
-      expect(res.body.productCustomisation).to.include.keys('id', 'message', 'attachment', 'createdAt', 'updatedAt')
+      expect(res.body.ProductCustomisationChat).to.include.keys('id', 'message', 'attachment', 'createdAt', 'updatedAt')
     })
 
     it('Should return 200 OK when an user get all chat', async () => {
@@ -640,7 +639,7 @@ describe('Product Customisation actions', () => {
       expect(res).to.have.status(200)
       expect(res.body).to.include.keys('statusCode', 'success', 'ProductCustomisationChats')
       expect(res.body.ProductCustomisationChats).to.be.an('array')
-      expect(res.body.ProductCustomisationChats[0].message).to.include.keys('message')
+      expect(res.body.ProductCustomisationChats[0].message).to.equal('Test Message')
     })
   })
 })

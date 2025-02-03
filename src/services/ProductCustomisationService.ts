@@ -1,5 +1,5 @@
 import { v1 as uuidv1 } from 'uuid'
-import BaseService, { generateFilterQuery, generateInclude } from './BaseService'
+import BaseService, { generateFilterQuery } from './BaseService'
 import db from '../models'
 
 class ProductCustomisationService extends BaseService {
@@ -9,7 +9,7 @@ class ProductCustomisationService extends BaseService {
 
     const productId = productCustomisation.productId
     const userId = user.id
-    const companyId = user.company.id
+    const companyId = user?.company?.id
 
     response = await db[this.model].findOne({
       where: {
@@ -33,7 +33,32 @@ class ProductCustomisationService extends BaseService {
     const where = generateFilterQuery(filter)
 
     const records = await db[this.model].findAndCountAll({
-      include: generateInclude(this.model),
+      include: [
+        {
+          model: db.User,
+          attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role', 'updatedAt', 'createdAt'],
+          as: 'owner',
+          include: [
+            {
+              model: db.Address,
+              attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type'],
+              as: 'addresses'
+            }
+          ]
+        },
+        {
+          model: db.ProductCustomisationChat,
+          attributes: ['id', 'message', 'attachment'],
+          include: [
+            {
+              model: db.User,
+              attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role', 'updatedAt', 'createdAt'],
+              as: 'owner'
+            }
+          ],
+          as: 'chats'
+        }
+      ],
       limit,
       offset,
       order: [['createdAt', 'DESC']],

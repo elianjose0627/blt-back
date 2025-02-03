@@ -384,18 +384,6 @@ export const generateInclude = (model: string): any => {
             as: 'addresses'
           }
         ]
-      },
-      {
-        model: db.ProductCustomisationChat,
-        attributes: ['id', 'message', 'attachment'],
-        include: [
-          {
-            model: db.User,
-            attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role', 'updatedAt', 'createdAt'],
-            as: 'owner'
-          }
-        ],
-        as: 'chats'
       }
     ]
   }
