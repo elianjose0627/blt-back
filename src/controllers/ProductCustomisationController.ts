@@ -63,9 +63,9 @@ class ProductCustomisationController extends BaseController {
   }
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { user: currentUser, query: { limit, page, offset, search, filter } } = req
+    const { user: currentUser, query: { limit, page, offset, filter } } = req
 
-    const records = await productCustomisationService.getAll(limit, offset, search, filter, currentUser)
+    const records = await productCustomisationService.getAll(limit, offset, filter, currentUser)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),

@@ -9,7 +9,6 @@ class ProductCustomisationService extends BaseService {
 
     const productId = productCustomisation.productId
     const userId = user.id
-    const companyId = user?.company?.id
 
     response = await db[this.model].findOne({
       where: {
@@ -24,12 +23,12 @@ class ProductCustomisationService extends BaseService {
       return { response: updatedResponse.toJSONFor(), status: 200 }
     }
 
-    response = await db[this.model].create({ ...productCustomisation, id: uuidv1(), userId, companyId })
+    response = await db[this.model].create({ ...productCustomisation, id: uuidv1(), userId, companyId: user?.company?.id })
 
     return { response: response.toJSONFor(), status: 201 }
   }
 
-  async getAll (limit: number, offset: number, search?: string, filter = { productId: '' }, user?: any): Promise<any> {
+  async getAll (limit: number, offset: number, filter = { productId: '' }, user?: any): Promise<any> {
     const where = generateFilterQuery(filter)
 
     const records = await db[this.model].findAndCountAll({
