@@ -1067,7 +1067,7 @@ export interface IPendingOrder {
   inetorderno: number
   shippingId: number
   shipped: Date
-  deliverydate: Date
+  deliveryDate: Date
   note: string
   description: string
   costCenter: string

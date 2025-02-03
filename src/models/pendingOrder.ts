@@ -114,7 +114,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
         inetorderno: this.inetorderno,
         shippingId: this.shippingId,
         shipped: this.shipped,
-        deliverydate: this.deliverydate,
+        deliveryDate: this.deliverydate,
         note: this.note,
         description: this.description,
         costCenter: this.costCenter,
