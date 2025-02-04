@@ -210,8 +210,8 @@ class PendingOrderController extends BaseController {
   }
 
   async update (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { body: { pendingOrders }, user: currentUser, record } = req
-    const { response, status } = await pendingOrderService.update({ pendingOrder: pendingOrders[0], currentUser, record })
+    const { body: { pendingOrder }, user: currentUser, record } = req
+    const { response, status } = await pendingOrderService.update({ pendingOrder, currentUser, record })
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} updated` })
 
     const { id: userId, companyId, role } = currentUser
