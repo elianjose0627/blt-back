@@ -2,6 +2,7 @@ import { v1 as uuidv1 } from 'uuid'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { Op, Sequelize } from 'sequelize'
+import Joi from 'joi'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 import triggerPubSub from '../utils/triggerPubSub'
@@ -10,9 +11,18 @@ import * as statusCodes from '../constants/statusCodes'
 import { BillingAddressRequest, IDuplicatePostedOrder, IPendingOrder, IUserExtended, ShippingAddressRequest } from '../types'
 import { Platform } from '../enums/platform'
 import * as appModules from '../utils/appModules'
-import Joi from 'joi'
+import FlakeIdGenerator from '../utils/flakeIdGenerator'
 
+const epoch = new Date('2022-08-01T00:00:00Z').getTime()
 dayjs.extend(utc)
+
+const enum OrderType {
+  Campaign = 0,
+  Catalogue = 1,
+  Duplicate = 2,
+  GETEC = 3,
+  BVG = 4
+}
 
 const where = {
   [Op.or]: [
@@ -223,10 +233,12 @@ class PendingOrderService extends BaseService {
 
   async insert (data: any): Promise<any> {
     const { pendingOrders, currentUser, campaign } = data
+    const flakeIdGenerator = new FlakeIdGenerator(OrderType.Campaign, epoch)
 
     const bulkInsertData = pendingOrders.map((pendingOrder: any) => ({
       ...pendingOrder,
       id: uuidv1(),
+      postedOrderId: flakeIdGenerator.generate(),
       paymentType: 0,
       paymentTarget: 0,
       discount: 0.00,
@@ -265,10 +277,11 @@ class PendingOrderService extends BaseService {
   async insertCataloguePendingOrders (data: any): Promise<any> {
     const { pendingOrders, currentUser } = data
     const { company } = currentUser
-
+    const flakeIdGenerator = new FlakeIdGenerator(OrderType.Catalogue, epoch)
     const bulkInsertData = pendingOrders.map((pendingOrder: any) => ({
       ...pendingOrder,
       id: uuidv1(),
+      postedOrderId: flakeIdGenerator.generate(),
       paymentType: 0,
       paymentTarget: 0,
       discount: 0.00,
@@ -339,9 +352,12 @@ class PendingOrderService extends BaseService {
         .map((postedOrder) => postedOrder.shipped)
 
       const shipped = dayjs(foundPostedOrderShipped).utc().add(1, 'hour').format()
+      const flakeIdGenerator = new FlakeIdGenerator(OrderType.Duplicate, epoch)
+
       return ({
         ...pendingOrder,
         id: uuidv1(),
+        postedOrderId: flakeIdGenerator.generate(),
         shipped,
         deliverydate: shipped,
         userId: currentUser.id,
@@ -349,7 +365,6 @@ class PendingOrderService extends BaseService {
         createdBy: currentUser.email,
         updatedBy: currentUser.email,
         createdByFullName: `${String(currentUser.firstName)} ${String(currentUser.lastName)}`,
-        postedOrderId: null,
         orderStatus: 0
       })
     })
@@ -401,10 +416,12 @@ class PendingOrderService extends BaseService {
     const { error } = uuidSchema.validate(process.env.GETEC_CAMPAIGN_ID)
     const getecCampaignId = error !== undefined ? null : process.env.GETEC_CAMPAIGN_ID
     const getecCustomerId = String(process.env.GETEC_CUSTOMER_ID)
+    const flakeIdGenerator = new FlakeIdGenerator(OrderType.GETEC, epoch)
 
     const bulkInsertData = parsedData.map((pendingOrder: any) => ({
       ...pendingOrder,
       id: uuidv1(),
+      postedOrderId: flakeIdGenerator.generate(),
       platform: 0,
       language: 0,
       orderStatus: 0,
