@@ -121,7 +121,12 @@ class PendingOrderService extends BaseService {
             OR shippingAddressRequest->>'country' ILIKE '%${search}%'
             OR shippingAddressRequest->>'company' ILIKE '%${search}%'
           )`
-        )
+        ),
+        {
+          postedOrderId: {
+            [Op.iLike]: `%${search}%`
+          }
+        }
       ]
     }
 

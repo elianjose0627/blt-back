@@ -155,7 +155,7 @@ describe('Pending Orders actions', () => {
       expect(res.body.pendingOrders).to.be.an('array')
     })
 
-    it('Should return 200 Success when an admin successfully retrieves all pending orders with search params.', async () => {
+    it('Should return 200 Success when an admin successfully retrieves all pending orders with search params for shipping address requests.', async () => {
       await chai
         .request(app)
         .post('/api/pending-orders')
@@ -213,6 +213,28 @@ describe('Pending Orders actions', () => {
         .request(app)
         .get('/api/pending-orders')
         .query({ search: 'Italy' })
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'pendingOrders')
+      expect(res.body.pendingOrders).to.be.an('array').lengthOf(1)
+    })
+
+    it('Should return 200 Success when an admin successfully retrieves all pending orders with search params for posted order id.', async () => {
+      const resPendingOrder = await chai
+        .request(app)
+        .post('/api/pending-orders')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          pendingOrders: pendingOrders.slice(0, 1)
+        })
+
+      const postedOrderId = resPendingOrder.body.pendingOrders[0].postedOrderId
+
+      const res = await chai
+        .request(app)
+        .get('/api/pending-orders')
+        .query({ search: postedOrderId })
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(200)
@@ -1262,7 +1284,7 @@ describe('Pending Orders actions', () => {
         .put(`/api/pending-orders/${pendingOrderId}`)
         .set('Authorization', `Bearer ${String(token)}`)
         .send({
-          pendingOrders: pendingOrderForUpdate
+          pendingOrder: pendingOrderForUpdate[0]
         })
 
       expect(res).to.have.status(200)
@@ -1287,7 +1309,7 @@ describe('Pending Orders actions', () => {
         .put(`/api/pending-orders/${pendingOrderId}`)
         .set('Authorization', `Bearer ${String(tokenAdmin)}`)
         .send({
-          pendingOrders: pendingOrderForUpdate
+          pendingOrder: pendingOrderForUpdate[0]
         })
 
       expect(res).to.have.status(200)
@@ -1312,7 +1334,7 @@ describe('Pending Orders actions', () => {
         .put(`/api/pending-orders/${pendingOrderId}`)
         .set('Authorization', `Bearer ${String(tokenCompanyAdministrator)}`)
         .send({
-          pendingOrders: pendingOrderForUpdate
+          pendingOrder: pendingOrderForUpdate[0]
         })
 
       expect(res).to.have.status(200)
@@ -1337,7 +1359,7 @@ describe('Pending Orders actions', () => {
         .put(`/api/pending-orders/${pendingOrderId}`)
         .set('Authorization', `Bearer ${String(tokenCampaignManager)}`)
         .send({
-          pendingOrders: pendingOrderForUpdate
+          pendingOrder: pendingOrderForUpdate[0]
         })
 
       expect(res).to.have.status(200)
@@ -1362,7 +1384,7 @@ describe('Pending Orders actions', () => {
         .put(`/api/pending-orders/${pendingOrderId}`)
         .set('Authorization', `Bearer ${String(token)}`)
         .send({
-          pendingOrders: pendingOrderForUpdate
+          pendingOrder: pendingOrderForUpdate[0]
         })
 
       expect(res).to.have.status(403)
@@ -1440,7 +1462,7 @@ describe('Pending Orders actions', () => {
         .put(`/api/pending-orders/${pendingOrderId}`)
         .set('Authorization', `Bearer ${String(campaignManagerToken)}`)
         .send({
-          pendingOrders: pendingOrderForUpdate
+          pendingOrder: pendingOrderForUpdate[0]
         })
 
       expect(res).to.have.status(403)
