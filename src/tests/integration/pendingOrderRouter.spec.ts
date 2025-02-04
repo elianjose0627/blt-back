@@ -1284,7 +1284,7 @@ describe('Pending Orders actions', () => {
         .put(`/api/pending-orders/${pendingOrderId}`)
         .set('Authorization', `Bearer ${String(token)}`)
         .send({
-          pendingOrders: pendingOrderForUpdate
+          pendingOrder: pendingOrderForUpdate[0]
         })
 
       expect(res).to.have.status(200)
@@ -1309,7 +1309,7 @@ describe('Pending Orders actions', () => {
         .put(`/api/pending-orders/${pendingOrderId}`)
         .set('Authorization', `Bearer ${String(tokenAdmin)}`)
         .send({
-          pendingOrders: pendingOrderForUpdate
+          pendingOrder: pendingOrderForUpdate[0]
         })
 
       expect(res).to.have.status(200)
@@ -1334,7 +1334,7 @@ describe('Pending Orders actions', () => {
         .put(`/api/pending-orders/${pendingOrderId}`)
         .set('Authorization', `Bearer ${String(tokenCompanyAdministrator)}`)
         .send({
-          pendingOrders: pendingOrderForUpdate
+          pendingOrder: pendingOrderForUpdate[0]
         })
 
       expect(res).to.have.status(200)
@@ -1359,7 +1359,7 @@ describe('Pending Orders actions', () => {
         .put(`/api/pending-orders/${pendingOrderId}`)
         .set('Authorization', `Bearer ${String(tokenCampaignManager)}`)
         .send({
-          pendingOrders: pendingOrderForUpdate
+          pendingOrder: pendingOrderForUpdate[0]
         })
 
       expect(res).to.have.status(200)
@@ -1384,7 +1384,7 @@ describe('Pending Orders actions', () => {
         .put(`/api/pending-orders/${pendingOrderId}`)
         .set('Authorization', `Bearer ${String(token)}`)
         .send({
-          pendingOrders: pendingOrderForUpdate
+          pendingOrder: pendingOrderForUpdate[0]
         })
 
       expect(res).to.have.status(403)
@@ -1462,7 +1462,7 @@ describe('Pending Orders actions', () => {
         .put(`/api/pending-orders/${pendingOrderId}`)
         .set('Authorization', `Bearer ${String(campaignManagerToken)}`)
         .send({
-          pendingOrders: pendingOrderForUpdate
+          pendingOrder: pendingOrderForUpdate[0]
         })
 
       expect(res).to.have.status(403)

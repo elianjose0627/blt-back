@@ -794,6 +794,10 @@ const validatePendingOrders = Joi.object({
   ).min(1).required()
 }).required()
 
+const validatePendingOrderUpdate = Joi.object({
+  pendingOrder: Joi.object({ ...commonPendingOrderSchema })
+}).required()
+
 const validateCardTemplate = Joi.object({
   cardTemplate: Joi.object({
     name: Joi.string().max(128).allow('').allow(null).required(),
@@ -1531,5 +1535,6 @@ export default {
   validateTitle,
   validatePostedOrderId,
   validateProductCategoryUpdate,
-  validatePendingOrder
+  validatePendingOrder,
+  validatePendingOrderUpdate
 }
