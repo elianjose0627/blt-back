@@ -5,6 +5,7 @@ const TokenModel = (sequelize: any, DataTypes: any): any => {
     id: string
     accessToken: string
     refreshToken: string
+    context: string
   }
 
   class Token extends Model<TokenAttributes> {
@@ -26,6 +27,10 @@ const TokenModel = (sequelize: any, DataTypes: any): any => {
     refreshToken: {
       type: DataTypes.TEXT,
       allowNull: false
+    },
+    context: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     sequelize,
