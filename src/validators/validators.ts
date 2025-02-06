@@ -142,7 +142,7 @@ const validateUserCompanyAndRole = Joi.object({
   user: Joi.object({
     companyId: Joi.string().uuid().required(),
     role: Joi.string()
-      .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
+      .valid(...[userRoles.ADMIN, userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
       .default(userRoles.USER)
   }).required()
 }).required()
