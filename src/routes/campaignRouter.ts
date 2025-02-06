@@ -18,6 +18,7 @@ import CampaignShippingDestinationController from '../controllers/CampaignShippi
 import CampaignAddressController from '../controllers/CampaignAddressController'
 import CampaignQuotaController from '../controllers/CampaignQuotaController'
 import CampaignQuotaNotificationController from '../controllers/CampaignQuotaNotificationController'
+import CampaignAdditionalProductSettingController from '../controllers/CampaignAdditionalProductSettingController'
 
 const CampaignRoutes = (): Router => {
   const campaignRouter = express.Router()
@@ -131,6 +132,19 @@ const CampaignRoutes = (): Router => {
       celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(CampaignQuotaNotificationController.getAllCampaignQuotaNotifications))
+  campaignRouter.route('/campaigns/:id/additional-product-settings')
+    .post(asyncHandler(checkPermissions),
+      celebrate({
+        [Segments.BODY]: validator.validateCampaignAdditionalProductSetting
+      }), asyncHandler(CampaignAdditionalProductSettingController.insert))
+    .get(asyncHandler(CampaignAdditionalProductSettingController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
+      celebrate({
+        [Segments.QUERY]: validator.validateQueryParams
+      }), asyncHandler(paginate), asyncHandler(CampaignAdditionalProductSettingController.getAllCampaignAdditionalProductSettings))
+  campaignRouter.route('/campaigns/:id/additional-product-settings/:settingId')
+    .delete(asyncHandler(CampaignAdditionalProductSettingController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
+      asyncHandler(CampaignAdditionalProductSettingController.delete))
   return campaignRouter
 }
 

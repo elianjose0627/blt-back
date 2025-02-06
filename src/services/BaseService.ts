@@ -23,7 +23,7 @@ const withoutUser = [
   'CompanyProductAccessControlGroup', 'CompanyUserGroup', 'UserCompanyUserGroup',
   'CompanyUserGroupProductAccessControlGroup', 'TaxRate', 'MassUnit',
   'SalesUnit', 'ProductDetail', 'ProductProductCategory', 'CompanyInviteToken',
-  'CampaignQuota', 'CampaignQuotaNotification', 'ApiKey', 'Title'
+  'CampaignQuota', 'CampaignQuotaNotification', 'CampaignAdditionalProductSetting', 'ApiKey', 'Title'
 ]
 
 export const includeCompanyAndOwner = {
@@ -142,6 +142,11 @@ export const generateInclude = (model: string): any => {
           model: db.CampaignAddress,
           attributes: { exclude: ['deletedAt', 'campaignId'] },
           as: 'campaignAddresses'
+        },
+        {
+          model: db.CampaignAdditionalProductSetting,
+          attributes: { exclude: ['deletedAt', 'campaignId'] },
+          as: 'campaignAdditionalProductSettings'
         }
       ]
     )
