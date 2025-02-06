@@ -512,16 +512,18 @@ class UserController extends BaseController {
       body: { user: { companyId, role } }
     } = req
 
-    const company = await companyService.findById(companyId)
+    if (companyId !== null) {
+      const company = await companyService.findById(companyId)
 
-    if (company === null) {
-      return res.status(statusCodes.NOT_FOUND).send({
-        statusCode: statusCodes.NOT_FOUND,
-        success: false,
-        errors: {
-          message: 'Company not found'
-        }
-      })
+      if (company === null) {
+        return res.status(statusCodes.NOT_FOUND).send({
+          statusCode: statusCodes.NOT_FOUND,
+          success: false,
+          errors: {
+            message: 'Company not found'
+          }
+        })
+      }
     }
 
     const response = await userService.update(user, { companyId, role, logoutTime: dayjs.utc() })
