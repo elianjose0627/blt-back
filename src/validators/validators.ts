@@ -140,10 +140,29 @@ const validateUserCompanyRole = Joi.object({
 
 const validateUserCompanyAndRole = Joi.object({
   user: Joi.object({
-    companyId: Joi.string().uuid().required(),
+    companyId: Joi.string().uuid().allow(null).required(),
     role: Joi.string()
-      .valid(...[userRoles.ADMIN, userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
-      .default(userRoles.USER)
+      .when('companyId', {
+        is: null,
+        then: Joi.string().when(Joi.ref('role'), {
+          is: userRoles.ADMIN,
+          then: Joi.valid(
+            userRoles.ADMIN,
+            userRoles.USER,
+            userRoles.EMPLOYEE,
+            userRoles.COMPANYADMINISTRATOR,
+            userRoles.CAMPAIGNMANAGER
+          ),
+          otherwise: Joi.valid(userRoles.USER)
+        }),
+        otherwise: Joi.string().valid(
+          userRoles.ADMIN,
+          userRoles.USER,
+          userRoles.EMPLOYEE,
+          userRoles.COMPANYADMINISTRATOR,
+          userRoles.CAMPAIGNMANAGER
+        )
+      }).default(userRoles.USER)
   }).required()
 }).required()
 

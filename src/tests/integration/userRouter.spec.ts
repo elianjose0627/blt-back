@@ -1211,6 +1211,53 @@ describe('A user', () => {
       expect(res.body.success).to.equal(true)
       expect(res.body.user.role).to.equal(userRoles.EMPLOYEE)
     })
+
+    it('Should return 200 OK when an admin updates the company of a user with null and role', async () => {
+      const resUser = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'TestNullCompany', lastName: 'User', email: 'testnullcompany@biglittlethings.de', phone: '254720123456', password: faker.internet.password() } })
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${String(resUser.body.user.id)}/company`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            companyId: null,
+            role: userRoles.ADMIN
+          }
+        })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+      expect(res.body.user).to.be.an('object')
+      expect(res.body.success).to.equal(true)
+      expect(res.body.user.role).to.equal(userRoles.ADMIN)
+    })
+
+    it('Should return 422 Unprocessable Entity when an admin updates the company of a user with null and role that is not admin', async () => {
+      const resUser = await chai
+        .request(app)
+        .post('/auth/signup')
+        .send({ user: { firstName: 'TestNullCompany', lastName: 'User', email: 'testnullcompanynotadmin@biglittlethings.de', phone: '254720123456', password: faker.internet.password() } })
+
+      const res = await chai
+        .request(app)
+        .patch(`/api/users/${String(resUser.body.user.id)}/company`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          user: {
+            companyId: null,
+            role: userRoles.COMPANYADMINISTRATOR
+          }
+        })
+
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
+      expect(res.body.success).to.equal(false)
+    })
   })
 
   describe('Company invitation code', () => {
