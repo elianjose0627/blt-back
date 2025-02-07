@@ -123,7 +123,8 @@ const CampaignRoutes = (): Router => {
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(CampaignQuotaController.getAllCampaignQuotas))
   campaignRouter.route('/campaigns/:id/quota-notifications')
-    .post(asyncHandler(checkPermissions),
+    .post(asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
       celebrate({
         [Segments.BODY]: validator.validateCampaignQuotaNotification
       }), asyncHandler(CampaignQuotaNotificationController.insert))
@@ -133,20 +134,16 @@ const CampaignRoutes = (): Router => {
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(CampaignQuotaNotificationController.getAllCampaignQuotaNotifications))
   campaignRouter.route('/campaigns/:id/additional-product-settings')
-    .post(asyncHandler(checkPermissions),
+    .post(asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
       celebrate({
         [Segments.BODY]: validator.validateCampaignAdditionalProductSetting
       }), asyncHandler(CampaignAdditionalProductSettingController.insert))
-    .get(asyncHandler(CampaignAdditionalProductSettingController.checkOwnerOrAdminOrEmployee),
+    .get(asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions),
       celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(CampaignAdditionalProductSettingController.getAllCampaignAdditionalProductSettings))
-  campaignRouter.route('/campaigns/:id/additional-product-settings/:settingId')
-    .delete(asyncHandler(CampaignAdditionalProductSettingController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
-    celebrate({
-      [Segments.QUERY]: validator.validateUUID
-    }), asyncHandler(CampaignAdditionalProductSettingController.delete))
   return campaignRouter
 }
 

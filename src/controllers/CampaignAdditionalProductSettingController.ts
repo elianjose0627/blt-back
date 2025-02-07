@@ -2,17 +2,17 @@ import BaseController from './BaseController'
 import CampaignAdditionalProductSettingService from '../services/CampaignAdditionalProductSettingService'
 import type { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
-import * as userRoles from '../utils/userRoles'
 import * as statusCodes from '../constants/statusCodes'
+import * as userRoles from '../utils/userRoles'
 
 const campaignAdditionalProductSettingService = new CampaignAdditionalProductSettingService('CampaignAdditionalProductSetting')
 
 class CampaignAdditionalProductSettingController extends BaseController {
   checkOwnerOrAdminOrEmployee (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
-    const { user: currentUser, record: { companyId } } = req
+    const { user: currentUser, record: { campaign: { company: { id: companyId, owner } } } } = req
 
-    const isOwnerOrAdmin = currentUser.role === userRoles.ADMIN
-    const isEmployee = currentUser?.companyId === companyId
+    const isOwnerOrAdmin = currentUser.id === owner?.id || currentUser.role === userRoles.ADMIN
+    const isEmployee = currentUser.companyId === companyId
 
     if (isOwnerOrAdmin || (isEmployee)) {
       req.isOwnerOrAdmin = isOwnerOrAdmin
@@ -22,7 +22,7 @@ class CampaignAdditionalProductSettingController extends BaseController {
         statusCode: statusCodes.FORBIDDEN,
         success: false,
         errors: {
-          message: 'Only the owner or admin can perform this action'
+          message: 'Only the owner, employee or admin can perform this action'
         }
       })
     }
@@ -64,20 +64,6 @@ class CampaignAdditionalProductSettingController extends BaseController {
       success: true,
       meta,
       [campaignAdditionalProductSettingService.manyRecords()]: records.rows
-    })
-  }
-
-  async delete (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { params: { settingId } } = req
-
-    const response = await campaignAdditionalProductSettingService.delete(settingId)
-
-    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} deleted` })
-
-
-    return res.status(statusCodes.NO_CONTENT).send({
-      statusCode: statusCodes.NO_CONTENT,
-      [this.service.singleRecord()]: response
     })
   }
 }

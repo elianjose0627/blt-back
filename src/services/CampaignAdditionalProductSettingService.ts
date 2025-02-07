@@ -43,17 +43,6 @@ class CampaignAdditionalProductSettingService extends BaseService {
       rows: records.rows.map((record: any) => record.toJSONFor())
     }
   }
-
-  async delete (settingId: string): Promise<any> {
-    const response = await db[this.model].destroy({
-      where: {
-        id: settingId
-      },
-      paranoid: false
-      
-    })
-    return response
-  }
 }
 
 export default CampaignAdditionalProductSettingService

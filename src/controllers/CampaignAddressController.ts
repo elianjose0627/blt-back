@@ -7,7 +7,7 @@ import * as userRoles from '../utils/userRoles'
 
 const campaignAddressService = new CampaignAddressService('CampaignAddress')
 
-class CampaignOrderLimitController extends BaseController {
+class CampaignAddressController extends BaseController {
   checkOwnerOrAdminOrEmployee (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: { campaign: { company: { id: companyId, owner } } } } = req
 
@@ -58,4 +58,4 @@ class CampaignOrderLimitController extends BaseController {
   }
 }
 
-export default new CampaignOrderLimitController(campaignAddressService)
+export default new CampaignAddressController(campaignAddressService)

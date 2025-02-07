@@ -152,7 +152,7 @@ export const generateInclude = (model: string): any => {
     )
   }
 
-  if (model === 'Recipient' || model === 'CardTemplate' || model === 'CampaignAddress') {
+  if (model === 'Recipient' || model === 'CardTemplate' || model === 'CampaignAddress' || model === 'CampaignAdditionalProductSetting') {
     return ([
       {
         model: db.Campaign,

@@ -1,19 +1,17 @@
 import { Model } from 'sequelize'
-import type { ICampaign, ICampaignAdditionalProductSetting, Role } from '../types'
+import type { ICampaignAdditionalProductSetting, Role } from '../types'
 
 const CampaignAdditionalProductSettingModel = (sequelize: any, DataTypes: any): any => {
   interface CampaignAdditionalProductSettingAttributes {
     id: string
     role: Role
     isSelectEnabled: boolean
-    campaignId: string
   }
 
   class CampaignAdditionalProductSetting extends Model<CampaignAdditionalProductSettingAttributes> {
     private readonly id: string
     private readonly role: Role
     private readonly isSelectEnabled: boolean
-    private readonly campaign: ICampaign
     private readonly createdAt: Date
     private readonly updatedAt: Date
 
@@ -30,7 +28,6 @@ const CampaignAdditionalProductSettingModel = (sequelize: any, DataTypes: any): 
         id: this.id,
         role: this.role,
         isSelectEnabled: this.isSelectEnabled,
-        campaign: this.campaign,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       }
@@ -51,10 +48,6 @@ const CampaignAdditionalProductSettingModel = (sequelize: any, DataTypes: any): 
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
-    },
-    campaignId: {
-      type: DataTypes.STRING,
-      allowNull: false
     }
   }, {
     sequelize,
