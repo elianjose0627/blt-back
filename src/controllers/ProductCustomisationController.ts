@@ -106,7 +106,7 @@ class ProductCustomisationController extends BaseController {
     return res.status(statusCodes.OK).send({
       statusCode: statusCodes.OK,
       success: true,
-      ProductCustomisation: record
+      productCustomisation: record
     })
   }
 
