@@ -54,7 +54,6 @@ import categoryRouter from './wawiAPI/categoryRouter'
 import campaignQuotaRouter from './campaignQuotaRouter'
 import campaignQuotaNotificationRouter from './campaignQuotaNotificationRouter'
 import apiKeyRouter from './apiKeyRouter'
-import productCustomisationRouter from './productCustomisationRouter'
 import orderConfirmationRouter from './orderConfirmationRouter'
 import packingSlipRouter from './packingSlipRouter'
 import titleRouter from './titleRouter'
@@ -117,7 +116,6 @@ const routers = {
   campaignQuotaRouter,
   campaignQuotaNotificationRouter,
   apiKeyRouter,
-  productCustomisationRouter,
   orderConfirmationRouter,
   packingSlipRouter,
   titleRouter,

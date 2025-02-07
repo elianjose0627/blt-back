@@ -10,6 +10,7 @@ import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import checkPermissions from '../middlewares/checkPermissions'
 import ProductTagController from '../controllers/ProductTagController'
 import setCatalogueAccess from '../middlewares/setCatalogueAccess'
+import ProductCustomisationController from '../controllers/ProductCustomisationController'
 
 const ProductRoutes = (): Router => {
   const productRouter = express.Router()
@@ -90,6 +91,29 @@ const ProductRoutes = (): Router => {
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.QUERY]: validator.validateUUID
     }), asyncHandler(ProductController.addGraduatedPriceToChildren))
+
+  productRouter.route('/products/:id/product-customisations')
+    .post(celebrate({
+      [Segments.BODY]: validator.validateProductCustomisation
+    }), asyncHandler(ProductCustomisationController.insert))
+    .get(celebrate({
+      [Segments.QUERY]: validator.validateQueryParams
+    }), asyncHandler(paginate), asyncHandler(ProductCustomisationController.getAll))
+
+  productRouter.use('/products/:id/product-customisations/:productCustomisationId', celebrate({
+    [Segments.PARAMS]: validator.validateProductCustomisationUUID
+  }, { abortEarly: false }), asyncHandler(ProductCustomisationController.checkRecord))
+  productRouter.route('/products/:id/product-customisations/:productCustomisationId')
+    .get(asyncHandler(ProductCustomisationController.get))
+    .put(asyncHandler(ProductCustomisationController.checkOwnerOrAdmin), celebrate({
+      [Segments.BODY]: validator.validateProductCustomisation
+    }), asyncHandler(ProductCustomisationController.update))
+    .delete(asyncHandler(ProductCustomisationController.checkOwnerOrAdmin), asyncHandler(ProductCustomisationController.delete))
+  productRouter.route('/products/:id/product-customisations/:productCustomisationId/chat')
+    .get(asyncHandler(ProductCustomisationController.getAllChat))
+    .post(celebrate({
+      [Segments.BODY]: validator.validateProductCustomisationChat
+    }), asyncHandler(ProductCustomisationController.insertChat))
   return productRouter
 }
 

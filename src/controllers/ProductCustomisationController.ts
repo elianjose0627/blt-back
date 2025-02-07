@@ -11,6 +11,23 @@ const productCustomisationService = new ProductCustomisationService('ProductCust
 const productService = new ProductService('Product')
 
 class ProductCustomisationController extends BaseController {
+  async checkRecord (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
+    const { productCustomisationId } = req.params
+    const record = await this.service.findById(productCustomisationId)
+
+    if (record === null) {
+      return res.status(statusCodes.NOT_FOUND).send({
+        statusCode: statusCodes.NOT_FOUND,
+        success: false,
+        errors: {
+          message: `${String(this.service.recordName())} not found`
+        }
+      })
+    }
+    req.record = record
+    return next()
+  }
+
   checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: { owner: { id } } } = req
 
@@ -31,11 +48,11 @@ class ProductCustomisationController extends BaseController {
   }
 
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { record: initialProduct, user, body: { productCustomisation } } = req
+    const { record: initialProduct, user, params: { id: productId }, body: { productCustomisation } } = req
 
     let product = initialProduct
 
-    product = await productService.findById(productCustomisation.productId)
+    product = await productService.findById(productId)
 
     if (product === null) {
       return res.status(statusCodes.NOT_FOUND).send({
@@ -47,7 +64,7 @@ class ProductCustomisationController extends BaseController {
       })
     }
 
-    const { response, status } = await productCustomisationService.insert({ user, productCustomisation })
+    const { response, status } = await productCustomisationService.insert({ user, productId, productCustomisation })
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 
     const statusCode: StatusCode = {
@@ -63,9 +80,9 @@ class ProductCustomisationController extends BaseController {
   }
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { user: currentUser, query: { limit, page, offset, filter } } = req
+    const { user: currentUser, params: { id: productId }, query: { limit, page, offset } } = req
 
-    const records = await productCustomisationService.getAll(limit, offset, filter, currentUser)
+    const records = await productCustomisationService.getAllProductCustomisation(limit, offset, productId, currentUser)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),
@@ -81,6 +98,32 @@ class ProductCustomisationController extends BaseController {
     })
   }
 
+  async get (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { productCustomisationId } = req.params
+
+    const record = await productCustomisationService.get(productCustomisationId)
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      ProductCustomisation: record
+    })
+  }
+
+  async update (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { user, params: { productCustomisationId }, body: { productCustomisation } } = req
+
+    const response = await this.service.update({ user, productCustomisationId, productCustomisation })
+
+    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} updated` })
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      [this.service.singleRecord()]: response
+    })
+  }
+
   async delete (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { record } = req
 
@@ -92,7 +135,7 @@ class ProductCustomisationController extends BaseController {
   }
 
   async getAllChat (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { id: productCustomisationId } = req.params
+    const { productCustomisationId } = req.params
 
     const records = await productCustomisationService.getAllChat(productCustomisationId)
 
@@ -104,7 +147,7 @@ class ProductCustomisationController extends BaseController {
   }
 
   async insertChat (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { user, body: { productCustomisationChat }, params: { id: productCustomisationId } } = req
+    const { user, body: { productCustomisationChat }, params: { productCustomisationId } } = req
 
     const { response, status } = await productCustomisationService.insertChat({ user, productCustomisationChat, productCustomisationId })
     io.emit('ProductCustomisationChats', { message: 'ProductCustomisationChats created' })

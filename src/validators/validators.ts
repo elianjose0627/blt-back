@@ -1404,8 +1404,7 @@ const validateProductCustomisation = Joi.object({
         filename: Joi.string().required(),
         url: Joi.string().uri().required()
       }).required()
-    ).required(),
-    productId: Joi.string().uuid().required()
+    ).required()
   }).required()
 })
 
@@ -1418,31 +1417,6 @@ const validateProductCustomisationChat = Joi.object({
         url: Joi.string().uri().required()
       })
     )
-  }).required()
-})
-
-const validateProductCustomisationForUpdate = Joi.object({
-  productCustomisation: Joi.object({
-    customisationType: Joi.string().required().valid(...['print', 'engraving', 'branding']),
-    customisationDetail: Joi.string().required(),
-    price: Joi.number().min(0),
-    available: Joi.boolean().optional().default(false),
-    isApproved: Joi.boolean().default(false),
-    designStatus: Joi.string().required(),
-    color: Joi.string().required(),
-    photos: Joi.array().items(
-      Joi.object({
-        filename: Joi.string().required(),
-        url: Joi.string().uri().required()
-      }).required()
-    ).required()
-  }).required()
-})
-
-const validateProductCustomisationQueryParams = Joi.object({
-  ...commonQueryParams,
-  filter: Joi.object({
-    productId: Joi.string().uuid().required()
   }).required()
 })
 
@@ -1476,6 +1450,10 @@ const validateCampaignAdditionalProductSetting = Joi.object({
     isSelectEnabled: Joi.boolean().default(true)
   }).required()
 })
+const validateProductCustomisationUUID = Joi.object().keys({
+  id: Joi.string().uuid().required(),
+  productCustomisationId: Joi.string().uuid().required()
+}).required()
 
 export default {
   validateCreatedUser,
@@ -1574,9 +1552,7 @@ export default {
   validateApiKey,
   validateCompanyShopHeader,
   validateProductCustomisation,
-  validateProductCustomisationQueryParams,
   validateDocumentQueryParams,
-  validateProductCustomisationForUpdate,
   validateProductCategoryForCompany,
   validateTitle,
   validatePostedOrderId,
@@ -1584,5 +1560,6 @@ export default {
   validatePendingOrder,
   validatePendingOrderUpdate,
   validateCampaignAdditionalProductSetting,
-  validateProductCustomisationChat
+  validateProductCustomisationChat,
+  validateProductCustomisationUUID
 }

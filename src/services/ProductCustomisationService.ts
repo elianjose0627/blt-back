@@ -1,13 +1,12 @@
 import { v1 as uuidv1 } from 'uuid'
-import BaseService, { generateFilterQuery } from './BaseService'
+import BaseService from './BaseService'
 import db from '../models'
 
 class ProductCustomisationService extends BaseService {
   async insert (data: any): Promise<any> {
-    const { user, productCustomisation } = data
+    const { user, productId, productCustomisation } = data
     let response: any
 
-    const productId = productCustomisation.productId
     const userId = user.id
 
     response = await db[this.model].findOne({
@@ -23,14 +22,12 @@ class ProductCustomisationService extends BaseService {
       return { response: updatedResponse.toJSONFor(), status: 200 }
     }
 
-    response = await db[this.model].create({ ...productCustomisation, id: uuidv1(), userId, companyId: user?.company?.id })
+    response = await db[this.model].create({ ...productCustomisation, id: uuidv1(), userId, companyId: user?.company?.id, productId })
 
     return { response: response.toJSONFor(), status: 201 }
   }
 
-  async getAll (limit: number, offset: number, filter = { productId: '' }, user?: any): Promise<any> {
-    const where = generateFilterQuery(filter)
-
+  async getAllProductCustomisation (limit: number, offset: number, productId: string, user: any): Promise<any> {
     const records = await db[this.model].findAndCountAll({
       include: [
         {
@@ -63,7 +60,7 @@ class ProductCustomisationService extends BaseService {
       order: [['createdAt', 'DESC']],
       attributes: { exclude: [] },
       where: {
-        ...where,
+        productId,
         userId: user.id
       },
       distinct: true
@@ -73,6 +70,24 @@ class ProductCustomisationService extends BaseService {
       count: records.count,
       rows: records.rows.map((record: any) => record.toJSONFor())
     }
+  }
+
+  async update (data: any): Promise<any> {
+    const { user, productCustomisationId, productCustomisation } = data
+    const userId = user.id
+
+    const response = await db[this.model].findOne({
+      where: {
+        id: productCustomisationId
+      },
+      paranoid: false
+    })
+
+    const updatedRecord = await response.update(
+      { ...productCustomisation, userId }
+    )
+
+    return updatedRecord
   }
 
   async getAllChat (productCustomisationId: string): Promise<any> {
@@ -98,22 +113,8 @@ class ProductCustomisationService extends BaseService {
 
   async insertChat (data: any): Promise<any> {
     const { user, productCustomisationChat, productCustomisationId } = data
-    // let response: any
 
     const userId = user.id
-
-    // response = await db[this.model].findOne({
-    //   where: {
-    //     productCustomisationId
-    //   },
-    //   paranoid: false
-    // })
-
-    // if (response !== null) {
-    //   await response.restore()
-    //   const updatedResponse = await response.update({ ...productCustomisationChat, userId })
-    //   return { response: updatedResponse.toJSONFor(), status: 200 }
-    // }
 
     const response = await db.ProductCustomisationChat.create({ ...productCustomisationChat, id: uuidv1(), userId, productCustomisationId })
 
