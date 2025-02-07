@@ -4505,6 +4505,57 @@ describe('Campaign actions', () => {
       expect(res.body.campaignAdditionalProductSettings).to.be.an('array')
     })
 
+    it('Should return 403 Forbidden when an non-admin tries to fetch campaign additional product settings for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Additional Product Setting User 45',
+            email: 'test@companymarvelsecretinvasionadditionalproductsetting45.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Quota Notification',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/additional-product-settings`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignAdditionalProductSetting: {
+            isSelectEnabled: true,
+            role: 'CampaignManager'
+         }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${campaignId}/additional-product-settings`)
+        .set('Authorization', `Bearer ${token}`)
+
+        expect(res).to.have.status(403)
+        expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+        expect(res.body.errors.message).to.equal('Only the owner or admin can perform this action')
+    })
+
     it('Should return 204 NOT CONTENT when an admin successfully deleltes campaign additional product settings for a campaign.', async () => {
       const resCompany = await chai
         .request(app)
