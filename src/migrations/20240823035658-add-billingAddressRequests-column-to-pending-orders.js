@@ -4,7 +4,7 @@ module.exports = {
     return Promise.all([
       queryInterface.addColumn('PendingOrders', 'billingAddressRequests', {
         allowNull: true,
-        type: Sequelize.JSON
+        type: Sequelize.JSONB
       })
     ])
   },

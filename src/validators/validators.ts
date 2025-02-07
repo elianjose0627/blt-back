@@ -1450,6 +1450,15 @@ const validatePostedOrderId = Joi.object({
   postedOrderId: Joi.string().regex(/^\d+$/).required()
 })
 
+const validateCampaignAdditionalProductSetting = Joi.object({
+  campaignAdditionalProductSetting: Joi.object({
+    role: Joi.string()
+      .valid(...[userRoles.USER, userRoles.EMPLOYEE, userRoles.COMPANYADMINISTRATOR, userRoles.CAMPAIGNMANAGER])
+      .required(),
+    isSelectEnabled: Joi.boolean().default(true)
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1555,5 +1564,6 @@ export default {
   validatePostedOrderId,
   validateProductCategoryUpdate,
   validatePendingOrder,
-  validatePendingOrderUpdate
+  validatePendingOrderUpdate,
+  validateCampaignAdditionalProductSetting
 }

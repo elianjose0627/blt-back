@@ -58,6 +58,7 @@ import productCustomisationRouter from './productCustomisationRouter'
 import orderConfirmationRouter from './orderConfirmationRouter'
 import packingSlipRouter from './packingSlipRouter'
 import titleRouter from './titleRouter'
+import campaignAdditionalProductSettingRouter from './campaignAdditionalProductSettingRouter'
 
 const routers = {
   authRouter,
@@ -119,7 +120,8 @@ const routers = {
   productCustomisationRouter,
   orderConfirmationRouter,
   packingSlipRouter,
-  titleRouter
+  titleRouter,
+  campaignAdditionalProductSettingRouter
 }
 
 export default routers

@@ -189,42 +189,6 @@ module.exports = {
       companyId: null
     },
     {
-      id: '03BC5033-37B9-4965-B7D9-C212754DCA17',
-      name: 'Company Administrator Read Write Order Additional Products',
-      module: 'orderAdditionalProducts',
-      role: 'CompanyAdministrator',
-      permission: 'readwrite',
-      isEnabled: 'TRUE',
-      createdAt,
-      updatedAt,
-      deletedAt: null,
-      companyId: null
-    },
-    {
-      id: 'DFBF27D5-A95F-43B1-BE9C-0DD1783853A6',
-      name: 'Campaign Manager No Access Order Additional Products',
-      module: 'orderAdditionalProducts',
-      role: 'CampaignManager',
-      permission: 'noaccess',
-      isEnabled: 'TRUE',
-      createdAt,
-      updatedAt,
-      deletedAt: null,
-      companyId: null
-    },
-    {
-      id: '6AE0312E-C7B2-4D46-965F-7599916CF5B5',
-      name: 'Employee No Access Order Additional Products',
-      module: 'orderAdditionalProducts',
-      role: 'Employee',
-      permission: 'noaccess',
-      isEnabled: 'TRUE',
-      createdAt,
-      updatedAt,
-      deletedAt: null,
-      companyId: null
-    },
-    {
       id: 'CD3989BC-7E4F-4C17-BA73-8BCAA2BEE1BD',
       name: 'Company Administrator Read Write Product Categories',
       module: 'productCategories',
