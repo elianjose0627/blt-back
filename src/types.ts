@@ -130,7 +130,7 @@ typeof appModules.PICTURES | typeof appModules.PRIVACYRULES |
 typeof appModules.PRODUCTS | typeof appModules.RECIPIENTS |
 typeof appModules.SALUTATIONS | typeof appModules.SECONDARYDOMAINS |
 typeof appModules.SHIPMENTS | typeof appModules.USERS |
-typeof appModules.COMPANYSUBSCRIPTIONS | typeof appModules.ORDERADDITIONALPRODUCTS
+typeof appModules.COMPANYSUBSCRIPTIONS
 
 export type Permission = typeof permissions.READ | typeof permissions.READWRITE | typeof permissions.NOACCESS
 
@@ -366,6 +366,7 @@ export interface ICampaign {
   shippingMethodType: Nullable<number>
   shippingMethodIsDropShipping: boolean
   totalOrderedQuota: number
+  campaignAdditionalProductSettings: ICampaignAdditionalProductSetting[]
 }
 
 export interface ISecondaryDomain {
@@ -1268,4 +1269,13 @@ export interface IOrderConfirmation {
   owner: IUser
   createdAt: Date
   updatedAt: Date
+}
+
+export interface ICampaignAdditionalProductSetting {
+  id: string
+  role: Role
+  isSelectEnabled: boolean
+  createdAt?: Date
+  updatedAt?: Date
+  campaign?: Pick<ICampaign, 'id' | 'name'>
 }

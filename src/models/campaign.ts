@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { CampaignStatus, CampaignType, IAddress, ICampaign, ICampaignOrderLimit, ICampaignShippingDestination, ICardSetting, ICardTemplate, ICompany, Nullable } from '../types'
+import type { CampaignStatus, CampaignType, IAddress, ICampaign, ICampaignAdditionalProductSetting, ICampaignOrderLimit, ICampaignShippingDestination, ICardSetting, ICardTemplate, ICompany, Nullable } from '../types'
 
 const CampaignModel = (sequelize: any, DataTypes: any): any => {
   interface CampaignAttributes {
@@ -54,6 +54,7 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
     private readonly shippingMethodIsDropShipping: boolean
     private readonly includeStartDate: boolean
     private readonly totalOrderedQuota: number
+    private readonly campaignAdditionalProductSettings: ICampaignAdditionalProductSetting[]
 
     static associate (models: any): any {
       Campaign.belongsTo(models.Company, {
@@ -106,6 +107,11 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
         as: 'campaignQuotaNotifications',
         onDelete: 'CASCADE'
       })
+      Campaign.hasMany(models.CampaignAdditionalProductSetting, {
+        foreignKey: 'campaignId',
+        as: 'campaignAdditionalProductSettings',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): ICampaign {
@@ -134,6 +140,7 @@ const CampaignModel = (sequelize: any, DataTypes: any): any => {
         campaignShippingDestinations: this.campaignShippingDestinations,
         campaignOrderLimits: this.campaignOrderLimits,
         campaignAddresses: this.campaignAddresses,
+        campaignAdditionalProductSettings: this.campaignAdditionalProductSettings,
         shippingMethodType: this.shippingMethodType,
         shippingMethodIsDropShipping: this.shippingMethodIsDropShipping,
         includeStartDate: this.includeStartDate,

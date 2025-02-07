@@ -122,6 +122,11 @@ class CampaignService extends BaseService {
           model: db.CampaignAddress,
           attributes: { exclude: ['deletedAt', 'campaignId'] },
           as: 'campaignAddresses'
+        },
+        {
+          model: db.CampaignAdditionalProductSetting,
+          attributes: { exclude: ['deletedAt', 'campaignId'] },
+          as: 'campaignAdditionalProductSettings'
         }
       ],
       distinct: true,
