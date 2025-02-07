@@ -4461,8 +4461,8 @@ describe('Campaign actions', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           company: {
-            name: 'Test Company Secret Invasion Quota Notification User 1',
-            email: 'test@companymarvelsecretinvasionquotanotification1.com',
+            name: 'Test Company Secret Invasion Additional Product Setting User 345',
+            email: 'test@companymarvelsecretinvasionadditionalproductsetting234.com',
             customerId: 123
           }
         })
