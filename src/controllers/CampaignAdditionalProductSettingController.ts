@@ -70,16 +70,13 @@ class CampaignAdditionalProductSettingController extends BaseController {
   async delete (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { params: { settingId } } = req
 
-    const {response, status} = await campaignAdditionalProductSettingService.delete(settingId)
+    const response = await campaignAdditionalProductSettingService.delete(settingId)
 
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} deleted` })
 
-    const statusCode: StatusCode = {
-      204: statusCodes.NO_CONTENT,
-    }
 
-    return res.status(statusCode[status]).send({
-      statusCode: statusCode[status],
+    return res.status(statusCodes.NO_CONTENT).send({
+      statusCode: statusCodes.NO_CONTENT,
       [this.service.singleRecord()]: response
     })
   }
