@@ -144,7 +144,9 @@ const CampaignRoutes = (): Router => {
       }), asyncHandler(paginate), asyncHandler(CampaignAdditionalProductSettingController.getAllCampaignAdditionalProductSettings))
   campaignRouter.route('/campaigns/:id/additional-product-settings/:settingId')
     .delete(asyncHandler(CampaignAdditionalProductSettingController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions),
-      asyncHandler(CampaignAdditionalProductSettingController.delete))
+    celebrate({
+      [Segments.QUERY]: validator.validateUUID
+    }), asyncHandler(CampaignAdditionalProductSettingController.delete))
   return campaignRouter
 }
 

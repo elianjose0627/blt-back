@@ -1459,6 +1459,11 @@ const validateCampaignAdditionalProductSetting = Joi.object({
   }).required()
 })
 
+const validateUUIDS = Joi.object().keys({
+  id: Joi.string().uuid(),
+  userId: Joi.string().uuid()
+}).required()
+
 export default {
   validateCreatedUser,
   validateLogin,

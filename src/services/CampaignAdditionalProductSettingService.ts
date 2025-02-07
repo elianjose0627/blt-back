@@ -45,13 +45,17 @@ class CampaignAdditionalProductSettingService extends BaseService {
   }
 
   async delete (settingId: string): Promise<any> {
-    const response = await db[this.model].destroy({
+    const response = await db[this.model].findOne({
       where: {
         id: settingId
-      }
+      },
+      paranoid: false // To get soft deleted record
     })
 
-    return response
+    if (response !== null) {
+      const updatedResponse = await response.destroy()
+      return { response: updatedResponse, status: 204 }
+    }
   }
 }
 

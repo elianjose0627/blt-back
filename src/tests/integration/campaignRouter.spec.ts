@@ -4352,4 +4352,208 @@ describe('Campaign actions', () => {
       expect(res.body.campaignQuotaNotifications).to.be.an('array')
     })
   })
+
+  describe('Campaign Additional Product Settings Actions', () => {
+    it('Should return 201 Created when an admin successfully creates a campaign additional product setting for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Additional Product Setting',
+            email: 'test@companymarvelsecretinvasionaddtionalproductsetting.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Additional Product Setting',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/additional-product-settings`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignAdditionalProductSetting: {
+              isSelectEnabled: true,
+              role: 'CampaignManager'
+          }
+        })
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignAdditionalProductSetting')
+      expect(res.body.campaignAdditionalProductSetting).to.be.an('object')
+    })
+
+    it('Should return 200 OK when an admin successfully creates a campaign additional product setting that exists for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Additioinal Prodcuct Setting 2',
+            email: 'test@companymarvelsecretinvasionaddtionalproduuctsetting2.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Additional Product Setting 2',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/additional-product-settings`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignAdditionalProductSetting: {
+            isSelectEnabled: true,
+            role: 'CampaignManager'
+         }
+        })
+      const res = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/additional-product-settings`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignAdditionalProductSetting: {
+            isSelectEnabled: true,
+            role: 'CampaignManager'
+        }
+        })
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'campaignAdditionalProductSetting')
+      expect(res.body.campaignAdditionalProductSetting).to.be.an('object')
+    })
+
+    it('Should return 200 OK when an admin successfully gets campaign additional product settings for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Quota Notification User 1',
+            email: 'test@companymarvelsecretinvasionquotanotification1.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Quota Notification',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/additional-product-settings`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignAdditionalProductSetting: {
+            isSelectEnabled: true,
+            role: 'CampaignManager'
+         }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/campaigns/${campaignId}/additional-product-settings`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'meta', 'campaignAdditionalProductSettings')
+      expect(res.body.campaignAdditionalProductSettings).to.be.an('array')
+    })
+
+    it('Should return 204 NOT CONTENT when an admin successfully deleltes campaign additional product settings for a campaign.', async () => {
+      const resCompany = await chai
+        .request(app)
+        .post('/api/companies')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          company: {
+            name: 'Test Company Secret Invasion Additional Product Setting User 5',
+            email: 'test@companymarvelsecretinvasionaddtioinalproductsetting5.com',
+            customerId: 123
+          }
+        })
+      const companyId = String(resCompany.body.company.id)
+
+      await verifyCompanyDomain(String(companyId))
+
+      const resCampaign = await chai
+        .request(app)
+        .post(`/api/companies/${String(companyId)}/campaigns`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          campaign: {
+            name: 'Onboarding Secret Invasion Quota Notification',
+            type: 'onboarding',
+            status: 'draft'
+          }
+        })
+
+      const campaignId = String(resCampaign.body.campaign.id)
+
+      const resAddtionalProductSetting = await chai
+        .request(app)
+        .post(`/api/campaigns/${campaignId}/additional-product-settings`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          campaignAdditionalProductSetting: {
+            isSelectEnabled: true,
+            role: 'CampaignManager'
+         }
+        })
+
+      const additionalProductSettingId = String(resAddtionalProductSetting.body.campaignAdditionalProductSetting.id)
+
+      const res = await chai
+        .request(app)
+        .delete(`/api/campaigns/${campaignId}/additional-product-settings/${additionalProductSettingId}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(204)
+    })
+  })
 })
