@@ -1057,9 +1057,9 @@ export interface OrderLineRequest {
 export interface IPendingOrder {
   id: string
   customerId: string
-  userId: string
-  campaignId: string
-  companyId: string
+  userId?: string
+  campaignId?: string
+  companyId?: string
   platform: number
   language: number
   currency: string
@@ -1067,7 +1067,7 @@ export interface IPendingOrder {
   inetorderno: number
   shippingId: number
   shipped: Date
-  deliverydate: Date
+  deliveryDate: Date
   note: string
   description: string
   costCenter: string
@@ -1089,10 +1089,15 @@ export interface IPendingOrder {
   created: Date
   createdAt?: Date
   updatedAt?: Date
-  company?: ICompany
+  company?: Pick<ICompany, 'id' | 'customerId' | 'name'>
   isOrderConfirmationGenerated: boolean
   isInvoiceGenerated: boolean
+  isQueued: boolean
+  jtlId: number
+  jtlNumber: string
+  owner: Pick<IUser, 'id' | 'firstName' | 'lastName' | 'email'>
   isPackingSlipGenerated: boolean
+  campaign: Pick<ICampaign, 'id' | 'name'>
 }
 
 export interface IDuplicatePostedOrder {

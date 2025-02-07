@@ -717,21 +717,21 @@ const validateShippingMethod = Joi.object({
 }).required()
 
 const commonPendingOrderSchema = {
-  platform: Joi.number(),
-  language: Joi.number(),
+  platform: Joi.number().equal(0),
+  language: Joi.number().equal(0),
   currency: Joi.string(),
   orderNo: Joi.string(),
-  inetorderno: Joi.number(),
+  inetorderno: Joi.number().equal(0),
   shippingId: Joi.number(),
   shipped: Joi.date().min(dayjs().utc().subtract(1, 'day').toDate()),
   deliverydate: Joi.date().min(Joi.ref('shipped')),
   note: Joi.string().allow('').allow(null),
   description: Joi.string().allow('').allow(null),
   costCenter: Joi.string().allow('').allow(null),
-  paymentType: Joi.number(),
-  paymentTarget: Joi.number(),
-  discount: Joi.number(),
-  orderStatus: Joi.number(),
+  paymentType: Joi.number().equal(0),
+  paymentTarget: Joi.number().equal(0),
+  discount: Joi.number().equal(0),
+  orderStatus: Joi.number().equal(0),
   quantity: Joi.number().positive().default(1),
   orderLineRequests: Joi.array().items(
     Joi.object({
@@ -811,6 +811,10 @@ const validatePendingOrders = Joi.object({
   pendingOrders: Joi.array().items(
     Joi.object({ ...commonPendingOrderSchema })
   ).min(1).required()
+}).required()
+
+const validatePendingOrderUpdate = Joi.object({
+  pendingOrder: Joi.object({ ...commonPendingOrderSchema })
 }).required()
 
 const validateCardTemplate = Joi.object({
@@ -1434,6 +1438,8 @@ const validateDocumentQueryParams = Joi.object({
   })
 }).required()
 
+const validatePendingOrder = Joi.object({ ...commonPendingOrderSchema }).required()
+
 const validateTitle = Joi.object({
   title: Joi.object({
     name: Joi.string().required().max(32)
@@ -1547,5 +1553,7 @@ export default {
   validateProductCategoryForCompany,
   validateTitle,
   validatePostedOrderId,
-  validateProductCategoryUpdate
+  validateProductCategoryUpdate,
+  validatePendingOrder,
+  validatePendingOrderUpdate
 }

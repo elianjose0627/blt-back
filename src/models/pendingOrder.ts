@@ -1,5 +1,5 @@
 import { Model } from 'sequelize'
-import type { IPendingOrder, OrderLineRequest, ShippingAddressRequest, PaymentInformationRequest, ICompany, Nullable, BillingAddressRequest } from '../types'
+import type { IPendingOrder, OrderLineRequest, ShippingAddressRequest, PaymentInformationRequest, ICompany, Nullable, BillingAddressRequest, IUser, ICampaign } from '../types'
 
 const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
   interface PendingOrderAttributes {
@@ -37,15 +37,15 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     created: Date
     isOrderConfirmationGenerated: boolean
     isInvoiceGenerated: boolean
+    isQueued: boolean
+    jtlId: number
+    jtlNumber: string
     isPackingSlipGenerated: boolean
   }
 
   class PendingOrder extends Model<PendingOrderAttributes> {
     private readonly id: string
     private readonly customerId: string
-    private readonly userId: string
-    private readonly campaignId: string
-    private readonly companyId: string
     private readonly platform: number
     private readonly language: number
     private readonly currency: string
@@ -78,7 +78,12 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly company: ICompany
     private readonly isOrderConfirmationGenerated: boolean
     private readonly isInvoiceGenerated: boolean
+    private readonly isQueued: boolean
+    private readonly jtlId: number
+    private readonly jtlNumber: string
+    private readonly owner: IUser
     private readonly isPackingSlipGenerated: boolean
+    private readonly campaign: ICampaign
 
     static associate (models: any): any {
       PendingOrder.belongsTo(models.Company, {
@@ -102,9 +107,6 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
       return {
         id: this.id,
         customerId: this.customerId,
-        userId: this.userId,
-        campaignId: this.campaignId,
-        companyId: this.companyId,
         platform: this.platform,
         language: this.language,
         currency: this.currency,
@@ -112,7 +114,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
         inetorderno: this.inetorderno,
         shippingId: this.shippingId,
         shipped: this.shipped,
-        deliverydate: this.deliverydate,
+        deliveryDate: this.deliverydate,
         note: this.note,
         description: this.description,
         costCenter: this.costCenter,
@@ -137,7 +139,12 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
         company: this.company,
         isOrderConfirmationGenerated: this.isOrderConfirmationGenerated,
         isInvoiceGenerated: this.isInvoiceGenerated,
-        isPackingSlipGenerated: this.isPackingSlipGenerated
+        isQueued: this.isQueued,
+        jtlId: this.jtlId,
+        jtlNumber: this.jtlNumber,
+        owner: this.owner,
+        isPackingSlipGenerated: this.isPackingSlipGenerated,
+        campaign: this.campaign
       }
     }
   };
@@ -242,19 +249,19 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
       allowNull: true
     },
     orderLineRequests: {
-      type: DataTypes.JSON,
+      type: DataTypes.JSONB,
       allowNull: false
     },
     shippingAddressRequests: {
-      type: DataTypes.JSON,
+      type: DataTypes.JSONB,
       allowNull: true
     },
     billingAddressRequests: {
-      type: DataTypes.JSON,
+      type: DataTypes.JSONB,
       allowNull: true
     },
     paymentInformationRequests: {
-      type: DataTypes.JSON,
+      type: DataTypes.JSONB,
       allowNull: true
     },
     isPosted: {
@@ -282,6 +289,19 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
+    },
+    isQueued: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
+    jtlId: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    jtlNumber: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     isPackingSlipGenerated: {
       type: DataTypes.BOOLEAN,
