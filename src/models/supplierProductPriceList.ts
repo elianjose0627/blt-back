@@ -4,7 +4,6 @@ import type { ISupplierProductPriceList, ISupplierProductPriceListScale } from '
 const SupplierProductPriceListModel = (sequelize: any, DataTypes: any): any => {
   interface SupplierProductPriceListAttributes {
     id: string
-    // supplierProductVariantId: string
     sku: string
     variantId: string
     price: number
@@ -15,7 +14,6 @@ const SupplierProductPriceListModel = (sequelize: any, DataTypes: any): any => {
 
   class SupplierProductPriceList extends Model<SupplierProductPriceListAttributes> {
     private readonly id: string
-    // private readonly supplierProductVariantId: string
     private readonly sku: string
     private readonly variantId: string
     private readonly price: number
@@ -36,7 +34,6 @@ const SupplierProductPriceListModel = (sequelize: any, DataTypes: any): any => {
     toJSONFor (): ISupplierProductPriceList {
       return {
         id: this.id,
-        // supplierProductVariantId: this.supplierProductVariantId,
         sku: this.sku,
         variantId: this.variantId,
         price: this.price,
@@ -55,11 +52,6 @@ const SupplierProductPriceListModel = (sequelize: any, DataTypes: any): any => {
       primaryKey: true,
       allowNull: false
     },
-    // supplierProductVariantId: {
-    //   type: DataTypes.UUID,
-    //   allowNull: false,
-    //   references: { model: 'SupplierProductVariants', key: 'id' }
-    // },
     sku: {
       type: DataTypes.STRING,
       allowNull: true

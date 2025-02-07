@@ -8,15 +8,6 @@ module.exports = {
         primaryKey: true,
         allowNull: false
       },
-      // supplierProductId: {
-      //   type: Sequelize.UUID,
-      //   allowNull: false,
-      //   references: {
-      //     model: 'SupplierProducts',
-      //     key: 'id'
-      //   },
-      //   onDelete: 'CASCADE'
-      // },
       sku: {
         type: Sequelize.STRING,
         allowNull: false

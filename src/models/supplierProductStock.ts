@@ -4,7 +4,6 @@ import type { ISupplierProductStock } from '../types'
 const SupplierProductStockModel = (sequelize: any, DataTypes: any): any => {
   interface SupplierProductStockAttributes {
     id: string
-    // supplierProductId: string
     sku: string
     firstArrivalDate: Date
     quantity: number
@@ -15,7 +14,6 @@ const SupplierProductStockModel = (sequelize: any, DataTypes: any): any => {
 
   class SupplierProductStock extends Model<SupplierProductStockAttributes> {
     private readonly id: string
-    // private readonly supplierProductId: string
     private readonly sku: string
     private readonly firstArrivalDate: Date
     private readonly quantity: number
@@ -25,18 +23,11 @@ const SupplierProductStockModel = (sequelize: any, DataTypes: any): any => {
     private readonly createdAt: Date
     private readonly updatedAt: Date
 
-    static associate (models: any): any {
-      // SupplierProductStock.belongsTo(models.SupplierProduct, {
-      //   foreignKey: 'supplierProductId',
-      //   as: 'supplierProduct',
-      //   onDelete: 'CASCADE'
-      // })
-    }
+    static associate (models: any): any { }
 
     toJSONFor (): ISupplierProductStock {
       return {
         id: this.id,
-        // supplierProductId: this.supplierProductId,
         sku: this.sku,
         firstArrivalDate: this.firstArrivalDate,
         quantity: this.quantity,
@@ -55,11 +46,6 @@ const SupplierProductStockModel = (sequelize: any, DataTypes: any): any => {
       primaryKey: true,
       allowNull: false
     },
-    // supplierProductId: {
-    //   type: DataTypes.UUID,
-    //   allowNull: false,
-    //   references: { model: 'SupplierProducts', key: 'id' }
-    // },
     sku: {
       type: DataTypes.STRING,
       allowNull: false

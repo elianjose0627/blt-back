@@ -1362,7 +1362,6 @@ export interface ISupplierProductVariant {
 
 export interface ISupplierProductStock {
   id: string
-  // supplierProductId: string
   sku: string
   firstArrivalDate: Date
   quantity: number
@@ -1380,7 +1379,6 @@ export interface ISupplierProductPriceListScale {
 
 export interface ISupplierProductPriceList {
   id: string
-  // supplierProductVariantId: string
   sku: string
   variantId: string
   price: number
