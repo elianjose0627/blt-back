@@ -4559,8 +4559,8 @@ describe('Product actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'ProductCustomisation')
-      expect(res.body.ProductCustomisation).to.be.an('object')
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCustomisation')
+      expect(res.body.productCustomisation).to.be.an('object')
     })
 
     it('Should return 422 Unprocessable Entity when an admin tries to retrieve a product customisations without productId.', async () => {
@@ -4587,12 +4587,12 @@ describe('Product actions', () => {
 
       const res = await chai
         .request(app)
-        .get(`/api/products/${productId}/product-customisations/}`)
+        .get(`/api/products/${productId}/product-customisations/`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
-      expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'ProductCustomisation')
-      expect(res.body.ProductCustomisation).to.be.an('object')
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
     })
 
     it('Should return 200 Success when a user retrieves all product customisatioins with productId.', async () => {
