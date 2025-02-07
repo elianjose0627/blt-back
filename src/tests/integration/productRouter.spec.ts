@@ -4494,7 +4494,7 @@ describe('Product actions', () => {
     it('Should return 422 Unprocessable Entity when a user retrieves all product customisatioin without productId.', async () => {
       const res = await chai
         .request(app)
-        .get('/api/products//product-customisations')
+        .get('/api/products/234/product-customisations')
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(422)
@@ -4563,7 +4563,7 @@ describe('Product actions', () => {
       expect(res.body.productCustomisation).to.be.an('object')
     })
 
-    it('Should return 422 Unprocessable Entity when an admin tries to retrieve a product customisations without productId.', async () => {
+    it('Should return 422 Unprocessable Entity when an admin tries to retrieve a product customisations with invalid product customiation id.', async () => {
       await chai
         .request(app)
         .post(`/api/products/${productId}/product-customisations`)
@@ -4587,7 +4587,7 @@ describe('Product actions', () => {
 
       const res = await chai
         .request(app)
-        .get(`/api/products/${productId}/product-customisations/`)
+        .get(`/api/products/${productId}/product-customisations/23`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(422)
@@ -4606,10 +4606,10 @@ describe('Product actions', () => {
       expect(res.body.productCustomisations).to.be.an('array')
     })
 
-    it('Should return 422 Unprocessable Entity when a user retrieves all product customisatioin without productId.', async () => {
+    it('Should return 422 Unprocessable Entity when a user retrieves all product customisatioin with invalid productId.', async () => {
       const res = await chai
         .request(app)
-        .get('/api/products/product-customisations')
+        .get('/api/products/345/product-customisations')
         .set('Authorization', `Bearer ${token}`)
 
       expect(res).to.have.status(422)
