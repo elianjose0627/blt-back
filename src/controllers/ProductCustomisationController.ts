@@ -1,14 +1,11 @@
 import BaseController from './BaseController'
 import ProductCustomisationService from '../services/ProductCustomisationService'
-import ProductService from '../services/ProductService'
 import { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
 
 const productCustomisationService = new ProductCustomisationService('ProductCustomisation')
-
-const productService = new ProductService('Product')
 
 class ProductCustomisationController extends BaseController {
   async checkRecord (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
@@ -48,22 +45,7 @@ class ProductCustomisationController extends BaseController {
   }
 
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { record: initialProduct, user, params: { id: productId }, body: { productCustomisation } } = req
-
-    let product = initialProduct
-
-    product = await productService.findById(productId)
-
-    if (product === null) {
-      return res.status(statusCodes.NOT_FOUND).send({
-        statusCode: statusCodes.NOT_FOUND,
-        success: false,
-        errors: {
-          message: `${String(productService.model)} not found`
-        }
-      })
-    }
-
+    const { user, params: { id: productId }, body: { productCustomisation } } = req
     const { response, status } = await productCustomisationService.insert({ user, productId, productCustomisation })
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 
