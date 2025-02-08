@@ -43,7 +43,8 @@
       "src/server/*",
       "src/utils/socket.ts",
       "src/constants",
-      "**/wawiAPI"
+      "**/wawiAPI",
+      "src/models/supplierProduct*"
     ],
     "reporter": [
       "html",
