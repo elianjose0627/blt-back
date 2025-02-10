@@ -1,13 +1,13 @@
 import BaseController from './BaseController'
-import CampaignAddressService from '../services/CampaignAddressService'
+import CampaignAdditionalProductSettingService from '../services/CampaignAdditionalProductSettingService'
 import type { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
 
-const campaignAddressService = new CampaignAddressService('CampaignAddress')
+const campaignAdditionalProductSettingService = new CampaignAdditionalProductSettingService('CampaignAdditionalProductSetting')
 
-class CampaignAddressController extends BaseController {
+class CampaignAdditionalProductSettingController extends BaseController {
   checkOwnerOrAdminOrEmployee (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: { campaign: { company: { id: companyId, owner } } } } = req
 
@@ -29,11 +29,11 @@ class CampaignAddressController extends BaseController {
   }
 
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { record: campaign, body: { campaignAddresses } } = req
+    const { record: campaign, body: { campaignAdditionalProductSetting } } = req
 
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 
-    const { response, status } = await campaignAddressService.insert({ campaign, campaignAddresses })
+    const { response, status } = await campaignAdditionalProductSettingService.insert({ campaign, campaignAdditionalProductSetting })
 
     const statusCode: StatusCode = {
       200: statusCodes.OK,
@@ -43,19 +43,29 @@ class CampaignAddressController extends BaseController {
     return res.status(statusCode[status]).send({
       statusCode: statusCode[status],
       success: true,
-      [campaignAddressService.manyRecords()]: response
+      [this.recordName()]: response
     })
   }
 
-  async delete (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { record } = req
+  async getAllCampaignAdditionalProductSettings (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { query: { limit, offset, page }, params: { id: campaignId } } = req
 
-    const response = await this.service.delete(record)
+    const records = await campaignAdditionalProductSettingService.getAllCampaignAdditionalProductSettings(limit, offset, campaignId)
 
-    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} deleted` })
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / limit),
+      perPage: limit,
+      page
+    }
 
-    return res.status(statusCodes.NO_CONTENT).send(response)
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      [campaignAdditionalProductSettingService.manyRecords()]: records.rows
+    })
   }
 }
 
-export default new CampaignAddressController(campaignAddressService)
+export default new CampaignAdditionalProductSettingController(campaignAdditionalProductSettingService)
