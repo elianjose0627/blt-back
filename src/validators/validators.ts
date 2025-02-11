@@ -203,8 +203,7 @@ const validateOtp = Joi.object({
 
 const validateUUID = Joi.object().keys({
   id: Joi.string().uuid(),
-  userId: Joi.string().uuid(),
-  productCustomisationId: Joi.string().uuid()
+  userId: Joi.string().uuid()
 }).required()
 
 const validateTrackingId = Joi.object().keys({

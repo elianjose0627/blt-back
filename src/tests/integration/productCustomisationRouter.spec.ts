@@ -561,7 +561,7 @@ describe('Product Customisation actions', () => {
       const productCustomisationId = resProductCustomisation.body.productCustomisation.id
       const res = await chai
         .request(app)
-        .post(`/api/product-customisations/${String(productCustomisationId)}/chat`)
+        .post(`/api/product-customisations/${String(productCustomisationId)}/chats`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productCustomisationChat: {
@@ -576,9 +576,9 @@ describe('Product Customisation actions', () => {
         })
 
       expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('statusCode', 'success', 'ProductCustomisationChat')
-      expect(res.body.ProductCustomisationChat).to.be.an('object')
-      expect(res.body.ProductCustomisationChat).to.include.keys('id', 'message', 'attachment', 'createdAt', 'updatedAt')
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCustomisationChat')
+      expect(res.body.productCustomisationChat).to.be.an('object')
+      expect(res.body.productCustomisationChat).to.include.keys('id', 'message', 'attachment', 'createdAt', 'updatedAt')
     })
 
     it('Should return 201 CREATED when an admin creates a chat without an attachment', async () => {
@@ -606,7 +606,7 @@ describe('Product Customisation actions', () => {
       const productCustomisationId = resProductCustomisation.body.productCustomisation.id
       const res = await chai
         .request(app)
-        .post(`/api/product-customisations/${String(productCustomisationId)}/chat`)
+        .post(`/api/product-customisations/${String(productCustomisationId)}/chats`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productCustomisationChat: {
@@ -616,9 +616,9 @@ describe('Product Customisation actions', () => {
         })
 
       expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('statusCode', 'success', 'ProductCustomisationChat')
-      expect(res.body.ProductCustomisationChat).to.be.an('object')
-      expect(res.body.ProductCustomisationChat).to.include.keys('id', 'message', 'attachment', 'createdAt', 'updatedAt')
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCustomisationChat')
+      expect(res.body.productCustomisationChat).to.be.an('object')
+      expect(res.body.productCustomisationChat).to.include.keys('id', 'message', 'attachment', 'createdAt', 'updatedAt')
     })
 
     it('Should return 200 OK when an admin gets all chats', async () => {
@@ -646,7 +646,7 @@ describe('Product Customisation actions', () => {
       const productCustomisationId = resProductCustomisation.body.productCustomisation.id
       await chai
         .request(app)
-        .post(`/api/product-customisations/${String(productCustomisationId)}/chat`)
+        .post(`/api/product-customisations/${String(productCustomisationId)}/chats`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productCustomisationChat: {
@@ -657,13 +657,13 @@ describe('Product Customisation actions', () => {
 
       const res = await chai
         .request(app)
-        .get(`/api/product-customisations/${String(productCustomisationId)}/chat`)
+        .get(`/api/product-customisations/${String(productCustomisationId)}/chats`)
         .set('Authorization', `Bearer ${tokenAdmin}`)
 
       expect(res).to.have.status(200)
-      expect(res.body).to.include.keys('statusCode', 'success', 'ProductCustomisationChats')
-      expect(res.body.ProductCustomisationChats).to.be.an('array')
-      expect(res.body.ProductCustomisationChats[0].message).to.equal('Test Message')
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCustomisationChats')
+      expect(res.body.productCustomisationChats).to.be.an('array')
+      expect(res.body.productCustomisationChats[0].message).to.equal('Test Message')
     })
   })
 })

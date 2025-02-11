@@ -8,23 +8,6 @@ import * as userRoles from '../utils/userRoles'
 const productCustomisationService = new ProductCustomisationService('ProductCustomisation')
 
 class ProductCustomisationController extends BaseController {
-  async checkRecord (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> {
-    const { productCustomisationId } = req.params
-    const record = await this.service.findById(productCustomisationId)
-
-    if (record === null) {
-      return res.status(statusCodes.NOT_FOUND).send({
-        statusCode: statusCodes.NOT_FOUND,
-        success: false,
-        errors: {
-          message: `${String(this.service.recordName())} not found`
-        }
-      })
-    }
-    req.record = record
-    return next()
-  }
-
   checkOwnerOrAdminOrEmployee (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: { owner, companyId } } = req
 
@@ -82,7 +65,7 @@ class ProductCustomisationController extends BaseController {
   }
 
   async get (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { productCustomisationId } = req.params
+    const { id: productCustomisationId } = req.params
 
     const record = await productCustomisationService.get(productCustomisationId)
 
@@ -94,7 +77,7 @@ class ProductCustomisationController extends BaseController {
   }
 
   async getAllProductCustomisationChats (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { params: { productCustomisationId }, query: { limit, page, offset } } = req
+    const { params: { id: productCustomisationId }, query: { limit, page, offset } } = req
 
     const records = await productCustomisationService.getAllProductCustomisationChats(limit, offset, productCustomisationId)
 
@@ -114,7 +97,7 @@ class ProductCustomisationController extends BaseController {
   }
 
   async insertProductCustomisationChat (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { user, body: { productCustomisationChat }, params: { productCustomisationId } } = req
+    const { user, body: { productCustomisationChat }, params: { id: productCustomisationId } } = req
 
     const { response, status } = await productCustomisationService.insertProductCustomisationChat({ user, productCustomisationChat, productCustomisationId })
     io.emit(`${String(productCustomisationService.recordName())}`, { message: `${String(productCustomisationService.recordName())} created` })

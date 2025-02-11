@@ -12,19 +12,19 @@ const productCustomisationRoutes = (): Router => {
   const productCustomisationRouter = express.Router()
 
   productCustomisationRouter.use('/product-customisations', checkAuth, checkUserIsVerifiedStatus, ProductCustomisationController.setModule)
-  productCustomisationRouter.use('/product-customisations/:productCustomisationId',
+  productCustomisationRouter.use('/product-customisations/:id',
     celebrate({ [Segments.PARAMS]: validator.validateUUID },
       { abortEarly: false }),
     asyncHandler(ProductCustomisationController.checkRecord),
     asyncHandler(ProductCustomisationController.checkOwnerOrAdminOrEmployee),
     asyncHandler(checkPermissions))
-  productCustomisationRouter.route('/product-customisations/:productCustomisationId')
+  productCustomisationRouter.route('/product-customisations/:id')
     .get(asyncHandler(ProductCustomisationController.get))
     .put(celebrate({
       [Segments.BODY]: validator.validateProductCustomisation
     }, { abortEarly: false }), asyncHandler(ProductCustomisationController.update))
     .delete(asyncHandler(ProductCustomisationController.delete))
-  productCustomisationRouter.route('/product-customisations/:productCustomisationId/chats')
+  productCustomisationRouter.route('/product-customisations/:id/chats')
     .get(asyncHandler(paginate), asyncHandler(ProductCustomisationController.getAllProductCustomisationChats))
     .post(celebrate({
       [Segments.BODY]: validator.validateProductCustomisationChat
