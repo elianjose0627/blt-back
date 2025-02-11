@@ -10,6 +10,7 @@ import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import checkPermissions from '../middlewares/checkPermissions'
 import ProductTagController from '../controllers/ProductTagController'
 import setCatalogueAccess from '../middlewares/setCatalogueAccess'
+import ProductCustomisationController from '../controllers/ProductCustomisationController'
 
 const ProductRoutes = (): Router => {
   const productRouter = express.Router()
@@ -90,6 +91,16 @@ const ProductRoutes = (): Router => {
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.QUERY]: validator.validateUUID
     }), asyncHandler(ProductController.addGraduatedPriceToChildren))
+  productRouter.route('/products/:id/product-customisations')
+    .post(ProductCustomisationController.setModule, asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions), celebrate({
+        [Segments.BODY]: validator.validateProductCustomisation
+      }), asyncHandler(ProductCustomisationController.insert))
+    .get(ProductCustomisationController.setModule, asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions), celebrate({
+        [Segments.QUERY]: validator.validateQueryParams
+      }), asyncHandler(paginate), asyncHandler(ProductCustomisationController.getAll))
+
   return productRouter
 }
 

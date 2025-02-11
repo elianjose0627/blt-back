@@ -371,6 +371,15 @@ export const generateInclude = (model: string): any => {
       }
     ]
   }
+  if (model === 'ProductCustomisation') {
+    return [
+      {
+        model: db.User,
+        attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role', 'updatedAt', 'createdAt'],
+        as: 'owner'
+      }
+    ]
+  }
   if (model === 'ApiKey') {
     return [
       {

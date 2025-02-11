@@ -126,7 +126,8 @@ export type Module = typeof appModules.ACCESSPERMISSIONS | typeof appModules.ADD
 typeof appModules.CAMPAIGNS | typeof appModules.COMPANIES |
 typeof appModules.COSTCENTERS | typeof appModules.LEGALTEXTS |
 typeof appModules.ORDERS | typeof appModules.PICTURES |
-typeof appModules.PICTURES | typeof appModules.PRIVACYRULES |
+typeof appModules.PRIVACYRULES | typeof appModules.PRODUCTCATEGORIES |
+typeof appModules.PRODUCTCUSTOMISATIONS |
 typeof appModules.PRODUCTS | typeof appModules.RECIPIENTS |
 typeof appModules.SALUTATIONS | typeof appModules.SECONDARYDOMAINS |
 typeof appModules.SHIPMENTS | typeof appModules.USERS |
@@ -1200,23 +1201,33 @@ export interface IShopHeader {
   filename: string
 }
 
-export interface IPhoto {
-  url: string
-  filename: string
-}
-
-export type ProductCustomisationType = 'print' | 'engraving'
+export type ProductCustomisationType = 'print' | 'engraving' | 'branding'
 export interface IProductCustomisation {
   id: string
   customisationType: ProductCustomisationType
-  customisationDetail: object
+  customisationDetail: string
   price: number
   available: boolean
-  photo: IPhoto[]
+  isApproved: boolean
+  designStatus: string
+  color: string
+  photos: MediaData[]
+  owner: IUser
+  company: ICompany
+  createdAt: Date
+  updatedAt: Date
+  chats: IProductCustomisationChat[]
+  product?: IProduct
+}
+
+export interface IProductCustomisationChat {
+  id: string
+  message: string
+  attachment: Nullable<MediaData>
+  productCustomisation: IProductCustomisation
   owner: IUser
   createdAt: Date
   updatedAt: Date
-  product?: IProduct
 }
 
 export interface IPackingSlip {
