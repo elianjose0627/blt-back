@@ -1,22 +1,22 @@
 import BaseController from './BaseController'
 import ProductCustomisationService from '../services/ProductCustomisationService'
-import ProductService from '../services/ProductService'
+import ProductCustomisationChatService from '../services/ProductCustomisationChatService'
 import { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
 
 const productCustomisationService = new ProductCustomisationService('ProductCustomisation')
-
-const productService = new ProductService('Product')
+const productCustomisationChatService = new ProductCustomisationChatService('ProductCustomisationChat')
 
 class ProductCustomisationController extends BaseController {
-  checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
-    const { user: currentUser, record: { owner: { id } } } = req
+  checkOwnerOrAdminOrEmployee (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { user: currentUser, record: { owner, companyId } } = req
 
-    const isOwnerOrAdmin = currentUser.id === id || currentUser.role === userRoles.ADMIN
+    const isOwnerOrAdmin = currentUser.id === owner.id || currentUser.role === userRoles.ADMIN
+    const isEmployee = currentUser.companyId != null && companyId != null && currentUser.companyId === companyId
 
-    if (isOwnerOrAdmin) {
+    if (isOwnerOrAdmin || isEmployee) {
       req.isOwnerOrAdmin = isOwnerOrAdmin
       return next()
     } else {
@@ -24,30 +24,15 @@ class ProductCustomisationController extends BaseController {
         statusCode: statusCodes.FORBIDDEN,
         success: false,
         errors: {
-          message: 'Only the owner or admin can perform this action'
+          message: 'Only the owner, employee or admin can perform this action'
         }
       })
     }
   }
 
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { record: initialProduct, user, body: { productCustomisation } } = req
-
-    let product = initialProduct
-
-    product = await productService.findById(productCustomisation.productId)
-
-    if (product === null) {
-      return res.status(statusCodes.NOT_FOUND).send({
-        statusCode: statusCodes.NOT_FOUND,
-        success: false,
-        errors: {
-          message: `${String(productService.model)} not found`
-        }
-      })
-    }
-
-    const { response, status } = await productCustomisationService.insert({ user, productCustomisation })
+    const { user, params: { id: productId }, body: { productCustomisation } } = req
+    const { response, status } = await productCustomisationService.insert({ user, productId, productCustomisation })
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 
     const statusCode: StatusCode = {
@@ -63,9 +48,9 @@ class ProductCustomisationController extends BaseController {
   }
 
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { user: currentUser, query: { limit, page, offset, search, filter } } = req
+    const { user: currentUser, params: { id: productId }, query: { limit, page, offset } } = req
 
-    const records = await productCustomisationService.getAll(limit, offset, search, filter, currentUser)
+    const records = await productCustomisationService.getAllProductCustomisations(limit, offset, productId, currentUser)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),
@@ -81,14 +66,54 @@ class ProductCustomisationController extends BaseController {
     })
   }
 
-  async delete (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { record } = req
+  async get (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { id: productCustomisationId } = req.params
 
-    const response = await this.service.delete(record)
+    const record = await productCustomisationService.get(productCustomisationId)
 
-    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} deleted` })
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      [this.service.singleRecord()]: record
+    })
+  }
 
-    return res.status(statusCodes.NO_CONTENT).send(response)
+  async getAllProductCustomisationChats (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { params: { id: productCustomisationId }, query: { limit, page, offset } } = req
+
+    const records = await productCustomisationService.getAllProductCustomisationChats(limit, offset, productCustomisationId)
+
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / limit),
+      perPage: limit,
+      page
+    }
+
+    return res.status(statusCodes.OK).send({
+      statusCode: statusCodes.OK,
+      success: true,
+      meta,
+      [productCustomisationChatService.manyRecords()]: records.rows
+    })
+  }
+
+  async insertProductCustomisationChat (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { user, body: { productCustomisationChat }, params: { id: productCustomisationId } } = req
+
+    const { response, status } = await productCustomisationService.insertProductCustomisationChat({ user, productCustomisationChat, productCustomisationId })
+    io.emit(`${String(productCustomisationService.recordName())}`, { message: `${String(productCustomisationService.recordName())} created` })
+
+    const statusCode: StatusCode = {
+      200: statusCodes.OK,
+      201: statusCodes.CREATED
+    }
+
+    return res.status(statusCode[status]).send({
+      statusCode: statusCode[status],
+      success: true,
+      [productCustomisationChatService.singleRecord()]: response
+    })
   }
 }
 

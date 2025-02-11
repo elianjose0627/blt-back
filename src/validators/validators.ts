@@ -1392,27 +1392,14 @@ const validateCompanyShopHeader = Joi.object({
 
 const validateProductCustomisation = Joi.object({
   productCustomisation: Joi.object({
-    customisationType: Joi.string().required().valid(...['print', 'engraving']),
+    customisationType: Joi.string().required().valid(...['print', 'engraving', 'branding']),
     customisationDetail: Joi.string().required(),
     price: Joi.number().min(0),
-    available: Joi.boolean().optional().default(false),
-    photo: Joi.array().items(
-      Joi.object({
-        filename: Joi.string().required(),
-        url: Joi.string().uri().required()
-      }).required()
-    ).required(),
-    productId: Joi.string().uuid().required()
-  }).required()
-})
-
-const validateProductCustomisationForUpdate = Joi.object({
-  productCustomisation: Joi.object({
-    customisationType: Joi.string().required().valid(...['print', 'engraving']),
-    customisationDetail: Joi.string().required(),
-    price: Joi.number().min(0),
-    available: Joi.boolean().optional().default(false),
-    photo: Joi.array().items(
+    available: Joi.boolean().optional(),
+    isApproved: Joi.boolean().default(false),
+    designStatus: Joi.string().required(),
+    color: Joi.string().required(),
+    photos: Joi.array().items(
       Joi.object({
         filename: Joi.string().required(),
         url: Joi.string().uri().required()
@@ -1421,10 +1408,15 @@ const validateProductCustomisationForUpdate = Joi.object({
   }).required()
 })
 
-const validateProductCustomisationQueryParams = Joi.object({
-  ...commonQueryParams,
-  filter: Joi.object({
-    productId: Joi.string().uuid().required()
+const validateProductCustomisationChat = Joi.object({
+  productCustomisationChat: Joi.object({
+    message: Joi.string().required(),
+    attachment: Joi.array().items(
+      Joi.object({
+        filename: Joi.string().required(),
+        url: Joi.string().uri().required()
+      })
+    ).allow(null)
   }).required()
 })
 
@@ -1556,14 +1548,13 @@ export default {
   validateApiKey,
   validateCompanyShopHeader,
   validateProductCustomisation,
-  validateProductCustomisationQueryParams,
   validateDocumentQueryParams,
-  validateProductCustomisationForUpdate,
   validateProductCategoryForCompany,
   validateTitle,
   validatePostedOrderId,
   validateProductCategoryUpdate,
   validatePendingOrder,
   validatePendingOrderUpdate,
-  validateCampaignAdditionalProductSetting
+  validateCampaignAdditionalProductSetting,
+  validateProductCustomisationChat
 }
