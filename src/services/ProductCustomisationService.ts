@@ -60,24 +60,6 @@ class ProductCustomisationService extends BaseService {
     }
   }
 
-  async update (data: any): Promise<any> {
-    const { user, productCustomisationId, productCustomisation } = data
-    const userId = user.id
-
-    const response = await db[this.model].findOne({
-      where: {
-        id: productCustomisationId
-      },
-      paranoid: false
-    })
-
-    const updatedRecord = await response.update(
-      { ...productCustomisation, userId }
-    )
-
-    return updatedRecord
-  }
-
   async getAllChats (productCustomisationId: string): Promise<any> {
     const records = await db.ProductCustomisationChat.findAndCountAll({
       include: {

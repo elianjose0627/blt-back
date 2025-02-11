@@ -19,14 +19,16 @@ const productCustomisationRoutes = (): Router => {
     asyncHandler(checkPermissions))
   productCustomisationRouter.route('/product-customisations/:productCustomisationId')
     .get(asyncHandler(ProductCustomisationController.get))
-    .put(asyncHandler(ProductCustomisationController.update))
+    .put(celebrate({
+      [Segments.BODY]: validator.validateProductCustomisation
+    }, { abortEarly: false }), asyncHandler(ProductCustomisationController.update))
     .delete(asyncHandler(ProductCustomisationController.delete))
 
   productCustomisationRouter.route('/product-customisations/:productCustomisationId/chat')
     .get(asyncHandler(ProductCustomisationController.getAllChats))
     .post(celebrate({
       [Segments.BODY]: validator.validateProductCustomisationChat
-    }), asyncHandler(ProductCustomisationController.insertChat))
+    }, { abortEarly: false }), asyncHandler(ProductCustomisationController.insertChat))
   return productCustomisationRouter
 }
 

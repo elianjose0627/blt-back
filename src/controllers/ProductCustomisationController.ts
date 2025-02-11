@@ -93,30 +93,6 @@ class ProductCustomisationController extends BaseController {
     })
   }
 
-  async update (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { user, params: { productCustomisationId }, body: { productCustomisation } } = req
-
-    const response = await this.service.update({ user, productCustomisationId, productCustomisation })
-
-    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} updated` })
-
-    return res.status(statusCodes.OK).send({
-      statusCode: statusCodes.OK,
-      success: true,
-      [this.service.singleRecord()]: response
-    })
-  }
-
-  async delete (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { record } = req
-
-    const response = await this.service.delete(record)
-
-    io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} deleted` })
-
-    return res.status(statusCodes.NO_CONTENT).send(response)
-  }
-
   async getAllChats (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { productCustomisationId } = req.params
 

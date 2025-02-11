@@ -1396,7 +1396,7 @@ const validateProductCustomisation = Joi.object({
     customisationType: Joi.string().required().valid(...['print', 'engraving', 'branding']),
     customisationDetail: Joi.string().required(),
     price: Joi.number().min(0),
-    available: Joi.boolean().optional().default(true),
+    available: Joi.boolean().optional(),
     isApproved: Joi.boolean().default(false),
     designStatus: Joi.string().required(),
     color: Joi.string().required(),
