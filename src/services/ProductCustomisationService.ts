@@ -27,20 +27,8 @@ class ProductCustomisationService extends BaseService {
       include: [
         {
           model: db.User,
-          attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role', 'updatedAt', 'createdAt'],
+          attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role'],
           as: 'owner'
-        },
-        {
-          model: db.ProductCustomisationChat,
-          attributes: ['id', 'message', 'attachment'],
-          include: [
-            {
-              model: db.User,
-              attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role', 'updatedAt', 'createdAt'],
-              as: 'owner'
-            }
-          ],
-          as: 'chats'
         }
       ],
       limit,
@@ -60,11 +48,11 @@ class ProductCustomisationService extends BaseService {
     }
   }
 
-  async getAllChats (productCustomisationId: string): Promise<any> {
+  async getAllProductCustomisationChats (limit: number, offset: number, productCustomisationId: string): Promise<any> {
     const records = await db.ProductCustomisationChat.findAndCountAll({
       include: {
         model: db.User,
-        attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role', 'updatedAt', 'createdAt'],
+        attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role'],
         as: 'owner'
       },
       order: [['createdAt', 'DESC']],
@@ -72,7 +60,9 @@ class ProductCustomisationService extends BaseService {
       where: {
         productCustomisationId
       },
-      distinct: true
+      distinct: true,
+      limit,
+      offset
     })
 
     return {
@@ -81,7 +71,7 @@ class ProductCustomisationService extends BaseService {
     }
   }
 
-  async insertChat (data: any): Promise<any> {
+  async insertProductCustomisationChat (data: any): Promise<any> {
     const { user, productCustomisationChat, productCustomisationId } = data
 
     const userId = user.id

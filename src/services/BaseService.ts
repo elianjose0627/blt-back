@@ -375,7 +375,7 @@ export const generateInclude = (model: string): any => {
     return [
       {
         model: db.User,
-        attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role', 'updatedAt', 'createdAt'],
+        attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role'],
         as: 'owner'
       }
     ]

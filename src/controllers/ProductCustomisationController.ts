@@ -89,27 +89,35 @@ class ProductCustomisationController extends BaseController {
     return res.status(statusCodes.OK).send({
       statusCode: statusCodes.OK,
       success: true,
-      productCustomisation: record
+      [this.service.singleRecord()]: record
     })
   }
 
-  async getAllChats (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { productCustomisationId } = req.params
+  async getAllProductCustomisationChats (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { params: { productCustomisationId }, query: { limit, page, offset } } = req
 
-    const records = await productCustomisationService.getAllChats(productCustomisationId)
+    const records = await productCustomisationService.getAllProductCustomisationChats(limit, offset, productCustomisationId)
+
+    const meta = {
+      total: records.count,
+      pageCount: Math.ceil(records.count / limit),
+      perPage: limit,
+      page
+    }
 
     return res.status(statusCodes.OK).send({
       statusCode: statusCodes.OK,
       success: true,
-      ProductCustomisationChats: records.rows
+      meta,
+      [productCustomisationService.manyRecords()]: records.rows
     })
   }
 
-  async insertChat (req: CustomRequest, res: CustomResponse): Promise<any> {
+  async insertProductCustomisationChat (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { user, body: { productCustomisationChat }, params: { productCustomisationId } } = req
 
-    const { response, status } = await productCustomisationService.insertChat({ user, productCustomisationChat, productCustomisationId })
-    io.emit('ProductCustomisationChats', { message: 'ProductCustomisationChats created' })
+    const { response, status } = await productCustomisationService.insertProductCustomisationChat({ user, productCustomisationChat, productCustomisationId })
+    io.emit(`${String(productCustomisationService.recordName())}`, { message: `${String(productCustomisationService.recordName())} created` })
 
     const statusCode: StatusCode = {
       200: statusCodes.OK,
@@ -119,7 +127,7 @@ class ProductCustomisationController extends BaseController {
     return res.status(statusCode[status]).send({
       statusCode: statusCode[status],
       success: true,
-      ProductCustomisationChat: response
+      [productCustomisationService.singleRecord()]: response
     })
   }
 }

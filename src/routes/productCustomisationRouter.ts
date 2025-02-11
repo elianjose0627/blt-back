@@ -6,6 +6,7 @@ import asyncHandler from '../middlewares/asyncHandler'
 import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import checkPermissions from '../middlewares/checkPermissions'
+import paginate from '../middlewares/pagination'
 
 const productCustomisationRoutes = (): Router => {
   const productCustomisationRouter = express.Router()
@@ -23,12 +24,11 @@ const productCustomisationRoutes = (): Router => {
       [Segments.BODY]: validator.validateProductCustomisation
     }, { abortEarly: false }), asyncHandler(ProductCustomisationController.update))
     .delete(asyncHandler(ProductCustomisationController.delete))
-
-  productCustomisationRouter.route('/product-customisations/:productCustomisationId/chat')
-    .get(asyncHandler(ProductCustomisationController.getAllChats))
+  productCustomisationRouter.route('/product-customisations/:productCustomisationId/chats')
+    .get(asyncHandler(paginate), asyncHandler(ProductCustomisationController.getAllProductCustomisationChats))
     .post(celebrate({
       [Segments.BODY]: validator.validateProductCustomisationChat
-    }, { abortEarly: false }), asyncHandler(ProductCustomisationController.insertChat))
+    }, { abortEarly: false }), asyncHandler(ProductCustomisationController.insertProductCustomisationChat))
   return productCustomisationRouter
 }
 
