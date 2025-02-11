@@ -1,11 +1,13 @@
 import BaseController from './BaseController'
 import ProductCustomisationService from '../services/ProductCustomisationService'
+import ProductCustomisationChatService from '../services/ProductCustomisationChatService'
 import { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
 
 const productCustomisationService = new ProductCustomisationService('ProductCustomisation')
+const productCustomisationChatService = new ProductCustomisationChatService('ProductCustomisationChat')
 
 class ProductCustomisationController extends BaseController {
   checkOwnerOrAdminOrEmployee (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
@@ -92,7 +94,7 @@ class ProductCustomisationController extends BaseController {
       statusCode: statusCodes.OK,
       success: true,
       meta,
-      [productCustomisationService.manyRecords()]: records.rows
+      [productCustomisationChatService.manyRecords()]: records.rows
     })
   }
 
@@ -110,7 +112,7 @@ class ProductCustomisationController extends BaseController {
     return res.status(statusCode[status]).send({
       statusCode: statusCode[status],
       success: true,
-      [productCustomisationService.singleRecord()]: response
+      [productCustomisationChatService.singleRecord()]: response
     })
   }
 }

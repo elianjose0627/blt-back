@@ -3,10 +3,6 @@ import BaseService from './BaseService'
 import db from '../models'
 
 class ProductCustomisationService extends BaseService {
-  manyRecords (): string {
-    return 'productCustomisations'
-  }
-
   recordName (): string {
     return 'Product Customisation'
   }
