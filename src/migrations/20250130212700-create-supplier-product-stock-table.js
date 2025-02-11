@@ -18,7 +18,7 @@ module.exports = {
       },
       quantity: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: true
       },
       firstArrivalQuantity: {
         type: Sequelize.INTEGER,

@@ -18,7 +18,7 @@ module.exports = {
       },
       itemColorNumbers: {
         type: Sequelize.JSONB,
-        allowNull: false
+        allowNull: true
       },
       printManipulation: {
         type: Sequelize.STRING,

@@ -27,7 +27,7 @@ module.exports = {
       },
       releaseDate: {
         type: Sequelize.DATE,
-        allowNull: false
+        allowNull: true
       },
       discontinuedDate: {
         type: Sequelize.DATE,
@@ -35,47 +35,47 @@ module.exports = {
       },
       productPropositionCategory: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       categoryLevel1: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       categoryLevel2: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       categoryLevel3: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       colorDescription: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       colorGroup: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       plcStatus: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       plcStatusDescription: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       gtin: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       colorCode: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       pmsColor: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       createdAt: {
         type: Sequelize.DATE,
