@@ -203,7 +203,8 @@ const validateOtp = Joi.object({
 
 const validateUUID = Joi.object().keys({
   id: Joi.string().uuid(),
-  userId: Joi.string().uuid()
+  userId: Joi.string().uuid(),
+  productCustomisationId: Joi.string().uuid()
 }).required()
 
 const validateTrackingId = Joi.object().keys({
@@ -1395,7 +1396,7 @@ const validateProductCustomisation = Joi.object({
     customisationType: Joi.string().required().valid(...['print', 'engraving', 'branding']),
     customisationDetail: Joi.string().required(),
     price: Joi.number().min(0),
-    available: Joi.boolean().optional().default(false),
+    available: Joi.boolean().optional().default(true),
     isApproved: Joi.boolean().default(false),
     designStatus: Joi.string().required(),
     color: Joi.string().required(),
@@ -1441,11 +1442,6 @@ const validateTitle = Joi.object({
 const validatePostedOrderId = Joi.object({
   postedOrderId: Joi.string().regex(/^\d+$/).required()
 })
-
-const validateProductCustomisationUUID = Joi.object().keys({
-  id: Joi.string().uuid(),
-  productCustomisationId: Joi.string().uuid()
-}).required()
 
 const validateCampaignAdditionalProductSetting = Joi.object({
   campaignAdditionalProductSetting: Joi.object({
@@ -1561,6 +1557,5 @@ export default {
   validatePendingOrder,
   validatePendingOrderUpdate,
   validateCampaignAdditionalProductSetting,
-  validateProductCustomisationChat,
-  validateProductCustomisationUUID
+  validateProductCustomisationChat
 }

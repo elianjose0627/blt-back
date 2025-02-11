@@ -5,35 +5,25 @@ import ProductCustomisationController from '../controllers/ProductCustomisationC
 import asyncHandler from '../middlewares/asyncHandler'
 import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
+import checkPermissions from '../middlewares/checkPermissions'
 
 const productCustomisationRoutes = (): Router => {
   const productCustomisationRouter = express.Router()
 
-  productCustomisationRouter.use(
-    '/product-customisations',
-    checkAuth,
-    checkUserIsVerifiedStatus,
-    ProductCustomisationController.setModule
-  )
-  productCustomisationRouter.use(
-    '/product-customisations/:productCustomisationId',
-    celebrate(
-      {
-        [Segments.PARAMS]: validator.validateProductCustomisationUUID
-      },
-      { abortEarly: false }
-    ),
+  productCustomisationRouter.use('/product-customisations', checkAuth, checkUserIsVerifiedStatus, ProductCustomisationController.setModule)
+  productCustomisationRouter.use('/product-customisations/:productCustomisationId',
+    celebrate({ [Segments.PARAMS]: validator.validateUUID },
+      { abortEarly: false }),
     asyncHandler(ProductCustomisationController.checkRecord),
-    asyncHandler(ProductCustomisationController.checkOwnerOrAdmin)
-  )
-  productCustomisationRouter
-    .route('/product-customisations/:productCustomisationId')
+    asyncHandler(ProductCustomisationController.checkOwnerOrAdminOrEmployee),
+    asyncHandler(checkPermissions))
+  productCustomisationRouter.route('/product-customisations/:productCustomisationId')
     .get(asyncHandler(ProductCustomisationController.get))
     .put(asyncHandler(ProductCustomisationController.update))
     .delete(asyncHandler(ProductCustomisationController.delete))
 
   productCustomisationRouter.route('/product-customisations/:productCustomisationId/chat')
-    .get(asyncHandler(ProductCustomisationController.getAllChat))
+    .get(asyncHandler(ProductCustomisationController.getAllChats))
     .post(celebrate({
       [Segments.BODY]: validator.validateProductCustomisationChat
     }), asyncHandler(ProductCustomisationController.insertChat))

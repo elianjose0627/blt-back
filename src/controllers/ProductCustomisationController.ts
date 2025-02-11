@@ -25,12 +25,13 @@ class ProductCustomisationController extends BaseController {
     return next()
   }
 
-  checkOwnerOrAdmin (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
-    const { user: currentUser, record: { owner: { id } } } = req
+  checkOwnerOrAdminOrEmployee (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { user: currentUser, record: { owner, companyId } } = req
 
-    const isOwnerOrAdmin = currentUser.id === id || currentUser.role === userRoles.ADMIN
+    const isOwnerOrAdmin = currentUser.id === owner.id || currentUser.role === userRoles.ADMIN
+    const isEmployee = currentUser.companyId != null && companyId != null && currentUser.companyId === companyId
 
-    if (isOwnerOrAdmin) {
+    if (isOwnerOrAdmin || isEmployee) {
       req.isOwnerOrAdmin = isOwnerOrAdmin
       return next()
     } else {
@@ -38,7 +39,7 @@ class ProductCustomisationController extends BaseController {
         statusCode: statusCodes.FORBIDDEN,
         success: false,
         errors: {
-          message: 'Only the owner or admin can perform this action'
+          message: 'Only the owner, employee or admin can perform this action'
         }
       })
     }
@@ -64,7 +65,7 @@ class ProductCustomisationController extends BaseController {
   async getAll (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { user: currentUser, params: { id: productId }, query: { limit, page, offset } } = req
 
-    const records = await productCustomisationService.getAllProductCustomisation(limit, offset, productId, currentUser)
+    const records = await productCustomisationService.getAllProductCustomisations(limit, offset, productId, currentUser)
     const meta = {
       total: records.count,
       pageCount: Math.ceil(records.count / limit),
@@ -116,10 +117,10 @@ class ProductCustomisationController extends BaseController {
     return res.status(statusCodes.NO_CONTENT).send(response)
   }
 
-  async getAllChat (req: CustomRequest, res: CustomResponse): Promise<any> {
+  async getAllChats (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { productCustomisationId } = req.params
 
-    const records = await productCustomisationService.getAllChat(productCustomisationId)
+    const records = await productCustomisationService.getAllChats(productCustomisationId)
 
     return res.status(statusCodes.OK).send({
       statusCode: statusCodes.OK,

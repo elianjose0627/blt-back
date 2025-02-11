@@ -91,14 +91,15 @@ const ProductRoutes = (): Router => {
     .post(asyncHandler(checkAdmin), celebrate({
       [Segments.QUERY]: validator.validateUUID
     }), asyncHandler(ProductController.addGraduatedPriceToChildren))
-
   productRouter.route('/products/:id/product-customisations')
-    .post(celebrate({
-      [Segments.BODY]: validator.validateProductCustomisation
-    }), asyncHandler(ProductCustomisationController.insert))
-    .get(celebrate({
-      [Segments.QUERY]: validator.validateQueryParams
-    }), asyncHandler(paginate), asyncHandler(ProductCustomisationController.getAll))
+    .post(ProductCustomisationController.setModule, asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions), celebrate({
+        [Segments.BODY]: validator.validateProductCustomisation
+      }), asyncHandler(ProductCustomisationController.insert))
+    .get(ProductCustomisationController.setModule, asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions), celebrate({
+        [Segments.QUERY]: validator.validateQueryParams
+      }), asyncHandler(paginate), asyncHandler(ProductCustomisationController.getAll))
 
   return productRouter
 }

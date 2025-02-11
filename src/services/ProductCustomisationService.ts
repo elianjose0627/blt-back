@@ -3,44 +3,32 @@ import BaseService from './BaseService'
 import db from '../models'
 
 class ProductCustomisationService extends BaseService {
+  manyRecords (): string {
+    return 'productCustomisations'
+  }
+
+  recordName (): string {
+    return 'Product Customisation'
+  }
+
   async insert (data: any): Promise<any> {
     const { user, productId, productCustomisation } = data
-    let response: any
 
     const userId = user.id
+    const companyId = user.companyId
 
-    response = await db[this.model].findOne({
-      where: {
-        productId
-      },
-      paranoid: false
-    })
-
-    if (response !== null) {
-      await response.restore()
-      const updatedResponse = await response.update({ ...productCustomisation, userId })
-      return { response: updatedResponse.toJSONFor(), status: 200 }
-    }
-
-    response = await db[this.model].create({ ...productCustomisation, id: uuidv1(), userId, companyId: user?.company?.id, productId })
+    const response = await db[this.model].create({ ...productCustomisation, id: uuidv1(), userId, companyId, productId })
 
     return { response: response.toJSONFor(), status: 201 }
   }
 
-  async getAllProductCustomisation (limit: number, offset: number, productId: string, user: any): Promise<any> {
+  async getAllProductCustomisations (limit: number, offset: number, productId: string, user: any): Promise<any> {
     const records = await db[this.model].findAndCountAll({
       include: [
         {
           model: db.User,
           attributes: ['id', 'firstName', 'lastName', 'username', 'email', 'photo', 'role', 'updatedAt', 'createdAt'],
-          as: 'owner',
-          include: [
-            {
-              model: db.Address,
-              attributes: ['id', 'country', 'city', 'street', 'zip', 'phone', 'addressAddition', 'type'],
-              as: 'addresses'
-            }
-          ]
+          as: 'owner'
         },
         {
           model: db.ProductCustomisationChat,
@@ -90,7 +78,7 @@ class ProductCustomisationService extends BaseService {
     return updatedRecord
   }
 
-  async getAllChat (productCustomisationId: string): Promise<any> {
+  async getAllChats (productCustomisationId: string): Promise<any> {
     const records = await db.ProductCustomisationChat.findAndCountAll({
       include: {
         model: db.User,
