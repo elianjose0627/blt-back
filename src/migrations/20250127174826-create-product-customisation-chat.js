@@ -13,7 +13,8 @@ module.exports = {
       },
       attachment: {
         type: Sequelize.JSONB,
-        allowNull: false
+        allowNull: true,
+        defaultValue: null
       },
       userId: {
         allowNull: true,

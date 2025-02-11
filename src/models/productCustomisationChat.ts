@@ -1,17 +1,17 @@
 import { Model } from 'sequelize'
-import type { IProductCustomisation, IProductCustomisationChat, IUser, MediaData } from '../types'
+import type { IProductCustomisation, IProductCustomisationChat, IUser, MediaData, Nullable } from '../types'
 
 const ProductCustomisationChatModel = (sequelize: any, DataTypes: any): any => {
   interface ProductCustomisationChatAttributes {
     id: string
     message: string
-    attachment: MediaData
+    attachment: Nullable<MediaData>
   }
 
   class ProductCustomisationChat extends Model<ProductCustomisationChatAttributes> {
     private readonly id: string
     private readonly message: string
-    private readonly attachment: MediaData
+    private readonly attachment: Nullable<MediaData>
     private readonly owner: IUser
     private readonly createdAt: Date
     private readonly updatedAt: Date
@@ -56,7 +56,7 @@ const ProductCustomisationChatModel = (sequelize: any, DataTypes: any): any => {
     },
     attachment: {
       type: DataTypes.JSONB,
-      allowNull: false
+      allowNull: true
     }
   }, {
     sequelize,
