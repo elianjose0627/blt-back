@@ -1204,7 +1204,7 @@ export type ProductCustomisationType = 'print' | 'engraving' | 'branding'
 export interface IProductCustomisation {
   id: string
   customisationType: ProductCustomisationType
-  customisationDetail: object
+  customisationDetail: string
   price: number
   available: boolean
   isApproved: boolean

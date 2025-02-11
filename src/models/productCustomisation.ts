@@ -5,7 +5,7 @@ const ProductCustomisationModel = (sequelize: any, DataTypes: any): any => {
   interface ProductCustomisationAttributes {
     id: string
     customisationType: ProductCustomisationType
-    customisationDetail: object
+    customisationDetail: string
     price: number
     available: boolean
     isApproved: boolean
@@ -17,7 +17,7 @@ const ProductCustomisationModel = (sequelize: any, DataTypes: any): any => {
   class ProductCustomisation extends Model<ProductCustomisationAttributes> {
     private readonly id: string
     private readonly customisationType: ProductCustomisationType
-    private readonly customisationDetail: object
+    private readonly customisationDetail: string
     private readonly price: number
     private readonly available: boolean
     private readonly isApproved: boolean
@@ -86,7 +86,7 @@ const ProductCustomisationModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false
     },
     customisationDetail: {
-      type: DataTypes.JSONB,
+      type: DataTypes.STRING,
       allowNull: false
     },
     price: {

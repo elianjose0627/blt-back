@@ -98,6 +98,7 @@ app.use(apiPrefix, routers.orderConfirmationRouter())
 app.use(apiPrefix, routers.packingSlipRouter())
 app.use(apiPrefix, routers.titleRouter())
 app.use(apiPrefix, routers.campaignAdditionalProductSettingRouter())
+app.use(apiPrefix, routers.productCustomisationRouter())
 
 // Add validation middleware
 app.use(joiErrors)

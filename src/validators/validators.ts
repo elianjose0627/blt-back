@@ -1442,6 +1442,11 @@ const validatePostedOrderId = Joi.object({
   postedOrderId: Joi.string().regex(/^\d+$/).required()
 })
 
+const validateProductCustomisationUUID = Joi.object().keys({
+  id: Joi.string().uuid(),
+  productCustomisationId: Joi.string().uuid()
+}).required()
+
 const validateCampaignAdditionalProductSetting = Joi.object({
   campaignAdditionalProductSetting: Joi.object({
     role: Joi.string()
@@ -1450,10 +1455,6 @@ const validateCampaignAdditionalProductSetting = Joi.object({
     isSelectEnabled: Joi.boolean().default(true)
   }).required()
 })
-const validateProductCustomisationUUID = Joi.object().keys({
-  id: Joi.string().uuid().required(),
-  productCustomisationId: Joi.string().uuid().required()
-}).required()
 
 export default {
   validateCreatedUser,
