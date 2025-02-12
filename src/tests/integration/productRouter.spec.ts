@@ -4529,4 +4529,71 @@ describe('Product actions', () => {
       expect(res.body.productCustomisations).to.be.an('array')
     })
   })
+
+  describe('Product Stock Notifications Actions', () => {
+    it('Should return 201 Created when an admin successfully creates a product stock notification for a product.', async () => {
+      const res = await chai
+        .request(app)
+        .post(`/api/products/${productId}/stock-notifications`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productStockNotification: {
+            threshold: 50,
+            recipients: [faker.internet.email()]
+          }
+        })
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productStockNotification')
+      expect(res.body.productStockNotification).to.be.an('object')
+    })
+
+    it('Should return 200 OK when an admin successfully creates a product stock notification that exists for a product.', async () => {
+      await chai
+        .request(app)
+        .post(`/api/products/${productId}/stock-notifications`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productStockNotification: {
+            threshold: 50,
+            recipients: [faker.internet.email()]
+          }
+        })
+      const res = await chai
+        .request(app)
+        .post(`/api/products/${productId}/stock-notifications`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productStockNotification: {
+            threshold: 50,
+            recipients: [faker.internet.email()]
+          }
+        })
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productStockNotification')
+      expect(res.body.productStockNotification).to.be.an('object')
+    })
+
+    it('Should return 200 OK when an admin successfully gets product stock notifications for a product.', async () => {
+      await chai
+        .request(app)
+        .post(`/api/products/${productId}/stock-notifications`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productStockNotification: {
+            threshold: 50,
+            quantity: 1,
+            recipients: [faker.internet.email()]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${productId}/stock-notifications`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'meta', 'productStockNotifications')
+      expect(res.body.productStockNotifications).to.be.an('array')
+    })
+  })
 })

@@ -76,6 +76,7 @@ export interface Database {
   ApiKey?: any
   ProductCustomisation?: any
   ProductCustomisationChat?: any
+  ProductStockNotification?: any
   [key: string]: any
 }
 
