@@ -1105,25 +1105,10 @@ export const pendingOrders = [
 export const pendingOrderForUpdate = [
   {
     costCenter: '',
-    currency: 'EUR',
-    orderNo: '0',
-    shippingId: 21,
-    shipped: '2025-07-29 10:35:11.0000000',
-    deliverydate: '2025-07-31 10:35:11.0000000',
+    shipped: dayjs.utc().add(1, 'day'),
+    deliverydate: dayjs.utc().add(1, 'day'),
     note: '',
     description: 'Updated Description',
-    orderLineRequests: [
-      {
-        itemName: 'Tasse - Kitty Mug - 1c - navy - Kurita - Muster',
-        articleNumber: '1005',
-        itemNetSale: 0.00,
-        itemVAT: 0.00,
-        quantity: 2,
-        type: 0,
-        discount: 0.00,
-        netPurchasePrice: 0.00
-      }
-    ],
     shippingAddressRequests: [
       {
         salutation: 'Mr',
@@ -1155,8 +1140,8 @@ export const postedPendingOrder = [
     currency: 'EUR',
     orderNo: '0',
     shippingId: 21,
-    shipped: '2025-07-29 10:35:11.0000000',
-    deliverydate: '2025-07-31 10:35:11.0000000',
+    shipped: dayjs.utc().add(1, 'day'),
+    deliverydate: dayjs.utc().add(1, 'day'),
     note: '',
     description: 'Updated Description',
     orderLineRequests: [
@@ -1203,8 +1188,8 @@ export const queuedPendingOrder = [
     currency: 'EUR',
     orderNo: '0',
     shippingId: 21,
-    shipped: '2025-07-29 10:35:11.0000000',
-    deliverydate: '2025-07-31 10:35:11.0000000',
+    shipped: dayjs.utc().add(1, 'day'),
+    deliverydate: dayjs.utc().add(1, 'day'),
     note: '',
     description: 'Updated Description',
     orderLineRequests: [

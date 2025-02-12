@@ -1,16 +1,21 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
-import cors from 'cors'
+import cors, { CorsRequest } from 'cors'
 import logger from 'morgan'
 import passport from 'passport'
 import path from 'path'
 import dotenv from 'dotenv'
+import { ApolloServer } from '@apollo/server'
+import { expressMiddleware } from '@apollo/server/express4'
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+import http from 'http'
 import joiErrors from './middlewares/joiErrors'
 import * as statusCodes from './constants/statusCodes'
-
-// Require our routes and passport into the application
 import routers from './routes'
 import passportAuth from './config/passport'
 import checkMaintenanceMode from './middlewares/checkMaintenanceMode'
+import resolvers from './graphql/resolvers'
+import typeDefs from './graphql/schemas'
+import { context } from './graphql/context'
 
 dotenv.config()
 passportAuth(passport)
@@ -94,11 +99,11 @@ app.use(apiPrefix, routers.categoryRouter())
 app.use(apiPrefix, routers.campaignQuotaRouter())
 app.use(apiPrefix, routers.campaignQuotaNotificationRouter())
 app.use(apiPrefix, routers.apiKeyRouter())
-app.use(apiPrefix, routers.productCustomisationRouter())
 app.use(apiPrefix, routers.orderConfirmationRouter())
 app.use(apiPrefix, routers.packingSlipRouter())
 app.use(apiPrefix, routers.titleRouter())
 app.use(apiPrefix, routers.campaignAdditionalProductSettingRouter())
+app.use(apiPrefix, routers.productCustomisationRouter())
 
 // Add validation middleware
 app.use(joiErrors)
@@ -110,12 +115,7 @@ app.get('/', (req: Request, res: Response) => res.status(200).send({
 
 app.get('/favicon.ico', (req: Request, res: Response) => {
   const options = {
-    root: path.join(__dirname, 'public'),
-    dotfiles: 'deny',
-    headers: {
-      'x-timestamp': Date.now(),
-      'x-sent': true
-    }
+    root: path.join(__dirname, 'public')
   }
   const fileName = 'favicon.ico'
   res.status(statusCodes.OK).sendFile(fileName, options)
@@ -133,13 +133,36 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   }
 })
 
-// Return 404 for nonexistent routes
-app.use((req: Request, res: Response) => res.status(statusCodes.NOT_FOUND).send({
-  statusCode: statusCodes.NOT_FOUND,
-  success: false,
-  errors: {
-    message: 'Route not found'
-  }
-}))
+export const appHttpServer = http.createServer(app)
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  plugins: [ApolloServerPluginDrainHttpServer({ httpServer: appHttpServer })]
+})
+
+void server.start()
+  .then(() => {
+    // eslint-disable-next-line no-console
+    console.log('Apollo GraphQL server started successfully')
+
+    app.use(
+      '/graphql',
+      cors<CorsRequest>(),
+      express.json(),
+      expressMiddleware(server, {
+        context: async ({ req, res }) => await context({ req, res })
+      })
+    )
+
+    // Return 404 for nonexistent routes
+    app.use((req: Request, res: Response) => res.status(statusCodes.NOT_FOUND).send({
+      statusCode: statusCodes.NOT_FOUND,
+      success: false,
+      errors: {
+        message: 'Route not found'
+      }
+    }))
+  })
 
 export default app

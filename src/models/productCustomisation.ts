@@ -1,27 +1,35 @@
 import { Model } from 'sequelize'
-import type { IPhoto, IProduct, IProductCustomisation, IUser, ProductCustomisationType } from '../types'
+import type { MediaData, IProduct, IProductCustomisation, IUser, ICompany, IProductCustomisationChat, ProductCustomisationType } from '../types'
 
 const ProductCustomisationModel = (sequelize: any, DataTypes: any): any => {
   interface ProductCustomisationAttributes {
     id: string
     customisationType: ProductCustomisationType
-    customisationDetail: object
+    customisationDetail: string
     price: number
     available: boolean
-    photo: IPhoto[]
+    isApproved: boolean
+    designStatus: string
+    color: string
+    photos: MediaData[]
   }
 
   class ProductCustomisation extends Model<ProductCustomisationAttributes> {
     private readonly id: string
     private readonly customisationType: ProductCustomisationType
-    private readonly customisationDetail: object
+    private readonly customisationDetail: string
     private readonly price: number
     private readonly available: boolean
-    private readonly photo: IPhoto[]
+    private readonly isApproved: boolean
+    private readonly designStatus: string
+    private readonly color: string
+    private readonly photos: MediaData[]
     private readonly owner: IUser
     private readonly createdAt: Date
     private readonly updatedAt: Date
     private readonly product: IProduct
+    private readonly company: ICompany
+    private readonly chats: IProductCustomisationChat[]
 
     static associate (models: any): any {
       ProductCustomisation.belongsTo(models.Product, {
@@ -34,6 +42,16 @@ const ProductCustomisationModel = (sequelize: any, DataTypes: any): any => {
         as: 'owner',
         onDelete: 'CASCADE'
       })
+      ProductCustomisation.belongsTo(models.Company, {
+        foreignKey: 'companyId',
+        as: 'company',
+        onDelete: 'CASCADE'
+      })
+      ProductCustomisation.hasMany(models.ProductCustomisationChat, {
+        foreignKey: 'productCustomisationId',
+        as: 'chats',
+        onDelete: 'CASCADE'
+      })
     }
 
     toJSONFor (): IProductCustomisation {
@@ -43,8 +61,13 @@ const ProductCustomisationModel = (sequelize: any, DataTypes: any): any => {
         customisationDetail: this.customisationDetail,
         price: this.price,
         available: this.available,
-        photo: this.photo,
+        isApproved: this.isApproved,
+        designStatus: this.designStatus,
+        color: this.color,
+        photos: this.photos,
+        company: this.company,
         owner: this.owner,
+        chats: this.chats,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         product: this.product
@@ -76,7 +99,20 @@ const ProductCustomisationModel = (sequelize: any, DataTypes: any): any => {
       allowNull: false,
       defaultValue: false
     },
-    photo: {
+    isApproved: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
+    designStatus: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    color: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    photos: {
       type: DataTypes.JSONB,
       allowNull: false
     }

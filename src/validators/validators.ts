@@ -814,7 +814,37 @@ const validatePendingOrders = Joi.object({
 }).required()
 
 const validatePendingOrderUpdate = Joi.object({
-  pendingOrder: Joi.object({ ...commonPendingOrderSchema })
+  pendingOrder: Joi.object({
+    shipped: Joi.date().min(dayjs().utc().subtract(1, 'day').toDate()),
+    deliverydate: Joi.date().min(Joi.ref('shipped')),
+    note: Joi.string().allow('').allow(null),
+    description: Joi.string().allow('').allow(null),
+    costCenter: Joi.string().allow('').allow(null),
+    shippingAddressRequests: Joi.array().items(
+      Joi.object({
+        salutation: Joi.string().allow('').allow(null),
+        firstName: Joi.string(),
+        lastName: Joi.string(),
+        title: Joi.string().allow('').allow(null),
+        company: Joi.string().allow('').allow(null),
+        companyAddition: Joi.string().allow('').allow(null),
+        street: Joi.string(),
+        addressAddition: Joi.string().allow('').allow(null),
+        zipCode: Joi.string(),
+        place: Joi.string(),
+        phone: Joi.string().allow('').allow(null),
+        state: Joi.string().allow('').allow(null),
+        country: Joi.string(),
+        iso: Joi.string().allow('').allow(null),
+        telephone: Joi.string().allow('').allow(null),
+        mobile: Joi.string().allow('').allow(null),
+        fax: Joi.string().allow('').allow(null),
+        email: Joi.string(),
+        costCenter: Joi.string().allow('').allow(null).default(null),
+        startDate: Joi.date().allow(null).default(null)
+      })
+    ).min(1).required()
+  })
 }).required()
 
 const validateCardTemplate = Joi.object({
@@ -1392,27 +1422,14 @@ const validateCompanyShopHeader = Joi.object({
 
 const validateProductCustomisation = Joi.object({
   productCustomisation: Joi.object({
-    customisationType: Joi.string().required().valid(...['print', 'engraving']),
+    customisationType: Joi.string().required().valid(...['print', 'engraving', 'branding']),
     customisationDetail: Joi.string().required(),
     price: Joi.number().min(0),
-    available: Joi.boolean().optional().default(false),
-    photo: Joi.array().items(
-      Joi.object({
-        filename: Joi.string().required(),
-        url: Joi.string().uri().required()
-      }).required()
-    ).required(),
-    productId: Joi.string().uuid().required()
-  }).required()
-})
-
-const validateProductCustomisationForUpdate = Joi.object({
-  productCustomisation: Joi.object({
-    customisationType: Joi.string().required().valid(...['print', 'engraving']),
-    customisationDetail: Joi.string().required(),
-    price: Joi.number().min(0),
-    available: Joi.boolean().optional().default(false),
-    photo: Joi.array().items(
+    available: Joi.boolean().optional(),
+    isApproved: Joi.boolean().default(false),
+    designStatus: Joi.string().required(),
+    color: Joi.string().required(),
+    photos: Joi.array().items(
       Joi.object({
         filename: Joi.string().required(),
         url: Joi.string().uri().required()
@@ -1421,10 +1438,15 @@ const validateProductCustomisationForUpdate = Joi.object({
   }).required()
 })
 
-const validateProductCustomisationQueryParams = Joi.object({
-  ...commonQueryParams,
-  filter: Joi.object({
-    productId: Joi.string().uuid().required()
+const validateProductCustomisationChat = Joi.object({
+  productCustomisationChat: Joi.object({
+    message: Joi.string().required(),
+    attachment: Joi.array().items(
+      Joi.object({
+        filename: Joi.string().required(),
+        url: Joi.string().uri().required()
+      })
+    ).allow(null)
   }).required()
 })
 
@@ -1556,14 +1578,13 @@ export default {
   validateApiKey,
   validateCompanyShopHeader,
   validateProductCustomisation,
-  validateProductCustomisationQueryParams,
   validateDocumentQueryParams,
-  validateProductCustomisationForUpdate,
   validateProductCategoryForCompany,
   validateTitle,
   validatePostedOrderId,
   validateProductCategoryUpdate,
   validatePendingOrder,
   validatePendingOrderUpdate,
-  validateCampaignAdditionalProductSetting
+  validateCampaignAdditionalProductSetting,
+  validateProductCustomisationChat
 }

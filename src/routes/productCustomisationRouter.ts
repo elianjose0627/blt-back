@@ -4,29 +4,31 @@ import validator from '../validators/validators'
 import ProductCustomisationController from '../controllers/ProductCustomisationController'
 import asyncHandler from '../middlewares/asyncHandler'
 import checkAuth from '../middlewares/checkAuth'
-import paginate from '../middlewares/pagination'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
+import checkPermissions from '../middlewares/checkPermissions'
+import paginate from '../middlewares/pagination'
 
 const productCustomisationRoutes = (): Router => {
   const productCustomisationRouter = express.Router()
 
   productCustomisationRouter.use('/product-customisations', checkAuth, checkUserIsVerifiedStatus, ProductCustomisationController.setModule)
-  productCustomisationRouter.route('/product-customisations')
-    .post(celebrate({
-      [Segments.BODY]: validator.validateProductCustomisation
-    }), asyncHandler(ProductCustomisationController.insert))
-    .get(celebrate({
-      [Segments.QUERY]: validator.validateProductCustomisationQueryParams
-    }), asyncHandler(paginate), asyncHandler(ProductCustomisationController.getAll))
-  productCustomisationRouter.use('/product-customisations/:id', celebrate({
-    [Segments.PARAMS]: validator.validateUUID
-  }, { abortEarly: false }), asyncHandler(ProductCustomisationController.checkRecord))
+  productCustomisationRouter.use('/product-customisations/:id',
+    celebrate({ [Segments.PARAMS]: validator.validateUUID },
+      { abortEarly: false }),
+    asyncHandler(ProductCustomisationController.checkRecord),
+    asyncHandler(ProductCustomisationController.checkOwnerOrAdminOrEmployee),
+    asyncHandler(checkPermissions))
   productCustomisationRouter.route('/product-customisations/:id')
-    .get(asyncHandler(ProductCustomisationController.checkOwnerOrAdmin), asyncHandler(ProductCustomisationController.get))
-    .put(asyncHandler(ProductCustomisationController.checkOwnerOrAdmin), celebrate({
-      [Segments.BODY]: validator.validateProductCustomisationForUpdate
-    }), asyncHandler(ProductCustomisationController.update))
-    .delete(asyncHandler(ProductCustomisationController.checkOwnerOrAdmin), asyncHandler(ProductCustomisationController.delete))
+    .get(asyncHandler(ProductCustomisationController.get))
+    .put(celebrate({
+      [Segments.BODY]: validator.validateProductCustomisation
+    }, { abortEarly: false }), asyncHandler(ProductCustomisationController.update))
+    .delete(asyncHandler(ProductCustomisationController.delete))
+  productCustomisationRouter.route('/product-customisations/:id/chats')
+    .get(asyncHandler(paginate), asyncHandler(ProductCustomisationController.getAllProductCustomisationChats))
+    .post(celebrate({
+      [Segments.BODY]: validator.validateProductCustomisationChat
+    }, { abortEarly: false }), asyncHandler(ProductCustomisationController.insertProductCustomisationChat))
   return productCustomisationRouter
 }
 

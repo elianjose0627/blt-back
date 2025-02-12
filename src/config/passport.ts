@@ -85,7 +85,11 @@ const passportAuth = (passport: PassportStatic): any => {
 
   const strategy = new JwtStrategy(jwtOptions, (jwtPayload, next) => {
     (async () => {
-      const user = await getUser(jwtPayload.email)
+      const jwtPayloadEmail = jwtPayload.email
+      if (jwtPayloadEmail === undefined) {
+        next(null, false, { message: 'token not valid' })
+      }
+      const user = await getUser(jwtPayloadEmail)
       if (user !== null) {
         const tokenDate = new Date(jwtPayload.logoutTime)
         const type = jwtPayload.type

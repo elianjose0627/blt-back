@@ -34,6 +34,7 @@ let companyUserGroupId2: string
 let userCompanyUserGroupId: string
 const campaignManagerPassword = faker.internet.password()
 const companyAdministratorWithCompanyPassword = faker.internet.password()
+let productId: string
 
 describe('Product actions', () => {
   before(async () => {
@@ -72,6 +73,22 @@ describe('Product actions', () => {
     token = resUser.body.token
     tokenCompanyAdminTwo = resCompanyAdminTwo.body.token
     tokenCampaignManager = resCampaignManager.body.token
+
+    const newProduct = await chai
+      .request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${tokenAdmin}`)
+      .send({
+        product: {
+          jfsku: 'VZ9N01AKBKA',
+          name: 'Lunch Box black',
+          merchantSku: '10478',
+          productGroup: 'general',
+          type: 'generic',
+          description: 'abc test'
+        }
+      })
+    productId = String(newProduct.body.product.id)
   })
 
   after(async () => {
@@ -4321,6 +4338,195 @@ describe('Product actions', () => {
       expect(res).to.have.status(404)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('Child product not found')
+    })
+  })
+
+  describe('Create a product customisation', () => {
+    it('Should return 201 Created when an admin creates a product customisation.', async () => {
+      const res = await chai
+        .request(app)
+        .post(`/api/products/${productId}/product-customisations`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCustomisation: {
+            customisationType: 'print',
+            customisationDetail: 'Two-color Print',
+            price: 100,
+            isApproved: false,
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
+              {
+                url: 'https://google.com',
+                filename: 'file.jpg'
+              }
+            ]
+          }
+        })
+
+      expect(res).to.have.status(201)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCustomisation')
+      expect(res.body.productCustomisation).to.be.an('object')
+      expect(res.body.productCustomisation).to.include.keys('id', 'customisationType', 'customisationDetail', 'price', 'available', 'designStatus', 'color', 'photos', 'createdAt', 'updatedAt')
+    })
+
+    it('Should return 404 NOT FOUND when a user creates the a product customisation with fake product ID.', async () => {
+      const res = await chai
+        .request(app)
+        .post('/api/products/88D48647-ED1C-49CF-9D53-403D7DAD8DB7/product-customisations')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+        .send({
+          productCustomisation: {
+            customisationType: 'print',
+            customisationDetail: 'Two-color Print',
+            price: 100,
+            isApproved: false,
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
+              {
+                url: 'https://google.com',
+                filename: 'file.jpg'
+              }
+            ]
+          }
+        })
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Product not found')
+    })
+  })
+
+  describe('Get all product customisations', () => {
+    it('Should return 200 Success when an admin successfully retrieves all product customisations with productId.', async () => {
+      await chai
+        .request(app)
+        .post(`/api/products/${productId}/product-customisations`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          productCustomisation: {
+            customisationType: 'print',
+            customisationDetail: 'Two-color Print',
+            price: 100,
+            isApproved: false,
+            designStatus: 'Laser Engraving',
+            color: 'red',
+            photos: [
+              {
+                url: 'https://google.com',
+                filename: 'file.jpg'
+              }
+            ]
+          }
+        })
+
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${productId}/product-customisations`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCustomisations')
+      expect(res.body.productCustomisations).to.be.an('array')
+    })
+
+    it('Should return 403 Forbidden when a user without permissions tries to retrieve all product customisations with productId.', async () => {
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${productId}/product-customisations`)
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Only the owner, admin or employee can perform this action')
+    })
+
+    it('Should return 422 Unprocessable Entity when a user retrieves all product customisation without productId.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/products/234/product-customisations')
+        .set('Authorization', `Bearer ${token}`)
+
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
+    })
+
+    it('Should return 200 Success when an admin retrieves all product customisations.', async () => {
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${productId}/product-customisations`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCustomisations')
+      expect(res.body.productCustomisations).to.be.an('array')
+    })
+
+    it('Should return 200 Success when an admin successfully retrieves all product customisations with params.', async () => {
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${productId}/product-customisations`)
+        .query({
+          limit: 10,
+          page: 1,
+          search: 'engraving'
+        })
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCustomisations')
+      expect(res.body.productCustomisations).to.be.an('array')
+    })
+
+    it('Should return 200 Success when an admin retrieves all product customisations with productId.', async () => {
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${productId}/product-customisations`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCustomisations')
+      expect(res.body.productCustomisations).to.be.an('array')
+    })
+
+    it('Should return 422 Unprocessable Entity when a user retrieves all product customisation with invalid productId.', async () => {
+      const res = await chai
+        .request(app)
+        .get('/api/products/345/product-customisations')
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
+    })
+
+    it('Should return 200 Success when a user retrieves all product customisations without params.', async () => {
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${productId}/product-customisations`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCustomisations')
+      expect(res.body.productCustomisations).to.be.an('array')
+    })
+
+    it('Should return 200 Success when an admin successfully retrieves all product customisations with params.', async () => {
+      const res = await chai
+        .request(app)
+        .get(`/api/products/${productId}/product-customisations`)
+        .query({
+          limit: 10,
+          page: 1,
+          search: 'engraving'
+        })
+        .set('Authorization', `Bearer ${tokenAdmin}`)
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'productCustomisations')
+      expect(res.body.productCustomisations).to.be.an('array')
     })
   })
 })
