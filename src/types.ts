@@ -1449,3 +1449,15 @@ export interface ISupplierProductPrintingTechniqueDescription {
   createdAt: Date
   updatedAt: Date
 }
+export interface IProductStockNotification {
+  id: string
+  threshold: number
+  recipients: string[]
+  frequency: number
+  frequencyUnit: TimeFrequencyUnit
+  quantity: number
+  lastSentAt: Nullable<Date>
+  isEnabled: boolean
+  createdAt: Date
+  updatedAt: Date
+}
