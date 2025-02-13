@@ -66,11 +66,11 @@ const SupplierProductPrintDataProductPrintingPositionModel = (sequelize: any, Da
     },
     positionId: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     printSizeUnit: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     maxPrintSizeHeight: {
       type: DataTypes.FLOAT,
@@ -78,7 +78,7 @@ const SupplierProductPrintDataProductPrintingPositionModel = (sequelize: any, Da
     },
     maxPrintSizeWidth: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: true
     },
     rotation: {
       type: DataTypes.FLOAT,
@@ -86,19 +86,19 @@ const SupplierProductPrintDataProductPrintingPositionModel = (sequelize: any, Da
     },
     printPositionType: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     printingTechniques: {
       type: DataTypes.JSONB,
-      allowNull: false
+      allowNull: true
     },
     points: {
       type: DataTypes.JSONB,
-      allowNull: false
+      allowNull: true
     },
     images: {
       type: DataTypes.JSONB,
-      allowNull: false
+      allowNull: true
     },
     supplierProductPrintDataProductId: {
       type: DataTypes.UUID,

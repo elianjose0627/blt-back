@@ -67,7 +67,7 @@ const SupplierProductDigitalAssetModel = (sequelize: any, DataTypes: any): any =
     },
     url: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     urlHighress: {
       type: DataTypes.STRING,
@@ -75,7 +75,7 @@ const SupplierProductDigitalAssetModel = (sequelize: any, DataTypes: any): any =
     },
     type: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     subtype: {
       type: DataTypes.STRING,
@@ -83,7 +83,7 @@ const SupplierProductDigitalAssetModel = (sequelize: any, DataTypes: any): any =
     },
     for: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     }
   }, {
     sequelize,

@@ -162,163 +162,163 @@ const SupplierProductModel = (sequelize: any, DataTypes: any): any => {
     },
     masterCode: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     masterId: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     typeOfProducts: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     commodityCode: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     numberOfPrintPositions: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     countryOfOrigin: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     brand: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     productName: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     categoryCode: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     productClass: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     dimensions: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     length: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: true
     },
     lengthUnit: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     width: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: true
     },
     widthUnit: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     height: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: true
     },
     heightUnit: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     volume: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: true
     },
     volumeUnit: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     grossWeight: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: true
     },
     grossWeightUnit: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     netWeight: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: true
     },
     netWeightUnit: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     innerCartonQuantity: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: true
     },
     outerCartonQuantity: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: true
     },
     cartonLength: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: true
     },
     cartonLengthUnit: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     cartonWidth: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: true
     },
     cartonWidthUnit: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     cartonHeight: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: true
     },
     cartonHeightUnit: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     cartonVolume: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: true
     },
     cartonVolumeUnit: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     cartonGrossWeight: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: true
     },
     cartonGrossWeightUnit: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     timestamp: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: true
     },
     shortDescription: {
       type: DataTypes.TEXT,
-      allowNull: false
+      allowNull: true
     },
     longDescription: {
       type: DataTypes.TEXT,
-      allowNull: false
+      allowNull: true
     },
     material: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     printable: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     }
   }, {
     sequelize,

@@ -10,11 +10,11 @@ module.exports = {
       },
       printingTechniqueDescriptionId: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       name: {
         type: Sequelize.JSONB,
-        allowNull: false
+        allowNull: true
       },
       createdAt: {
         type: Sequelize.DATE,

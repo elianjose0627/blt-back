@@ -18,155 +18,155 @@ module.exports = {
       },
       typeOfProducts: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       commodityCode: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       numberOfPrintPositions: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       countryOfOrigin: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       brand: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       productName: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       categoryCode: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       productClass: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       dimensions: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       length: {
         type: Sequelize.FLOAT,
-        allowNull: false
+        allowNull: true
       },
       lengthUnit: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       width: {
         type: Sequelize.FLOAT,
-        allowNull: false
+        allowNull: true
       },
       widthUnit: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       height: {
         type: Sequelize.FLOAT,
-        allowNull: false
+        allowNull: true
       },
       heightUnit: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       volume: {
         type: Sequelize.FLOAT,
-        allowNull: false
+        allowNull: true
       },
       volumeUnit: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       grossWeight: {
         type: Sequelize.FLOAT,
-        allowNull: false
+        allowNull: true
       },
       grossWeightUnit: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       netWeight: {
         type: Sequelize.FLOAT,
-        allowNull: false
+        allowNull: true
       },
       netWeightUnit: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       innerCartonQuantity: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: true
       },
       outerCartonQuantity: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: true
       },
       cartonLength: {
         type: Sequelize.FLOAT,
-        allowNull: false
+        allowNull: true
       },
       cartonLengthUnit: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       cartonWidth: {
         type: Sequelize.FLOAT,
-        allowNull: false
+        allowNull: true
       },
       cartonWidthUnit: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       cartonHeight: {
         type: Sequelize.FLOAT,
-        allowNull: false
+        allowNull: true
       },
       cartonHeightUnit: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       cartonVolume: {
         type: Sequelize.FLOAT,
-        allowNull: false
+        allowNull: true
       },
       cartonVolumeUnit: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       cartonGrossWeight: {
         type: Sequelize.FLOAT,
-        allowNull: false
+        allowNull: true
       },
       cartonGrossWeightUnit: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       timestamp: {
         type: Sequelize.DATE,
-        allowNull: false
+        allowNull: true
       },
       shortDescription: {
         type: Sequelize.TEXT,
-        allowNull: false
+        allowNull: true
       },
       longDescription: {
         type: Sequelize.TEXT,
-        allowNull: false
+        allowNull: true
       },
       material: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       printable: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       createdAt: {
         type: Sequelize.DATE,
