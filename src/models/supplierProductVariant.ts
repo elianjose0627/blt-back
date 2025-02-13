@@ -89,7 +89,7 @@ const SupplierProductVariantModel = (sequelize: any, DataTypes: any): any => {
     },
     variantId: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     sku: {
       type: DataTypes.STRING,
@@ -97,7 +97,7 @@ const SupplierProductVariantModel = (sequelize: any, DataTypes: any): any => {
     },
     releaseDate: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: true
     },
     discontinuedDate: {
       type: DataTypes.DATE,
@@ -105,47 +105,47 @@ const SupplierProductVariantModel = (sequelize: any, DataTypes: any): any => {
     },
     productPropositionCategory: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     categoryLevel1: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     categoryLevel2: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     categoryLevel3: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     colorDescription: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     colorGroup: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     plcStatus: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     plcStatusDescription: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     gtin: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     colorCode: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     pmsColor: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     }
   }, {
     sequelize,
