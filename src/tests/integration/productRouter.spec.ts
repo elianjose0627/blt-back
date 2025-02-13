@@ -4538,7 +4538,7 @@ describe('Product actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productStockNotification: {
-            threshold: 50,
+            quantity: 50,
             recipients: [faker.internet.email()]
           }
         })
@@ -4554,7 +4554,7 @@ describe('Product actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productStockNotification: {
-            threshold: 50,
+            quantity: 55,
             recipients: [faker.internet.email()]
           }
         })
@@ -4564,7 +4564,7 @@ describe('Product actions', () => {
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           productStockNotification: {
-            threshold: 50,
+            quantity: 55,
             recipients: [faker.internet.email()]
           }
         })

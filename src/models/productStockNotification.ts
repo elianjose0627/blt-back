@@ -57,7 +57,8 @@ const ProductStockNotificationModel = (sequelize: any, DataTypes: any): any => {
     },
     threshold: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      defaultValue: 0
     },
     recipients: {
       type: DataTypes.ARRAY(DataTypes.STRING),

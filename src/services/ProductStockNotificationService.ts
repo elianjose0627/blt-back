@@ -11,7 +11,7 @@ class ProductStockNotificationService extends BaseService {
     response = await db[this.model].findOne({
       where: {
         productId: product.id,
-        threshold: productStockNotification.threshold
+        quantity: productStockNotification.quantity
       },
       paranoid: false // To get soft deleted record
     })
