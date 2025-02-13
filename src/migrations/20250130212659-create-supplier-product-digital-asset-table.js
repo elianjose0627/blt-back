@@ -28,7 +28,7 @@ module.exports = {
       },
       url: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       urlHighress: {
         type: Sequelize.STRING,
@@ -36,7 +36,7 @@ module.exports = {
       },
       type: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       subtype: {
         type: Sequelize.STRING,
@@ -44,7 +44,7 @@ module.exports = {
       },
       for: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       createdAt: {
         type: Sequelize.DATE,

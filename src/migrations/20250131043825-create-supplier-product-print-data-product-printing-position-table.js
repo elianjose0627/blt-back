@@ -14,7 +14,7 @@ module.exports = {
       },
       printSizeUnit: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       maxPrintSizeHeight: {
         type: Sequelize.FLOAT,
@@ -22,7 +22,7 @@ module.exports = {
       },
       maxPrintSizeWidth: {
         type: Sequelize.FLOAT,
-        allowNull: false
+        allowNull: true
       },
       rotation: {
         type: Sequelize.FLOAT,
@@ -30,19 +30,19 @@ module.exports = {
       },
       printPositionType: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       printingTechniques: {
         type: Sequelize.JSONB,
-        allowNull: false
+        allowNull: true
       },
       points: {
         type: Sequelize.JSONB,
-        allowNull: false
+        allowNull: true
       },
       images: {
         type: Sequelize.JSONB,
-        allowNull: false
+        allowNull: true
       },
       supplierProductPrintDataProductId: {
         type: Sequelize.UUID,

@@ -18,16 +18,16 @@ module.exports = {
       },
       price: {
         type: Sequelize.FLOAT,
-        allowNull: false
+        allowNull: true
       },
       currency: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         defaultValue: 'EUR'
       },
       validUntil: {
         type: Sequelize.DATE,
-        allowNull: false
+        allowNull: true
       },
       scale: {
         type: Sequelize.JSONB,
