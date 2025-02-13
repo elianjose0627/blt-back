@@ -58,20 +58,20 @@ const SupplierProductPriceListModel = (sequelize: any, DataTypes: any): any => {
     },
     variantId: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     price: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: true
     },
     currency: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       defaultValue: 'EUR'
     },
     validUntil: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: true
     },
     scale: {
       type: DataTypes.JSONB,

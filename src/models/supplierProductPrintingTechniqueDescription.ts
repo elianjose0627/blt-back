@@ -38,11 +38,11 @@ const SupplierProductPrintingTechniqueDescriptionModel = (sequelize: any, DataTy
     },
     printingTechniqueDescriptionId: {
       type: DataTypes.UUID,
-      allowNull: false
+      allowNull: true
     },
     name: {
       type: DataTypes.JSONB,
-      allowNull: false
+      allowNull: true
     }
   }, {
     sequelize,

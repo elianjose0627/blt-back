@@ -48,7 +48,7 @@ const SupplierProductStockModel = (sequelize: any, DataTypes: any): any => {
     },
     sku: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     firstArrivalDate: {
       type: DataTypes.DATE,
@@ -56,7 +56,7 @@ const SupplierProductStockModel = (sequelize: any, DataTypes: any): any => {
     },
     quantity: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: true
     },
     firstArrivalQuantity: {
       type: DataTypes.INTEGER,

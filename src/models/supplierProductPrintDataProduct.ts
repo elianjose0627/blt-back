@@ -51,7 +51,7 @@ const SupplierProductPrintDataProductModel = (sequelize: any, DataTypes: any): a
     },
     masterCode: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     masterId: {
       type: DataTypes.STRING,
@@ -59,7 +59,7 @@ const SupplierProductPrintDataProductModel = (sequelize: any, DataTypes: any): a
     },
     itemColorNumbers: {
       type: DataTypes.JSONB,
-      allowNull: false
+      allowNull: true
     },
     printManipulation: {
       type: DataTypes.STRING,
