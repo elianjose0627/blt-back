@@ -412,6 +412,29 @@ export const generateInclude = (model: string): any => {
       }
     ]
   }
+  if (model === 'ProductStockNotification') {
+    return [
+      {
+        model: db.Product,
+        attributes: ['id', 'name'],
+        as: 'product',
+        include: [
+          {
+            model: db.Company,
+            attributes: ['id'],
+            as: 'company',
+            include: [
+              {
+                model: db.User,
+                attributes: ['id'],
+                as: 'owner'
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
   if (withoutUser.includes(model)) {
     return ([])
   }

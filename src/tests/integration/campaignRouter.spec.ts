@@ -797,7 +797,7 @@ describe('Campaign actions', () => {
       const resCampaign = await chai
         .request(app)
         .post(`/api/companies/${String(companyIdPrivacyRule)}/campaigns`)
-        .set('Authorization', `Bearer ${tokenCompanyAdminTwoPrivacyRule}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           campaign: {
             name: 'Onboarding Privacy',
@@ -809,7 +809,7 @@ describe('Campaign actions', () => {
       await chai
         .request(app)
         .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/recipients`)
-        .set('Authorization', `Bearer ${tokenCompanyAdminTwoPrivacyRule}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           recipient: {
             firstName: 'John',
@@ -844,7 +844,7 @@ describe('Campaign actions', () => {
       const resCampaign = await chai
         .request(app)
         .post(`/api/companies/${String(companyIdPrivacyRule)}/campaigns`)
-        .set('Authorization', `Bearer ${tokenCompanyAdminTwoPrivacyRule}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           campaign: {
             name: 'Onboarding Privacy',

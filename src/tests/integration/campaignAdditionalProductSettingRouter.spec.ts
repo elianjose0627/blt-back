@@ -66,7 +66,7 @@ describe('Campaign Additional Product Setting actions', () => {
   })
 
   describe('Delete a campaign additional product setting by id', () => {
-    it('Should return 204 No Content when an admin successfully deletes a additional product setting.', async () => {
+    it('Should return 204 No Content when an admin successfully deletes an additional product setting.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -111,7 +111,7 @@ describe('Campaign Additional Product Setting actions', () => {
       expect(res).to.have.status(204)
     })
 
-    it('Should return 204 No Content when a campaign manager successfully deletes a additional product setting.', async () => {
+    it('Should return 403 Forbidden when a campaign manager tries to delete an additional product setting.', async () => {
       const resCompany = await createVerifiedCompany(userIdAdmin)
 
       const companyId = resCompany.id
@@ -165,10 +165,12 @@ describe('Campaign Additional Product Setting actions', () => {
         .delete(`/api/campaign-additional-product-settings/${String(resAdditionalProductSetting.body.campaignAdditionalProductSetting.id)}`)
         .set('Authorization', `Bearer ${tokenCampaignManager}`)
 
-      expect(res).to.have.status(204)
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
     })
 
-    it('Should return 403 Forbidden when a company admin who is not an employee tries to delete a additional product setting.', async () => {
+    it('Should return 403 Forbidden when a company admin who is not an employee tries to delete an additional product setting.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -237,7 +239,7 @@ describe('Campaign Additional Product Setting actions', () => {
       expect(res.body.errors.message).to.equal('Only the owner, employee or admin can perform this action')
     })
 
-    it('Should return 403 Forbidden when a user who is not an employee tries to delete a additional product setting.', async () => {
+    it('Should return 403 Forbidden when a user who is not an employee tries to delete an additional product setting.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -306,7 +308,7 @@ describe('Campaign Additional Product Setting actions', () => {
       expect(res.body.errors.message).to.equal('Only the owner, employee or admin can perform this action')
     })
 
-    it('Should return 403 Forbidden when a company non owner tries to delete a additional product setting', async () => {
+    it('Should return 403 Forbidden when a company non owner tries to delete an additional product setting', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')

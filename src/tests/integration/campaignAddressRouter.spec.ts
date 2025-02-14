@@ -113,7 +113,7 @@ describe('Campaign Address actions', () => {
       expect(res).to.have.status(204)
     })
 
-    it('Should return 204 No Content when a campaign manager successfully deletes a campaign address.', async () => {
+    it('Should return 403 Forbidden when a campaign manager tries to delete a campaign address.', async () => {
       const resCompany = await createVerifiedCompany(userIdAdmin)
 
       const companyId = resCompany.id
@@ -168,10 +168,12 @@ describe('Campaign Address actions', () => {
         .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddresses[0].id)}`)
         .set('Authorization', `Bearer ${tokenCampaignManager}`)
 
-      expect(res).to.have.status(204)
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
     })
 
-    it('Should return 204 No Content when a company admin successfully deletes a campaign address.', async () => {
+    it('Should return 403 Forbidden when a company admin tries to delete a campaign address.', async () => {
       const resCompany = await createVerifiedCompany(userIdAdmin)
 
       const companyId = resCompany.id
@@ -226,7 +228,9 @@ describe('Campaign Address actions', () => {
         .delete(`/api/campaign-addresses/${String(resCampaignAddress.body.campaignAddresses[0].id)}`)
         .set('Authorization', `Bearer ${tokenCompanyAdministrator}`)
 
-      expect(res).to.have.status(204)
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
     })
 
     it('Should return 403 Forbidden when a company admin who is not an employee tries to delete a campaign address.', async () => {

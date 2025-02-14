@@ -112,7 +112,7 @@ describe('Campaign Quota Notification actions', () => {
       expect(res).to.have.status(204)
     })
 
-    it('Should return 204 No Content when a campaign manager successfully deletes a quota notification.', async () => {
+    it('Should return 403 Forbidden when a campaign manager tries to delete a quota notification.', async () => {
       const resCompany = await createVerifiedCompany(userIdAdmin)
 
       const companyId = resCompany.id
@@ -166,7 +166,9 @@ describe('Campaign Quota Notification actions', () => {
         .delete(`/api/campaign-quota-notifications/${String(resCampaignQuotaNotification.body.campaignQuotaNotification.id)}`)
         .set('Authorization', `Bearer ${tokenCampaignManager}`)
 
-      expect(res).to.have.status(204)
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
     })
 
     it('Should return 403 Forbidden when a user tries to delete a quota notification.', async () => {

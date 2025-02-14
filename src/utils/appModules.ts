@@ -1,41 +1,47 @@
-export const ACCESSPERMISSIONS = 'accessPermissions'
-export const ADDRESSES = 'addresses'
-export const BUNDLES = 'bundles'
-export const CAMPAIGNS = 'campaigns'
-export const COMPANIES = 'companies'
-export const COSTCENTERS = 'costCenters'
-export const LEGALTEXTS = 'legalTexts'
-export const ORDERS = 'orders'
-export const PICTURES = 'pictures'
-export const PRIVACYRULES = 'privacyRules'
-export const PRODUCTS = 'products'
-export const RECIPIENTS = 'recipients'
-export const SALUTATIONS = 'salutations'
-export const SECONDARYDOMAINS = 'secondaryDomains'
-export const SHIPMENTS = 'shipments'
-export const USERS = 'users'
-export const COMPANYSUBSCRIPTIONS = 'companySubscriptions'
-export const PRODUCTCATEGORIES = 'productCategories'
-export const PRODUCTCUSTOMISATIONS = 'productCustomisations'
+export const MODULES = {
+  ACCESSPERMISSIONS: 'accessPermissions',
+  ADDRESSES: 'addresses',
+  BUNDLES: 'bundles',
+  CAMPAIGNS: 'campaigns',
+  COMPANIES: 'companies',
+  COSTCENTERS: 'costCenters',
+  LEGALTEXTS: 'legalTexts',
+  ORDERS: 'orders',
+  PICTURES: 'pictures',
+  PRIVACYRULES: 'privacyRules',
+  PRODUCTS: 'products',
+  RECIPIENTS: 'recipients',
+  SALUTATIONS: 'salutations',
+  SECONDARYDOMAINS: 'secondaryDomains',
+  SHIPMENTS: 'shipments',
+  USERS: 'users',
+  COMPANYSUBSCRIPTIONS: 'companySubscriptions',
+  PRODUCTCATEGORIES: 'productCategories',
+  PRODUCTCUSTOMISATIONS: 'productCustomisations',
+  PRODUCTSTOCKNOTIFICATIONS: 'productStockNotifications'
+} as const
 
-export const MODULES_ARRAY = [
-  'accessPermissions',
-  'addresses',
-  'bundles',
-  'campaigns',
-  'companies',
-  'costCenters',
-  'legalTexts',
-  'orders',
-  'pictures',
-  'privacyRules',
-  'products',
-  'recipients',
-  'salutations',
-  'secondaryDomains',
-  'shipments',
-  'users',
-  'companySubscriptions',
-  'productCategories',
-  'productCustomisations'
-]
+export const {
+  ACCESSPERMISSIONS,
+  ADDRESSES,
+  BUNDLES,
+  CAMPAIGNS,
+  COMPANIES,
+  COSTCENTERS,
+  LEGALTEXTS,
+  ORDERS,
+  PICTURES,
+  PRIVACYRULES,
+  PRODUCTS,
+  RECIPIENTS,
+  SALUTATIONS,
+  SECONDARYDOMAINS,
+  SHIPMENTS,
+  USERS,
+  COMPANYSUBSCRIPTIONS,
+  PRODUCTCATEGORIES,
+  PRODUCTCUSTOMISATIONS,
+  PRODUCTSTOCKNOTIFICATIONS
+} = MODULES
+
+export const MODULES_ARRAY = Object.values(MODULES)

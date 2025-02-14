@@ -7,7 +7,7 @@ const mailer = String(process.env.MAILER_EMAIL)
 
 const appName = String(process.env.APP_NAME)
 
-export const sendNotifierEmail = async (email: string, subject: string, message: string, bccStatus = true, html = '', sandboxMode: boolean): Promise<any> => {
+export const sendNotifierEmail = async (email: string, subject: string, message: string, bccStatus: boolean, html: string, sandboxMode: boolean): Promise<any> => {
   const msg: EmailMessage = {
     to: email,
     from: `${appName} <${mailer}>`,
@@ -22,7 +22,9 @@ export const sendNotifierEmail = async (email: string, subject: string, message:
   }
 
   if (html !== '') {
-    msg.html = html ?? '<p></p>'
+    msg.html = html
+  } else {
+    msg.html = '<p></p>'
   }
 
   try {
