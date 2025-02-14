@@ -23,7 +23,7 @@ const withoutUser = [
   'CompanyProductAccessControlGroup', 'CompanyUserGroup', 'UserCompanyUserGroup',
   'CompanyUserGroupProductAccessControlGroup', 'TaxRate', 'MassUnit',
   'SalesUnit', 'ProductDetail', 'ProductProductCategory', 'CompanyInviteToken',
-  'CampaignQuota', 'CampaignQuotaNotification', 'CampaignAdditionalProductSetting', 'ApiKey', 'Title'
+  'CampaignQuota', 'CampaignQuotaNotification', 'CampaignAdditionalProductSetting', 'ProductStockNotification', 'ApiKey', 'Title'
 ]
 
 export const includeCompanyAndOwner = {
@@ -386,6 +386,52 @@ export const generateInclude = (model: string): any => {
         model: db.User,
         attributes: ['id', 'firstName', 'lastName', 'username', 'email'],
         as: 'user'
+      }
+    ]
+  }
+  if (model === 'CampaignQuotaNotification') {
+    return [
+      {
+        model: db.Campaign,
+        attributes: ['id', 'name', 'status', 'type'],
+        as: 'campaign',
+        include: [
+          {
+            model: db.Company,
+            attributes: ['id'],
+            as: 'company',
+            include: [
+              {
+                model: db.User,
+                attributes: ['id'],
+                as: 'owner'
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+  if (model === 'ProductStockNotification') {
+    return [
+      {
+        model: db.Product,
+        attributes: ['id', 'name'],
+        as: 'product',
+        include: [
+          {
+            model: db.Company,
+            attributes: ['id'],
+            as: 'company',
+            include: [
+              {
+                model: db.User,
+                attributes: ['id'],
+                as: 'owner'
+              }
+            ]
+          }
+        ]
       }
     ]
   }

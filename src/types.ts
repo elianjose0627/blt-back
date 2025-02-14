@@ -122,16 +122,8 @@ export interface IAccessPermission {
   company?: ICompany
 }
 
-export type Module = typeof appModules.ACCESSPERMISSIONS | typeof appModules.ADDRESSES | typeof appModules.BUNDLES |
-typeof appModules.CAMPAIGNS | typeof appModules.COMPANIES |
-typeof appModules.COSTCENTERS | typeof appModules.LEGALTEXTS |
-typeof appModules.ORDERS | typeof appModules.PICTURES |
-typeof appModules.PRIVACYRULES | typeof appModules.PRODUCTCATEGORIES |
-typeof appModules.PRODUCTCUSTOMISATIONS |
-typeof appModules.PRODUCTS | typeof appModules.RECIPIENTS |
-typeof appModules.SALUTATIONS | typeof appModules.SECONDARYDOMAINS |
-typeof appModules.SHIPMENTS | typeof appModules.USERS |
-typeof appModules.COMPANYSUBSCRIPTIONS
+type ModuleKeys = (typeof appModules.MODULES_ARRAY)[number]
+export type Module = typeof appModules[Uppercase<ModuleKeys>]
 
 export type Permission = typeof permissions.READ | typeof permissions.READWRITE | typeof permissions.NOACCESS
 
@@ -1446,6 +1438,18 @@ export interface ISupplierProductPrintingTechniqueDescription {
   id: string
   printingTechniqueDescriptionId: string
   name: object
+  createdAt: Date
+  updatedAt: Date
+}
+export interface IProductStockNotification {
+  id: string
+  threshold: number
+  recipients: string[]
+  frequency: number
+  frequencyUnit: TimeFrequencyUnit
+  quantity: number
+  lastSentAt: Nullable<Date>
+  isEnabled: boolean
   createdAt: Date
   updatedAt: Date
 }
