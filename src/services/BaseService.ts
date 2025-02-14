@@ -389,6 +389,29 @@ export const generateInclude = (model: string): any => {
       }
     ]
   }
+  if (model === 'CampaignQuotaNotification') {
+    return [
+      {
+        model: db.Campaign,
+        attributes: ['id', 'name', 'status', 'type'],
+        as: 'campaign',
+        include: [
+          {
+            model: db.Company,
+            attributes: ['id'],
+            as: 'company',
+            include: [
+              {
+                model: db.User,
+                attributes: ['id'],
+                as: 'owner'
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
   if (withoutUser.includes(model)) {
     return ([])
   }

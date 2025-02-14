@@ -13,8 +13,8 @@ class CampaignController extends BaseController {
   checkOwnerOrAdminOrEmployee (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
     const { user: currentUser, record: { companyId, company: { owner } } } = req
 
-    const isOwnerOrAdmin = currentUser?.id === owner?.id || currentUser.role === userRoles.ADMIN
-    const isEmployee = currentUser?.companyId === companyId
+    const isOwnerOrAdmin = currentUser.id === owner?.id || currentUser.role === userRoles.ADMIN
+    const isEmployee = currentUser.companyId != null && companyId != null && currentUser.companyId === companyId
 
     if (isOwnerOrAdmin || (isEmployee)) {
       req.isOwnerOrAdmin = isOwnerOrAdmin
@@ -24,7 +24,7 @@ class CampaignController extends BaseController {
         statusCode: statusCodes.FORBIDDEN,
         success: false,
         errors: {
-          message: 'Only the owner or admin can perform this action'
+          message: 'Only the owner, admin or employee can perform this action'
         }
       })
     }

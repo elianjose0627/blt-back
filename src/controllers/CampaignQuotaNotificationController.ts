@@ -1,12 +1,33 @@
 import BaseController from './BaseController'
 import CampaignQuotaNotificationService from '../services/CampaignQuotaNotificationService'
-import type { CustomRequest, CustomResponse, StatusCode } from '../types'
+import type { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
+import * as userRoles from '../utils/userRoles'
 
 const campaignQuotaNotificationService = new CampaignQuotaNotificationService('CampaignQuotaNotification')
 
 class CampaignQuotaNotificationController extends BaseController {
+  checkOwnerOrAdminOrEmployee (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
+    const { user: currentUser, record: { campaign: { company } } } = req
+
+    const isOwnerOrAdmin = currentUser.id === company?.owner?.id || currentUser.role === userRoles.ADMIN
+    const isEmployee = currentUser.companyId != null && company.id != null && currentUser.companyId === company.id
+
+    if (isOwnerOrAdmin || (isEmployee)) {
+      req.isOwnerOrAdmin = isOwnerOrAdmin
+      return next()
+    } else {
+      return res.status(statusCodes.FORBIDDEN).send({
+        statusCode: statusCodes.FORBIDDEN,
+        success: false,
+        errors: {
+          message: 'Only the owner, admin or employee can perform this action'
+        }
+      })
+    }
+  }
+
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
     const { record: campaign, body: { campaignQuotaNotification } } = req
 
