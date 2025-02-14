@@ -104,6 +104,7 @@ app.use(apiPrefix, routers.packingSlipRouter())
 app.use(apiPrefix, routers.titleRouter())
 app.use(apiPrefix, routers.campaignAdditionalProductSettingRouter())
 app.use(apiPrefix, routers.productCustomisationRouter())
+app.use(apiPrefix, routers.productStockNotificationRouter())
 
 // Add validation middleware
 app.use(joiErrors)

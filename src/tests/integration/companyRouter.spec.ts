@@ -1809,7 +1809,7 @@ describe('Company actions', () => {
       expect(res.body.errors.message).to.equal('A validation error has occurred')
     })
 
-    it('Should return 201 Created when a campaign manager for a company successfully creates a campaign.', async () => {
+    it('Should return 403 Forbidden when a campaign manager for a company tries to create a campaign.', async () => {
       const resCompany = await createVerifiedCompany(userId)
 
       const companyId = resCompany.id
@@ -1844,10 +1844,9 @@ describe('Company actions', () => {
           }
         })
 
-      expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('statusCode', 'success', 'campaign')
-      expect(res.body.campaign).to.be.an('object')
-      expect(res.body.campaign).to.include.keys('id', 'name', 'status', 'type', 'description', 'quota', 'correctionQuota', 'createdAt', 'updatedAt')
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('You do not have the necessary permissions to perform this action')
     })
 
     it('Should return 403 Forbidden when a non-employee Campaign Manager tries to creates a campaign for a company.', async () => {
@@ -5016,7 +5015,7 @@ describe('Company actions', () => {
       expect(res.body.errors.message).to.equal('A validation error has occurred')
     })
 
-    it('Should return 201 Created when an admin successfully creates an access permission for a default role with the override option.', async () => {
+    it('Should return 422 Unprocessable Entity when an admin tries to elevate an access permission for a default role with the override option.', async () => {
       const resCompany = await chai
         .request(app)
         .post('/api/companies')
@@ -5044,10 +5043,10 @@ describe('Company actions', () => {
           }
         })
 
-      expect(res).to.have.status(201)
-      expect(res.body).to.include.keys('statusCode', 'success', 'accessPermission')
-      expect(res.body.accessPermission).to.be.an('object')
-      expect(res.body.accessPermission).to.include.keys('id', 'name', 'role', 'module', 'permission', 'isEnabled', 'createdAt', 'updatedAt')
+      expect(res).to.have.status(422)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('A validation error has occurred')
+      expect(res.body.errors.details[0].permission).to.equal('accessPermission.permission must be [read]')
     })
 
     it('Should return 403 Forbidden when a campaign manager tries to create a campaign for an overridden permission for campaigns that is now read only.', async () => {

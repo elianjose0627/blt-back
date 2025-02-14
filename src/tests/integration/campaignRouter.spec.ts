@@ -797,7 +797,7 @@ describe('Campaign actions', () => {
       const resCampaign = await chai
         .request(app)
         .post(`/api/companies/${String(companyIdPrivacyRule)}/campaigns`)
-        .set('Authorization', `Bearer ${tokenCompanyAdminTwoPrivacyRule}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           campaign: {
             name: 'Onboarding Privacy',
@@ -809,7 +809,7 @@ describe('Campaign actions', () => {
       await chai
         .request(app)
         .post(`/api/campaigns/${String(resCampaign.body.campaign.id)}/recipients`)
-        .set('Authorization', `Bearer ${tokenCompanyAdminTwoPrivacyRule}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           recipient: {
             firstName: 'John',
@@ -844,7 +844,7 @@ describe('Campaign actions', () => {
       const resCampaign = await chai
         .request(app)
         .post(`/api/companies/${String(companyIdPrivacyRule)}/campaigns`)
-        .set('Authorization', `Bearer ${tokenCompanyAdminTwoPrivacyRule}`)
+        .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
           campaign: {
             name: 'Onboarding Privacy',
@@ -914,7 +914,7 @@ describe('Campaign actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner or admin can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner, admin or employee can perform this action')
     })
   })
 
@@ -3111,7 +3111,7 @@ describe('Campaign actions', () => {
 
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Only the owner or admin can perform this action')
+      expect(res.body.errors.message).to.equal('Only the owner, admin or employee can perform this action')
     })
 
     it('Should return 403 Forbidden when a employee user without permissions tries to create bulk orders for a campaign belonging to a company.', async () => {

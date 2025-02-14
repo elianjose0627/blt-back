@@ -51,6 +51,8 @@ steps:
 - name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'migrate']
 - name: 'gcr.io/cloud-builders/npm'
+  args: ['run', 'seed']
+- name: 'gcr.io/cloud-builders/npm'
   args: ['run', 'codecov-coverage']
   env:
     - 'CODECOV_TOKEN=${_CODECOV_TOKEN}'

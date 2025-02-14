@@ -16,10 +16,10 @@ const campaignQuotaNotificationRoutes = (): Router => {
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(CampaignQuotaNotificationController.checkRecord))
   campaignQuotaNotificationRouter.route('/campaign-quota-notifications/:id')
-    .put(asyncHandler(checkPermissions), celebrate({
+    .put(asyncHandler(CampaignQuotaNotificationController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions), celebrate({
       [Segments.BODY]: validator.validateCampaignQuotaNotification
     }), asyncHandler(CampaignQuotaNotificationController.update))
-    .delete(asyncHandler(checkPermissions), asyncHandler(CampaignQuotaNotificationController.delete))
+    .delete(asyncHandler(CampaignQuotaNotificationController.checkOwnerOrAdminOrEmployee), asyncHandler(checkPermissions), asyncHandler(CampaignQuotaNotificationController.delete))
   return campaignQuotaNotificationRouter
 }
 

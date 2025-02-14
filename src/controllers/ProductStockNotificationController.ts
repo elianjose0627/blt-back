@@ -1,15 +1,14 @@
 import BaseController from './BaseController'
-import CampaignQuotaNotificationService from '../services/CampaignQuotaNotificationService'
+import ProductStockNotificationService from '../services/ProductStockNotificationService'
 import type { CustomNext, CustomRequest, CustomResponse, StatusCode } from '../types'
 import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
+const productStockNotificationService = new ProductStockNotificationService('ProductStockNotification')
 
-const campaignQuotaNotificationService = new CampaignQuotaNotificationService('CampaignQuotaNotification')
-
-class CampaignQuotaNotificationController extends BaseController {
+class ProductStockNotificationController extends BaseController {
   checkOwnerOrAdminOrEmployee (req: CustomRequest, res: CustomResponse, next: CustomNext): any {
-    const { user: currentUser, record: { campaign: { company } } } = req
+    const { user: currentUser, record: { product: { company } } } = req
 
     const isOwnerOrAdmin = currentUser.id === company?.owner?.id || currentUser.role === userRoles.ADMIN
     const isEmployee = currentUser.companyId != null && company.id != null && currentUser.companyId === company.id
@@ -29,11 +28,11 @@ class CampaignQuotaNotificationController extends BaseController {
   }
 
   async insert (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { record: campaign, body: { campaignQuotaNotification } } = req
+    const { record: product, body: { productStockNotification } } = req
 
     io.emit(`${String(this.recordName())}`, { message: `${String(this.recordName())} created` })
 
-    const { response, status } = await campaignQuotaNotificationService.insert({ campaign, campaignQuotaNotification })
+    const { response, status } = await productStockNotificationService.insert({ product, productStockNotification })
 
     const statusCode: StatusCode = {
       200: statusCodes.OK,
@@ -47,10 +46,10 @@ class CampaignQuotaNotificationController extends BaseController {
     })
   }
 
-  async getAllCampaignQuotaNotifications (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { query: { limit, offset, page }, params: { id: campaignId } } = req
+  async getAllProductStockNotifications (req: CustomRequest, res: CustomResponse): Promise<any> {
+    const { query: { limit, offset, page }, params: { id: productId } } = req
 
-    const records = await campaignQuotaNotificationService.getAllCampaignQuotaNotifications(limit, offset, campaignId)
+    const records = await productStockNotificationService.getAllProductStockNotifications(limit, offset, productId)
 
     const meta = {
       total: records.count,
@@ -63,9 +62,9 @@ class CampaignQuotaNotificationController extends BaseController {
       statusCode: statusCodes.OK,
       success: true,
       meta,
-      [campaignQuotaNotificationService.manyRecords()]: records.rows
+      [productStockNotificationService.manyRecords()]: records.rows
     })
   }
 }
 
-export default new CampaignQuotaNotificationController(campaignQuotaNotificationService)
+export default new ProductStockNotificationController(productStockNotificationService)

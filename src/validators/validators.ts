@@ -1481,6 +1481,17 @@ const validateCampaignAdditionalProductSetting = Joi.object({
   }).required()
 })
 
+const validateProductStockNotification = Joi.object({
+  productStockNotification: Joi.object({
+    threshold: Joi.number().min(0).max(100),
+    recipients: Joi.array().items(Joi.string().email()).min(1).required(),
+    frequency: Joi.number().min(1).default(1),
+    frequencyUnit: Joi.string().valid('hour', 'hours', 'day', 'days', 'week', 'weeks', 'month', 'months').default('month'),
+    quantity: Joi.number().required().min(0),
+    isEnabled: Joi.boolean().default(true)
+  }).required()
+})
+
 export default {
   validateCreatedUser,
   validateLogin,
@@ -1586,5 +1597,6 @@ export default {
   validatePendingOrder,
   validatePendingOrderUpdate,
   validateCampaignAdditionalProductSetting,
-  validateProductCustomisationChat
+  validateProductCustomisationChat,
+  validateProductStockNotification
 }

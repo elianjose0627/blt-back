@@ -11,6 +11,7 @@ import checkPermissions from '../middlewares/checkPermissions'
 import ProductTagController from '../controllers/ProductTagController'
 import setCatalogueAccess from '../middlewares/setCatalogueAccess'
 import ProductCustomisationController from '../controllers/ProductCustomisationController'
+import ProductStockNotificationController from '../controllers/ProductStockNotificationController'
 
 const ProductRoutes = (): Router => {
   const productRouter = express.Router()
@@ -100,6 +101,17 @@ const ProductRoutes = (): Router => {
       asyncHandler(checkPermissions), celebrate({
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(ProductCustomisationController.getAll))
+  productRouter.route('/products/:id/stock-notifications')
+    .post(ProductStockNotificationController.setModule, asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
+      celebrate({
+        [Segments.BODY]: validator.validateProductStockNotification
+      }), asyncHandler(ProductStockNotificationController.insert))
+    .get(ProductStockNotificationController.setModule, asyncHandler(ProductController.checkOwnerOrAdminOrEmployee),
+      asyncHandler(checkPermissions),
+      celebrate({
+        [Segments.QUERY]: validator.validateQueryParams
+      }), asyncHandler(paginate), asyncHandler(ProductStockNotificationController.getAllProductStockNotifications))
 
   return productRouter
 }
