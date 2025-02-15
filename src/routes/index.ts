@@ -1,3 +1,4 @@
+import { Router } from 'express'
 import authRouter from './authRouter'
 import userRouter from './userRouter'
 import profileRouter from './profileRouter'
@@ -17,7 +18,7 @@ import secondaryDomainRouter from './secondaryDomainRouter'
 import legalTextRouter from './legalTextRouter'
 import privacyRuleRouter from './privacyRuleRouter'
 import accessPermissionsRouter from './accessPermissionRouter'
-import healthcheckRouter from './healthCheckRouter'
+import healthCheckRouter from './healthCheckRouter'
 import shippingMethodRouter from './shippingMethodRouter'
 import webhookRouter from './webhookRouter'
 import pendingOrderRouter from './pendingOrderRouter'
@@ -61,8 +62,15 @@ import campaignAdditionalProductSettingRouter from './campaignAdditionalProductS
 import productCustomisationRouter from './productCustomisationRouter'
 import productStockNotificationRouter from './productStockNotificationRouter'
 
-const routers = {
+const router = Router()
+
+export const maintenanceModeBypassRoutes = {
   authRouter,
+  maintenanceModeRouter,
+  webhookRouter
+}
+
+const routes = [
   userRouter,
   profileRouter,
   companyRouter,
@@ -81,9 +89,8 @@ const routers = {
   legalTextRouter,
   privacyRuleRouter,
   accessPermissionsRouter,
-  healthcheckRouter,
+  healthCheckRouter,
   shippingMethodRouter,
-  webhookRouter,
   pendingOrderRouter,
   cardTemplateRouter,
   greetingCardRouter,
@@ -92,7 +99,6 @@ const routers = {
   emailTemplateRouter,
   emailTempleTypeRouter,
   campaignAddressRouter,
-  maintenanceModeRouter,
   productCategoryRouter,
   productCategoryTagRouter,
   productGraduatedPriceRouter,
@@ -124,6 +130,9 @@ const routers = {
   campaignAdditionalProductSettingRouter,
   productCustomisationRouter,
   productStockNotificationRouter
-}
+]
 
-export default routers
+routes.forEach((route) => {
+  router.use(route())
+})
+export default router
