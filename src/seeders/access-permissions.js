@@ -221,6 +221,30 @@ const accessPermissions = [
     updatedAt: dayjs(now).add(18, 'ms').toDate(),
     deletedAt: null,
     companyId: null
+  },
+  {
+    id: uuidv4(),
+    name: 'Company Administrator Read Write Campaign Additional Product Settings',
+    module: 'campaignAdditionalProductSettings',
+    role: 'CompanyAdministrator',
+    permission: 'readwrite',
+    isEnabled: 'TRUE',
+    createdAt: dayjs(now).add(19, 'ms').toDate(),
+    updatedAt: dayjs(now).add(19, 'ms').toDate(),
+    deletedAt: null,
+    companyId: null
+  },
+  {
+    id: uuidv4(),
+    name: 'Campaign Manager Read Write Campaign Additional Product Settings',
+    module: 'campaignAdditionalProductSettings',
+    role: 'CampaignManager',
+    permission: 'readwrite',
+    isEnabled: 'TRUE',
+    createdAt: dayjs(now).add(20, 'ms').toDate(),
+    updatedAt: dayjs(now).add(20, 'ms').toDate(),
+    deletedAt: null,
+    companyId: null
   }
 ]
 

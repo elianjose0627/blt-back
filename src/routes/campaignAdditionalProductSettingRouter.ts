@@ -5,13 +5,12 @@ import CampaignAdditionalProductSettingController from '../controllers/CampaignA
 import asyncHandler from '../middlewares/asyncHandler'
 import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
-import CampaignController from '../controllers/CampaignController'
 import checkPermissions from '../middlewares/checkPermissions'
 
 const campaignAdditionalProductSettingRoutes = (): Router => {
   const campaignAdditionalProductSettingRouter = express.Router()
 
-  campaignAdditionalProductSettingRouter.use('/campaign-additional-product-settings', checkAuth, checkUserIsVerifiedStatus, CampaignController.setModule)
+  campaignAdditionalProductSettingRouter.use('/campaign-additional-product-settings', checkAuth, checkUserIsVerifiedStatus, CampaignAdditionalProductSettingController.setModule)
   campaignAdditionalProductSettingRouter.use('/campaign-additional-product-settings/:id', celebrate({
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(CampaignAdditionalProductSettingController.checkRecord))
