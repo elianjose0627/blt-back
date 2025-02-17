@@ -11,7 +11,7 @@ class ProductStockNotificationController extends BaseController {
     const { user: currentUser, record: { product: { company } } } = req
 
     const isOwnerOrAdmin = currentUser.id === company?.owner?.id || currentUser.role === userRoles.ADMIN
-    const isEmployee = currentUser.companyId != null && company.id != null && currentUser.companyId === company.id
+    const isEmployee = currentUser.companyId != null && company?.id != null && currentUser.companyId === company.id
 
     if (isOwnerOrAdmin || (isEmployee)) {
       req.isOwnerOrAdmin = isOwnerOrAdmin
