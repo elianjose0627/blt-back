@@ -18,7 +18,8 @@ export const MODULES = {
   COMPANYSUBSCRIPTIONS: 'companySubscriptions',
   PRODUCTCATEGORIES: 'productCategories',
   PRODUCTCUSTOMISATIONS: 'productCustomisations',
-  PRODUCTSTOCKNOTIFICATIONS: 'productStockNotifications'
+  PRODUCTSTOCKNOTIFICATIONS: 'productStockNotifications',
+  CAMPAIGNADDITIONALPRODUCTSETTINGS: 'campaignAdditionalProductSettings'
 } as const
 
 export const {
@@ -41,7 +42,8 @@ export const {
   COMPANYSUBSCRIPTIONS,
   PRODUCTCATEGORIES,
   PRODUCTCUSTOMISATIONS,
-  PRODUCTSTOCKNOTIFICATIONS
+  PRODUCTSTOCKNOTIFICATIONS,
+  CAMPAIGNADDITIONALPRODUCTSETTINGS
 } = MODULES
 
 export const MODULES_ARRAY = Object.values(MODULES)

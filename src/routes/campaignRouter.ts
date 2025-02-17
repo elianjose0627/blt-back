@@ -134,12 +134,12 @@ const CampaignRoutes = (): Router => {
         [Segments.QUERY]: validator.validateQueryParams
       }), asyncHandler(paginate), asyncHandler(CampaignQuotaNotificationController.getAllCampaignQuotaNotifications))
   campaignRouter.route('/campaigns/:id/additional-product-settings')
-    .post(asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee),
+    .post(CampaignAdditionalProductSettingController.setModule, asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions),
       celebrate({
         [Segments.BODY]: validator.validateCampaignAdditionalProductSetting
       }), asyncHandler(CampaignAdditionalProductSettingController.insert))
-    .get(asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee),
+    .get(CampaignAdditionalProductSettingController.setModule, asyncHandler(CampaignController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions),
       celebrate({
         [Segments.QUERY]: validator.validateQueryParams
