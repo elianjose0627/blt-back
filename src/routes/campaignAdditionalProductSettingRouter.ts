@@ -15,6 +15,12 @@ const campaignAdditionalProductSettingRoutes = (): Router => {
     [Segments.PARAMS]: validator.validateUUID
   }, { abortEarly: false }), asyncHandler(CampaignAdditionalProductSettingController.checkRecord))
   campaignAdditionalProductSettingRouter.route('/campaign-additional-product-settings/:id')
+    .put(celebrate({
+      [Segments.BODY]: validator.validateCampaignAdditionalProductSetting
+    }), asyncHandler(CampaignAdditionalProductSettingController.checkOwnerOrAdminOrEmployee),
+    asyncHandler(checkPermissions),
+    asyncHandler(CampaignAdditionalProductSettingController.update))
+  campaignAdditionalProductSettingRouter.route('/campaign-additional-product-settings/:id')
     .delete(asyncHandler(CampaignAdditionalProductSettingController.checkOwnerOrAdminOrEmployee),
       asyncHandler(checkPermissions),
       asyncHandler(CampaignAdditionalProductSettingController.delete))
