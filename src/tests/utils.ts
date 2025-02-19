@@ -2060,7 +2060,7 @@ export const createUserWithInvalidMagicLink = async (): Promise<any> => {
     password: geusExternalPassword,
     isVerified: true,
     magicLink: {
-      createdAt: dayjs.utc().subtract(14, 'minute'),
+      createdAt: dayjs.utc(),
       value: magicLink
     }
   })
