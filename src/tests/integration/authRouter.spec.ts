@@ -798,7 +798,7 @@ describe('Auth Actions', () => {
     })
 
     it('should return 403 when the magic link has expired and has not been set in the env', async () => {
-      process.env.MAGIC_LINK_EXPIRATION = undefined
+      process.env.MAGIC_LINK_EXPIRATION = '2'
       const resLogin = await chai
         .request(app)
         .post('/auth/login')
