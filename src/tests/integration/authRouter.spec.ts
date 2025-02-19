@@ -18,7 +18,9 @@ import {
   createUserWithMagicLink,
   createUserWithExpiredMagicLink,
   alexEternalPassword,
-  omarExternalPassword
+  omarExternalPassword,
+  createUserWithInvalidMagicLink,
+  geusExternalPassword
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 import { encodeString, encryptUUID } from '../../utils/encryption'
@@ -41,6 +43,7 @@ describe('Auth Actions', () => {
     await createAdminTestUser()
     await createUserWithMagicLink()
     await createUserWithExpiredMagicLink()
+    await createUserWithInvalidMagicLink()
 
     const resAdmin = await chai
       .request(app)
@@ -792,6 +795,25 @@ describe('Auth Actions', () => {
       expect(res).to.have.status(403)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
       expect(res.body.errors.message).to.equal('Magic link has expired')
+    })
+
+    it('should return 401 Unauthorized when the magic link has expired', async () => {
+      const resLogin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'geuseternal@celestialmarvel.com', password: geusExternalPassword } })
+
+      const userId = String(resLogin.body.user.id)
+      const magicLink = generateMagicLink(userId)
+
+      const res = await chai
+        .request(app)
+        .get('/auth/verify')
+        .query({ token: magicLink })
+
+      expect(res).to.have.status(401)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Magic Link is invalid')
     })
   })
 })

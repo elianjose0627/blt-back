@@ -20,6 +20,7 @@ export const thenaEternalPassword = faker.internet.password()
 export const sersiEternalPassword = faker.internet.password()
 export const alexEternalPassword = faker.internet.password()
 export const omarExternalPassword = faker.internet.password()
+export const geusExternalPassword = faker.internet.password()
 
 export const deleteTestUser = async (email: string): Promise<any> => {
   const user = await db.User.findOne({
@@ -2035,6 +2036,28 @@ export const createUserWithExpiredMagicLink = async (): Promise<any> => {
     email: 'omareternal@celestialmarvel.com',
     phone: '2222222222',
     password: omarExternalPassword,
+    isVerified: true,
+    magicLink: {
+      createdAt: dayjs.utc().subtract(14, 'minute'),
+      value: magicLink
+    }
+  })
+
+  if (user !== null) {
+    return user
+  }
+}
+
+export const createUserWithInvalidMagicLink = async (): Promise<any> => {
+  const userId = uuidv1()
+  const magicLink = generateMagicLink(uuidv1())
+  const user = await db.User.create({
+    id: userId,
+    firstName: 'geus',
+    lastName: 'Eternal',
+    email: 'geuseternal@celestialmarvel.com',
+    phone: '2222222222',
+    password: geusExternalPassword,
     isVerified: true,
     magicLink: {
       createdAt: dayjs.utc().subtract(14, 'minute'),

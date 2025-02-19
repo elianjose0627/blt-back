@@ -451,6 +451,9 @@ class UserService extends BaseService {
       })
       accountVerificationEmailTemplate = defaultAccountVerificationEmailTemplate
     }
+
+    const mininumWaitMinutes = Number(process.env.OTP_EXPIRATION ?? 10)
+
     const replacements = {
       app: appName,
       firstname: firstName,
@@ -461,7 +464,8 @@ class UserService extends BaseService {
       mailer,
       salesmailer: salesMailer,
       otp: otp.toString(),
-      magiclink: `${appUrl}/auth/verify/${magicLink}`
+      magiclink: `${appUrl}/auth/verify/${magicLink}`,
+      magiclinkvalidity: `${mininumWaitMinutes}minutes`
     }
     subject = replacePlaceholders(accountVerificationEmailTemplate.subject, replacements)
     message = replacePlaceholders(accountVerificationEmailTemplate.template, replacements)
