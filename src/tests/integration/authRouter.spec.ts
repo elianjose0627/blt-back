@@ -797,6 +797,26 @@ describe('Auth Actions', () => {
       expect(res.body.errors.message).to.equal('Magic link has expired')
     })
 
+    it('should return 403 when the magic link has expired and has not been set in the env', async () => {
+      process.env.MAGIC_LINK_EXPIRATION = undefined
+      const resLogin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'omareternal@celestialmarvel.com', password: omarExternalPassword } })
+
+      const userId = String(resLogin.body.user.id)
+      const magicLink = generateMagicLink(userId)
+
+      const res = await chai
+        .request(app)
+        .get('/auth/verify')
+        .query({ token: magicLink })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Magic link has expired')
+    })
+
     it('should return 401 Unauthorized when the magic link has expired', async () => {
       const resLogin = await chai
         .request(app)
