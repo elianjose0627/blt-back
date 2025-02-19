@@ -6,6 +6,7 @@ import db from '../models'
 import * as userRoles from '../utils/userRoles'
 import type { Module, Role } from '../types'
 import generateToken from '../utils/generateToken'
+import generateMagicLink from '../utils/generateMagicLink'
 
 dayjs.extend(utc)
 
@@ -17,6 +18,8 @@ export const happyHoganPassword = faker.internet.password()
 export const sharonCarterPassword = faker.internet.password()
 export const thenaEternalPassword = faker.internet.password()
 export const sersiEternalPassword = faker.internet.password()
+export const alexEternalPassword = faker.internet.password()
+export const omarExternalPassword = faker.internet.password()
 
 export const deleteTestUser = async (email: string): Promise<any> => {
   const user = await db.User.findOne({
@@ -1998,4 +2001,48 @@ export const pendingOrderWithMissingDataPoints = {
       fax: ''
     }
   ]
+}
+
+export const createUserWithMagicLink = async (): Promise<any> => {
+  const userId = uuidv1()
+  const magicLink = generateMagicLink(userId)
+  const user = await db.User.create({
+    id: userId,
+    firstName: 'Alex',
+    lastName: 'Eternal',
+    email: 'alexeternal@celestialmarvel.com',
+    phone: '2222222222',
+    password: alexEternalPassword,
+    isVerified: true,
+    magicLink: {
+      createdAt: dayjs.utc(),
+      value: magicLink
+    }
+  })
+
+  if (user !== null) {
+    return user
+  }
+}
+
+export const createUserWithExpiredMagicLink = async (): Promise<any> => {
+  const userId = uuidv1()
+  const magicLink = generateMagicLink(userId)
+  const user = await db.User.create({
+    id: userId,
+    firstName: 'Omar',
+    lastName: 'Eternal',
+    email: 'omareternal@celestialmarvel.com',
+    phone: '2222222222',
+    password: omarExternalPassword,
+    isVerified: true,
+    magicLink: {
+      createdAt: dayjs.utc().subtract(14, 'minute'),
+      value: magicLink
+    }
+  })
+
+  if (user !== null) {
+    return user
+  }
 }

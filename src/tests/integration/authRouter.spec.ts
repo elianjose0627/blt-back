@@ -14,10 +14,15 @@ import {
   verifyCompanyDomain,
   createBlockedDomain,
   iversAtKreeDotKrPassword,
-  createCompanyAdministrator
+  createCompanyAdministrator,
+  createUserWithMagicLink,
+  createUserWithExpiredMagicLink,
+  alexEternalPassword,
+  omarExternalPassword
 } from '../utils'
 import * as userRoles from '../../utils/userRoles'
 import { encodeString, encryptUUID } from '../../utils/encryption'
+import generateMagicLink from '../../utils/generateMagicLink'
 
 const { expect } = chai
 
@@ -34,6 +39,8 @@ describe('Auth Actions', () => {
     await createLockedOutUser1min()
     await createUserWithOtp()
     await createAdminTestUser()
+    await createUserWithMagicLink()
+    await createUserWithExpiredMagicLink()
 
     const resAdmin = await chai
       .request(app)
@@ -732,6 +739,59 @@ describe('Auth Actions', () => {
       expect(res.body).to.include.keys('statusCode', 'success', 'user')
       expect(res.body.user.email).to.equal('raywiretest@gmail.com')
       expect(res.body.user.message).to.equal('A password reset link has been sent to your email')
+    })
+  })
+
+  describe('Email verificatioin via Magic Link', () => {
+    it('should return 200 OK the magic link is valid', async () => {
+      const resLogin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'alexeternal@celestialmarvel.com', password: alexEternalPassword } })
+
+      const userId = String(resLogin.body.user.id)
+
+      const magicLink = generateMagicLink(userId)
+
+      const res = await chai
+        .request(app)
+        .get('/auth/verify')
+        .query({ token: magicLink })
+
+      expect(res).to.have.status(200)
+      expect(res.body).to.include.keys('statusCode', 'success', 'user')
+    })
+
+    it('should return 404 Not Found when the magic link is valid but user id is invalid', async () => {
+      const magicLink = generateMagicLink('a4dc5170-edc0-11ee-8f51-21d9e555ea40')
+
+      const res = await chai
+        .request(app)
+        .get('/auth/verify')
+        .query({ token: magicLink })
+
+      expect(res).to.have.status(404)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('User not found')
+    })
+
+    it('should return 403 when the magic link has expired', async () => {
+      const resLogin = await chai
+        .request(app)
+        .post('/auth/login')
+        .send({ user: { email: 'omareternal@celestialmarvel.com', password: omarExternalPassword } })
+
+      const userId = String(resLogin.body.user.id)
+      const magicLink = generateMagicLink(userId)
+
+      const res = await chai
+        .request(app)
+        .get('/auth/verify')
+        .query({ token: magicLink })
+
+      expect(res).to.have.status(403)
+      expect(res.body).to.include.keys('statusCode', 'success', 'errors')
+      expect(res.body.errors.message).to.equal('Magic link has expired')
     })
   })
 })

@@ -7,6 +7,7 @@ import checkAuth from '../middlewares/checkAuth'
 import checkResetToken from '../middlewares/checkResetToken'
 import TokenController from '../controllers/TokenController'
 import checkBlockedDomain from '../middlewares/checkBlockedDomain'
+import checkMagicLink from '../middlewares/checkMagicLink'
 
 const authRoutes = (): Router => {
   const authRouter = express.Router()
@@ -43,6 +44,10 @@ const authRoutes = (): Router => {
       [Segments.BODY]: validator.validateAuthToken
     }), asyncHandler(checkAuth), asyncHandler(TokenController.getRefreshToken))
 
+  authRouter.route('/verify')
+    .get(celebrate({
+      [Segments.QUERY]: validator.validateVerifyTokenQueryParams
+    }, { abortEarly: false }), asyncHandler(checkMagicLink), asyncHandler(UserController.verifyEmail))
   return authRouter
 }
 
