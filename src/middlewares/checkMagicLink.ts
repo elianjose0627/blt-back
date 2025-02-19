@@ -30,7 +30,7 @@ const checkMagicLink = async (req: CustomRequest, res: CustomResponse, next: Cus
     })
   }
 
-  const mininumWaitMinutes = Number(process.env.OTP_EXPIRATION ?? 10)
+  const mininumWaitMinutes = Number(process.env.MAGIC_LINK_EXPIRATION ?? 10)
   const now = dayjs.utc()
   const createdAt = record.magicLink.createdAt
   const diff = now.diff(createdAt, 'minute')
