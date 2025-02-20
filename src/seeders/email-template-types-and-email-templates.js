@@ -118,6 +118,16 @@ const emailTemplateTypes = [
     createdAt: dayjs(now).add(11, 'ms').toDate(),
     updatedAt: dayjs(now).add(11, 'ms').toDate(),
     deletedAt: null
+  },
+  {
+    id: 'C1CB9F6A-ECA6-4C8F-9298-CDA186C516E4',
+    name: 'Product Stock Notification',
+    type: 'productStockNotification',
+    description: 'This is used for the product stock notification',
+    placeholders: '["[threshold]", "[quantity]", "[articlename]"]',
+    createdAt: dayjs(now).add(12, 'ms').toDate(),
+    updatedAt: dayjs(now).add(12, 'ms').toDate(),
+    deletedAt: null
   }
 ]
 
@@ -230,6 +240,16 @@ const emailTemplates = [
     updatedAt: dayjs(now).add(11, 'ms').toDate(),
     deletedAt: null,
     emailTemplateTypeId: '59D02764-BE73-475B-880D-327B2DB2E51F',
+    isDefault: false
+  },
+  {
+    id: '2d332014-886b-4f87-a932-f99e0dc67615',
+    subject: 'Action Required: Your Product Stock Quantity Has Reached [quantity]%',
+    template: '<p>Dear company administrator,</p><p>We wanted to inform you that your stock of [articlename] is below [quantity]. To ensure uninterrupted delivery of your sendings, we kindly recommend stocking up as soon as possible.<br>For assistance please reach out to our fulfillment team via <a href=mailto:fulfillment@biglittlethings.de>fulfillment@biglittlethings.de.</a></p><p>To take advantage of our procurement service to have us replenish your stock automatically please reach out to our sales team via sales@biglittlethings.de.</p><p>Thank you for your attention to this matter. We look forward to supporting the continued success of your campaign.</p><p>Best regards,<br>The big little things Team</p>',
+    createdAt: dayjs(now).add(12, 'ms').toDate(),
+    updatedAt: dayjs(now).add(12, 'ms').toDate(),
+    deletedAt: null,
+    emailTemplateTypeId: 'C1CB9F6A-ECA6-4C8F-9298-CDA186C516E4',
     isDefault: false
   }
 ]
