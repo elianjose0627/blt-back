@@ -470,7 +470,7 @@ class UserService extends BaseService {
     subject = replacePlaceholders(accountVerificationEmailTemplate.subject, replacements)
     message = replacePlaceholders(accountVerificationEmailTemplate.template, replacements)
 
-    await user.update({ otp: { createdAt: dayjs.utc(), value: otp }, magicLink: { createdAt: dayjs.utc(), value: magicLink } })
+    await user.update({ otp: { createdAt: dayjs.utc(), value: otp }, magicLink: { createdAt: dayjs.utc(), value: magicLink, usedAt: null } })
 
     const info = await sendNotifierEmail(email, subject, message, false, message, false)
 

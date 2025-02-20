@@ -145,7 +145,7 @@ const emailTemplates = [
   {
     id: '8c47cc20-8970-43f7-bf4f-00c71bc0f24d',
     subject: 'Password Change',
-    template: "<p>Hello [firstname], your password for [app] app has been updated to: </p>\n<p><span style=\"font-size:1.5em;\"><strong>[password]</strong></span></p>\n<p>If you didn't ask to change your password, contact us immediately through [adminemail]. </p>\n<p>Thanks,<br>[app] application team</p>",
+    template: '<p>Hello [firstname], your password for [app] app has been updated to: </p>\n<p><span style="font-size:1.5em;"><strong>[password]</strong></span></p>\n<p>If you didn\'t ask to change your password, contact us immediately through [adminemail]. </p>\n<p>Thanks,<br>[app] application team</p>',
     createdAt: dayjs(now).add(3, 'ms').toDate(),
     updatedAt: dayjs(now).add(3, 'ms').toDate(),
     deletedAt: null,
@@ -165,7 +165,7 @@ const emailTemplates = [
   {
     id: 'e7ae56ee-d3c8-4e2e-8060-97cdc954381e',
     subject: 'Verify your email for [app]',
-    template: "<p>Hello [firstname],</p>\n\n<p>You have requested a verification OTP to activate your account at [app].<br>Your OTP is: <span style=\"font-size:1.5em;\"><strong>[otp]</strong></span></p>\n\n<p>Steps to verify:</p>\n\n<ol>\n  <li>Login to your account at [url].</li>\n  <li>Click on the profile picture at the top right corner of the screen and select \"Profile\".</li>\n  <li>Under the Pending Actions Section, Enter your verification OTP <strong>[otp]</strong> and click \"Verify Email\".</li>\n</ol>\n\n<p>If you haven't requested a verification code or created an account at [app], notify us: [mailer].</p>\n\n<p>Best Regards,<br>[app] team</p>\n<p>For questions regarding your order, please reach out to: <br>Support: [mailer] <br>Sales: [salesmailer]</p>",
+    template: '<p>Hello [firstname],</p><p>You have requested a verification link and OTP to activate your account at [app].</p><p>Click the link below within [magiclinkvalidity] to verify your email: <br><a href="[magiclink]">[magiclink]</a></p><p>Or use the OTP below: <br>Your OTP is: <span style="font-size:1.5em;"><strong>[otp]</strong></span></p><p>Steps to verify via the OTP:</p><ol><li>Login to your account at [url].</li><li>Click on the profile picture at the top right corner of the screen and select "Profile".</li><li>Under the Pending Actions Section, Enter your verification OTP <strong>[otp]</strong> and click "Verify Email".</li></ol><p>If you haven\'t requested a verification code or created an account at [app], notify us: [mailer].</p><p>Best Regards,<br>[app] team</p><p>For questions regarding your order, please reach out to: <br>Support: [mailer] <br>Sales: [salesmailer]</p>',
     createdAt: dayjs(now).add(5, 'ms').toDate(),
     updatedAt: dayjs(now).add(5, 'ms').toDate(),
     deletedAt: null,

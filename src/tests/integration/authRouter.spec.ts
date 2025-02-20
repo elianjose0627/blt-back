@@ -833,7 +833,7 @@ describe('Auth Actions', () => {
 
       expect(res).to.have.status(401)
       expect(res.body).to.include.keys('statusCode', 'success', 'errors')
-      expect(res.body.errors.message).to.equal('Magic Link is invalid')
+      expect(res.body.errors.message).to.equal('Magic link is invalid')
     })
   })
 })

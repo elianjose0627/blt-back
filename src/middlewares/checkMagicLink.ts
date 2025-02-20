@@ -46,7 +46,7 @@ const checkMagicLink = async (req: CustomRequest, res: CustomResponse, next: Cus
   }
 
   if ((record !== null) && record.magicLink.value === token) {
-    await record.update({ magicLink: { usedAt: now } })
+    await record.update({ magicLink: { ...record.magicLink, usedAt: now } })
     req.user = record
     return next()
   }
@@ -55,7 +55,7 @@ const checkMagicLink = async (req: CustomRequest, res: CustomResponse, next: Cus
     statusCode: statusCodes.UNAUTHORIZED,
     success: false,
     errors: {
-      message: 'Magic Link is invalid'
+      message: 'Magic link is invalid'
     }
   })
 }
