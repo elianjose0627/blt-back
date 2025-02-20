@@ -1,7 +1,7 @@
 import { Model } from 'sequelize'
 import bcrypt from 'bcrypt'
 import capitalize from '../utils/capitalize'
-import type { LoginTime, MediaData, INotifications, Nullable, Role, IUser, ICompany, IAddress, IProductAccessControlGroup, ICompanyUserGroup } from '../types'
+import type { LoginTime, MediaData, INotifications, Nullable, Role, IUser, ICompany, IAddress, IProductAccessControlGroup, ICompanyUserGroup, IMagicLink } from '../types'
 import * as userRoles from '../utils/userRoles'
 
 const UserModel = (sequelize: any, DataTypes: any): any => {
@@ -29,6 +29,7 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
     startDate: Nullable<Date>
     birthDate: Nullable<Date>
     releaseDate: Nullable<Date>
+    magicLink: IMagicLink
   }
   class User extends Model<UserAttributes> {
     private readonly id: string
@@ -237,6 +238,14 @@ const UserModel = (sequelize: any, DataTypes: any): any => {
     releaseDate: {
       type: DataTypes.DATE,
       allowNull: true
+    },
+    magicLink: {
+      type: DataTypes.JSON,
+      defaultValue: {
+        createdAt: null,
+        value: null,
+        usedAt: null
+      }
     }
   }, {
     sequelize,
