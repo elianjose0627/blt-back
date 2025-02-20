@@ -2,7 +2,9 @@ import dayjs from 'dayjs'
 import { XMLParser, XMLValidator } from 'fast-xml-parser'
 import validator from '../validators/validators'
 
-const parser = new XMLParser()
+const parser = new XMLParser({
+  isArray: (name: string) => name.startsWith('List')
+})
 
 const getecOrderDetailMappings = [
   {
@@ -34,12 +36,7 @@ export const parseXml = async (xmlContent: string): Promise<any> => {
     if (isValid !== true) {
       throw new Error(isValid.err.msg.replace('.', '') + ` in line ${isValid.err.line} and column ${isValid.err.col}`)
     }
-
     const xmlData = parser.parse(xmlContent)
-    let itemDetail = (xmlData.QxCBL.xCBLPayload.embedded.Order.OrderDetail.ListOfItemDetail.ItemDetail)
-    if (!Array.isArray(itemDetail) && typeof itemDetail === 'object' && itemDetail !== null) {
-      itemDetail = [itemDetail]
-    }
     const pendingOrder = {
       currency: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderHeader.OrderCurrency.Currency.CurrencyCoded,
       orderNo: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderHeader.OrderNumber.BuyerOrderNumber,
@@ -49,14 +46,14 @@ export const parseXml = async (xmlContent: string): Promise<any> => {
       deliverydate: dayjs(xmlData.QxCBL.xCBLPayload.embedded.Order.OrderHeader.OrderDates.RequestedDeliverByDate, 'DD.MM.YYYY').format(),
       note: '',
       description: '',
-      costCenter: itemDetail[0].BaseItemDetail.BaseItemReferences.ListOfCostCenter.CostCenter.CostCenterNumber,
+      costCenter: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderDetail.ListOfItemDetail[0].ItemDetail.BaseItemDetail.BaseItemReferences.ListOfCostCenter[0].CostCenter.CostCenterNumber,
       quantity: 1,
-      orderLineRequests: itemDetail.map((item: any) => ({
-        itemName: item.BaseItemDetail.ItemIdentifiers.ItemDescription,
-        articleNumber: getecOrderDetailMappings.filter((mapping) => mapping.key === item.BaseItemDetail.ItemIdentifiers.PartNumbers.SellerPartNumber.PartNum.PartID)[0].cArtNr,
-        itemNetSale: item.PricingDetail.ListOfPrice.Price.UnitPrice.UnitPriceValue,
-        itemVAT: item.PricingDetail.Tax.TaxAmount,
-        quantity: item.BaseItemDetail.TotalQuantity.Quantity.QuantityValue,
+      orderLineRequests: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderDetail.ListOfItemDetail.map((itemDetail: any) => ({
+        itemName: itemDetail.ItemDetail.BaseItemDetail.ItemIdentifiers.ItemDescription,
+        articleNumber: getecOrderDetailMappings.filter((mapping) => mapping.key === itemDetail.ItemDetail.BaseItemDetail.ItemIdentifiers.PartNumbers.SellerPartNumber.PartNum.PartID)[0].cArtNr,
+        itemNetSale: itemDetail.ItemDetail.PricingDetail.ListOfPrice[0].Price.UnitPrice.UnitPriceValue,
+        itemVAT: itemDetail.ItemDetail.PricingDetail.Tax.TaxAmount,
+        quantity: itemDetail.ItemDetail.BaseItemDetail.TotalQuantity.Quantity.QuantityValue,
         type: 1,
         discount: 0,
         netPurchasePrice: 0
@@ -80,7 +77,7 @@ export const parseXml = async (xmlContent: string): Promise<any> => {
         telephone: '',
         mobile: '',
         fax: '',
-        email: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderHeader.OrderParty.ShipToParty.Party.ReceivingContact.Contact.ListOfContactNumber.ContactNumber[0].ContactNumberValue
+        email: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderHeader.OrderParty.ShipToParty.Party.ReceivingContact.Contact.ListOfContactNumber[0].ContactNumber.ContactNumberValue
       }]
     }
 
