@@ -34,7 +34,12 @@ export const parseXml = async (xmlContent: string): Promise<any> => {
     if (isValid !== true) {
       throw new Error(isValid.err.msg.replace('.', '') + ` in line ${isValid.err.line} and column ${isValid.err.col}`)
     }
+
     const xmlData = parser.parse(xmlContent)
+    let itemDetail = (xmlData.QxCBL.xCBLPayload.embedded.Order.OrderDetail.ListOfItemDetail.ItemDetail)
+    if (!Array.isArray(itemDetail) && typeof itemDetail === 'object' && itemDetail !== null) {
+      itemDetail = [itemDetail]
+    }
     const pendingOrder = {
       currency: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderHeader.OrderCurrency.Currency.CurrencyCoded,
       orderNo: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderHeader.OrderNumber.BuyerOrderNumber,
@@ -44,9 +49,9 @@ export const parseXml = async (xmlContent: string): Promise<any> => {
       deliverydate: dayjs(xmlData.QxCBL.xCBLPayload.embedded.Order.OrderHeader.OrderDates.RequestedDeliverByDate, 'DD.MM.YYYY').format(),
       note: '',
       description: '',
-      costCenter: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderDetail.ListOfItemDetail.ItemDetail[0].BaseItemDetail.BaseItemReferences.ListOfCostCenter.CostCenter.CostCenterNumber,
+      costCenter: itemDetail[0].BaseItemDetail.BaseItemReferences.ListOfCostCenter.CostCenter.CostCenterNumber,
       quantity: 1,
-      orderLineRequests: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderDetail.ListOfItemDetail.ItemDetail.map((item: any) => ({
+      orderLineRequests: itemDetail.map((item: any) => ({
         itemName: item.BaseItemDetail.ItemIdentifiers.ItemDescription,
         articleNumber: getecOrderDetailMappings.filter((mapping) => mapping.key === item.BaseItemDetail.ItemIdentifiers.PartNumbers.SellerPartNumber.PartNum.PartID)[0].cArtNr,
         itemNetSale: item.PricingDetail.ListOfPrice.Price.UnitPrice.UnitPriceValue,
