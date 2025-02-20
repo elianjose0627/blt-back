@@ -47,7 +47,7 @@ const authRoutes = (): Router => {
   authRouter.route('/verify')
     .get(celebrate({
       [Segments.QUERY]: validator.validateVerifyTokenQueryParams
-    }, { abortEarly: false }), asyncHandler(checkMagicLink), asyncHandler(UserController.verifyEmail))
+    }), asyncHandler(checkMagicLink), asyncHandler(UserController.verifyEmail))
   return authRouter
 }
 

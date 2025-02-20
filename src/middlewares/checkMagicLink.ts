@@ -11,7 +11,7 @@ const secretKey = String(process.env.MAGIC_LINK_SECRET_KEY)
 
 const checkMagicLink = async (req: CustomRequest, res: CustomResponse, next: CustomNext): Promise<any> => {
   const { query: { token } } = req
-  const userId = decryptUUID(token, 'base64', secretKey)
+  const userId = decryptUUID(token, 'hex', secretKey)
 
   const record = await db.User.findOne({
     attributes: { exclude: ['password'] },
