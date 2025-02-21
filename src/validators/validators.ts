@@ -1491,6 +1491,9 @@ const validateProductStockNotification = Joi.object({
     isEnabled: Joi.boolean().default(true)
   }).required()
 })
+const validateVerifyTokenQueryParams = Joi.object({
+  token: Joi.string()
+}).required()
 
 export default {
   validateCreatedUser,
@@ -1598,5 +1601,6 @@ export default {
   validatePendingOrderUpdate,
   validateCampaignAdditionalProductSetting,
   validateProductCustomisationChat,
-  validateProductStockNotification
+  validateProductStockNotification,
+  validateVerifyTokenQueryParams
 }

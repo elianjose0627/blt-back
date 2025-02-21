@@ -11,6 +11,7 @@ import * as userRoles from '../utils/userRoles'
 import generatePassword from '../utils/generatePassword'
 import { IEmailTemplate } from '../types'
 import { replacePlaceholders } from '../utils/replacePlaceholders'
+import generateMagicLink from '../utils/generateMagicLink'
 
 dayjs.extend(utc)
 
@@ -415,10 +416,12 @@ class UserService extends BaseService {
   }
 
   async sendVerifyEmail (user: any): Promise<any> {
-    const { email, firstName, lastName, salutation } = user
+    const { id, email, firstName, lastName, salutation } = user
     const otp = generateOtp()
     let subject = ''
     let message = ''
+
+    const magicLink = generateMagicLink(id)
 
     let accountVerificationEmailTemplate: IEmailTemplate = await db.EmailTemplate.findOne({
       include: {
@@ -448,6 +451,9 @@ class UserService extends BaseService {
       })
       accountVerificationEmailTemplate = defaultAccountVerificationEmailTemplate
     }
+
+    const minimumWaitMinutes = Number(process.env.OTP_EXPIRATION ?? 10)
+
     const replacements = {
       app: appName,
       firstname: firstName,
@@ -457,12 +463,14 @@ class UserService extends BaseService {
       adminemail: adminEmail,
       mailer,
       salesmailer: salesMailer,
-      otp: otp.toString()
+      otp: otp.toString(),
+      magiclink: `${appUrl}/auth/verify?token=${magicLink}`,
+      magiclinkvalidity: `${minimumWaitMinutes} minutes`
     }
     subject = replacePlaceholders(accountVerificationEmailTemplate.subject, replacements)
     message = replacePlaceholders(accountVerificationEmailTemplate.template, replacements)
 
-    await user.update({ otp: { createdAt: dayjs.utc(), value: otp } })
+    await user.update({ otp: { createdAt: dayjs.utc(), value: otp }, magicLink: { createdAt: dayjs.utc(), value: magicLink, usedAt: null } })
 
     const info = await sendNotifierEmail(email, subject, message, false, message, false)
 
