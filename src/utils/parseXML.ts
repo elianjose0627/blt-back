@@ -46,14 +46,14 @@ export const parseXml = async (xmlContent: string): Promise<any> => {
       deliverydate: dayjs(xmlData.QxCBL.xCBLPayload.embedded.Order.OrderHeader.OrderDates.RequestedDeliverByDate, 'DD.MM.YYYY').format(),
       note: '',
       description: '',
-      costCenter: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderDetail.ListOfItemDetail[0].ItemDetail.BaseItemDetail.BaseItemReferences.ListOfCostCenter[0].CostCenter.CostCenterNumber,
+      costCenter: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderDetail.ListOfItemDetail[0].ItemDetail[0].BaseItemDetail.BaseItemReferences.ListOfCostCenter[0].CostCenter.CostCenterNumber,
       quantity: 1,
-      orderLineRequests: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderDetail.ListOfItemDetail.map((itemDetail: any) => ({
-        itemName: itemDetail.ItemDetail.BaseItemDetail.ItemIdentifiers.ItemDescription,
-        articleNumber: getecOrderDetailMappings.filter((mapping) => mapping.key === itemDetail.ItemDetail.BaseItemDetail.ItemIdentifiers.PartNumbers.SellerPartNumber.PartNum.PartID)[0].cArtNr,
-        itemNetSale: itemDetail.ItemDetail.PricingDetail.ListOfPrice[0].Price.UnitPrice.UnitPriceValue,
-        itemVAT: itemDetail.ItemDetail.PricingDetail.Tax.TaxAmount,
-        quantity: itemDetail.ItemDetail.BaseItemDetail.TotalQuantity.Quantity.QuantityValue,
+      orderLineRequests: xmlData.QxCBL.xCBLPayload.embedded.Order.OrderDetail.ListOfItemDetail[0].ItemDetail.map((itemDetail: any) => ({
+        itemName: itemDetail.BaseItemDetail.ItemIdentifiers.ItemDescription,
+        articleNumber: getecOrderDetailMappings.filter((mapping) => mapping.key === itemDetail.BaseItemDetail.ItemIdentifiers.PartNumbers.SellerPartNumber.PartNum.PartID)[0].cArtNr,
+        itemNetSale: itemDetail.PricingDetail.ListOfPrice[0].Price.UnitPrice.UnitPriceValue,
+        itemVAT: itemDetail.PricingDetail.Tax.TaxAmount,
+        quantity: itemDetail.BaseItemDetail.TotalQuantity.Quantity.QuantityValue,
         type: 1,
         discount: 0,
         netPurchasePrice: 0
