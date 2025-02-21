@@ -1441,6 +1441,7 @@ export interface ISupplierProductPrintingTechniqueDescription {
   createdAt: Date
   updatedAt: Date
 }
+
 export interface IProductStockNotification {
   id: string
   threshold: number
@@ -1452,4 +1453,9 @@ export interface IProductStockNotification {
   isEnabled: boolean
   createdAt: Date
   updatedAt: Date
+}
+export interface IMagicLink {
+  createdAt?: Date
+  value?: string
+  usedAt?: Date
 }
