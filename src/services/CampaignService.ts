@@ -142,11 +142,11 @@ class CampaignService extends BaseService {
   async update (record: any, data: any): Promise<any> {
     const updatedRecord = await record.update(data)
 
-    const topicId = 'campaign-quota'
+    const topicId = 'quota'
     const campaignId = record.id
     const attributes = { campaignId }
 
-    await triggerPubSub(topicId, 'updateCorrectionQuotaPerCampaign', attributes)
+    await triggerPubSub(topicId, 'updateCampaignsUsedQuota', attributes)
 
     return updatedRecord.toJSONFor()
   }
