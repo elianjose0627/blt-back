@@ -270,11 +270,11 @@ class PendingOrderService extends BaseService {
     await triggerPubSub(pendingOrdersTopicId, 'postPendingOrders', pendingOrdersAttributes)
 
     // Recalculate Quota
-    const quotaTopicId = 'campaign-quota'
+    const quotaTopicId = 'quota'
     const campaignId = campaign.id
     const attributes = { campaignId, environment }
 
-    await triggerPubSub(quotaTopicId, 'updateCorrectionQuotaPerCampaign', attributes)
+    await triggerPubSub(quotaTopicId, 'updateCampaignsUsedQuota', attributes)
 
     return { response: response.map((response: any) => response.toJSONFor()), status: 201 }
   }
@@ -384,9 +384,9 @@ class PendingOrderService extends BaseService {
 
     const promises = Array.from(campaignIds).map(async (campaignId) => {
       // Recalculate Quota
-      const quotaTopicId = 'campaign-quota'
+      const quotaTopicId = 'quota'
       const campaignAttributes = { campaignId, environment }
-      await triggerPubSub(quotaTopicId, 'updateCorrectionQuotaPerCampaign', campaignAttributes)
+      await triggerPubSub(quotaTopicId, 'updateCampaignsUsedQuota', campaignAttributes)
     })
     await Promise.all(promises)
 
