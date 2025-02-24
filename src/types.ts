@@ -336,7 +336,6 @@ export interface ICampaign {
   status: CampaignStatus
   type: CampaignType
   description: string
-  quota: number
   usedQuota: number
   correctionQuota: number
   lastQuotaResetDate: Nullable<Date>
