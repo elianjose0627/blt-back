@@ -7,15 +7,10 @@ import checkAuth from '../middlewares/checkAuth'
 import checkUserIsVerifiedStatus from '../middlewares/checkUserIsVerifiedStatus'
 import paginate from '../middlewares/pagination'
 import checkProductOrderQuantity from '../middlewares/checkProductOrderQuantity'
-import { uploadToMemory } from '../middlewares/uploadFile'
-import uploadFileToGCP from '../middlewares/uploadFileToGCP'
-import checkAuthBasic from '../middlewares/checkAuthBasic'
 
 const pendingOrderRoutes = (): Router => {
   const pendingOrderRouter = express.Router()
 
-  pendingOrderRouter.route('/pending-orders/upload')
-    .post(checkAuthBasic, checkUserIsVerifiedStatus, PendingOrderController.setModule, asyncHandler(uploadToMemory), asyncHandler(uploadFileToGCP), asyncHandler(PendingOrderController.insertGETECPendingOrder))
   pendingOrderRouter.use('/pending-orders', checkAuth, checkUserIsVerifiedStatus, PendingOrderController.setModule)
   pendingOrderRouter.route('/pending-orders')
     .get(celebrate({
