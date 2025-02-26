@@ -2,7 +2,6 @@ import { v1 as uuidv1 } from 'uuid'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { Op, Sequelize } from 'sequelize'
-import Joi from 'joi'
 import BaseService, { generateInclude } from './BaseService'
 import db from '../models'
 import triggerPubSub from '../utils/triggerPubSub'
@@ -412,51 +411,6 @@ class PendingOrderService extends BaseService {
     await triggerPubSub(pendingOrdersTopicId, 'postPendingOrders', pendingOrdersAttributes)
 
     return { response: response.toJSONFor(), status: 200 }
-  }
-
-  async insertGETECPendingOrder (data: any): Promise<any> {
-    const { currentUser, parsedData } = data
-
-    const uuidSchema = Joi.string().uuid()
-    const { error } = uuidSchema.validate(process.env.GETEC_CAMPAIGN_ID)
-    const getecCampaignId = error !== undefined ? null : process.env.GETEC_CAMPAIGN_ID
-    const getecCustomerId = String(process.env.GETEC_CUSTOMER_ID)
-    const flakeIdGenerator = new FlakeIdGenerator(OrderType.GETEC, epoch)
-
-    const bulkInsertData = parsedData.map((pendingOrder: any) => ({
-      ...pendingOrder,
-      id: uuidv1(),
-      postedOrderId: flakeIdGenerator.generate(),
-      platform: 0,
-      language: 0,
-      orderStatus: 0,
-      isPosted: false,
-      isQueued: false,
-      paymentType: 0,
-      paymentTarget: 0,
-      discount: 0.00,
-      inetorderno: 0,
-      userId: currentUser.id,
-      campaignId: getecCampaignId,
-      customerId: getecCustomerId,
-      companyId: currentUser.companyId,
-      created: dayjs.utc().format(),
-      createdBy: currentUser.email,
-      updatedBy: currentUser.email,
-      createdByFullName: `${String(currentUser.firstName)} ${String(currentUser.lastName)}`
-    }))
-
-    const response = await db.PendingOrder.bulkCreate(bulkInsertData, { returning: true })
-
-    const pendingOrdersTopicId = 'pending-orders'
-    const environment = String(process.env.ENVIRONMENT)
-    const pendingOrdersAttributes = { environment }
-
-    await triggerPubSub(pendingOrdersTopicId, 'postPendingOrders', pendingOrdersAttributes)
-    return {
-      response: response.map((response: any) => response.toJSONFor()),
-      status: 201
-    }
   }
 }
 
