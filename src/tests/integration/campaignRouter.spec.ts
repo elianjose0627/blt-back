@@ -2590,7 +2590,6 @@ describe('Campaign actions', () => {
             type: 'onboarding',
             status: 'draft',
             isQuotaEnabled: true,
-            quota: 10,
             correctionQuota: 10
           }
         })
@@ -2649,7 +2648,6 @@ describe('Campaign actions', () => {
             type: 'onboarding',
             status: 'draft',
             isQuotaEnabled: true,
-            quota: 5,
             correctionQuota: 0
           }
         })
@@ -2720,7 +2718,6 @@ describe('Campaign actions', () => {
             type: 'onboarding',
             status: 'draft',
             isQuotaEnabled: true,
-            quota: 4,
             correctionQuota: 0
           }
         })
@@ -2779,7 +2776,6 @@ describe('Campaign actions', () => {
             type: 'onboarding',
             status: 'draft',
             isQuotaEnabled: true,
-            quota: 4,
             correctionQuota: 0
           }
         })
@@ -2850,7 +2846,6 @@ describe('Campaign actions', () => {
             type: 'onboarding',
             status: 'draft',
             isQuotaEnabled: true,
-            quota: 10,
             correctionQuota: 10,
             isExceedQuotaEnabled: true
           }
@@ -2910,7 +2905,6 @@ describe('Campaign actions', () => {
             type: 'onboarding',
             status: 'draft',
             isQuotaEnabled: true,
-            quota: 10,
             correctionQuota: 10
           }
         })

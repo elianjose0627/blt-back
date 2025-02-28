@@ -6,7 +6,6 @@ import { io } from '../utils/socket'
 import * as statusCodes from '../constants/statusCodes'
 import * as userRoles from '../utils/userRoles'
 import * as appModules from '../utils/appModules'
-import { parseXml } from '../utils/parseXML'
 
 const pendingOrderService = new PendingOrderService('PendingOrder')
 const privacyRuleService = new PrivacyRuleService('PrivacyRule')
@@ -237,51 +236,6 @@ class PendingOrderController extends BaseController {
       success: true,
       [this.service.singleRecord()]: response
     })
-  }
-
-  async insertGETECPendingOrder (req: CustomRequest, res: CustomResponse): Promise<any> {
-    const { user: currentUser } = req
-    const files: Express.Multer.File[] = req.files as Express.Multer.File[]
-    try {
-      const parsedData = []
-      for (const file of files) {
-        // Parse XML content
-        const xmlContent = file.buffer.toString('utf-8')
-        const parsedFileData = await parseXml(xmlContent)
-        if (parsedFileData.status === false) {
-          return res.status(statusCodes.BAD_REQUEST).send({
-            statusCode: statusCodes.BAD_REQUEST,
-            success: false,
-            errors: {
-              message: parsedFileData.message
-            }
-          })
-        }
-        parsedData.push(parsedFileData.xmlDoc)
-      }
-
-      const { response, status } = await pendingOrderService.insertGETECPendingOrder({ currentUser, parsedData })
-      io.emit('pendingOrders', { message: 'pendingOrders created' })
-
-      const statusCode: StatusCode = {
-        200: statusCodes.OK,
-        201: statusCodes.CREATED
-      }
-
-      return res.status(statusCode[status]).send({
-        statusCode: statusCode[status],
-        success: true,
-        [pendingOrderService.manyRecords()]: response
-      })
-    } catch (error: any) {
-      return res.status(statusCodes.BAD_REQUEST).send({
-        statusCode: statusCodes.BAD_REQUEST,
-        success: false,
-        errors: {
-          message: error.message
-        }
-      })
-    }
   }
 }
 
