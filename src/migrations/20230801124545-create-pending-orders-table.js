@@ -31,6 +31,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      projectNumber: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       shippingId: {
         type: Sequelize.INTEGER,
         allowNull: false
