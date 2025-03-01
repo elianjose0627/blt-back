@@ -1057,6 +1057,7 @@ export interface IPendingOrder {
   language: number
   currency: string
   orderNo: string
+  projectNumber: Nullable<string>
   inetorderno: number
   shippingId: number
   shipped: Date

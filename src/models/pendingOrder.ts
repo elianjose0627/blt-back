@@ -12,6 +12,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     language: number
     currency: string
     orderNo: string
+    projectNumber: Nullable<string>
     inetorderno: number
     shippingId: number
     shipped: Date
@@ -50,6 +51,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     private readonly language: number
     private readonly currency: string
     private readonly orderNo: string
+    private readonly projectNumber: Nullable<string>
     private readonly inetorderno: number
     private readonly shippingId: number
     private readonly shipped: Date
@@ -111,6 +113,7 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
         language: this.language,
         currency: this.currency,
         orderNo: this.orderNo,
+        projectNumber: this.projectNumber,
         inetorderno: this.inetorderno,
         shippingId: this.shippingId,
         shipped: this.shipped,
@@ -190,6 +193,10 @@ const PendingOrderModel = (sequelize: any, DataTypes: any): any => {
     orderNo: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    projectNumber: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     shippingId: {
       type: DataTypes.INTEGER,
