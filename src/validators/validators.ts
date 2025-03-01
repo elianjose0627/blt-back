@@ -720,6 +720,7 @@ const commonPendingOrderSchema = {
   language: Joi.number().equal(0),
   currency: Joi.string(),
   orderNo: Joi.string(),
+  projectNumber: Joi.string().allow('').allow(null),
   inetorderno: Joi.number().equal(0),
   shippingId: Joi.number(),
   shipped: Joi.date().min(dayjs().utc().subtract(1, 'day').toDate()),
