@@ -20,7 +20,7 @@ postgres=# grant all privileges on database your_database to username;
 # Run the application on local development environment
 ## Clone the repository using: 
 ```bash
-git clone https://github.com/big-little-things/endeavour-backend.git
+git clone git@github.com:elianjose0627/blt-back.git
 cd endeavour-backend
 ```
 
